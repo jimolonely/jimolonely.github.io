@@ -1,1 +1,0 @@
-my blog,my world.
