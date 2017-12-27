@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>linux下分割合并文件命令 | 在我的世界</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="分割与合并文件操作. 分割与合并文件有时候大文件分割后更方便传输。以一张图片为例：分割：默认分割12345678910111213[jimo@jimo-pc shell]$ ls -lh总用量 1.5M-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png[jimo@jimo-pc shell]$ split 1.png [jimo@jimo-pc shell">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux下分割合并文件命令">
+<meta property="og:url" content="http://yoursite.com/2017/12/27/linux/003-split-file/index.html">
+<meta property="og:site_name" content="在我的世界">
+<meta property="og:description" content="分割与合并文件操作. 分割与合并文件有时候大文件分割后更方便传输。以一张图片为例：分割：默认分割12345678910111213[jimo@jimo-pc shell]$ ls -lh总用量 1.5M-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png[jimo@jimo-pc shell]$ split 1.png [jimo@jimo-pc shell">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-27T08:36:47.821Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux下分割合并文件命令">
+<meta name="twitter:description" content="分割与合并文件操作. 分割与合并文件有时候大文件分割后更方便传输。以一张图片为例：分割：默认分割12345678910111213[jimo@jimo-pc shell]$ ls -lh总用量 1.5M-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png[jimo@jimo-pc shell]$ split 1.png [jimo@jimo-pc shell">
+  
+    <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我的世界</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">你是谁,从哪里来,为什么你活着?</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-linux/003-split-file" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/27/linux/003-split-file/" class="article-date">
+  <time datetime="2017-12-27T08:35:58.000Z" itemprop="datePublished">2017-12-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      linux下分割合并文件命令
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>分割与合并文件操作.</p>
+<h2 id="分割与合并文件"><a href="#分割与合并文件" class="headerlink" title="分割与合并文件"></a>分割与合并文件</h2><p>有时候大文件分割后更方便传输。<br>以一张图片为例：<br>分割：默认分割<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 1.5M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">[jimo@jimo-pc shell]$ split 1.png </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 2.9M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
+<p>合并：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
+<p>指定每个文件大小：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ split 1.png -b 500KB </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo  972 11月 12 18:35 xad</span><br></pre></td></tr></table></figure></p>
+<p>类似的命令可以看csplit</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/27/linux/003-split-file/" data-id="cjbot58f70008njkat46r8yda" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/12/27/linux/002-system-info/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">查看linux系统相关信息</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/12/27/linux/003-split-file/">linux下分割合并文件命令</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/linux/002-system-info/">查看linux系统相关信息</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/linux/001-linux-manjaro/">配置manjaro</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/linux/000-build-mysystem/">如何构建个性化linux系统</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/design-pattern/command/">command模式实现undo/redo操作</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Jackpler<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
