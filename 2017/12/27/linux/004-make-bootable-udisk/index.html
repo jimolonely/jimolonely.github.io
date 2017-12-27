@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>linux下制作启动盘 | 在我的世界</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="制作U盘启动盘1.查看挂载的U盘1234567891011121314151617181920212223[jimo@jimo-pc ~]$ sudo fdisk -l[sudo] jimo 的密码：Disk /dev/sda：223.6 GiB，240057409536 字节，468862128 个扇区单元：扇区 / 1 * 512 = 512 字节扇区大小(逻辑/物理)：512 字节 / 51">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux下制作启动盘">
+<meta property="og:url" content="http://yoursite.com/2017/12/27/linux/004-make-bootable-udisk/index.html">
+<meta property="og:site_name" content="在我的世界">
+<meta property="og:description" content="制作U盘启动盘1.查看挂载的U盘1234567891011121314151617181920212223[jimo@jimo-pc ~]$ sudo fdisk -l[sudo] jimo 的密码：Disk /dev/sda：223.6 GiB，240057409536 字节，468862128 个扇区单元：扇区 / 1 * 512 = 512 字节扇区大小(逻辑/物理)：512 字节 / 51">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-27T08:39:22.801Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux下制作启动盘">
+<meta name="twitter:description" content="制作U盘启动盘1.查看挂载的U盘1234567891011121314151617181920212223[jimo@jimo-pc ~]$ sudo fdisk -l[sudo] jimo 的密码：Disk /dev/sda：223.6 GiB，240057409536 字节，468862128 个扇区单元：扇区 / 1 * 512 = 512 字节扇区大小(逻辑/物理)：512 字节 / 51">
+  
+    <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我的世界</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">你是谁,从哪里来,为什么你活着?</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-linux/004-make-bootable-udisk" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/27/linux/004-make-bootable-udisk/" class="article-date">
+  <time datetime="2017-12-27T08:38:47.000Z" itemprop="datePublished">2017-12-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      linux下制作启动盘
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="制作U盘启动盘"><a href="#制作U盘启动盘" class="headerlink" title="制作U盘启动盘"></a>制作U盘启动盘</h2><p>1.查看挂载的U盘<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo fdisk -l</span><br><span class="line">[sudo] jimo 的密码：</span><br><span class="line">Disk /dev/sda：223.6 GiB，240057409536 字节，468862128 个扇区</span><br><span class="line">单元：扇区 / 1 * 512 = 512 字节</span><br><span class="line">扇区大小(逻辑/物理)：512 字节 / 512 字节</span><br><span class="line">I/O 大小(最小/最佳)：512 字节 / 512 字节</span><br><span class="line">磁盘标签类型：gpt</span><br><span class="line">磁盘标识符：1C0C5B08-4489-429F-9226-660849ADF8D2</span><br><span class="line"></span><br><span class="line">设备            起点      末尾      扇区   大小 类型</span><br><span class="line">/dev/sda1       4097    618497    614401   300M EFI 系统</span><br><span class="line">/dev/sda2     618498 450402086 449783589 214.5G Linux 文件系统</span><br><span class="line">/dev/sda3  450402087 468857024  18454938   8.8G Linux swap</span><br><span class="line"></span><br><span class="line">Disk /dev/sdc：7.5 GiB，8054112256 字节，15730688 个扇区</span><br><span class="line">单元：扇区 / 1 * 512 = 512 字节</span><br><span class="line">扇区大小(逻辑/物理)：512 字节 / 512 字节</span><br><span class="line">I/O 大小(最小/最佳)：512 字节 / 512 字节</span><br><span class="line">磁盘标签类型：dos</span><br><span class="line">磁盘标识符：0x2cde6d13</span><br><span class="line"></span><br><span class="line">设备       启动  起点     末尾     扇区  大小 Id 类型</span><br><span class="line">/dev/sdc1  *    16128 15730687 15714560  7.5G  c W95 FAT32 (LBA)</span><br></pre></td></tr></table></figure></p>
+<p>2.umount该U盘<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo umount /dev/sdc1</span><br></pre></td></tr></table></figure></p>
+<p>3.格式化为fat格式：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo mkfs.vfat /dev/sdc1 -I</span><br><span class="line">mkfs.fat 4.1 (2017-01-24)</span><br></pre></td></tr></table></figure></p>
+<p>4.写入iso文件，这一步可能花很长时间，取决于U盘速度<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo dd if=/run/media/jimo/寂寞的U/virtualbox/iso/deepin-15.3-amd64.iso of=/dev/sdc1</span><br><span class="line">记录了4684440+0 的读入</span><br><span class="line">记录了4684440+0 的写出</span><br><span class="line">2398433280 bytes (2.4 GB, 2.2 GiB) copied, 1043.71 s, 2.3 MB/s</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjbot8e090008qyka10y5cykl" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/12/27/linux/003-split-file/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">linux下分割合并文件命令</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/12/27/linux/004-make-bootable-udisk/">linux下制作启动盘</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/linux/003-split-file/">linux下分割合并文件命令</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/linux/002-system-info/">查看linux系统相关信息</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/linux/001-linux-manjaro/">配置manjaro</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/linux/000-build-mysystem/">如何构建个性化linux系统</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Jackpler<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
