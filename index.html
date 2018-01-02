@@ -94,9 +94,19 @@
           <!-- <div class="article-entry" itemprop="articleBody">
       
         <p>使用pyodbc</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install odbc</span><br></pre></td></tr></table></figure>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pyodbc</span><br></pre></td></tr></table></figure>
 <p>如果出现:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">src/pyodbc.h:56:10: 致命错误：sql.h：没有那个文件或目录</span><br><span class="line">     #include &lt;sql.h&gt;</span><br><span class="line">              ^~~~~~~</span><br><span class="line">    编译中断。</span><br><span class="line">    error: command 'gcc' failed with exit status 1</span><br></pre></td></tr></table></figure></p>
 <p>则再安装:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo pacman -S unixodbc</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><ol>
+<li><p>需要安装驱动,我使用freetds,如果linux没有自带安装源可以下载:<a href="http://www.freetds.org/" target="_blank" rel="noopener">http://www.freetds.org/</a></p>
+</li>
+<li><p>配置/etc/odbcinst.ini:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat /etc/odbcinst.ini </span><br><span class="line">[SQL Server]</span><br><span class="line">Description = FreeTDS ODBC driver for MSSQL</span><br><span class="line"></span><br><span class="line">Driver = /usr/lib/libtdsodbc.so</span><br><span class="line"></span><br><span class="line">Setup = /usr/lib/libtdsS.so</span><br><span class="line"></span><br><span class="line">FileUsage = 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> pyodbc</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;cnxn = pyodbc.connect(<span class="string">'DRIVER=&#123;SQL Server&#125;;SERVER=host\\sql;DATABASE=testDB;UID=sa;PWD=myPassword'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
 
       
     </div> -->
@@ -134,7 +144,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/python/000-pyodbc/" data-id="cjbxl7rf5000hobkaxz331sv5" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/02/python/000-pyodbc/" data-id="cjbxnsy78000hg2ka4au05x4s" class="article-share-link">
           Share
         </a>
         
@@ -230,7 +240,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/spark/01-rdd/" data-id="cjbxl7rfa000robkaumlz775h" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/02/spark/01-rdd/" data-id="cjbxnsy7d000rg2kadngnxwpu" class="article-share-link">
           Share
         </a>
         
@@ -304,7 +314,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/scala/001-method-vs-function/" data-id="cjbxl7rf8000lobka0czgu4uu" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/02/scala/001-method-vs-function/" data-id="cjbxnsy7b000lg2kajd2y3j8g" class="article-share-link">
           Share
         </a>
         
@@ -394,7 +404,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjbxl7rfc000tobkahsco3c46" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjbxnsy7f000tg2kabr3xzmq3" class="article-share-link">
           Share
         </a>
         
@@ -514,7 +524,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/git/000-multi-git-account/" data-id="cjbxl7res0002obka9mv4s0c8" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/31/git/000-multi-git-account/" data-id="cjbxnsy6v0002g2kao2bvwaf5" class="article-share-link">
           Share
         </a>
         
@@ -588,7 +598,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/linux/006-vim/" data-id="cjbxl7rf4000gobkaw8bjfa71" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/31/linux/006-vim/" data-id="cjbxnsy77000gg2kai0o4t9aw" class="article-share-link">
           Share
         </a>
         
@@ -671,7 +681,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjbxl7rf6000jobkamo5r43f7" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjbxnsy79000jg2kahvml0zno" class="article-share-link">
           Share
         </a>
         
@@ -752,7 +762,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjbxl7rfa000qobkagyummicx" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjbxnsy7c000qg2kagepr80la" class="article-share-link">
           Share
         </a>
         
@@ -888,7 +898,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjbxl7rf8000nobkakpqkqw3c" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjbxnsy7b000ng2kauxmovgvf" class="article-share-link">
           Share
         </a>
         
@@ -967,7 +977,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/linux/005-ssh-and-remote/" data-id="cjbxl7rf2000dobkayz8pw21i" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/linux/005-ssh-and-remote/" data-id="cjbxnsy75000dg2kahi8awgd6" class="article-share-link">
           Share
         </a>
         
