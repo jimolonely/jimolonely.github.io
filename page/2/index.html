@@ -71,6 +71,84 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/003-split-file" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/27/linux/003-split-file/" class="article-date">
+  <time datetime="2017-12-27T08:35:58.000Z" itemprop="datePublished">2017-12-27</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/27/linux/003-split-file/">linux下分割合并文件命令</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>分割与合并文件操作.</p>
+<h2 id="分割与合并文件"><a href="#分割与合并文件" class="headerlink" title="分割与合并文件"></a>分割与合并文件</h2><p>有时候大文件分割后更方便传输。<br>以一张图片为例：<br>分割：默认分割<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 1.5M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">[jimo@jimo-pc shell]$ split 1.png </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 2.9M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
+<p>合并：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
+<p>指定每个文件大小：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ split 1.png -b 500KB </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo  972 11月 12 18:35 xad</span><br></pre></td></tr></table></figure></p>
+<p>类似的命令可以看csplit</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>分割与合并文件操作.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2017/12/27/linux/003-split-file/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2017/12/27/linux/003-split-file/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2017/12/27/linux/003-split-file/" data-id="cjbxbexbo0009h4kadlcqhpop" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/002-system-info" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/27/linux/002-system-info/" class="article-date">
@@ -137,7 +215,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/002-system-info/" data-id="cjbx22zi00008ywka1os5qc62" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/002-system-info/" data-id="cjbxbexbn0008h4kabcgz517h" class="article-share-link">
           Share
         </a>
         
@@ -300,7 +378,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/001-linux-manjaro/" data-id="cjbx22zhz0006ywkaj1hmor0e" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/001-linux-manjaro/" data-id="cjbxbexbm0006h4ka3sifcs9u" class="article-share-link">
           Share
         </a>
         
@@ -389,7 +467,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/000-build-mysystem/" data-id="cjbx22zhy0005ywkaeszznzsm" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/000-build-mysystem/" data-id="cjbxbexbl0005h4kaojm8teni" class="article-share-link">
           Share
         </a>
         
@@ -474,7 +552,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/24/design-pattern/command/" data-id="cjbx22zho0001ywkabrn0woou" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/24/design-pattern/command/" data-id="cjbxbexbc0001h4karkw7n7ua" class="article-share-link">
           Share
         </a>
         
@@ -546,7 +624,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjbx22zhw0004ywka8psillzv" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjbxbexbg0002h4kaen6uhqsa" class="article-share-link">
           Share
         </a>
         
@@ -588,7 +666,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 13.33px;">java</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/scala/" style="font-size: 16.67px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 10px;">spark</a> <a href="/tags/ssh/" style="font-size: 13.33px;">ssh</a> <a href="/tags/tool/" style="font-size: 10px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a>
+      <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 13.33px;">java</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/scala/" style="font-size: 16.67px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.33px;">spark</a> <a href="/tags/ssh/" style="font-size: 13.33px;">ssh</a> <a href="/tags/tool/" style="font-size: 10px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a>
     </div>
   </div>
 
@@ -610,6 +688,10 @@
       <ul>
         
           <li>
+            <a href="/2018/01/02/spark/01-rdd/">理解RDD</a>
+          </li>
+        
+          <li>
             <a href="/2018/01/02/scala/001-method-vs-function/">scala中方法和函数的区别</a>
           </li>
         
@@ -623,10 +705,6 @@
         
           <li>
             <a href="/2017/12/31/linux/006-vim/">vim</a>
-          </li>
-        
-          <li>
-            <a href="/2017/12/29/scala/000-case-class-cs-class/">case class和class的区别</a>
           </li>
         
       </ul>
