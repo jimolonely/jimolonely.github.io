@@ -71,6 +71,89 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-scala/000-case-class-cs-class" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/29/scala/000-case-class-cs-class/" class="article-date">
+  <time datetime="2017-12-29T13:29:43.000Z" itemprop="datePublished">2017-12-29</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/29/scala/000-case-class-cs-class/">case class和class的区别</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="case-class和class的区别"><a href="#case-class和class的区别" class="headerlink" title="case class和class的区别"></a><a href="https://www.scala-exercises.org/scala_tutorial/classes_vs_case_classes" target="_blank" rel="noopener">case class和class的区别</a></h2><p>以以下两个class为例:</p>
+<p>class<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BankAccount</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> balance = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">deposit</span></span>(amount: <span class="type">Int</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (amount &gt; <span class="number">0</span>) balance = balance + amount</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">withdraw</span></span>(amount: <span class="type">Int</span>): <span class="type">Int</span> =</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> &lt; amount &amp;&amp; amount &lt;= balance) &#123;</span><br><span class="line">      balance = balance - amount</span><br><span class="line">      balance</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">Error</span>(<span class="string">"insufficient funds"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>case class<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Note</span>(<span class="params">name: <span class="type">String</span>, duration: <span class="type">String</span>, octave: <span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="1-创建方式"><a href="#1-创建方式" class="headerlink" title="1.创建方式"></a>1.创建方式</h2><p>一个要new,一个不用<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> aliceAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-对象比较"><a href="#2-对象比较" class="headerlink" title="2.对象比较"></a>2.对象比较</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> aliceAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"><span class="keyword">val</span> bobAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"></span><br><span class="line">aliceAccount == bobAccount <span class="comment">//false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>) <span class="comment">//不变性</span></span><br><span class="line"><span class="keyword">val</span> cThree = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">c3 == cThree <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
+<h2 id="3-模式匹配"><a href="#3-模式匹配" class="headerlink" title="3.模式匹配"></a>3.模式匹配</h2><p>只有case class支持:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c3 <span class="keyword">match</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="type">Note</span>(name, duration, octave) =&gt; <span class="string">s"The duration of c3 is <span class="subst">$duration</span>"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-扩展性"><a href="#4-扩展性" class="headerlink" title="4.扩展性"></a>4.扩展性</h2><p>class可继承,而case class是不变的</p>
+<h2 id="5-为什么需要case-class"><a href="#5-为什么需要case-class" class="headerlink" title="5.为什么需要case class"></a>5.为什么需要case class</h2><p>总的来说,case class就是class的特例,提取出来是因为实践中大量使用case class.</p>
+<p>对于上面那个Note,扩展成class如下:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span>(<span class="params">_name: <span class="type">String</span>, _duration: <span class="type">String</span>, _octave: <span class="type">Int</span></span>) <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor parameters are promoted to members</span></span><br><span class="line">  <span class="keyword">val</span> name = _name</span><br><span class="line">  <span class="keyword">val</span> duration = _duration</span><br><span class="line">  <span class="keyword">val</span> octave = _octave</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Equality redefinition</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">equals</span></span>(other: <span class="type">Any</span>): <span class="type">Boolean</span> = other <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> that: <span class="type">Note</span> =&gt;</span><br><span class="line">      (that canEqual <span class="keyword">this</span>) &amp;&amp;</span><br><span class="line">        name == that.name &amp;&amp;</span><br><span class="line">        duration == that.duration &amp;&amp;</span><br><span class="line">        octave == that.octave</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">canEqual</span></span>(other: <span class="type">Any</span>): <span class="type">Boolean</span> = other.isInstanceOf[<span class="type">Note</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Java hashCode redefinition according to equality</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">hashCode</span></span>(): <span class="type">Int</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> state = <span class="type">Seq</span>(name, duration, octave)</span><br><span class="line">    state.map(_.hashCode()).foldLeft(<span class="number">0</span>)((a, b) =&gt; <span class="number">31</span> * a + b)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// toString redefinition to return the value of an instance instead of its memory addres</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">toString</span> </span>= <span class="string">s"Note(<span class="subst">$name</span>,<span class="subst">$duration</span>,<span class="subst">$octave</span>)"</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create a copy of a case class, with potentially modified field values</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">copy</span></span>(name: <span class="type">String</span> = name, duration: <span class="type">String</span> = duration, octave: <span class="type">Int</span> = octave): <span class="type">Note</span> =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Note</span>(name, duration, octave)</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Note</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor that allows the omission of the `new` keyword</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(name: <span class="type">String</span>, duration: <span class="type">String</span>, octave: <span class="type">Int</span>): <span class="type">Note</span> =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Note</span>(name, duration, octave)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Extractor for pattern matching</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">unapply</span></span>(note: <span class="type">Note</span>): <span class="type">Option</span>[(<span class="type">String</span>, <span class="type">String</span>, <span class="type">Int</span>)] =</span><br><span class="line">    <span class="keyword">if</span> (note eq <span class="literal">null</span>) <span class="type">None</span></span><br><span class="line">    <span class="keyword">else</span> <span class="type">Some</span>((note.name, note.duration, note.octave))</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>例子:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line">c3.toString shouldBe <span class="string">"Note(C,Quarter,3)"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> d = <span class="type">Note</span>(<span class="string">"D"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line">c3.equals(d) shouldBe <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> c4 = c3.copy(octave = <span class="number">4</span>)</span><br><span class="line">c4.toString shouldBe <span class="string">"Note(C,Quarter,4)"</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <h2 id="case-class和class的区别"><a href="#case-class和class的区别" class="headerlink" title="case class和class的区别"></a><a href="https://www.scala-exercises.org/scala_tutorial/classes_vs_case_classes" target="_blank" rel="noopener">case class和class的区别</a></h2><p>以以下两个class为例:</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2017/12/29/scala/000-case-class-cs-class/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2017/12/29/scala/000-case-class-cs-class/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjc1tf972000lwbka0l4a1opy" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-spark/00-quick-start" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/28/spark/00-quick-start/" class="article-date">
@@ -138,7 +221,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjc1daxgr000sk4kaa70rccai" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjc1tf976000rwbka6y9zw9sz" class="article-share-link">
           Share
         </a>
         
@@ -274,7 +357,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjc1daxgq000qk4ka3x9wy1r5" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjc1tf975000qwbkadwe8y8au" class="article-share-link">
           Share
         </a>
         
@@ -353,7 +436,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/linux/005-ssh-and-remote/" data-id="cjc1daxgg000dk4ka8nffgy26" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/linux/005-ssh-and-remote/" data-id="cjc1tf96x000dwbka5bjetu77" class="article-share-link">
           Share
         </a>
         
@@ -430,7 +513,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjc1daxgf000bk4kab6cbgdvk" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjc1tf96w000bwbkavpovzxkz" class="article-share-link">
           Share
         </a>
         
@@ -508,7 +591,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/003-split-file/" data-id="cjc1daxge0009k4ka8ssh3xkf" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/003-split-file/" data-id="cjc1tf96t0009wbka6lu0wccn" class="article-share-link">
           Share
         </a>
         
@@ -588,7 +671,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/002-system-info/" data-id="cjc1daxgd0008k4kaunbmzlnb" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/002-system-info/" data-id="cjc1tf96s0008wbkajoquhajl" class="article-share-link">
           Share
         </a>
         
@@ -751,7 +834,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/001-linux-manjaro/" data-id="cjc1daxgc0006k4kapw1vk7mp" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/001-linux-manjaro/" data-id="cjc1tf96q0006wbkazafb6kx1" class="article-share-link">
           Share
         </a>
         
@@ -840,7 +923,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/000-build-mysystem/" data-id="cjc1daxg60002k4kaheutacwg" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/000-build-mysystem/" data-id="cjc1tf96p0005wbkayn956p7n" class="article-share-link">
           Share
         </a>
         
@@ -925,7 +1008,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/24/design-pattern/command/" data-id="cjc1daxg20001k4ka07kdkf73" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/24/design-pattern/command/" data-id="cjc1tf96k0002wbkakzyxbqf3" class="article-share-link">
           Share
         </a>
         
@@ -939,83 +1022,11 @@
 
 
   
-    <article id="post-hexo/deploy-hexo-on-github" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/23/hexo/deploy-hexo-on-github/" class="article-date">
-  <time datetime="2017-12-23T14:08:04.000Z" itemprop="datePublished">2017-12-23</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/23/hexo/deploy-hexo-on-github/">部署hexo到github</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>飞快搭建hexo+github博客.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
-        
-          <p class="article-more-link">
-            <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">Read More</a>
-          </p>
-        
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                  
-                    <p>
-                      <p>飞快搭建hexo+github博客.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
-                    </p>
-                    
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjc1daxgb0005k4kaqkixq177" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
 
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+    <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -1029,7 +1040,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li></ul>
     </div>
   </div>
 
@@ -1039,7 +1050,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 16px;">java</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scala/" style="font-size: 18px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/tool/" style="font-size: 10px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a>
+      <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 12.5px;">python</a> <a href="/tags/scala/" style="font-size: 17.5px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 15px;">spark</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/tool/" style="font-size: 10px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a>
     </div>
   </div>
 
@@ -1061,6 +1072,10 @@
       <ul>
         
           <li>
+            <a href="/2018/01/05/spark/04-pyspark-jupyter/">配置pyspark和jupyter一起使用</a>
+          </li>
+        
+          <li>
             <a href="/2018/01/05/maven/000-package-execute-jar/">打包成可执行jar包</a>
           </li>
         
@@ -1074,10 +1089,6 @@
         
           <li>
             <a href="/2018/01/02/python/000-pyodbc/">python使用pyodbc</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/02/spark/01-rdd/">理解RDD</a>
           </li>
         
       </ul>
