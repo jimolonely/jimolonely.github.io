@@ -17,7 +17,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2018/01/01/tools/000-latex/001.png">
 <meta property="og:image" content="http://yoursite.com/2018/01/01/tools/000-latex/000.png">
-<meta property="og:updated_time" content="2018-01-09T08:36:58.127Z">
+<meta property="og:updated_time" content="2018-01-09T09:36:01.960Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="不得不会的latex">
 <meta name="twitter:description" content="1.什么是latexLaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂">
@@ -116,7 +116,23 @@
 <p>使用vscode时需要注意,需要先安装texlive环境.<br>windows环境没问题,linux下有多个包:</p>
 <img src="/2018/01/01/tools/000-latex/001.png">
 <p>安装上面最基本就可以了,后面还可增加.</p>
-<h1 id="4-先看一张图"><a href="#4-先看一张图" class="headerlink" title="4.先看一张图"></a>4.先看一张图</h1><img src="/2018/01/01/tools/000-latex/000.png">
+<h1 id="4-让vscode支持中文"><a href="#4-让vscode支持中文" class="headerlink" title="4.让vscode支持中文"></a>4.让vscode支持中文</h1><h2 id="4-1"><a href="#4-1" class="headerlink" title="4.1"></a>4.1</h2><p>其他配置都不用改,直接修改文档:</p>
+<ol>
+<li><p>最前面加上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%!TEX program = pdflatex</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在要使用中文的地方加上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;bsmi&#125;</span><br><span class="line">Hello World! 有没有改错,这就是中文</span><br><span class="line">\end&#123;CJK&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>然而这种方法会出现字体支持不全的情况,简体中文很多都没有.</p>
+<h2 id="4-2"><a href="#4-2" class="headerlink" title="4.2"></a>4.2</h2><p>这个方法需要安装xelatex,一般都有了.</p>
+<p>然后设置编译环境:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&quot;latex-workshop.latex.toolchain&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;command&quot;: &quot;xelatex&quot;,</span><br><span class="line">            &quot;args&quot;: [</span><br><span class="line">                &quot;-synctex=1&quot;,</span><br><span class="line">                &quot;-interaction=nonstopmode&quot;,</span><br><span class="line">                &quot;-file-line-error&quot;,</span><br><span class="line">                &quot;-pdf&quot;,</span><br><span class="line">                &quot;%DOC%&quot;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">&quot;editor.fontFamily&quot;: &quot;&apos;Droid Sans Fallback&apos;,&apos;Droid Sans Mono&apos;, &apos;monospace&apos;, monospace&quot;</span><br></pre></td></tr></table></figure></p>
+<p>文档中声明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br></pre></td></tr></table></figure></p>
+<p>如果中文不能正常显示,那么就需要手动指定字体:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为Droid Sans Fallback</span><br></pre></td></tr></table></figure></p>
+<p>如果没有对应的字体,就需要下载了.</p>
+<p>最后一个简单的例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[30pt,a4paper]&#123;article&#125;</span><br><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为 Droid Sans Fallback</span><br><span class="line"></span><br><span class="line">\title&#123; hehe第一篇 latex&#125;</span><br><span class="line">\author&#123;jimo \thanks&#123;latex&#125;&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line"></span><br><span class="line">\maketitle</span><br><span class="line"></span><br><span class="line">中文求显示,有没有搞错,这就是中文</span><br><span class="line"></span><br><span class="line">First document. This is a</span><br><span class="line">simple example, with no extra parameters or packages included.</span><br><span class="line"></span><br><span class="line">% 注释不会显示</span><br><span class="line"></span><br><span class="line">\textbf&#123;bold&#125; \underline&#123;underline&#125; \textbf&#123;\textit&#123;italic-bold&#125;&#125;</span><br><span class="line"></span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="5-先看一张图"><a href="#5-先看一张图" class="headerlink" title="5.先看一张图"></a>5.先看一张图</h1><img src="/2018/01/01/tools/000-latex/000.png">
       
     </div> -->
           <div class="article-entry" itemprop="articleBody">
@@ -145,13 +161,29 @@
 <p>使用vscode时需要注意,需要先安装texlive环境.<br>windows环境没问题,linux下有多个包:</p>
 <img src="/2018/01/01/tools/000-latex/001.png">
 <p>安装上面最基本就可以了,后面还可增加.</p>
-<h1 id="4-先看一张图"><a href="#4-先看一张图" class="headerlink" title="4.先看一张图"></a>4.先看一张图</h1><img src="/2018/01/01/tools/000-latex/000.png">
+<h1 id="4-让vscode支持中文"><a href="#4-让vscode支持中文" class="headerlink" title="4.让vscode支持中文"></a>4.让vscode支持中文</h1><h2 id="4-1"><a href="#4-1" class="headerlink" title="4.1"></a>4.1</h2><p>其他配置都不用改,直接修改文档:</p>
+<ol>
+<li><p>最前面加上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%!TEX program = pdflatex</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在要使用中文的地方加上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;bsmi&#125;</span><br><span class="line">Hello World! 有没有改错,这就是中文</span><br><span class="line">\end&#123;CJK&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>然而这种方法会出现字体支持不全的情况,简体中文很多都没有.</p>
+<h2 id="4-2"><a href="#4-2" class="headerlink" title="4.2"></a>4.2</h2><p>这个方法需要安装xelatex,一般都有了.</p>
+<p>然后设置编译环境:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&quot;latex-workshop.latex.toolchain&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;command&quot;: &quot;xelatex&quot;,</span><br><span class="line">            &quot;args&quot;: [</span><br><span class="line">                &quot;-synctex=1&quot;,</span><br><span class="line">                &quot;-interaction=nonstopmode&quot;,</span><br><span class="line">                &quot;-file-line-error&quot;,</span><br><span class="line">                &quot;-pdf&quot;,</span><br><span class="line">                &quot;%DOC%&quot;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">&quot;editor.fontFamily&quot;: &quot;&apos;Droid Sans Fallback&apos;,&apos;Droid Sans Mono&apos;, &apos;monospace&apos;, monospace&quot;</span><br></pre></td></tr></table></figure></p>
+<p>文档中声明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br></pre></td></tr></table></figure></p>
+<p>如果中文不能正常显示,那么就需要手动指定字体:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为Droid Sans Fallback</span><br></pre></td></tr></table></figure></p>
+<p>如果没有对应的字体,就需要下载了.</p>
+<p>最后一个简单的例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[30pt,a4paper]&#123;article&#125;</span><br><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为 Droid Sans Fallback</span><br><span class="line"></span><br><span class="line">\title&#123; hehe第一篇 latex&#125;</span><br><span class="line">\author&#123;jimo \thanks&#123;latex&#125;&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line"></span><br><span class="line">\maketitle</span><br><span class="line"></span><br><span class="line">中文求显示,有没有搞错,这就是中文</span><br><span class="line"></span><br><span class="line">First document. This is a</span><br><span class="line">simple example, with no extra parameters or packages included.</span><br><span class="line"></span><br><span class="line">% 注释不会显示</span><br><span class="line"></span><br><span class="line">\textbf&#123;bold&#125; \underline&#123;underline&#125; \textbf&#123;\textit&#123;italic-bold&#125;&#125;</span><br><span class="line"></span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="5-先看一张图"><a href="#5-先看一张图" class="headerlink" title="5.先看一张图"></a>5.先看一张图</h1><img src="/2018/01/01/tools/000-latex/000.png">
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjc7duput000zfekaoq4sjc6q" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjc7fynnn0012yhkacrdgmgie" class="article-share-link">
           Share
         </a>
         
