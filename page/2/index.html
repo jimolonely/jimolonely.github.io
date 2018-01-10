@@ -71,6 +71,115 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-tools/000-latex" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/01/tools/000-latex/" class="article-date">
+  <time datetime="2018-01-01T05:51:55.000Z" itemprop="datePublished">2018-01-01</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/01/tools/000-latex/">不得不会的latex</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-什么是latex"><a href="#1-什么是latex" class="headerlink" title="1.什么是latex"></a>1.什么是latex</h1><p>LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</p>
+<p>参看<a href="https://zh.wikipedia.org/wiki/LaTeX" target="_blank" rel="noopener">wiki</a></p>
+<h1 id="2-latex可以做什么"><a href="#2-latex可以做什么" class="headerlink" title="2.latex可以做什么"></a>2.latex可以做什么</h1><ol>
+<li>书籍排版</li>
+<li>论文</li>
+<li>数学符号</li>
+<li>化学公式</li>
+<li>五线谱</li>
+<li>象棋</li>
+<li>电路图</li>
+</ol>
+<p>只要有相应的语法规则和宏包,就可以表示出来.</p>
+<h1 id="3-编写latex的工具"><a href="#3-编写latex的工具" class="headerlink" title="3.编写latex的工具"></a>3.编写latex的工具</h1><p>可以参考wiki做的对比:<a href="https://en.wikipedia.org/wiki/Comparison_of_TeX_editors" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Comparison_of_TeX_editors</a></p>
+<p>也有在线的网页版本(个人免费),<a href="https://cn.sharelatex.com/user/subscription/plans" target="_blank" rel="noopener">shareLatex</a></p>
+<p>常用的在linux:Texmaker,TeXstuio.</p>
+<p>和一些加插件的编辑器: sublime,visual studio,atom,emacx,vim等.</p>
+<p>更多参考知乎:<a href="https://www.zhihu.com/question/19954023" target="_blank" rel="noopener">知乎</a></p>
+<p>使用vscode时需要注意,需要先安装texlive环境.<br>windows环境没问题,linux下有多个包:</p>
+<img src="/2018/01/01/tools/000-latex/001.png">
+<p>安装上面最基本就可以了,后面还可增加.</p>
+<h1 id="4-让vscode支持中文"><a href="#4-让vscode支持中文" class="headerlink" title="4.让vscode支持中文"></a>4.让vscode支持中文</h1><h2 id="4-1"><a href="#4-1" class="headerlink" title="4.1"></a>4.1</h2><p>其他配置都不用改,直接修改文档:</p>
+<ol>
+<li><p>最前面加上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%!TEX program = pdflatex</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在要使用中文的地方加上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;bsmi&#125;</span><br><span class="line">Hello World! 有没有改错,这就是中文</span><br><span class="line">\end&#123;CJK&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>然而这种方法会出现字体支持不全的情况,简体中文很多都没有.</p>
+<h2 id="4-2"><a href="#4-2" class="headerlink" title="4.2"></a>4.2</h2><p>这个方法需要安装xelatex,一般都有了.</p>
+<p>然后设置编译环境:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&quot;latex-workshop.latex.toolchain&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;command&quot;: &quot;xelatex&quot;,</span><br><span class="line">            &quot;args&quot;: [</span><br><span class="line">                &quot;-synctex=1&quot;,</span><br><span class="line">                &quot;-interaction=nonstopmode&quot;,</span><br><span class="line">                &quot;-file-line-error&quot;,</span><br><span class="line">                &quot;-pdf&quot;,</span><br><span class="line">                &quot;%DOC%&quot;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">&quot;editor.fontFamily&quot;: &quot;&apos;Droid Sans Fallback&apos;,&apos;Droid Sans Mono&apos;, &apos;monospace&apos;, monospace&quot;</span><br></pre></td></tr></table></figure></p>
+<p>文档中声明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br></pre></td></tr></table></figure></p>
+<p>如果中文不能正常显示,那么就需要手动指定字体:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为Droid Sans Fallback</span><br></pre></td></tr></table></figure></p>
+<p>如果没有对应的字体,就需要下载了.</p>
+<p>最后一个简单的例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[30pt,a4paper]&#123;article&#125;</span><br><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为 Droid Sans Fallback</span><br><span class="line"></span><br><span class="line">\title&#123; hehe第一篇 latex&#125;</span><br><span class="line">\author&#123;jimo \thanks&#123;latex&#125;&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line"></span><br><span class="line">\maketitle</span><br><span class="line"></span><br><span class="line">中文求显示,有没有搞错,这就是中文</span><br><span class="line"></span><br><span class="line">First document. This is a</span><br><span class="line">simple example, with no extra parameters or packages included.</span><br><span class="line"></span><br><span class="line">% 注释不会显示</span><br><span class="line"></span><br><span class="line">\textbf&#123;bold&#125; \underline&#123;underline&#125; \textbf&#123;\textit&#123;italic-bold&#125;&#125;</span><br><span class="line"></span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="5-先看一张图"><a href="#5-先看一张图" class="headerlink" title="5.先看一张图"></a>5.先看一张图</h1><img src="/2018/01/01/tools/000-latex/000.png">
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <h1 id="1-什么是latex"><a href="#1-什么是latex" class="headerlink" title="1.什么是latex"></a>1.什么是latex</h1><p>LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/01/tools/000-latex/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/01/tools/000-latex/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjc8v5zfz0012dxkaqjystxpg" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-git/000-multi-git-account" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/31/git/000-multi-git-account/" class="article-date">
@@ -177,7 +286,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/git/000-multi-git-account/" data-id="cjc7fynmw0002yhkadd2g5rk9" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/31/git/000-multi-git-account/" data-id="cjc8v5zf40001dxka37oq8lc8" class="article-share-link">
           Share
         </a>
         
@@ -251,7 +360,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/linux/006-vim/" data-id="cjc7fynn8000gyhkab17cl3pg" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/31/linux/006-vim/" data-id="cjc8v5zfk000gdxkavekypmjp" class="article-share-link">
           Share
         </a>
         
@@ -334,7 +443,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjc7fynnd000nyhkavkrjk562" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjc8v5zfp000ndxka07anf3zv" class="article-share-link">
           Share
         </a>
         
@@ -415,7 +524,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjc7fynnh000tyhkate8xbam7" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjc8v5zfu000udxkafl972lss" class="article-share-link">
           Share
         </a>
         
@@ -551,7 +660,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjc7fynnf000ryhkak652nifg" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjc8v5zft000rdxkaz7w725k2" class="article-share-link">
           Share
         </a>
         
@@ -630,7 +739,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/linux/005-ssh-and-remote/" data-id="cjc7fynn6000dyhkaex4gbhy7" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/linux/005-ssh-and-remote/" data-id="cjc8v5zfi000ddxkargptg20w" class="article-share-link">
           Share
         </a>
         
@@ -707,7 +816,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjc7fynn5000byhkayqmsdt53" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjc8v5zfh000bdxkaprz0f51b" class="article-share-link">
           Share
         </a>
         
@@ -785,7 +894,7 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/003-split-file/" data-id="cjc7fynn40009yhkal1eenkhg" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/003-split-file/" data-id="cjc8v5zfg0009dxkalghuyfho" class="article-share-link">
           Share
         </a>
         
@@ -865,175 +974,12 @@
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/002-system-info/" data-id="cjc7fynn30008yhkauuhqbj4q" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/002-system-info/" data-id="cjc8v5zff0008dxkaoqfm4mya" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/001-linux-manjaro" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/27/linux/001-linux-manjaro/" class="article-date">
-  <time datetime="2017-12-27T08:29:07.000Z" itemprop="datePublished">2017-12-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/27/linux/001-linux-manjaro/">配置manjaro</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="manjaro"><a href="#manjaro" class="headerlink" title="manjaro"></a>manjaro</h1><p>讲了manjaro如何配置.</p>
-<h2 id="配置鏡像"><a href="#配置鏡像" class="headerlink" title="配置鏡像"></a>配置鏡像</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ nano /etc/pacman-mirrors.conf </span><br><span class="line">OnlyCountry=China</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc ~]$ sudo pacman-mirrors -g</span><br><span class="line">.: Info Downloading mirrors from repo.manjaro.org</span><br><span class="line">.: Info Using custom mirror file</span><br><span class="line">.: Info Querying mirrors - This may take some time</span><br><span class="line">   0.490 China          : https://mirrors.ustc.edu.cn/manjaro/</span><br><span class="line">   0.291 China          : http://ftp.cuhk.edu.hk/pub/Linux/manjaro/</span><br><span class="line">   1.109 China          : ftp://ftp.cuhk.edu.hk/pub/Linux/manjaro/</span><br><span class="line">   0.131 China          : http://mirrors.tuna.tsinghua.edu.cn/manjaro/</span><br><span class="line">   0.279 China          : https://mirrors.zju.edu.cn/manjaro/</span><br><span class="line">.: Info Writing mirror list</span><br><span class="line">   China           : http://mirrors.tuna.tsinghua.edu.cn/manjaro/stable</span><br><span class="line">   China           : https://mirrors.zju.edu.cn/manjaro/stable</span><br><span class="line">   China           : https://mirrors.ustc.edu.cn/manjaro/stable</span><br><span class="line">   China           : http://ftp.cuhk.edu.hk/pub/Linux/manjaro/stable</span><br><span class="line">.: Info Mirror list generated and saved to: /etc/pacman.d/mirrorlist</span><br></pre></td></tr></table></figure>
-<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> /etc/pacman.conf </span><br><span class="line">[archlinuxcn] </span><br><span class="line">SigLevel = Optional TrustedOnly </span><br><span class="line">Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch</span><br></pre></td></tr></table></figure></p>
-<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -Syy &amp;&amp; sudo pacman -S archlinuxcn-keyring</span><br></pre></td></tr></table></figure></p>
-<h2 id="中文輸入法"><a href="#中文輸入法" class="headerlink" title="中文輸入法"></a>中文輸入法</h2><p>有了上面的鏡像，可以配置下面的輸入法。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -S fcitx-sogoupinyin</span><br><span class="line">sudo pacman -S fcitx-im # 全部安装</span><br><span class="line">sudo pacman -S fcitx-configtool # 图形化配置工具</span><br></pre></td></tr></table></figure></p>
-<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nano ~/.xprofile </span><br><span class="line">export GTK_IM_MODULE=fcitx</span><br><span class="line">export QT_IM_MODULE=fcitx</span><br><span class="line">export XMODIFIERS="@im=fcitx"</span><br></pre></td></tr></table></figure></p>
-<h2 id="VIM"><a href="#VIM" class="headerlink" title="VIM"></a>VIM</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo pacman -S vim</span><br></pre></td></tr></table></figure>
-<h2 id="Chrome"><a href="#Chrome" class="headerlink" title="Chrome"></a>Chrome</h2><p>通過源安裝太慢了。</p>
-<p>[jimo@jimo-pc ~]$ sudo pacman -Sy google-chrome</p>
-<p>但可以使用yaourt安裝<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>首先安裝yaourt</span><br><span class="line">sudo pacman -S yaourt</span><br><span class="line"><span class="meta">#</span> 再安裝chrome</span><br><span class="line">yaourt google-chrome</span><br></pre></td></tr></table></figure></p>
-<p>不過可以使用Chromium<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo pacman -Sy chromium</span><br></pre></td></tr></table></figure></p>
-<h2 id="快捷鍵設置"><a href="#快捷鍵設置" class="headerlink" title="快捷鍵設置"></a>快捷鍵設置</h2><p>在鍵盤設置裏进行快捷键设置</p>
-<table>
-<thead>
-<tr>
-<th>功能</th>
-<th>快捷键</th>
-<th>命令</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>截图</td>
-<td>Ctrl+Alt+A</td>
-<td>xfce4-screenshooter -rc</td>
-</tr>
-<tr>
-<td>查找程序</td>
-<td>super</td>
-<td>xfce4-appfinder</td>
-</tr>
-<tr>
-<td>锁屏</td>
-<td>super+L</td>
-<td>xflock4</td>
-</tr>
-</tbody>
-</table>
-<p>下面是常用的默认快捷键:可以在设置编辑器里面看</p>
-<table>
-<thead>
-<tr>
-<th>功能</th>
-<th>快捷键</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>最大化窗口</td>
-<td>Alt+F10</td>
-</tr>
-<tr>
-<td>最小化窗口</td>
-<td>Alt+F9</td>
-</tr>
-<tr>
-<td>切换窗口</td>
-<td>Alt+Tab</td>
-</tr>
-<tr>
-<td>显示桌面</td>
-<td>Ctrl+Alt+D</td>
-</tr>
-<tr>
-<td>关闭窗口</td>
-<td>Alt+F4</td>
-</tr>
-</tbody>
-</table>
-<h2 id="安装mariadb"><a href="#安装mariadb" class="headerlink" title="安装mariadb"></a>安装mariadb</h2><p>用mariadb替代mysql</p>
-<p><a href="https://downloads.mariadb.org/mariadb/repositories/#mirror=tuna&amp;distro=Arch+Linux&amp;distro_release=opensuse42-amd64--opensuse42" target="_blank" rel="noopener">参考文档</a><br><a href="https://wiki.archlinux.org/index.php/MySQL" target="_blank" rel="noopener">文档二</a></p>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>按下面的额顺序：</p>
-<p>先安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -S mariadb</span><br></pre></td></tr></table></figure></p>
-<p>设置开机启动:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable mysqld.service</span><br></pre></td></tr></table></figure></p>
-<p>开启服务：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql</span><br></pre></td></tr></table></figure></p>
-<p>启动数据库：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start mysqld.service</span><br></pre></td></tr></table></figure></p>
-<p>自定义安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql_secure_installation</span><br></pre></td></tr></table></figure></p>
-<p>停止服务：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl stop mysqld.service</span><br></pre></td></tr></table></figure></p>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>修改编码：/etc/mysql/my.cnf<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[client]</span><br><span class="line">default-character-set = utf8mb4</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">collation_server = utf8mb4_unicode_ci</span><br><span class="line">character_set_client = utf8mb4</span><br><span class="line">character_set_server = utf8mb4</span><br><span class="line">skip-character-set-client-handshake</span><br><span class="line"></span><br><span class="line">[mysql]</span><br><span class="line">default-character-set = utf8mb4</span><br></pre></td></tr></table></figure></p>
-<p>然后查看：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show variables like 'character%';</span><br><span class="line">+--------------------------+----------------------------+</span><br><span class="line">| Variable_name            | Value                      |</span><br><span class="line">+--------------------------+----------------------------+</span><br><span class="line">| character_set_client     | utf8mb4                    |</span><br><span class="line">| character_set_connection | utf8mb4                    |</span><br><span class="line">| character_set_database   | utf8mb4                    |</span><br><span class="line">| character_set_filesystem | binary                     |</span><br><span class="line">| character_set_results    | utf8mb4                    |</span><br><span class="line">| character_set_server     | utf8mb4                    |</span><br><span class="line">| character_set_system     | utf8                       |</span><br><span class="line">| character_sets_dir       | /usr/share/mysql/charsets/ |</span><br><span class="line">+--------------------------+----------------------------+</span><br></pre></td></tr></table></figure></p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>按照通用<a href="https://github.com/jimolonely/myshell/blob/master/build-mysystem.md" target="_blank" rel="noopener">系統構建</a></p>
-<h3 id="QQ"><a href="#QQ" class="headerlink" title="QQ"></a>QQ</h3><p>可一使用deepin的qq。<br>使用命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yaourt -Sy deepin.com.qq.im</span><br></pre></td></tr></table></figure></p>
-<p>假如安装不成功，可以在manjaro的包管理器中选择库-extra模块，搜索qq找到安装。</p>
-<p>不过我的电脑上有些字体乱码。</p>
-<h3 id="openjdk源码"><a href="#openjdk源码" class="headerlink" title="openjdk源码"></a>openjdk源码</h3><p>直接在库里面找到下载即可</p>
-<h3 id="性能监控"><a href="#性能监控" class="headerlink" title="性能监控"></a>性能监控</h3><p>包括网速，内存，CPU等，Xface自带有多面板功能，可以添加，具体步骤如下：</p>
-<p>设置–面板–项目–+，同样可以自定义面板位置和大小，都在外观选项里。</p>
-<h3 id="自带单词查询"><a href="#自带单词查询" class="headerlink" title="自带单词查询"></a>自带单词查询</h3><p>使用look命令查询单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myshell]$ look car</span><br><span class="line">look: /usr/share/dict/words: 没有那个文件或目录</span><br></pre></td></tr></table></figure></p>
-<p>这个字典文件怎么下载呢？很简单，在软件管理里搜索words，即可安装，安装后有很多语言的单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/usr/share/dict/american-english</span><br><span class="line">/usr/share/dict/british</span><br><span class="line">/usr/share/dict/british-english</span><br><span class="line">/usr/share/dict/catala</span><br><span class="line">/usr/share/dict/catalan</span><br><span class="line">/usr/share/dict/finnish</span><br><span class="line">/usr/share/dict/french</span><br><span class="line">/usr/share/dict/german</span><br><span class="line">/usr/share/dict/italian</span><br><span class="line">/usr/share/dict/ngerman</span><br><span class="line">/usr/share/dict/ogerman</span><br><span class="line">/usr/share/dict/spanish</span><br><span class="line">/usr/share/dict/usa</span><br><span class="line">/usr/share/licenses/words/copyright-ca</span><br><span class="line">/usr/share/licenses/words/copyright-de</span><br><span class="line">/usr/share/licenses/words/copyright-en</span><br><span class="line">/usr/share/licenses/words/copyright-es</span><br><span class="line">/usr/share/licenses/words/copyright-fi</span><br><span class="line">/usr/share/licenses/words/copyright-fr</span><br><span class="line">/usr/share/licenses/words/copyright-it</span><br></pre></td></tr></table></figure></p>
-<p>现在我要查询zero开头的单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myshell]$ look zer</span><br><span class="line">zero</span><br><span class="line">zeroed</span><br><span class="line">zeroes</span><br><span class="line">zeroing</span><br><span class="line">zero's</span><br><span class="line">zeros</span><br><span class="line">zeroth</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="manjaro"><a href="#manjaro" class="headerlink" title="manjaro"></a>manjaro</h1><p>讲了manjaro如何配置.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/27/linux/001-linux-manjaro/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/27/linux/001-linux-manjaro/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/001-linux-manjaro/" data-id="cjc7fynn20006yhkalfxhzbmv" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/manjaro/">manjaro</a></li></ul>
 
       </footer>
       </div>
@@ -1060,7 +1006,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li></ul>
     </div>
   </div>
 
@@ -1070,7 +1016,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 16px;">java</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 14px;">python</a> <a href="/tags/scala/" style="font-size: 18px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 16px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/tool/" style="font-size: 12px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a>
+      <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 16px;">java</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 14px;">python</a> <a href="/tags/scala/" style="font-size: 18px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 16px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/tool/" style="font-size: 12px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a>
     </div>
   </div>
 
@@ -1092,6 +1038,10 @@
       <ul>
         
           <li>
+            <a href="/2018/01/10/hadoop/000-config-environment/">配置hadoop环境变量</a>
+          </li>
+        
+          <li>
             <a href="/2018/01/07/tools/001-asciidoc/">asciidoc转pdf</a>
           </li>
         
@@ -1105,10 +1055,6 @@
         
           <li>
             <a href="/2018/01/05/maven/000-package-execute-jar/">打包成可执行jar包</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/03/spark/03-spark-warning/">spark挖坑详解</a>
           </li>
         
       </ul>
