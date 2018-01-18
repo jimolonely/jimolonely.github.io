@@ -84,6 +84,93 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-ai/001-fp_growth" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/18/ai/001-fp_growth/" class="article-date">
+  <time datetime="2018-01-18T09:10:20.000Z" itemprop="datePublished">2018-01-18</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/18/ai/001-fp_growth/">python实现FP_Growth算法</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将手动实现FP_Growth算法并挖掘关联规则.</p>
+<h1 id="定义FP树"><a href="#定义FP树" class="headerlink" title="定义FP树"></a>定义FP树</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="string">'''定义FP树'''</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,nameValue,numOccur,parentNode)</span>:</span></span><br><span class="line">        self.name = nameValue</span><br><span class="line">        self.count = numOccur</span><br><span class="line">        self.nodeLink = <span class="keyword">None</span></span><br><span class="line">        self.parent = parentNode</span><br><span class="line">        self.children = &#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inc</span><span class="params">(self,numOccur)</span>:</span></span><br><span class="line">        self.count += numOccur</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">disp</span><span class="params">(self,ind=<span class="number">1</span>)</span>:</span></span><br><span class="line">        print(<span class="string">'  '</span>*ind,self.name,<span class="string">' '</span>,self.count)</span><br><span class="line">        <span class="keyword">for</span> child <span class="keyword">in</span> self.children.values():</span><br><span class="line">            child.disp(ind+<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>测试:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 测试</span></span><br><span class="line">rootNode = TreeNode(<span class="string">'root'</span>,<span class="number">9</span>,<span class="keyword">None</span>)</span><br><span class="line">rootNode.children[<span class="string">'eye'</span>] = TreeNode(<span class="string">'eye'</span>,<span class="number">13</span>,<span class="keyword">None</span>)</span><br><span class="line">rootNode.disp()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">root   9</span></span><br><span class="line"><span class="string">     eye   13</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="构建FP树"><a href="#构建FP树" class="headerlink" title="构建FP树"></a>构建FP树</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构建FP树</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">createTree</span><span class="params">(dataSet,minSup=<span class="number">1</span>)</span>:</span></span><br><span class="line">    headerTable = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> trans <span class="keyword">in</span> dataSet:</span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> trans:</span><br><span class="line">            headerTable[item] = headerTable.get(item,<span class="number">0</span>) + dataSet[trans]</span><br><span class="line">    <span class="comment"># 去除不满足最小支持度的项</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> list(headerTable.keys()):</span><br><span class="line">        <span class="keyword">if</span> headerTable[k] &lt; minSup:</span><br><span class="line">            <span class="keyword">del</span>(headerTable[k])</span><br><span class="line">    freqItemSet = set(headerTable.keys())</span><br><span class="line">    <span class="keyword">if</span> len(freqItemSet) == <span class="number">0</span>: <span class="keyword">return</span> <span class="keyword">None</span>,<span class="keyword">None</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> headerTable:</span><br><span class="line">        headerTable[k] = [headerTable[k],<span class="keyword">None</span>]</span><br><span class="line">    retTree = TreeNode(<span class="string">'Null Set'</span>,<span class="number">1</span>,<span class="keyword">None</span>)</span><br><span class="line">    <span class="keyword">for</span> tranSet,count <span class="keyword">in</span> dataSet.items():</span><br><span class="line">        localD = &#123;&#125;</span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> tranSet:</span><br><span class="line">            <span class="keyword">if</span> item <span class="keyword">in</span> freqItemSet:</span><br><span class="line">                localD[item] = headerTable[item][<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">if</span> len(localD) &gt; <span class="number">0</span>:</span><br><span class="line">            <span class="comment"># 按频率降序排列</span></span><br><span class="line">            orderedItems = [v[<span class="number">0</span>] <span class="keyword">for</span> v <span class="keyword">in</span> sorted(localD.items(),key=<span class="keyword">lambda</span> p: p[<span class="number">1</span>],reverse=<span class="keyword">True</span>)]</span><br><span class="line">            updateTree(orderedItems,retTree,headerTable,count)</span><br><span class="line">    <span class="keyword">return</span> retTree,headerTable</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">updateTree</span><span class="params">(items,inTree,headerTable,count)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> items[<span class="number">0</span>] <span class="keyword">in</span> inTree.children:</span><br><span class="line">        inTree.children[items[<span class="number">0</span>]].inc(count)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        inTree.children[items[<span class="number">0</span>]] = TreeNode(items[<span class="number">0</span>],count,inTree)</span><br><span class="line">        <span class="keyword">if</span> headerTable[items[<span class="number">0</span>]][<span class="number">1</span>]==<span class="keyword">None</span>:</span><br><span class="line">            headerTable[items[<span class="number">0</span>]][<span class="number">1</span>] = inTree.children[items[<span class="number">0</span>]]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            updateHeader(headerTable[items[<span class="number">0</span>]][<span class="number">1</span>],inTree.children[items[<span class="number">0</span>]])</span><br><span class="line">    <span class="keyword">if</span> len(items)&gt;<span class="number">1</span>:</span><br><span class="line">        updateTree(items[<span class="number">1</span>::],inTree.children[items[<span class="number">0</span>]],headerTable,count)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">updateHeader</span><span class="params">(nodeToTest,targetNode)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> nodeToTest.nodeLink != <span class="keyword">None</span>:</span><br><span class="line">        nodeToTest = nodeToTest.nodeLink</span><br><span class="line">    nodeToTest.nodeLink = targetNode</span><br></pre></td></tr></table></figure>
+<p>数据集:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loadDataSet</span><span class="params">()</span>:</span></span><br><span class="line">    ds = [</span><br><span class="line">        [<span class="string">'r'</span>,<span class="string">'z'</span>,<span class="string">'h'</span>,<span class="string">'j'</span>,<span class="string">'p'</span>],</span><br><span class="line">        [<span class="string">'z'</span>,<span class="string">'y'</span>,<span class="string">'x'</span>,<span class="string">'w'</span>,<span class="string">'v'</span>,<span class="string">'u'</span>,<span class="string">'t'</span>,<span class="string">'s'</span>],</span><br><span class="line">        [<span class="string">'z'</span>],</span><br><span class="line">        [<span class="string">'r'</span>,<span class="string">'x'</span>,<span class="string">'n'</span>,<span class="string">'o'</span>,<span class="string">'s'</span>],</span><br><span class="line">        [<span class="string">'y'</span>,<span class="string">'r'</span>,<span class="string">'x'</span>,<span class="string">'z'</span>,<span class="string">'q'</span>,<span class="string">'t'</span>,<span class="string">'p'</span>],</span><br><span class="line">        [<span class="string">'y'</span>,<span class="string">'z'</span>,<span class="string">'x'</span>,<span class="string">'e'</span>,<span class="string">'q'</span>,<span class="string">'s'</span>,<span class="string">'t'</span>,<span class="string">'m'</span>]</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">return</span> ds</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">createInitSet</span><span class="params">(dataSet)</span>:</span></span><br><span class="line">    retDict = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> trans <span class="keyword">in</span> dataSet:</span><br><span class="line">        retDict[frozenset(trans)] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> retDict</span><br></pre></td></tr></table></figure></p>
+<p>测试:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 测试</span></span><br><span class="line">ds = loadDataSet()</span><br><span class="line">dataSet = createInitSet(ds)</span><br><span class="line">dataSet</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;frozenset(&#123;'z'&#125;): 1,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'h', 'j', 'p', 'r', 'z'&#125;): 1,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'s', 't', 'u', 'v', 'w', 'x', 'y', 'z'&#125;): 1,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'n', 'o', 'r', 's', 'x'&#125;): 1,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'p', 'q', 'r', 't', 'x', 'y', 'z'&#125;): 1,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'e', 'm', 'q', 's', 't', 'x', 'y', 'z'&#125;): 1&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line">myFPTree,myHeaderTab = createTree(dataSet,<span class="number">3</span>)</span><br><span class="line">myFPTree.disp()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   5</span></span><br><span class="line"><span class="string">       r   1</span></span><br><span class="line"><span class="string">       x   3</span></span><br><span class="line"><span class="string">         t   2</span></span><br><span class="line"><span class="string">           s   2</span></span><br><span class="line"><span class="string">             y   2</span></span><br><span class="line"><span class="string">         r   1</span></span><br><span class="line"><span class="string">           t   1</span></span><br><span class="line"><span class="string">             y   1</span></span><br><span class="line"><span class="string">     x   1</span></span><br><span class="line"><span class="string">       r   1</span></span><br><span class="line"><span class="string">         s   1</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="寻找条件模式基"><a href="#寻找条件模式基" class="headerlink" title="寻找条件模式基"></a>寻找条件模式基</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ascendTree</span><span class="params">(leafNode,prefixPath)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> leafNode.parent != <span class="keyword">None</span>:</span><br><span class="line">        prefixPath.append(leafNode.name)</span><br><span class="line">        ascendTree(leafNode.parent,prefixPath)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">findPrefixPath</span><span class="params">(basePat,treeNode)</span>:</span></span><br><span class="line">    condPats = &#123;&#125;</span><br><span class="line">    <span class="keyword">while</span> treeNode != <span class="keyword">None</span>:</span><br><span class="line">        prefixPath = []</span><br><span class="line">        ascendTree(treeNode,prefixPath)</span><br><span class="line">        <span class="keyword">if</span> len(prefixPath) &gt; <span class="number">1</span>:</span><br><span class="line">            condPats[frozenset(prefixPath[<span class="number">1</span>:])] = treeNode.count</span><br><span class="line">        treeNode = treeNode.nodeLink</span><br><span class="line">    <span class="keyword">return</span> condPats</span><br></pre></td></tr></table></figure>
+<p>测试:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">condPats = findPrefixPath(<span class="string">'r'</span>,myHeaderTab[<span class="string">'r'</span>][<span class="number">1</span>])</span><br><span class="line">condPats</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;frozenset(&#123;'z'&#125;): 1, frozenset(&#123;'x'&#125;): 1, frozenset(&#123;'x', 'z'&#125;): 1&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="创建条件FP树"><a href="#创建条件FP树" class="headerlink" title="创建条件FP树"></a>创建条件FP树</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mineTree</span><span class="params">(inTree,headerTable,minSup,preFix,freqItemSet)</span>:</span></span><br><span class="line">    bigL = [v[<span class="number">0</span>] <span class="keyword">for</span> v <span class="keyword">in</span> sorted(headerTable.items(),key=<span class="keyword">lambda</span> p:p[<span class="number">1</span>][<span class="number">0</span>])]</span><br><span class="line">    <span class="keyword">for</span> basePat <span class="keyword">in</span> bigL:</span><br><span class="line">        newFreqSet = preFix.copy()</span><br><span class="line">        newFreqSet.add(basePat)</span><br><span class="line">        support = headerTable[basePat][<span class="number">0</span>]</span><br><span class="line">        freqItemSet[frozenset(newFreqSet)] = support</span><br><span class="line">        condPattBases = findPrefixPath(basePat,headerTable[basePat][<span class="number">1</span>])</span><br><span class="line">        myCondTree , myHead = createTree(condPattBases,minSup)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> myHead != <span class="keyword">None</span>:</span><br><span class="line">            <span class="comment"># debug</span></span><br><span class="line">            print(<span class="string">'条件树:'</span>,newFreqSet)</span><br><span class="line">            myCondTree.disp(<span class="number">1</span>)</span><br><span class="line">            mineTree(myCondTree,myHead,minSup,newFreqSet,freqItemSet)</span><br></pre></td></tr></table></figure>
+<p>测试:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">freqItems = &#123;&#125;</span><br><span class="line">mineTree(myFPTree,myHeaderTab,<span class="number">3</span>,set([]),freqItems)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">条件树: &#123;'t'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   3</span></span><br><span class="line"><span class="string">       x   3</span></span><br><span class="line"><span class="string">条件树: &#123;'t', 'x'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   3</span></span><br><span class="line"><span class="string">条件树: &#123;'s'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     x   3</span></span><br><span class="line"><span class="string">条件树: &#123;'y'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   3</span></span><br><span class="line"><span class="string">       t   3</span></span><br><span class="line"><span class="string">         x   3</span></span><br><span class="line"><span class="string">条件树: &#123;'y', 't'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   3</span></span><br><span class="line"><span class="string">条件树: &#123;'y', 'x'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   3</span></span><br><span class="line"><span class="string">       t   3</span></span><br><span class="line"><span class="string">条件树: &#123;'y', 't', 'x'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   3</span></span><br><span class="line"><span class="string">条件树: &#123;'x'&#125;</span></span><br><span class="line"><span class="string">   Null Set   1</span></span><br><span class="line"><span class="string">     z   3</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line">freqItems</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;frozenset(&#123;'r'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'z'&#125;): 5,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t', 'z'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t', 'x'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t', 'x', 'z'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'s'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'s', 'x'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'y'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'y', 'z'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t', 'y'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t', 'y', 'z'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'x'&#125;): 4,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'x', 'y'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'x', 'y', 'z'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t', 'x', 'y'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'x', 'z'&#125;): 3,</span></span><br><span class="line"><span class="string"> frozenset(&#123;'t', 'x', 'y', 'z'&#125;): 3&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="挖掘关联规则"><a href="#挖掘关联规则" class="headerlink" title="挖掘关联规则"></a>挖掘关联规则</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ruleGenerator</span><span class="params">(freqItems,minConf,rules)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> freqItemSet <span class="keyword">in</span> freqItems:</span><br><span class="line">        <span class="keyword">if</span> len(freqItemSet)&gt;<span class="number">1</span>:</span><br><span class="line">            getRules(freqItemSet,freqItemSet,rules,freqItems,minConf)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">removeStr</span><span class="params">(set, str)</span>:</span></span><br><span class="line">    tempSet = []</span><br><span class="line">    <span class="keyword">for</span> elem <span class="keyword">in</span> set:</span><br><span class="line">        <span class="keyword">if</span>(elem != str):</span><br><span class="line">            tempSet.append(elem)</span><br><span class="line">    tempFrozenSet = frozenset(tempSet)</span><br><span class="line">    <span class="keyword">return</span> tempFrozenSet</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getRules</span><span class="params">(freqItemSet,currSet,rules,freqItems,minConf)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> freqElem <span class="keyword">in</span> currSet:</span><br><span class="line">        subSet = removeStr(currSet,freqElem)</span><br><span class="line">        confidence = freqItems[freqItemSet] / freqItems[subSet]</span><br><span class="line">        <span class="keyword">if</span> confidence &gt;= minConf:</span><br><span class="line">            flag = <span class="keyword">False</span></span><br><span class="line">            <span class="keyword">for</span> rule <span class="keyword">in</span> rules:</span><br><span class="line">                <span class="keyword">if</span> rule[<span class="number">0</span>]==subSet <span class="keyword">and</span> rule[<span class="number">1</span>]==freqItemSet-subSet:</span><br><span class="line">                    flag = <span class="keyword">True</span></span><br><span class="line">            <span class="keyword">if</span> flag == <span class="keyword">False</span>:</span><br><span class="line">                rules.append((subSet,freqItemSet-subSet,confidence))</span><br><span class="line">            <span class="keyword">if</span> len(subSet)&gt;=<span class="number">2</span>:</span><br><span class="line">                getRules(freqItemSet,subSet,rules,freqItems,minConf)</span><br></pre></td></tr></table></figure>
+<p>测试:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">rules = []</span><br><span class="line">ruleGenerator(freqItems,<span class="number">0.6</span>,rules)</span><br><span class="line">rules</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">[(frozenset(&#123;'t'&#125;), frozenset(&#123;'z'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'z'&#125;), frozenset(&#123;'t'&#125;), 0.6),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'x'&#125;), frozenset(&#123;'t'&#125;), 0.75),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'t'&#125;), frozenset(&#123;'x'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'t', 'x'&#125;), frozenset(&#123;'z'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'x'&#125;), frozenset(&#123;'t', 'z'&#125;), 0.75),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'t'&#125;), frozenset(&#123;'x', 'z'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'x', 'z'&#125;), frozenset(&#123;'t'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'z'&#125;), frozenset(&#123;'t', 'x'&#125;), 0.6),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'t', 'z'&#125;), frozenset(&#123;'x'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'x'&#125;), frozenset(&#123;'s'&#125;), 0.75),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'s'&#125;), frozenset(&#123;'x'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'z'&#125;), frozenset(&#123;'y'&#125;), 0.6),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'y'&#125;), frozenset(&#123;'z'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'t'&#125;), frozenset(&#123;'y'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'y'&#125;), frozenset(&#123;'t'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'t', 'z'&#125;), frozenset(&#123;'y'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'t'&#125;), frozenset(&#123;'y', 'z'&#125;), 1.0),</span></span><br><span class="line"><span class="string"> (frozenset(&#123;'z'&#125;), frozenset(&#123;'t', 'y'&#125;), 0.6),</span></span><br><span class="line"><span class="string"> ...</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h1><p>以上来源于&lt;&lt;机器学习实战&gt;&gt;.</p>
+<p>觉得IBM的博客也不错:<a href="https://www.ibm.com/developerworks/cn/analytics/library/machine-learning-hands-on2-fp-growth/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/analytics/library/machine-learning-hands-on2-fp-growth/index.html</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将手动实现FP_Growth算法并挖掘关联规则.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/18/ai/001-fp_growth/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/18/ai/001-fp_growth/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/18/ai/001-fp_growth/" data-id="cjckab3b600023wkalzrrpgwq" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-python/002-flask-wordcloud" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/18/python/002-flask-wordcloud/" class="article-date">
@@ -152,7 +239,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/18/python/002-flask-wordcloud/" data-id="cjcjy4bhg000qoikaacpqwdfd" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/18/python/002-flask-wordcloud/" data-id="cjckab3bs000t3wkaglcew4d2" class="article-share-link">
           Share
         </a>
         
@@ -242,7 +329,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjcjy4bhx001goika1ek2ym3f" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjckab3c000193wkac9iglziq" class="article-share-link">
           Share
         </a>
         
@@ -464,7 +551,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjcjy4bhw001eoikarm1wbn4x" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjckab3bz00173wka5wdo973h" class="article-share-link">
           Share
         </a>
         
@@ -544,7 +631,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjcjy4bgs0001oikaytait71u" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjckab3b300013wkalmgm6o03" class="article-share-link">
           Share
         </a>
         
@@ -630,7 +717,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjcjy4bhu001boikankay7ebg" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjckab3by00163wka4ymtfbfn" class="article-share-link">
           Share
         </a>
         
@@ -709,7 +796,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjcjy4bgz0004oika93x5kt3e" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjckab3bc00063wkap5fznkj6" class="article-share-link">
           Share
         </a>
         
@@ -790,7 +877,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjcjy4bht0019oika3amgi4tz" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjckab3bx00133wka6hk8ggk5" class="article-share-link">
           Share
         </a>
         
@@ -879,7 +966,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjcjy4bhf000noikaleowfskp" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjckab3br000r3wka6cw0a1dw" class="article-share-link">
           Share
         </a>
         
@@ -977,92 +1064,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjcjy4bhr0016oikafbgn18c1" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjckab3c4001h3wka0s5u2sfw" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-maven/000-package-execute-jar" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/05/maven/000-package-execute-jar/" class="article-date">
-  <time datetime="2018-01-05T03:34:08.000Z" itemprop="datePublished">2018-01-05</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/05/maven/000-package-execute-jar/">打包成可执行jar包</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>Maven手记,打包成可执行jar</p>
-<h2 id="打包成可执行jar"><a href="#打包成可执行jar" class="headerlink" title="打包成可执行jar"></a>打包成可执行jar</h2><p>官方文档：<a href="https://maven.apache.org/plugins/maven-jar-plugin/" target="_blank" rel="noopener">https://maven.apache.org/plugins/maven-jar-plugin/</a> </p>
-<p>在之前可能会遇到找不到主类的问题：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc target]$ java test-app-1.0-SNAPSHOT.jar</span><br><span class="line">Error: Could not find or load main class test-app-1.0-SNAPSHOT.jar</span><br><span class="line">[jimo@jimo-pc target]$ java -jar test-app-1.0-SNAPSHOT.jar</span><br><span class="line">no main manifest attribute, in test-app-1.0-SNAPSHOT.jar</span><br></pre></td></tr></table></figure></p>
-<p>解决办法：需要在pom.xml里配置<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;project&gt;</span><br><span class="line">  ...</span><br><span class="line">  &lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;3.0.2&lt;/version&gt;</span><br><span class="line">        &lt;configuration&gt;</span><br><span class="line">          &lt;archive&gt;</span><br><span class="line">            &lt;manifestFile&gt;$&#123;project.build.outputDirectory&#125;/META-INF/MANIFEST.MF&lt;/manifestFile&gt;</span><br><span class="line">          &lt;/archive&gt;</span><br><span class="line">        &lt;/configuration&gt;</span><br><span class="line">        ...</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br><span class="line">  ...</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure></p>
-<p>当然这种方法需要自定义清单文件，更简单的是直接定义入口类：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;3.0.2&lt;/version&gt;</span><br><span class="line">            &lt;configuration&gt;</span><br><span class="line">                &lt;archive&gt;</span><br><span class="line">                    &lt;manifest&gt;</span><br><span class="line">                        &lt;mainClass&gt;com.jimo.App&lt;/mainClass&gt;</span><br><span class="line">                    &lt;/manifest&gt;</span><br><span class="line">                &lt;/archive&gt;</span><br><span class="line">            &lt;/configuration&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br></pre></td></tr></table></figure></p>
-<p>其中com.jimo.App包含main方法，是整个程序的入口。</p>
-<p>然后重新构建jar包再执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc test-app]$ mvn clean install</span><br><span class="line">[jimo@jimo-pc target]$ java -jar test-app-1.0-SNAPSHOT.jar</span><br><span class="line">Hello World!</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>Maven手记,打包成可执行jar</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/05/maven/000-package-execute-jar/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/05/maven/000-package-execute-jar/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/maven/000-package-execute-jar/" data-id="cjcjy4bhc000joikaqf901cpq" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a></li></ul>
 
       </footer>
       </div>
@@ -1099,7 +1106,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 17.5px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 15px;">spark</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a>
+      <a href="/tags/AI/" style="font-size: 12px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 14px;">java</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18px;">python</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 16px;">tool</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a>
     </div>
   </div>
 
@@ -1121,6 +1128,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/01/18/ai/001-fp_growth/">python实现FP_Growth算法</a>
+          </li>
+        
+          <li>
             <a href="/2018/01/18/python/002-flask-wordcloud/">Flask提供词云API</a>
           </li>
         
@@ -1134,10 +1145,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/01/11/ai/000-perceptron/">神经元的实现</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/11/tools/002-speed-test/">如何测网速</a>
           </li>
         
       </ul>
