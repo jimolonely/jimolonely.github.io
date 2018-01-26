@@ -28,10 +28,12 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="在我的世界">
 <meta property="og:description" content="记录下ip,掩码,网关的基础知识和ubuntu下的配置. 基础知识学过计算机网络肯定知道,如果不用也很快就忘了. 什么是IP,子网掩码,网关? 简单来说IP用于定位地址,用于屏蔽物理差异,由网络号和主机号组成.子网掩码用于区分前面的网络号和后面的具体地址,前面为1和后面为0.网关也是个ip,是通向其他网络的IP. 举个例子:12IP: 192.168.1.100/24子网掩码:255.255.25">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-01-26T03:23:03.377Z">
+<meta property="og:image" content="http://yoursite.com/2018/01/26/linux/007-ubuntu-static-ip/000.png">
+<meta property="og:updated_time" content="2018-01-26T03:39:51.252Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ubuntu下设置静态ip">
 <meta name="twitter:description" content="记录下ip,掩码,网关的基础知识和ubuntu下的配置. 基础知识学过计算机网络肯定知道,如果不用也很快就忘了. 什么是IP,子网掩码,网关? 简单来说IP用于定位地址,用于屏蔽物理差异,由网络号和主机号组成.子网掩码用于区分前面的网络号和后面的具体地址,前面为1和后面为0.网关也是个ip,是通向其他网络的IP. 举个例子:12IP: 192.168.1.100/24子网掩码:255.255.25">
+<meta name="twitter:image" content="http://yoursite.com/2018/01/26/linux/007-ubuntu-static-ip/000.png">
   
     <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
   
@@ -119,6 +121,10 @@ ga('send', 'pageview');
 <p>原来:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br></pre></td></tr></table></figure></p>
 <p>现在:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo vim /etc/network/interfaces</span><br><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line">auto enp0s3</span><br><span class="line"></span><br><span class="line">iface enp0s3 inet static</span><br><span class="line">address 10.0.2.14</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 10.0.2.2</span><br></pre></td></tr></table></figure></p>
 <p>重启服务:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo /etc/init.d/networking restart</span><br><span class="line">[ ok ] Restarting networking (via systemctl): networking.service.</span><br></pre></td></tr></table></figure></p>
+<p>再重启一下连接.</p>
+<h1 id="更简单的"><a href="#更简单的" class="headerlink" title="更简单的"></a>更简单的</h1><p>直接在界面上操作</p>
+<img src="/2018/01/26/linux/007-ubuntu-static-ip/000.png">
+<p>然后需要重启一下连接.</p>
 
       
     </div> -->
@@ -141,13 +147,17 @@ ga('send', 'pageview');
 <p>原来:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br></pre></td></tr></table></figure></p>
 <p>现在:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo vim /etc/network/interfaces</span><br><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line">auto enp0s3</span><br><span class="line"></span><br><span class="line">iface enp0s3 inet static</span><br><span class="line">address 10.0.2.14</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 10.0.2.2</span><br></pre></td></tr></table></figure></p>
 <p>重启服务:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo /etc/init.d/networking restart</span><br><span class="line">[ ok ] Restarting networking (via systemctl): networking.service.</span><br></pre></td></tr></table></figure></p>
+<p>再重启一下连接.</p>
+<h1 id="更简单的"><a href="#更简单的" class="headerlink" title="更简单的"></a>更简单的</h1><p>直接在界面上操作</p>
+<img src="/2018/01/26/linux/007-ubuntu-static-ip/000.png">
+<p>然后需要重启一下连接.</p>
 
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjcvdcmm9000ofhka0r0o2qj8" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjcvdpsoc000oktka1n5trf48" class="article-share-link">
           Share
         </a>
         
