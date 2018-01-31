@@ -84,6 +84,100 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/003-py-weibo" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/python/003-py-weibo/" class="article-date">
+  <time datetime="2018-01-31T02:03:05.000Z" itemprop="datePublished">2018-01-31</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/31/python/003-py-weibo/">爬取个人微博</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将讲解如何爬取微博,并将内容生成词云.</p>
+<h1 id="爬取准备"><a href="#爬取准备" class="headerlink" title="爬取准备"></a>爬取准备</h1><ol>
+<li>使用Google Chrome浏览器,将Agent调成手机客户端,方法如下:</li>
+</ol>
+<p>F12–&gt;setting–&gt;More Tools–&gt;Network conditions,把User Agent换成手机.</p>
+<img src="/2018/01/31/python/003-py-weibo/000.png">
+<img src="/2018/01/31/python/003-py-weibo/001.png">
+<ol>
+<li><p>登录微博.</p>
+</li>
+<li><p>得到要爬取者的uid: <a href="https://m.weibo.cn/u/xxxxxxxxxxxxxx" target="_blank" rel="noopener">https://m.weibo.cn/u/xxxxxxxxxxxxxx</a></p>
+</li>
+<li><p>在访问主页时得到访问的cookie,复制Cookie.</p>
+</li>
+</ol>
+<img src="/2018/01/31/python/003-py-weibo/002.png">
+<h1 id="爬取代码"><a href="#爬取代码" class="headerlink" title="爬取代码"></a>爬取代码</h1><p>将网页分页保存起来,等会解析.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*-coding:utf8-*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"></span><br><span class="line">user_id = xxxx</span><br><span class="line"></span><br><span class="line">cookie = &#123;</span><br><span class="line">    <span class="string">"Cookie"</span>: <span class="string">"_T_WM=xxx; SCF=xxx.; SUB=xxx; SUHB=xxx; WEIBOCN_FROM=xxx; M_WEIBOCN_PARAMS=xxx"</span>&#125;</span><br><span class="line">url = <span class="string">'http://weibo.cn/u/%d?filter=1&amp;page=1'</span> % user_id</span><br><span class="line"></span><br><span class="line">html = requests.get(url, cookies=cookie).content</span><br><span class="line">selector = etree.HTML(html)</span><br><span class="line">pageNum = (int)(selector.xpath(<span class="string">'//input[@name="mp"]'</span>)[<span class="number">0</span>].attrib[<span class="string">'value'</span>])</span><br><span class="line"></span><br><span class="line">print(<span class="string">u'爬虫准备就绪...'</span>)</span><br><span class="line"></span><br><span class="line">pages = []</span><br><span class="line"><span class="keyword">for</span> page <span class="keyword">in</span> range(<span class="number">1</span>, pageNum + <span class="number">1</span>):</span><br><span class="line">    <span class="comment"># 获取lxml页面</span></span><br><span class="line">    url = <span class="string">'http://weibo.cn/u/%d?filter=1&amp;page=%d'</span> % (user_id, page)</span><br><span class="line">    lxml = requests.get(url, cookies=cookie).content</span><br><span class="line"></span><br><span class="line">    pages.append(lxml.decode(encoding=<span class="string">'utf-8'</span>))</span><br><span class="line">    print(<span class="string">"下载完成第%d页"</span> % page)</span><br><span class="line"></span><br><span class="line">dir_path = <span class="string">"/home/jimo/workspace/temp/python/love/"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">"%s%s"</span> % (dir_path, user_id), <span class="string">"w"</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> page <span class="keyword">in</span> pages:</span><br><span class="line">        f.write(page)</span><br><span class="line">        f.write(<span class="string">"\n"</span>)</span><br><span class="line">    print(<span class="string">u'微博文字爬取完毕'</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="解析代码"><a href="#解析代码" class="headerlink" title="解析代码"></a>解析代码</h1><img src="/2018/01/31/python/003-py-weibo/003.png">
+<p>注意对于中文,词云要指定支持中文的字体.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"><span class="keyword">from</span> wordcloud <span class="keyword">import</span> WordCloud</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">path = <span class="string">"/home/jimo/workspace/temp/python/love/"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">analyze</span><span class="params">(line)</span>:</span></span><br><span class="line">    <span class="string">'''解析html'''</span></span><br><span class="line">    html = etree.HTML(line.encode(encoding=<span class="string">'utf-8'</span>))</span><br><span class="line">    <span class="comment"># 解析微博内容</span></span><br><span class="line">    contents = html.xpath(<span class="string">'//span[@class="ctt"]'</span>)</span><br><span class="line">    content = <span class="string">" "</span>.join([c.xpath(<span class="string">"string(.)"</span>) <span class="keyword">for</span> c <span class="keyword">in</span> contents])</span><br><span class="line">    <span class="comment"># for c in contents:</span></span><br><span class="line">    <span class="comment">#     text = c.xpath("string(.)")</span></span><br><span class="line">    <span class="comment">#     print(text)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 解析发的时间和来自哪里</span></span><br><span class="line">    times = html.xpath(<span class="string">'//span[@class="ct"]'</span>)</span><br><span class="line">    time = []</span><br><span class="line">    fromWhere = []</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> times:</span><br><span class="line">        text = t.xpath(<span class="string">"string(.)"</span>)</span><br><span class="line">        splitIndex = text.index(<span class="string">"来自"</span>)</span><br><span class="line">        time.append(text[:splitIndex - <span class="number">1</span>])</span><br><span class="line">        fromWhere.append(text[splitIndex:])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> content, <span class="string">" "</span>.join(time), <span class="string">" "</span>.join(fromWhere)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_word_cloud</span><span class="params">(content)</span>:</span></span><br><span class="line">    <span class="string">'''生成词云'''</span></span><br><span class="line">    wc = WordCloud(font_path=<span class="string">"SimHei.ttf"</span>, max_font_size=<span class="number">60</span>, min_font_size=<span class="number">10</span>, width=<span class="number">1000</span>, height=<span class="number">800</span>).generate(content)</span><br><span class="line">    plt.figure()</span><br><span class="line">    plt.imshow(wc, interpolation=<span class="string">"bilinear"</span>)</span><br><span class="line">    plt.axis(<span class="string">"off"</span>)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(path + <span class="string">"1786727217"</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    lines = f.readlines()</span><br><span class="line">    contents, times, fromWhere = [], [], []</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">        c, t, f = analyze(line)</span><br><span class="line">        contents.append(c)</span><br><span class="line">        times.append(t)</span><br><span class="line">        fromWhere.append(f)</span><br><span class="line">    generate_word_cloud(<span class="string">" "</span>.join(contents))</span><br><span class="line">    generate_word_cloud(<span class="string">" "</span>.join(fromWhere))</span><br></pre></td></tr></table></figure></p>
+<p>My Love:</p>
+<img src="/2018/01/31/python/003-py-weibo/004.png">
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将讲解如何爬取微博,并将内容生成词云.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/31/python/003-py-weibo/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/31/python/003-py-weibo/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/31/python/003-py-weibo/" data-id="cjd2g2vqg000x12ka0az922xa" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-cloudcompute/000-install-openstack-unbuntu" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" class="article-date">
@@ -151,7 +245,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjd1o329j0007rkkaootjw2o6" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjd2g2vpt000412kal12xxeo3" class="article-share-link">
           Share
         </a>
         
@@ -241,7 +335,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjd1o329x000urkkaximhastc" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjd2g2vqc000r12katnaidwmv" class="article-share-link">
           Share
         </a>
         
@@ -320,7 +414,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/21/react/000-import-js-function/" data-id="cjd1o32a30016rkkahvk58xn5" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/21/react/000-import-js-function/" data-id="cjd2g2vqh001012kavzgtbed3" class="article-share-link">
           Share
         </a>
         
@@ -409,7 +503,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/18/ai/001-fp_growth/" data-id="cjd1o329i0006rkkaddh2ovke" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/18/ai/001-fp_growth/" data-id="cjd2g2vpq000212kauts782ap" class="article-share-link">
           Share
         </a>
         
@@ -491,7 +585,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/18/python/002-flask-wordcloud/" data-id="cjd1o32a20014rkkam9vh9cn0" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/18/python/002-flask-wordcloud/" data-id="cjd2g2vqf000w12kafivbyff3" class="article-share-link">
           Share
         </a>
         
@@ -581,7 +675,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjd1o32aj001xrkkaslaneyuo" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjd2g2vqv001r12kagj5mn5lr" class="article-share-link">
           Share
         </a>
         
@@ -814,7 +908,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjd1o32ag001wrkkaqly3jahu" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjd2g2vqt001p12kavk0gek14" class="article-share-link">
           Share
         </a>
         
@@ -894,7 +988,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjd1o328x0001rkkalf5yjnmi" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjd2g2vpm000112kad4zom3h3" class="article-share-link">
           Share
         </a>
         
@@ -980,91 +1074,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjd1o32af001urkka02obwijo" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjd2g2vqs001o12kawchvldtg" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-hadoop/000-config-environment" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/hadoop/000-config-environment/" class="article-date">
-  <time datetime="2018-01-10T08:57:35.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/hadoop/000-config-environment/">配置hadoop环境变量</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="http://ftp.cuhk.edu.hk/pub/packages/apache.org/hadoop/common/current/hadoop-3.0.0.tar.gz" target="_blank" rel="noopener">下载</a><br>完后的hadoop需要配置各个组件的的环境变量.</p>
-<p>参考<a href="https://wiki.apache.org/hadoop/HowToSetupYourDevelopmentEnvironment" target="_blank" rel="noopener">wiki-hadoop</a></p>
-<h1 id="在linux中"><a href="#在linux中" class="headerlink" title="在linux中"></a>在linux中</h1><p>一般作为开发环境才需要配置.</p>
-<p>以前是这样,打开.bashrc或者.bash_profile<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_COMMON_HOME=xxx/hadoop-2.9.0/share/hadoop/common</span><br><span class="line">export HADOOP_HDFS_HOME=xxx/hadoop-2.9.0/share/hadoop/hdfs</span><br><span class="line">export HADOOP_MAPRED_HOME=xxx/hadoop-2.9.0/share/hadoop/mapreduce</span><br><span class="line">export HADOOP_YARN_HOME=xxx/hadoop-2.9.0/share/hadoop/yarn</span><br><span class="line">export PATH=$HADOOP_COMMON_HOME/bin:$HADOOP_HDFS_HOME/bin:$HADOOP_MAPRED_HOME/bin:$PATH</span><br></pre></td></tr></table></figure></p>
-<p>但是如果并没有安装hadoop,而只是下载了源码,其实那几个命令都在hadoop/bin下了,所以只需要配:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME=/home/jimo/workspace/temp/hadoop/hadoop-3.0.0</span><br><span class="line">export PATH=$HADOOP_HOME/bin:$PATH</span><br></pre></td></tr></table></figure></p>
-<h1 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h1><p><a href="https://wiki.apache.org/hadoop/HadoopUnderIDEA" target="_blank" rel="noopener">配置IDEA的Hadoop开发环境</a><br><a href="https://wiki.apache.org/hadoop/EclipseEnvironment" target="_blank" rel="noopener">配置Eclipse的Hadoop开发环境</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p><a href="http://ftp.cuhk.edu.hk/pub/packages/apache.org/hadoop/common/current/hadoop-3.0.0.tar.gz" target="_blank" rel="noopener">下载</a><br>完后的hadoop需要配置各个组件的的环境变量.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/10/hadoop/000-config-environment/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/10/hadoop/000-config-environment/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjd1o329m000crkkahyzjt2ot" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
 
       </footer>
       </div>
@@ -1091,7 +1106,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1101,7 +1116,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 12px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 14px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 16px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a>
+      <a href="/tags/AI/" style="font-size: 12px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 14px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 16px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1123,6 +1138,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/01/31/python/003-py-weibo/">爬取个人微博</a>
+          </li>
+        
+          <li>
             <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/">在ubuntu上安装openstack</a>
           </li>
         
@@ -1136,10 +1155,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/01/18/ai/001-fp_growth/">python实现FP_Growth算法</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/18/python/002-flask-wordcloud/">Flask提供词云API</a>
           </li>
         
       </ul>

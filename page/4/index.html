@@ -84,6 +84,169 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/001-linux-manjaro" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/27/linux/001-linux-manjaro/" class="article-date">
+  <time datetime="2017-12-27T08:29:07.000Z" itemprop="datePublished">2017-12-27</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/27/linux/001-linux-manjaro/">配置manjaro</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="manjaro"><a href="#manjaro" class="headerlink" title="manjaro"></a>manjaro</h1><p>讲了manjaro如何配置.</p>
+<h2 id="配置鏡像"><a href="#配置鏡像" class="headerlink" title="配置鏡像"></a>配置鏡像</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ nano /etc/pacman-mirrors.conf </span><br><span class="line">OnlyCountry=China</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc ~]$ sudo pacman-mirrors -g</span><br><span class="line">.: Info Downloading mirrors from repo.manjaro.org</span><br><span class="line">.: Info Using custom mirror file</span><br><span class="line">.: Info Querying mirrors - This may take some time</span><br><span class="line">   0.490 China          : https://mirrors.ustc.edu.cn/manjaro/</span><br><span class="line">   0.291 China          : http://ftp.cuhk.edu.hk/pub/Linux/manjaro/</span><br><span class="line">   1.109 China          : ftp://ftp.cuhk.edu.hk/pub/Linux/manjaro/</span><br><span class="line">   0.131 China          : http://mirrors.tuna.tsinghua.edu.cn/manjaro/</span><br><span class="line">   0.279 China          : https://mirrors.zju.edu.cn/manjaro/</span><br><span class="line">.: Info Writing mirror list</span><br><span class="line">   China           : http://mirrors.tuna.tsinghua.edu.cn/manjaro/stable</span><br><span class="line">   China           : https://mirrors.zju.edu.cn/manjaro/stable</span><br><span class="line">   China           : https://mirrors.ustc.edu.cn/manjaro/stable</span><br><span class="line">   China           : http://ftp.cuhk.edu.hk/pub/Linux/manjaro/stable</span><br><span class="line">.: Info Mirror list generated and saved to: /etc/pacman.d/mirrorlist</span><br></pre></td></tr></table></figure>
+<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> /etc/pacman.conf </span><br><span class="line">[archlinuxcn] </span><br><span class="line">SigLevel = Optional TrustedOnly </span><br><span class="line">Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch</span><br></pre></td></tr></table></figure></p>
+<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -Syy &amp;&amp; sudo pacman -S archlinuxcn-keyring</span><br></pre></td></tr></table></figure></p>
+<h2 id="中文輸入法"><a href="#中文輸入法" class="headerlink" title="中文輸入法"></a>中文輸入法</h2><p>有了上面的鏡像，可以配置下面的輸入法。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -S fcitx-sogoupinyin</span><br><span class="line">sudo pacman -S fcitx-im # 全部安装</span><br><span class="line">sudo pacman -S fcitx-configtool # 图形化配置工具</span><br></pre></td></tr></table></figure></p>
+<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nano ~/.xprofile </span><br><span class="line">export GTK_IM_MODULE=fcitx</span><br><span class="line">export QT_IM_MODULE=fcitx</span><br><span class="line">export XMODIFIERS="@im=fcitx"</span><br></pre></td></tr></table></figure></p>
+<h2 id="VIM"><a href="#VIM" class="headerlink" title="VIM"></a>VIM</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo pacman -S vim</span><br></pre></td></tr></table></figure>
+<h2 id="Chrome"><a href="#Chrome" class="headerlink" title="Chrome"></a>Chrome</h2><p>通過源安裝太慢了。</p>
+<p>[jimo@jimo-pc ~]$ sudo pacman -Sy google-chrome</p>
+<p>但可以使用yaourt安裝<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>首先安裝yaourt</span><br><span class="line">sudo pacman -S yaourt</span><br><span class="line"><span class="meta">#</span> 再安裝chrome</span><br><span class="line">yaourt google-chrome</span><br></pre></td></tr></table></figure></p>
+<p>不過可以使用Chromium<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo pacman -Sy chromium</span><br></pre></td></tr></table></figure></p>
+<h2 id="快捷鍵設置"><a href="#快捷鍵設置" class="headerlink" title="快捷鍵設置"></a>快捷鍵設置</h2><p>在鍵盤設置裏进行快捷键设置</p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>快捷键</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>截图</td>
+<td>Ctrl+Alt+A</td>
+<td>xfce4-screenshooter -rc</td>
+</tr>
+<tr>
+<td>查找程序</td>
+<td>super</td>
+<td>xfce4-appfinder</td>
+</tr>
+<tr>
+<td>锁屏</td>
+<td>super+L</td>
+<td>xflock4</td>
+</tr>
+</tbody>
+</table>
+<p>下面是常用的默认快捷键:可以在设置编辑器里面看</p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>快捷键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最大化窗口</td>
+<td>Alt+F10</td>
+</tr>
+<tr>
+<td>最小化窗口</td>
+<td>Alt+F9</td>
+</tr>
+<tr>
+<td>切换窗口</td>
+<td>Alt+Tab</td>
+</tr>
+<tr>
+<td>显示桌面</td>
+<td>Ctrl+Alt+D</td>
+</tr>
+<tr>
+<td>关闭窗口</td>
+<td>Alt+F4</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装mariadb"><a href="#安装mariadb" class="headerlink" title="安装mariadb"></a>安装mariadb</h2><p>用mariadb替代mysql</p>
+<p><a href="https://downloads.mariadb.org/mariadb/repositories/#mirror=tuna&amp;distro=Arch+Linux&amp;distro_release=opensuse42-amd64--opensuse42" target="_blank" rel="noopener">参考文档</a><br><a href="https://wiki.archlinux.org/index.php/MySQL" target="_blank" rel="noopener">文档二</a></p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>按下面的额顺序：</p>
+<p>先安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -S mariadb</span><br></pre></td></tr></table></figure></p>
+<p>设置开机启动:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable mysqld.service</span><br></pre></td></tr></table></figure></p>
+<p>开启服务：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql</span><br></pre></td></tr></table></figure></p>
+<p>启动数据库：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start mysqld.service</span><br></pre></td></tr></table></figure></p>
+<p>自定义安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql_secure_installation</span><br></pre></td></tr></table></figure></p>
+<p>停止服务：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl stop mysqld.service</span><br></pre></td></tr></table></figure></p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>修改编码：/etc/mysql/my.cnf<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[client]</span><br><span class="line">default-character-set = utf8mb4</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">collation_server = utf8mb4_unicode_ci</span><br><span class="line">character_set_client = utf8mb4</span><br><span class="line">character_set_server = utf8mb4</span><br><span class="line">skip-character-set-client-handshake</span><br><span class="line"></span><br><span class="line">[mysql]</span><br><span class="line">default-character-set = utf8mb4</span><br></pre></td></tr></table></figure></p>
+<p>然后查看：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show variables like 'character%';</span><br><span class="line">+--------------------------+----------------------------+</span><br><span class="line">| Variable_name            | Value                      |</span><br><span class="line">+--------------------------+----------------------------+</span><br><span class="line">| character_set_client     | utf8mb4                    |</span><br><span class="line">| character_set_connection | utf8mb4                    |</span><br><span class="line">| character_set_database   | utf8mb4                    |</span><br><span class="line">| character_set_filesystem | binary                     |</span><br><span class="line">| character_set_results    | utf8mb4                    |</span><br><span class="line">| character_set_server     | utf8mb4                    |</span><br><span class="line">| character_set_system     | utf8                       |</span><br><span class="line">| character_sets_dir       | /usr/share/mysql/charsets/ |</span><br><span class="line">+--------------------------+----------------------------+</span><br></pre></td></tr></table></figure></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>按照通用<a href="https://github.com/jimolonely/myshell/blob/master/build-mysystem.md" target="_blank" rel="noopener">系統構建</a></p>
+<h3 id="QQ"><a href="#QQ" class="headerlink" title="QQ"></a>QQ</h3><p>可一使用deepin的qq。<br>使用命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yaourt -Sy deepin.com.qq.im</span><br></pre></td></tr></table></figure></p>
+<p>假如安装不成功，可以在manjaro的包管理器中选择库-extra模块，搜索qq找到安装。</p>
+<p>不过我的电脑上有些字体乱码。</p>
+<h3 id="openjdk源码"><a href="#openjdk源码" class="headerlink" title="openjdk源码"></a>openjdk源码</h3><p>直接在库里面找到下载即可</p>
+<h3 id="性能监控"><a href="#性能监控" class="headerlink" title="性能监控"></a>性能监控</h3><p>包括网速，内存，CPU等，Xface自带有多面板功能，可以添加，具体步骤如下：</p>
+<p>设置–面板–项目–+，同样可以自定义面板位置和大小，都在外观选项里。</p>
+<h3 id="自带单词查询"><a href="#自带单词查询" class="headerlink" title="自带单词查询"></a>自带单词查询</h3><p>使用look命令查询单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myshell]$ look car</span><br><span class="line">look: /usr/share/dict/words: 没有那个文件或目录</span><br></pre></td></tr></table></figure></p>
+<p>这个字典文件怎么下载呢？很简单，在软件管理里搜索words，即可安装，安装后有很多语言的单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/usr/share/dict/american-english</span><br><span class="line">/usr/share/dict/british</span><br><span class="line">/usr/share/dict/british-english</span><br><span class="line">/usr/share/dict/catala</span><br><span class="line">/usr/share/dict/catalan</span><br><span class="line">/usr/share/dict/finnish</span><br><span class="line">/usr/share/dict/french</span><br><span class="line">/usr/share/dict/german</span><br><span class="line">/usr/share/dict/italian</span><br><span class="line">/usr/share/dict/ngerman</span><br><span class="line">/usr/share/dict/ogerman</span><br><span class="line">/usr/share/dict/spanish</span><br><span class="line">/usr/share/dict/usa</span><br><span class="line">/usr/share/licenses/words/copyright-ca</span><br><span class="line">/usr/share/licenses/words/copyright-de</span><br><span class="line">/usr/share/licenses/words/copyright-en</span><br><span class="line">/usr/share/licenses/words/copyright-es</span><br><span class="line">/usr/share/licenses/words/copyright-fi</span><br><span class="line">/usr/share/licenses/words/copyright-fr</span><br><span class="line">/usr/share/licenses/words/copyright-it</span><br></pre></td></tr></table></figure></p>
+<p>现在我要查询zero开头的单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myshell]$ look zer</span><br><span class="line">zero</span><br><span class="line">zeroed</span><br><span class="line">zeroes</span><br><span class="line">zeroing</span><br><span class="line">zero's</span><br><span class="line">zeros</span><br><span class="line">zeroth</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <h1 id="manjaro"><a href="#manjaro" class="headerlink" title="manjaro"></a>manjaro</h1><p>讲了manjaro如何配置.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2017/12/27/linux/001-linux-manjaro/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2017/12/27/linux/001-linux-manjaro/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2017/12/27/linux/001-linux-manjaro/" data-id="cjd2g2vq6000g12kaza9gccpu" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/manjaro/">manjaro</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/000-build-mysystem" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/27/linux/000-build-mysystem/" class="article-date">
@@ -159,7 +322,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/27/linux/000-build-mysystem/" data-id="cjd1o329p000grkka3vunby41" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/27/linux/000-build-mysystem/" data-id="cjd2g2vq2000b12ka13m0i4ku" class="article-share-link">
           Share
         </a>
         
@@ -244,7 +407,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/24/design-pattern/command/" data-id="cjd1o329l0009rkkauy5qazan" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/24/design-pattern/command/" data-id="cjd2g2vpu000512kacebnznar" class="article-share-link">
           Share
         </a>
         
@@ -316,7 +479,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjd1o329o000erkkao5el1qzj" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjd2g2vpz000912ka9rfah8c6" class="article-share-link">
           Share
         </a>
         
@@ -348,7 +511,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -358,7 +521,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 12px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 14px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 16px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a>
+      <a href="/tags/AI/" style="font-size: 12px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 14px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14px;">spark</a> <a href="/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 16px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -380,6 +543,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/01/31/python/003-py-weibo/">爬取个人微博</a>
+          </li>
+        
+          <li>
             <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/">在ubuntu上安装openstack</a>
           </li>
         
@@ -393,10 +560,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/01/18/ai/001-fp_growth/">python实现FP_Growth算法</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/18/python/002-flask-wordcloud/">Flask提供词云API</a>
           </li>
         
       </ul>
