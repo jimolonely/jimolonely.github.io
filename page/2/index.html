@@ -84,6 +84,86 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-ai/000-perceptron" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/11/ai/000-perceptron/" class="article-date">
+  <time datetime="2018-01-11T07:38:42.000Z" itemprop="datePublished">2018-01-11</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/11/ai/000-perceptron/">神经元的实现</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将使用python实现一个神经元(感知器).</p>
+<p>本文来自<a href="https://www.zybuluo.com/hanbingtao/note/433855" target="_blank" rel="noopener">https://www.zybuluo.com/hanbingtao/note/433855</a></p>
+<p>理论请参考上文.下面是python2和3的实现</p>
+<h1 id="python2"><a href="#python2" class="headerlink" title="python2"></a>python2</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, input_num, activator)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        初始化感知器，设置输入参数的个数，以及激活函数。</span></span><br><span class="line"><span class="string">        激活函数的类型为double -&gt; double</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        self.activator = activator</span><br><span class="line">        <span class="comment"># 权重向量初始化为0</span></span><br><span class="line">        self.weights = [<span class="number">0.0</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(input_num)]</span><br><span class="line">        <span class="comment"># 偏置项初始化为0</span></span><br><span class="line">        self.bias = <span class="number">0.0</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        打印学习到的权重、偏置项</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'weights\t:%s\nbias\t:%f\n'</span> % (self.weights, self.bias)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, input_vec)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        输入向量，输出感知器的计算结果</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把input_vec[x1,x2,x3...]和weights[w1,w2,w3,...]打包在一起</span></span><br><span class="line">        <span class="comment"># 变成[(x1,w1),(x2,w2),(x3,w3),...]</span></span><br><span class="line">        <span class="comment"># 然后利用map函数计算[x1*w1, x2*w2, x3*w3]</span></span><br><span class="line">        <span class="comment"># 最后利用reduce求和</span></span><br><span class="line">        <span class="keyword">return</span> self.activator(</span><br><span class="line">            reduce(<span class="keyword">lambda</span> a, b: a + b,</span><br><span class="line">                   map(<span class="keyword">lambda</span> (x, w): x * w,  </span><br><span class="line">                       zip(input_vec, self.weights))</span><br><span class="line">                , <span class="number">0.0</span>) + self.bias)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self, input_vecs, labels, iteration, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        输入训练数据：一组向量、与每个向量对应的label；以及训练轮数、学习率</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(iteration):</span><br><span class="line">            self._one_iteration(input_vecs, labels, rate)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_one_iteration</span><span class="params">(self, input_vecs, labels, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        一次迭代，把所有的训练数据过一遍</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把输入和输出打包在一起，成为样本的列表[(input_vec, label), ...]</span></span><br><span class="line">        <span class="comment"># 而每个训练样本是(input_vec, label)</span></span><br><span class="line">        samples = zip(input_vecs, labels)</span><br><span class="line">        <span class="comment"># 对每个样本，按照感知器规则更新权重</span></span><br><span class="line">        <span class="keyword">for</span> (input_vec, label) <span class="keyword">in</span> samples:</span><br><span class="line">            <span class="comment"># 计算感知器在当前权重下的输出</span></span><br><span class="line">            output = self.predict(input_vec)</span><br><span class="line">            <span class="comment"># 更新权重</span></span><br><span class="line">            self._update_weights(input_vec, output, label, rate)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_weights</span><span class="params">(self, input_vec, output, label, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        按照感知器规则更新权重</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把input_vec[x1,x2,x3,...]和weights[w1,w2,w3,...]打包在一起</span></span><br><span class="line">        <span class="comment"># 变成[(x1,w1),(x2,w2),(x3,w3),...]</span></span><br><span class="line">        <span class="comment"># 然后利用感知器规则更新权重</span></span><br><span class="line">        delta = label - output</span><br><span class="line">        self.weights = map(</span><br><span class="line">            <span class="keyword">lambda</span> (x, w): w + rate * delta * x,</span><br><span class="line">            zip(input_vec, self.weights))</span><br><span class="line">        <span class="comment"># 更新bias</span></span><br><span class="line">        self.bias += rate * delta</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    定义激活函数f</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_training_dataset</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    基于and真值表构建训练数据</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="comment"># 构建训练数据</span></span><br><span class="line">    <span class="comment"># 输入向量列表</span></span><br><span class="line">    input_vecs = [[<span class="number">1</span>,<span class="number">1</span>], [<span class="number">0</span>,<span class="number">0</span>], [<span class="number">1</span>,<span class="number">0</span>], [<span class="number">0</span>,<span class="number">1</span>]]</span><br><span class="line">    <span class="comment"># 期望的输出列表，注意要与输入一一对应</span></span><br><span class="line">    <span class="comment"># [1,1] -&gt; 1, [0,0] -&gt; 0, [1,0] -&gt; 0, [0,1] -&gt; 0</span></span><br><span class="line">    labels = [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]</span><br><span class="line">    <span class="keyword">return</span> input_vecs, labels    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_and_perceptron</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    使用and真值表训练感知器</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="comment"># 创建感知器，输入参数个数为2（因为and是二元函数），激活函数为f</span></span><br><span class="line">    p = Perceptron(<span class="number">2</span>, f)</span><br><span class="line">    <span class="comment"># 训练，迭代10轮, 学习速率为0.1</span></span><br><span class="line">    input_vecs, labels = get_training_dataset()</span><br><span class="line">    p.train(input_vecs, labels, <span class="number">10</span>, <span class="number">0.1</span>)</span><br><span class="line">    <span class="comment">#返回训练好的感知器</span></span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>: </span><br><span class="line">    <span class="comment"># 训练and感知器</span></span><br><span class="line">    and_perception = train_and_perceptron()</span><br><span class="line">    <span class="comment"># 打印训练获得的权重</span></span><br><span class="line">    <span class="keyword">print</span> and_perception</span><br><span class="line">    <span class="comment"># 测试</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'1 and 1 = %d'</span> % and_perception.predict([<span class="number">1</span>, <span class="number">1</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'0 and 0 = %d'</span> % and_perception.predict([<span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'1 and 0 = %d'</span> % and_perception.predict([<span class="number">1</span>, <span class="number">0</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'0 and 1 = %d'</span> % and_perception.predict([<span class="number">0</span>, <span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<h1 id="python3"><a href="#python3" class="headerlink" title="python3"></a>python3</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> reduce</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, input_num, activator)</span>:</span></span><br><span class="line">        self.activator = activator</span><br><span class="line">        self.weights = [<span class="number">0.0</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(input_num)]</span><br><span class="line">        self.bias = <span class="number">0.0</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self, input_vec, iteration, labels, rate)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(iteration):</span><br><span class="line">            self._one_iteration(input_vec, labels, rate)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_one_iteration</span><span class="params">(self, input_vec, labels, rate)</span>:</span></span><br><span class="line">        samples = zip(input_vec, labels)</span><br><span class="line">        <span class="keyword">for</span> (vec, label) <span class="keyword">in</span> samples:</span><br><span class="line">            output = self.predict(vec)</span><br><span class="line">            self._update_weights(vec, output, label, rate)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, vec)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.activator(</span><br><span class="line">            reduce(</span><br><span class="line">                <span class="keyword">lambda</span> a, b: a + b,</span><br><span class="line">                list(map(</span><br><span class="line">                    <span class="keyword">lambda</span> x, w: x * w,</span><br><span class="line">                    vec, self.weights</span><br><span class="line">                )), <span class="number">0.0</span></span><br><span class="line">            ) + self.bias</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_weights</span><span class="params">(self, vec, output, label, rate)</span>:</span></span><br><span class="line">        delta = label - output</span><br><span class="line">        self.weights = list(map(</span><br><span class="line">            <span class="keyword">lambda</span> x, w: w + rate * delta * x,  <span class="comment"># 在python2里是用的(x,w)形式</span></span><br><span class="line">            vec, self.weights</span><br><span class="line">        ))</span><br><span class="line">        self.bias += rate * delta</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'weights: %s\nbias: %s\n'</span> % (self.weights, self.bias)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">activator</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_data_sets</span><span class="params">()</span>:</span></span><br><span class="line">    x = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">1</span>, <span class="number">0</span>], [<span class="number">1</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">0</span>]]</span><br><span class="line">    labels = [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>]</span><br><span class="line">    <span class="keyword">return</span> x, labels</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">()</span>:</span></span><br><span class="line">    p = Perceptron(<span class="number">2</span>, activator)</span><br><span class="line">    x, labels = get_data_sets()</span><br><span class="line">    p.train(x, <span class="number">20</span>, labels, <span class="number">0.05</span>)</span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    p = train()</span><br><span class="line">    print(p)</span><br><span class="line">    <span class="comment"># 测试</span></span><br><span class="line">    print(<span class="string">'1 and 1 = %d'</span> % p.predict([<span class="number">1</span>, <span class="number">1</span>]))</span><br><span class="line">    print(<span class="string">'0 and 0 = %d'</span> % p.predict([<span class="number">0</span>, <span class="number">0</span>]))</span><br><span class="line">    print(<span class="string">'1 and 0 = %d'</span> % p.predict([<span class="number">1</span>, <span class="number">0</span>]))</span><br><span class="line">    print(<span class="string">'0 and 1 = %d'</span> % p.predict([<span class="number">0</span>, <span class="number">1</span>]))</span><br></pre></td></tr></table></figure>
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">weights: [0.1, 0.05]</span><br><span class="line">bias: -0.1</span><br><span class="line"></span><br><span class="line">1 and 1 = 1</span><br><span class="line">0 and 0 = 0</span><br><span class="line">1 and 0 = 0</span><br><span class="line">0 and 1 = 0</span><br></pre></td></tr></table></figure>
+<p>其实上面就是梯度下降的过程.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将使用python实现一个神经元(感知器).</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/11/ai/000-perceptron/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/11/ai/000-perceptron/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjedmup8t004omaka8yqfigsu" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/002-speed-test" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/11/tools/002-speed-test/" class="article-date">
@@ -156,7 +236,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjdf9bfwa001ozwkaw5ye3ook" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjedmup7v001lmaka32t7c3qn" class="article-share-link">
           Share
         </a>
         
@@ -235,7 +315,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjdf9bfvf0008zwka4pvu1pgd" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjedmup710006makayiqr97w1" class="article-share-link">
           Share
         </a>
         
@@ -316,7 +396,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjdf9bfw9001mzwkauo213jak" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjedmup7v001jmakaj81tuwqj" class="article-share-link">
           Share
         </a>
         
@@ -405,7 +485,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjdf9bfvt000tzwkaqgj077in" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjedmup7g000rmaka5hqdhw5q" class="article-share-link">
           Share
         </a>
         
@@ -503,7 +583,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjdf9bfw4001gzwka332u36a8" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjedmup7s001fmakankr4zxsa" class="article-share-link">
           Share
         </a>
         
@@ -583,7 +663,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/maven/000-package-execute-jar/" data-id="cjdf9bfvg0009zwka7y0r5u2e" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/05/maven/000-package-execute-jar/" data-id="cjedmup7e000nmakaobhixtmd" class="article-share-link">
           Share
         </a>
         
@@ -676,7 +756,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/03/spark/03-spark-warning/" data-id="cjdf9bfw3001dzwkaqwweo05u" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/03/spark/03-spark-warning/" data-id="cjedmup7r001dmakaso8b3iqx" class="article-share-link">
           Share
         </a>
         
@@ -759,7 +839,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/03/spark/02-write-csv/" data-id="cjdf9bfw2001bzwkayd7l2d2t" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/03/spark/02-write-csv/" data-id="cjedmup7p001bmakat6vwuh90" class="article-share-link">
           Share
         </a>
         
@@ -846,108 +926,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/python/000-pyodbc/" data-id="cjdf9bfvt000rzwkaprm8y3c4" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/02/python/000-pyodbc/" data-id="cjedmup7f000omaka3sgob2ao" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-spark/01-rdd" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/02/spark/01-rdd/" class="article-date">
-  <time datetime="2018-01-02T07:04:20.000Z" itemprop="datePublished">2018-01-02</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/02/spark/01-rdd/">理解RDD</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>RDD虽然是spark抽象出来的概念,但不得不理解.</p>
-<h1 id="什么是RDD"><a href="#什么是RDD" class="headerlink" title="什么是RDD"></a>什么是RDD</h1><p>RDD(resilient distributed datasets),弹性分布式数据集.<br>spark的核心概念,简单说就是分布式的元素集合.</p>
-<h1 id="RDD操作"><a href="#RDD操作" class="headerlink" title="RDD操作"></a>RDD操作</h1><ol>
-<li><p>转化操作:并不进行实际运算</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> lines = sc.textFile(<span class="string">"README.md"</span>)</span><br><span class="line">lines: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">String</span>] = <span class="type">README</span>.md <span class="type">MapPartitionsRDD</span>[<span class="number">1</span>] at textFile at &lt;console&gt;:<span class="number">2</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> pythonLines = lines.filter(line=&gt;line.contains(<span class="string">"Python"</span>))</span><br><span class="line">res3: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">String</span>] = <span class="type">MapPartitionsRDD</span>[<span class="number">2</span>] at filter at &lt;console&gt;:<span class="number">27</span></span><br><span class="line">``` </span><br><span class="line"><span class="number">2.</span> 行动操作(<span class="type">Action</span>):做实际运算</span><br><span class="line">```scala</span><br><span class="line">scala&gt; pythonLines.count()</span><br><span class="line">res5: <span class="type">Long</span> = <span class="number">3</span></span><br><span class="line"></span><br><span class="line">scala&gt; pythonLines.take(<span class="number">10</span>).foreach(line=&gt;println(line))</span><br><span class="line">high-level <span class="type">APIs</span> in <span class="type">Scala</span>, <span class="type">Java</span>, <span class="type">Python</span>, and <span class="type">R</span>, and an optimized engine that</span><br><span class="line">## <span class="type">Interactive</span> <span class="type">Python</span> <span class="type">Shell</span></span><br><span class="line"><span class="type">Alternatively</span>, <span class="keyword">if</span> you prefer <span class="type">Python</span>, you can use the <span class="type">Python</span> shell:</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>惰性求值:在调用行动操作前不会开始计算.</p>
-</li>
-</ol>
-<h1 id="常见操作"><a href="#常见操作" class="headerlink" title="常见操作"></a>常见操作</h1><ol>
-<li><p>常见转化操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">filter</span><br><span class="line">map</span><br><span class="line">flatMap</span><br><span class="line">distinct</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>伪集合操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">union</span><br><span class="line">intersection</span><br><span class="line">substract</span><br><span class="line">cartesian</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>行动操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">collect</span><br><span class="line">count</span><br><span class="line">take</span><br><span class="line">top</span><br><span class="line">reduce</span><br><span class="line">fold</span><br><span class="line">aggregate</span><br><span class="line">foreach</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h1><p>由于RDD是惰性求值的,所以我们多次使用行动操作时每次都会重算,所以缓存起来比较好.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.storage.<span class="type">StorageLevel</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = input.map(x=&gt;x*x)</span><br><span class="line">result.persist(<span class="type">StorageLevel</span>.<span class="type">DISK_ONLY</span>)</span><br><span class="line">println(result.count())</span><br><span class="line">println(result.collect().mkString(<span class="string">","</span>))</span><br></pre></td></tr></table></figure></p>
-<p>持久化级别有几种:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MEMORY_ONLY</span><br><span class="line">MEMORY_AND_DISK</span><br><span class="line">DISK_ONLY</span><br></pre></td></tr></table></figure></p>
-<p>内存写不下会放到磁盘,spark使用的LRU算法.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>RDD虽然是spark抽象出来的概念,但不得不理解.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/02/spark/01-rdd/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/02/spark/01-rdd/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/spark/01-rdd/" data-id="cjdf9bfw10018zwkatcene3o6" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
 
       </footer>
       </div>
@@ -974,7 +958,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -984,7 +968,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 14.29px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.14px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 15.71px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.14px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -993,7 +977,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
     </div>
   </div>
 
@@ -1004,6 +988,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/03/05/tools/006-gradle/">gradle必经之路</a>
+          </li>
         
           <li>
             <a href="/2018/02/07/tools/005-latex2/">不得不会的latex2</a>
@@ -1019,10 +1007,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/01/26/linux/007-ubuntu-static-ip/">ubuntu下设置静态ip</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/21/react/000-import-js-function/">在React中引入js函数</a>
           </li>
         
       </ul>
