@@ -84,6 +84,96 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-tools/004-install-texlive" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/12/tools/004-install-texlive/" class="article-date">
+  <time datetime="2018-01-12T07:46:23.000Z" itemprop="datePublished">2018-01-12</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/12/tools/004-install-texlive/">手动安装texlive</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将手动安装texlive环境,从下载到配置.</p>
+<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><p>CTAN有各个安装源<a href="https://ctan.org/mirrors" target="_blank" rel="noopener">https://ctan.org/mirrors</a></p>
+<p>我使用清华的:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> wget -c http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/Images/texlive2017-20170524.iso</span><br></pre></td></tr></table></figure></p>
+<p>下载有3个多GB.</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>在安装前清除遗留程序,解压或挂载后在root下执行安装程序:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> locate texlive | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> sudo ./install-tl</span><br></pre></td></tr></table></figure></p>
+<p>这是个漫长的过程,大概要12分钟.</p>
+<p>安装完后会提示各个路径:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Welcome to TeX Live!</span><br><span class="line"></span><br><span class="line">Documentation links: /usr/local/texlive/2017/index.html</span><br><span class="line">The TeX Live web site (https://tug.org/texlive/)</span><br><span class="line">contains updates and corrections.</span><br><span class="line"></span><br><span class="line">TeX Live is a joint project of the TeX user groups around the world;</span><br><span class="line">please consider supporting it by joining the group best for you.</span><br><span class="line">The list of groups is on the web at https://tug.org/usergroups.html.</span><br><span class="line"></span><br><span class="line">Add /usr/local/texlive/2017/texmf-dist/doc/man to MANPATH.</span><br><span class="line">Add /usr/local/texlive/2017/texmf-dist/doc/info to INFOPATH.</span><br><span class="line">Most importantly, add /usr/local/texlive/2017/bin/x86_64-linux</span><br><span class="line">to your PATH for current and future sessions.</span><br><span class="line"></span><br><span class="line">Logfile: /usr/local/texlive/2017/install-tl.log</span><br></pre></td></tr></table></figure></p>
+<p>比如文档路径:/usr/local/texlive/2017/index.html</p>
+<p>更重要的是环境变量:/usr/local/texlive/2017/bin/x86_64-linux</p>
+<h1 id="配置与测试"><a href="#配置与测试" class="headerlink" title="配置与测试"></a>配置与测试</h1><p>配置环境变量:追加.bashrc<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export TEXLIVE=/usr/local/texlive/2017/bin/x86_64-linux</span><br><span class="line">export PATH=$TEXLIVE:$PATH</span><br></pre></td></tr></table></figure></p>
+<p>测试:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> tex --version</span><br><span class="line">TeX 3.14159265 (TeX Live 2017)</span><br><span class="line">kpathsea version 6.2.3</span><br><span class="line">Copyright 2017 D.E. Knuth.</span><br><span class="line">There is NO warranty.  Redistribution of this software is</span><br><span class="line">covered by the terms of both the TeX copyright and</span><br><span class="line">the Lesser GNU General Public License.</span><br><span class="line">For more information about these matters, see the file</span><br><span class="line">named COPYING and the TeX source.</span><br><span class="line">Primary author of TeX: D.E. Knuth.</span><br></pre></td></tr></table></figure></p>
+<p>编辑个简单的文档保存为sample.tex:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[12pt,a4paper]&#123;report&#125;</span><br><span class="line"></span><br><span class="line">\title&#123;Title&#125;</span><br><span class="line">\author&#123;jackpler&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line">hello world!</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后测试:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> latex sample.tex  # 编译一个测试文件</span><br><span class="line"><span class="meta">$</span> pdftex sample.tex # 生成测试文档的pdf文件</span><br></pre></td></tr></table></figure></p>
+<h1 id="tlmgr使用"><a href="#tlmgr使用" class="headerlink" title="tlmgr使用"></a>tlmgr使用</h1><p>现在texlive自带tlmgr包管理工具进行管理,方便了.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 自动选择最近的仓库更新</span><br><span class="line"><span class="meta">$</span> sudo tlmgr option repository http://mirror.ctan.org/systems/texlive/tlnet    </span><br><span class="line"><span class="meta">#</span> 更新宏包管理器</span><br><span class="line"><span class="meta">$</span> sudo tlmgr update --self  </span><br><span class="line"><span class="meta">#</span> 更新所有已安装的宏包</span><br><span class="line"><span class="meta">$</span> sudo tlmgr update --all   </span><br><span class="line"><span class="meta">#</span> 安装新包</span><br><span class="line"><span class="meta">$</span> sudo tlmgr install 包名</span><br></pre></td></tr></table></figure></p>
+<p>更多包在<a href="https://ctan.org" target="_blank" rel="noopener">CTAN</a>上去找.</p>
+<h1 id="更多学习"><a href="#更多学习" class="headerlink" title="更多学习"></a>更多学习</h1><p>使用官方文档:<a href="https://www.tug.org/texlive/doc/texlive-zh-cn/texlive-zh-cn.pdf" target="_blank" rel="noopener">https://www.tug.org/texlive/doc/texlive-zh-cn/texlive-zh-cn.pdf</a></p>
+<p>完整的tlmgr命令文档<a href="http://tug.org/texlive/doc/tlmgr.html" target="_blank" rel="noopener">tlmgr</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将手动安装texlive环境,从下载到配置.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/12/tools/004-install-texlive/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/12/tools/004-install-texlive/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjeeywzuw001wwxkazspvoq3t" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/003-resources" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/12/tools/003-resources/" class="article-date">
@@ -303,7 +393,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjedzmo9r001qovka0izjbx13" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjeeywzuu001uwxkaf2z8bbbw" class="article-share-link">
           Share
         </a>
         
@@ -383,7 +473,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjedzmo8k0001ovka8j0e05fe" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjeeywztt0004wxkajpaaoira" class="article-share-link">
           Share
         </a>
         
@@ -469,7 +559,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjedzmo9q001oovkah65zwr9l" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjeeywzus001swxka7ccqs7iw" class="article-share-link">
           Share
         </a>
         
@@ -548,7 +638,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjedzmo8u0008ovkazy62o7g0" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjeeywztw0008wxkaz9toskqf" class="article-share-link">
           Share
         </a>
         
@@ -629,7 +719,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjedzmo9p001movkaxajjbmuo" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjeeywzur001rwxka2ovua61y" class="article-share-link">
           Share
         </a>
         
@@ -718,7 +808,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjedzmo9a000vovkaxdrcpnkz" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjeeywzue000ywxkap8j3pu9u" class="article-share-link">
           Share
         </a>
         
@@ -816,7 +906,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjedzmo9n001iovkannwv83s8" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjeeywzuo001jwxkas9ltsivs" class="article-share-link">
           Share
         </a>
         
@@ -896,7 +986,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/maven/000-package-execute-jar/" data-id="cjedzmo98000rovkaglosyrjg" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/05/maven/000-package-execute-jar/" data-id="cjeeywzuc000twxka1mmtvdef" class="article-share-link">
           Share
         </a>
         
@@ -989,95 +1079,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/03/spark/03-spark-warning/" data-id="cjedzmo9m001govkahiasqihn" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/03/spark/03-spark-warning/" data-id="cjeeywzun001iwxkagvfef4co" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-spark/02-write-csv" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/03/spark/02-write-csv/" class="article-date">
-  <time datetime="2018-01-03T03:04:46.000Z" itemprop="datePublished">2018-01-03</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/03/spark/02-write-csv/">CSV data source does not support array&lt;string&gt; data type</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
-<h1 id="例子数据"><a href="#例子数据" class="headerlink" title="例子数据"></a>例子数据</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----------+----------+-------------------+</span><br><span class="line">|antecedent|consequent|         confidence|</span><br><span class="line">+----------+----------+-------------------+</span><br><span class="line">|   [C47_D]|    [C3_B]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C13_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C23_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C24_D]|0.35714285714285715|</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>前面2个是数组.</p>
-<h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><p>多种,下面看2种</p>
-<ol>
-<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions.udf</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stringify = udf((vs: <span class="type">Seq</span>[<span class="type">String</span>]) =&gt; <span class="string">s""</span><span class="string">"$&#123;vs.mkString("</span>,<span class="string">")&#125;"</span><span class="string">""</span>)</span><br><span class="line">    df.withColumn(<span class="string">"antecedent"</span>, stringify($<span class="string">"antecedent"</span>))</span><br><span class="line">      .withColumn(<span class="string">"consequent"</span>, stringify($<span class="string">"consequent"</span>))</span><br><span class="line">      .write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
-</li>
-<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Asso</span>(<span class="params">antecedent: <span class="type">String</span>, consequent: <span class="type">String</span>, confidence: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">df</span>.<span class="title">rdd</span>.<span class="title">map</span> </span>&#123; line =&gt; <span class="type">Asso</span>(line(<span class="number">0</span>).toString, line(<span class="number">1</span>).toString, line(<span class="number">2</span>).toString) &#125;.</span><br><span class="line">      toDF().write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/03/spark/02-write-csv/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/03/spark/02-write-csv/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/03/spark/02-write-csv/" data-id="cjedzmo9l001dovkatf28bev8" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
 
       </footer>
       </div>
@@ -1104,7 +1111,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1114,7 +1121,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.67px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.67px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 13.33px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.33px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 16.67px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 15px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.67px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 18.33px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 17.14px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 18.57px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1136,6 +1143,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/06/lang/000-groovy/">Groovy必经之路</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/05/tools/007-magnet/">不得不知的magnet链接</a>
           </li>
         
@@ -1149,10 +1160,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/01/31/python/003-py-weibo/">爬取个人微博</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/">在ubuntu上安装openstack</a>
           </li>
         
       </ul>
