@@ -84,6 +84,96 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/007-ubuntu-static-ip" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/26/linux/007-ubuntu-static-ip/" class="article-date">
+  <time datetime="2018-01-26T03:04:41.000Z" itemprop="datePublished">2018-01-26</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/26/linux/007-ubuntu-static-ip/">ubuntu下设置静态ip</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>记录下ip,掩码,网关的基础知识和ubuntu下的配置.</p>
+<h1 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h1><p>学过计算机网络肯定知道,如果不用也很快就忘了.</p>
+<p>什么是IP,子网掩码,网关?</p>
+<p>简单来说IP用于定位地址,用于屏蔽物理差异,由网络号和主机号组成.<br>子网掩码用于区分前面的网络号和后面的具体地址,前面为1和后面为0.<br>网关也是个ip,是通向其他网络的IP.</p>
+<p>举个例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IP: 192.168.1.100/24</span><br><span class="line">子网掩码:255.255.255.0</span><br></pre></td></tr></table></figure></p>
+<p>24代表掩码前面的1的个数,也表示这个子网可以容纳256个局域网IP.</p>
+<p>如何得到网关(gateway):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">一般来说采用dhcp不需要关注,当配置静态ip时就需要配网关了.</span><br><span class="line">一般取该子网第一个或最后一个可用IP.</span><br><span class="line">方法:</span><br><span class="line">使用IP和掩码相与得: 192.168.1.0</span><br><span class="line">一般1和255不用,所以可以取2或则254,那么网关为:192.168.1.2或192.168.1.254</span><br></pre></td></tr></table></figure></p>
+<h1 id="在虚拟机里的ubuntu配置静态IP"><a href="#在虚拟机里的ubuntu配置静态IP" class="headerlink" title="在虚拟机里的ubuntu配置静态IP"></a>在虚拟机里的ubuntu配置静态IP</h1><p>在配之前查看下原来的IP:发现IP是10.0.2.15/24<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ ip addr</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000</span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: enp0s3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000</span><br><span class="line">    link/ether 08:00:27:dd:c4:25 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3</span><br><span class="line">       valid_lft 84947sec preferred_lft 84947sec</span><br><span class="line">    inet6 fe80::2466:c20b:788d:f576/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure></p>
+<p>设置静态IP:修改为14</p>
+<p>文件/etc/network/interfaces</p>
+<p>原来:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br></pre></td></tr></table></figure></p>
+<p>现在:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo vim /etc/network/interfaces</span><br><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line">auto enp0s3</span><br><span class="line"></span><br><span class="line">iface enp0s3 inet static</span><br><span class="line">address 10.0.2.14</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 10.0.2.2</span><br></pre></td></tr></table></figure></p>
+<p>重启服务:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo /etc/init.d/networking restart</span><br><span class="line">[ ok ] Restarting networking (via systemctl): networking.service.</span><br></pre></td></tr></table></figure></p>
+<p>再重启一下连接.</p>
+<h1 id="更简单的"><a href="#更简单的" class="headerlink" title="更简单的"></a>更简单的</h1><p>直接在界面上操作</p>
+<img src="/2018/01/26/linux/007-ubuntu-static-ip/000.png">
+<p>然后需要重启一下连接.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>记录下ip,掩码,网关的基础知识和ubuntu下的配置.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/26/linux/007-ubuntu-static-ip/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/26/linux/007-ubuntu-static-ip/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjemdm6mb0010w3karwz1awlr" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ip/">ip</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-react/000-import-js-function" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/21/react/000-import-js-function/" class="article-date">
@@ -149,7 +239,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/21/react/000-import-js-function/" data-id="cjem4vdjx001b9jka98y83752" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/21/react/000-import-js-function/" data-id="cjemdm6mi001ew3ka0zdq02qg" class="article-share-link">
           Share
         </a>
         
@@ -238,7 +328,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/18/ai/001-fp_growth/" data-id="cjem4vdj000029jkaum2y23kc" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/18/ai/001-fp_growth/" data-id="cjemdm6ll0002w3kaqsy8m8zd" class="article-share-link">
           Share
         </a>
         
@@ -320,7 +410,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/18/python/002-flask-wordcloud/" data-id="cjem4vdju00169jkajb0luczl" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/18/python/002-flask-wordcloud/" data-id="cjemdm6mf001aw3kan2072xrn" class="article-share-link">
           Share
         </a>
         
@@ -410,7 +500,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjem4vdke00249jkaoby3syfh" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjemdm6my0021w3kaspfibzja" class="article-share-link">
           Share
         </a>
         
@@ -643,7 +733,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjem4vdkd00219jkaj616s0ja" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjemdm6n00023w3ka3hrbwe5v" class="article-share-link">
           Share
         </a>
         
@@ -723,7 +813,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjem4vdix00019jkac92lgmxw" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjemdm6lg0001w3kaqomohb6f" class="article-share-link">
           Share
         </a>
         
@@ -809,7 +899,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjem4vdkc001z9jkaos8yushz" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjemdm6mx0020w3kateripzij" class="article-share-link">
           Share
         </a>
         
@@ -888,7 +978,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjem4vdj900099jkagzzv8ucz" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjemdm6lx0009w3ka99mn3yr7" class="article-share-link">
           Share
         </a>
         
@@ -969,101 +1059,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjem4vdka001x9jkac5045hi7" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjemdm6mw001zw3kawrd4ks3j" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-python/001-music21" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/06/python/001-music21/" class="article-date">
-  <time datetime="2018-01-06T07:32:29.000Z" itemprop="datePublished">2018-01-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/06/python/001-music21/">music21</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
-<h1 id="music21是什么"><a href="#music21是什么" class="headerlink" title="music21是什么"></a>music21是什么</h1><p>music21是一个基于python的计算机辅助音乐学工具包。该系统自2008年以来一直在不断发展壮大。<br>music21中的方法和传统已被用在许多以前的软件系统中。</p>
-<p>music21中的21指的是在MIT中所有的课程都有数字和音乐，还有其他一些人文科学部门，编号为21. </p>
-<p>MIT的音乐部门以及哈佛大学，史密斯学院和圣约克山学院帮助把这个工具包从最简单的根源变成了一个成熟的系统。</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接用pip就行,更多安装参考官方文档<a href="http://web.mit.edu/music21/doc/installing/index.html" target="_blank" rel="noopener">music</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> pip install music21</span><br></pre></td></tr></table></figure></p>
-<h1 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h1><h3 id="1-展示一个音符"><a href="#1-展示一个音符" class="headerlink" title="1. 展示一个音符"></a>1. 展示一个音符</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> music21 <span class="keyword">import</span> *</span><br><span class="line">In [<span class="number">2</span>]: n = note.Note(<span class="string">"D#3"</span>)</span><br><span class="line">In [<span class="number">3</span>]: n.duration.type = <span class="string">'half'</span></span><br><span class="line">In [<span class="number">4</span>]: n.show()</span><br></pre></td></tr></table></figure>
-<p>你以为会出现图片,但由于没有打开mxl文件的应用会报错:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SubConverterException: Cannot find a valid application path <span class="keyword">for</span> format musicxml. Specify this <span class="keyword">in</span> your Environment by calling environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/path/to/application'</span>)</span><br></pre></td></tr></table></figure></p>
-<p>这时安装<a href="https://musescore.org/zh-hans" target="_blank" rel="noopener">musescore</a>,这个跨平台的开源乐谱编辑器.其路径默认在/usr/bin/musescore</p>
-<p>然后配置路径再显示: (注意:这个environment是music21下的)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">7</span>]: environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/usr/bin/musescore'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: n.show()</span><br><span class="line">qt5ct: using qt5ct plugin</span><br></pre></td></tr></table></figure></p>
-<p>应该会打开musescore软件:</p>
-<img src="/2018/01/06/python/001-music21/000.png">
-<h3 id="2-播放midi"><a href="#2-播放midi" class="headerlink" title="2.播放midi"></a>2.播放midi</h3><p>同样需要配置midi播放器:这里使用timidity<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">9</span>]: littleMelody = converter.parse(<span class="string">"tinynotation: 3/4 c4 d8 f g16 a g f#"</span>)</span><br><span class="line">In [<span class="number">13</span>]: environment.set(<span class="string">'midiPath'</span>, <span class="string">'/usr/bin/timidity'</span>)</span><br><span class="line">In [<span class="number">14</span>]: littleMelody.show(<span class="string">'midi'</span>)</span><br><span class="line">Requested buffer size <span class="number">32768</span>, fragment size <span class="number">8192</span></span><br><span class="line">ALSA pcm <span class="string">'default'</span> set buffer size <span class="number">32768</span>, period size <span class="number">8192</span> bytes</span><br><span class="line">Playing /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">MIDI file: /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">Format: <span class="number">1</span>  Tracks: <span class="number">1</span>  Divisions: <span class="number">1024</span></span><br><span class="line">Sequence: </span><br><span class="line">No instrument mapped to tone bank <span class="number">0</span>, program <span class="number">0</span> - this instrument will <span class="keyword">not</span> be heard</span><br><span class="line">No pre-resampling cache hit</span><br><span class="line">Last <span class="number">1</span> MIDI events are ignored</span><br><span class="line">Playing time: ~<span class="number">4</span> seconds</span><br><span class="line">Notes cut: <span class="number">0</span></span><br><span class="line">Notes lost totally: <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
-<p>可以看到,默认这些临时文件都在/tmp/music21/下.</p>
-<h3 id="3-其他"><a href="#3-其他" class="headerlink" title="3.其他"></a>3.其他</h3><p>还可以生成图片,读取mxl文件,生成和弦等.</p>
-<p>如果不想配置软件,就直接去tmp目录下查看文件.</p>
-<p>学习还是官方文档最好:<a href="http://web.mit.edu/music21/doc/index.html" target="_blank" rel="noopener">music21-doc</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/06/python/001-music21/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/06/python/001-music21/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjem4vdjs00139jkaqpp75eyv" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/music/">music</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
 
       </footer>
       </div>
@@ -1090,7 +1091,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1100,7 +1101,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 17.14px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 18.57px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 17.14px;">java</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 18.57px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1122,6 +1123,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/11/elasticsearch/000-basic-concept/">01elasticsearch基础概念</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/09/lang/002-redis/">我的redis之路</a>
           </li>
         
@@ -1135,10 +1140,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/06/lang/000-groovy/">Groovy必经之路</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/05/tools/007-magnet/">不得不知的magnet链接</a>
           </li>
         
       </ul>
