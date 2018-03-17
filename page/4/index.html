@@ -84,6 +84,89 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-spark/02-write-csv" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/03/spark/02-write-csv/" class="article-date">
+  <time datetime="2018-01-03T03:04:46.000Z" itemprop="datePublished">2018-01-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/03/spark/02-write-csv/">CSV data source does not support array&lt;string&gt; data type</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
+<h1 id="例子数据"><a href="#例子数据" class="headerlink" title="例子数据"></a>例子数据</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----------+----------+-------------------+</span><br><span class="line">|antecedent|consequent|         confidence|</span><br><span class="line">+----------+----------+-------------------+</span><br><span class="line">|   [C47_D]|    [C3_B]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C13_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C23_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C24_D]|0.35714285714285715|</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>前面2个是数组.</p>
+<h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><p>多种,下面看2种</p>
+<ol>
+<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions.udf</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stringify = udf((vs: <span class="type">Seq</span>[<span class="type">String</span>]) =&gt; <span class="string">s""</span><span class="string">"$&#123;vs.mkString("</span>,<span class="string">")&#125;"</span><span class="string">""</span>)</span><br><span class="line">    df.withColumn(<span class="string">"antecedent"</span>, stringify($<span class="string">"antecedent"</span>))</span><br><span class="line">      .withColumn(<span class="string">"consequent"</span>, stringify($<span class="string">"consequent"</span>))</span><br><span class="line">      .write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Asso</span>(<span class="params">antecedent: <span class="type">String</span>, consequent: <span class="type">String</span>, confidence: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">df</span>.<span class="title">rdd</span>.<span class="title">map</span> </span>&#123; line =&gt; <span class="type">Asso</span>(line(<span class="number">0</span>).toString, line(<span class="number">1</span>).toString, line(<span class="number">2</span>).toString) &#125;.</span><br><span class="line">      toDF().write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/03/spark/02-write-csv/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/03/spark/02-write-csv/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/03/spark/02-write-csv/" data-id="cjeuodxxx002kl5kawuebpdxk" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-python/000-pyodbc" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/02/python/000-pyodbc/" class="article-date">
@@ -157,7 +240,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/python/000-pyodbc/" data-id="cjersoexl001hdaka21fmeaka" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/02/python/000-pyodbc/" data-id="cjeuodxxk001rl5kac3rn8byu" class="article-share-link">
           Share
         </a>
         
@@ -253,7 +336,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/spark/01-rdd/" data-id="cjersoey3002gdakadizijdux" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/02/spark/01-rdd/" data-id="cjeuodxxv002fl5kasoexbckb" class="article-share-link">
           Share
         </a>
         
@@ -327,7 +410,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/scala/001-method-vs-function/" data-id="cjersoexr001vdaka00nyuniu" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/02/scala/001-method-vs-function/" data-id="cjeuodxxt002al5kar15o3nbx" class="article-share-link">
           Share
         </a>
         
@@ -436,7 +519,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjersoexu001zdakalx2k7rwj" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjeuodxy2002tl5ka8vq14l6v" class="article-share-link">
           Share
         </a>
         
@@ -556,7 +639,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/git/000-multi-git-account/" data-id="cjersoex0000gdakaudocm66f" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/31/git/000-multi-git-account/" data-id="cjeuodxx4000ul5kadzn106mh" class="article-share-link">
           Share
         </a>
         
@@ -630,7 +713,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/linux/006-vim/" data-id="cjersoexg0017dakagilw3ck1" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/31/linux/006-vim/" data-id="cjeuodxxi001ml5kaq723qj1a" class="article-share-link">
           Share
         </a>
         
@@ -713,7 +796,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjersoexr001tdaka6axzbazl" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjeuodxxs0028l5kaf3mj2qjg" class="article-share-link">
           Share
         </a>
         
@@ -794,7 +877,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjersoey2002edakan58u0ov6" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjeuodxxw002hl5kank6u4okd" class="article-share-link">
           Share
         </a>
         
@@ -930,91 +1013,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjersoext001ydaka503oh9m2" class="article-share-link">
+        <a data-url="http://yoursite.com/2017/12/28/shell/000-use-awk/" data-id="cjeuodxxu002cl5kan4yzf7et" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/005-ssh-and-remote" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/28/linux/005-ssh-and-remote/" class="article-date">
-  <time datetime="2017-12-28T07:51:00.000Z" itemprop="datePublished">2017-12-28</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/28/linux/005-ssh-and-remote/">linux远程连接</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>讲ssh和远程桌面相关.</p>
-<h2 id="1-远程桌面"><a href="#1-远程桌面" class="headerlink" title="1.远程桌面"></a>1.远程桌面</h2><p>可以采用rdesktop命令，连linux，windows都没问题。</p>
-<p>就windows而言，通常可以挂载本地文件夹：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> -r disk:Jimo=/home/jimo/xxx:挂载本地文件夹</span><br><span class="line"><span class="meta">#</span> sound:local 写上比较好</span><br><span class="line"><span class="meta">$</span> rdesktop -u xxx ip:port -p xxxx -r sound:local -r disk:Jimo=/home/jimo/xxx</span><br></pre></td></tr></table></figure></p>
-<p>还需要注意的就是密码，当然可以不指定，等到出现界面时才输，在命令行上输密码需要转义，比如!,需要写成：!,<br>否则会被当成shell命令执行</p>
-<h2 id="2-ssh"><a href="#2-ssh" class="headerlink" title="2.ssh"></a>2.ssh</h2><p>对于远程的云服务器,需要ssh链接.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh username@ip</span><br></pre></td></tr></table></figure></p>
-<p>通过ssh传文件到远程linux服务器:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> scp localfile username@ip:/remote_path</span><br><span class="line"><span class="meta">#</span> 例如</span><br><span class="line"><span class="meta">$</span> scp apache8.0.tar root@119.1.1.1:/root/webapp</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>讲ssh和远程桌面相关.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/28/linux/005-ssh-and-remote/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/28/linux/005-ssh-and-remote/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/linux/005-ssh-and-remote/" data-id="cjersoexf0014dakahxzevlzs" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a></li></ul>
 
       </footer>
       </div>
@@ -1051,7 +1055,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 11.43px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 18.57px;">java</a> <a href="/tags/javascript/" style="font-size: 11.43px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.14px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 12.86px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 18.57px;">java</a> <a href="/tags/javascript/" style="font-size: 11.43px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.14px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1073,6 +1077,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/17/elasticsearch/004-configure/">elasticsearch配置</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/15/elasticsearch/003-data-explore/">elasticsearch搜索数据</a>
           </li>
         
@@ -1086,10 +1094,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/12/python/004-python-common-use/">python中的常用操作</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/11/elasticsearch/001-cluster-explore/">02elasticsearch集群探索</a>
           </li>
         
       </ul>
