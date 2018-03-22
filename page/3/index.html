@@ -84,6 +84,88 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/002-flask-wordcloud" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/18/python/002-flask-wordcloud/" class="article-date">
+  <time datetime="2018-01-18T03:27:21.000Z" itemprop="datePublished">2018-01-18</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/18/python/002-flask-wordcloud/">Flask提供词云API</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>麻雀虽小,五脏俱全.</p>
+<h1 id="先看代码"><a href="#先看代码" class="headerlink" title="先看代码"></a>先看代码</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"><span class="keyword">from</span> flask_restful <span class="keyword">import</span> Resource, Api</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> wordcloud <span class="keyword">import</span> WordCloud</span><br><span class="line"><span class="keyword">from</span> flask_cors <span class="keyword">import</span> CORS</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">api = Api(app)</span><br><span class="line">CORS(app)</span><br><span class="line"></span><br><span class="line">base_url = <span class="string">'http://192.168.1.146:8081'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, stuId)</span>:</span></span><br><span class="line">        text = requests.get(base_url + <span class="string">"/fun/getStuAdviceToTeacher?stuId="</span>+str(stuId)).json()[<span class="string">'data'</span>]</span><br><span class="line">        <span class="keyword">return</span> self.student_cloud_imgstr(text)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">student_cloud_imgstr</span><span class="params">(self,txt)</span>:</span></span><br><span class="line">        wd = WordCloud(font_path=<span class="string">"SimHei.ttf"</span>, max_font_size=<span class="number">60</span>, \</span><br><span class="line">                    width=<span class="number">600</span>, height=<span class="number">400</span>).generate(txt)</span><br><span class="line">        b = BytesIO()</span><br><span class="line">        wd.to_image().save(b, <span class="string">"PNG"</span>)</span><br><span class="line">        img_str = base64.b64encode(b.getvalue())</span><br><span class="line">        <span class="keyword">return</span> img_str.decode(<span class="string">"ascii"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">api.add_resource(HelloWorld, <span class="string">'/fun/&lt;stuId&gt;'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="keyword">True</span>, port=<span class="number">8082</span>, host=<span class="string">'0.0.0.0'</span>)</span><br></pre></td></tr></table></figure>
+<p>下面将解释有什么问题.</p>
+<p>这是干嘛:是访问服务器获取文本,然后生成词云,并将词云图片转为Base64编码返回回去.</p>
+<h1 id="1-跨域访问"><a href="#1-跨域访问" class="headerlink" title="1.跨域访问"></a>1.跨域访问</h1><p>允许所有跨域<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask_cors <span class="keyword">import</span> CORS</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">CORS(app)</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-允许所有IP"><a href="#2-允许所有IP" class="headerlink" title="2.允许所有IP"></a>2.允许所有IP</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.run(host=<span class="string">'0.0.0.0'</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="3-词云如何转Base64"><a href="#3-词云如何转Base64" class="headerlink" title="3.词云如何转Base64"></a>3.词云如何转Base64</h1><p>这是python3环境<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wd = WordCloud(font_path=<span class="string">"SimHei.ttf"</span>, max_font_size=<span class="number">60</span>, \</span><br><span class="line">                    width=<span class="number">600</span>, height=<span class="number">400</span>).generate(txt)</span><br><span class="line">b = BytesIO()</span><br><span class="line">wd.to_image().save(b, <span class="string">"PNG"</span>)</span><br><span class="line">img_str = base64.b64encode(b.getvalue())</span><br><span class="line"><span class="keyword">return</span> img_str.decode(<span class="string">"ascii"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>在python2下:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cStringIO</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">b = cStringIO.StringIO()</span><br><span class="line">wc.to_image().save(b, format=<span class="string">"PNG"</span>)</span><br><span class="line">img_str = base64.b64encode(b.getvalue())</span><br><span class="line"><span class="keyword">return</span> img_str.decode(<span class="string">"ascii"</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="4-前端图片解析Base64"><a href="#4-前端图片解析Base64" class="headerlink" title="4.前端图片解析Base64"></a>4.前端图片解析Base64</h1><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"data:image/jpeg;base64,"</span>+<span class="attr">img_str</span>/&gt;</span>&gt;</span><br></pre></td></tr></table></figure>
+<img src="/2018/01/18/python/002-flask-wordcloud/00.jpeg">
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>麻雀虽小,五脏俱全.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/18/python/002-flask-wordcloud/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/18/python/002-flask-wordcloud/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://yoursite.com/2018/01/18/python/002-flask-wordcloud/" data-id="cjf27w9oo001m3hkauw7ktk5v" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flask/">flask</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wordcloud/">wordcloud</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/004-install-texlive" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/12/tools/004-install-texlive/" class="article-date">
@@ -160,7 +242,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjf1tqd7k002kp0kafrge24vo" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/004-install-texlive/" data-id="cjf27w9p7002l3hka4j947kuz" class="article-share-link">
           Share
         </a>
         
@@ -393,7 +475,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjf1tqd7j002ip0kamas60473" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/12/tools/003-resources/" data-id="cjf27w9p7002j3hkadxe0fbf7" class="article-share-link">
           Share
         </a>
         
@@ -473,7 +555,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjf1tqd4y0001p0kaetu2ibla" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/ai/000-perceptron/" data-id="cjf27w9nf00013hkapyplap07" class="article-share-link">
           Share
         </a>
         
@@ -559,7 +641,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjf1tqd7i002hp0kadvqofw5l" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/11/tools/002-speed-test/" data-id="cjf27w9p5002i3hkasrfzw9db" class="article-share-link">
           Share
         </a>
         
@@ -638,7 +720,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjf1tqd6h000lp0kavy4zz3c9" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/10/hadoop/000-config-environment/" data-id="cjf27w9o3000j3hkaz2ipzeom" class="article-share-link">
           Share
         </a>
         
@@ -719,7 +801,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjf1tqd7g002gp0karnftkib1" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/07/tools/001-asciidoc/" data-id="cjf27w9p4002f3hka4x0wc7rk" class="article-share-link">
           Share
         </a>
         
@@ -808,7 +890,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjf1tqd71001kp0kaeeuva0v9" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/06/python/001-music21/" data-id="cjf27w9on001j3hkahttw74ww" class="article-share-link">
           Share
         </a>
         
@@ -906,7 +988,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjf1tqd7e002bp0karfpzekgu" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjf27w9p2002a3hkaf14rlv98" class="article-share-link">
           Share
         </a>
         
@@ -986,105 +1068,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/05/maven/000-package-execute-jar/" data-id="cjf1tqd6z001fp0kaz5l7ssvl" class="article-share-link">
+        <a data-url="http://yoursite.com/2018/01/05/maven/000-package-execute-jar/" data-id="cjf27w9ol001f3hka0ywvybmv" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-spark/03-spark-warning" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/03/spark/03-spark-warning/" class="article-date">
-  <time datetime="2018-01-03T12:20:05.000Z" itemprop="datePublished">2018-01-03</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/03/spark/03-spark-warning/">spark挖坑详解</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这是一些官方文档没给完的坑.</p>
-<h1 id="命令行参数"><a href="#命令行参数" class="headerlink" title="命令行参数"></a>命令行参数</h1><ol>
-<li>指定jdbc驱动</li>
-</ol>
-<p>打开shell<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-shell --driver-class-path /home/jimo/lib/sqljdbc42.jar</span><br></pre></td></tr></table></figure></p>
-<p>运行submit<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-submit --class "CodeDataFromRDB" --master local[1] --driver-class-path /home/jimo/lib/sqljdbc42.jar /home/jimo/target/scala-2.11/aprioritest_2.11-0.1.jar</span><br></pre></td></tr></table></figure></p>
-<h1 id="spark-jdbc"><a href="#spark-jdbc" class="headerlink" title="spark jdbc"></a>spark jdbc</h1><p>官方地址:</p>
-<p>例子代码:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder().appName(<span class="string">s"<span class="subst">$&#123;this.getClass.getSimpleName&#125;</span>"</span>).getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">//连接数据库</span></span><br><span class="line"><span class="keyword">val</span> connProperties = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line">connProperties.put(<span class="string">"user"</span>, <span class="string">"xxx"</span>)</span><br><span class="line">connProperties.put(<span class="string">"password"</span>, <span class="string">"xxx"</span>)</span><br><span class="line"><span class="keyword">val</span> dbUrl = <span class="string">"jdbc:sqlserver://host:1433;databaseName=mydb"</span></span><br><span class="line"><span class="comment">//构造成绩表DF</span></span><br><span class="line"><span class="keyword">var</span> tableName = <span class="string">"exam_mark"</span></span><br><span class="line"><span class="keyword">val</span> markDF = spark.read.jdbc(dbUrl, tableName, connProperties)</span><br><span class="line">markDF.createOrReplaceTempView(tableName)</span><br><span class="line"><span class="comment">//学生记录</span></span><br><span class="line">tableName = <span class="string">"student_record"</span></span><br><span class="line"><span class="keyword">val</span> studentRecordDF = spark.read.jdbc(dbUrl, tableName, connProperties)</span><br><span class="line">studentRecordDF.createOrReplaceTempView(tableName)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> dataDF = spark.sql(<span class="string">"select student_id,course_code,cast((CASE when mark&gt;=90 then 'A' "</span> +</span><br><span class="line">  <span class="string">"when mark&gt;=80 then 'B' when mark&gt;=70 then 'C' when mark&gt;=60 then 'D' else 'E' end) as String) as mark from exam_mark "</span> +</span><br><span class="line">  <span class="string">"where mark&lt;&gt;0 and student_id like '2014%' and student_id in("</span> +</span><br><span class="line">  <span class="string">"select student_id from student_record where speciality_code='0408')"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>就上面那段sql语句的坑:</p>
-<ol>
-<li>为什么要cast,因为不这样mark得出的结果是null</li>
-<li>cast as String,在sqlserver里是cast as varchar,然而这样也行.</li>
-</ol>
-<p>上面得出的结果是:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dataDF.show(<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">+----------+-----------+----+</span><br><span class="line">|student_id|course_code|mark|</span><br><span class="line">+----------+-----------+----+</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">0471024</span>|   <span class="type">D</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">3223700</span>|   <span class="type">B</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">7047924</span>|   <span class="type">B</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">3273526</span>|   <span class="type">A</span>|</span><br></pre></td></tr></table></figure></p>
-<h1 id="RDD-到-DataSet"><a href="#RDD-到-DataSet" class="headerlink" title="RDD 到 DataSet"></a>RDD 到 DataSet</h1><h1 id="分区的问题"><a href="#分区的问题" class="headerlink" title="分区的问题"></a>分区的问题</h1><p>下面这样写会产生200个txt文件<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">markDS.write.text(<span class="string">"/home/data/d.txt"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>可以这样:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">markDS.repartition(<span class="number">1</span>).write.text(<span class="string">"/home/data/d.txt"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>还有一些是coalesce()</p>
-<p>他们的区别是什么?</p>
-<h1 id="map之后的结果包含括号的问题"><a href="#map之后的结果包含括号的问题" class="headerlink" title="map之后的结果包含括号的问题"></a>map之后的结果包含括号的问题</h1><h1 id="去除某一列的重复元素"><a href="#去除某一列的重复元素" class="headerlink" title="去除某一列的重复元素"></a>去除某一列的重复元素</h1><p>原数据:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">marks = spark.sql(<span class="string">"select distinct(student_id),mark1,mark2,mark3,mark4,mark5,mark6 as reault from mark"</span>)</span><br><span class="line">marks.show(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br><span class="line">|student_id|mark1|mark2|mark3|mark4|mark5|reault|</span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br><span class="line">|  <span class="number">19990520</span>| <span class="number">80.0</span>| <span class="number">89.0</span>| <span class="number">67.0</span>| <span class="number">82.0</span>| <span class="number">64.0</span>|  <span class="number">87.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">68.0</span>| <span class="number">60.0</span>| <span class="number">58.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">68.0</span>| <span class="number">60.0</span>| <span class="number">65.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">44.0</span>| <span class="number">60.0</span>| <span class="number">58.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">44.0</span>| <span class="number">60.0</span>| <span class="number">65.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br></pre></td></tr></table></figure></p>
-<p>要去除student_id这一列的重复值:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">marks = marks.dropDuplicates([<span class="string">'student_id'</span>])</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这是一些官方文档没给完的坑.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/03/spark/03-spark-warning/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/03/spark/03-spark-warning/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/03/spark/03-spark-warning/" data-id="cjf1tqd7d0028p0kao93vbalh" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
 
       </footer>
       </div>
@@ -1121,7 +1110,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 12.86px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 18.57px;">java</a> <a href="/tags/javascript/" style="font-size: 11.43px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.14px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 12.5px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 18.75px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 16.25px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1143,6 +1132,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/22/java/000-date-util/">Java中日期常用操作</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/17/elasticsearch/004-configure/">elasticsearch配置</a>
           </li>
         
@@ -1156,10 +1149,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/13/js/000-echarts-graph/">echarts中的graph demo</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/12/python/004-python-common-use/">python中的常用操作</a>
           </li>
         
       </ul>
