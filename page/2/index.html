@@ -84,6 +84,96 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/007-ubuntu-static-ip" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/26/linux/007-ubuntu-static-ip/" class="article-date">
+  <time datetime="2018-01-26T03:04:41.000Z" itemprop="datePublished">2018-01-26</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/26/linux/007-ubuntu-static-ip/">ubuntu下设置静态ip</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>记录下ip,掩码,网关的基础知识和ubuntu下的配置.</p>
+<h1 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h1><p>学过计算机网络肯定知道,如果不用也很快就忘了.</p>
+<p>什么是IP,子网掩码,网关?</p>
+<p>简单来说IP用于定位地址,用于屏蔽物理差异,由网络号和主机号组成.<br>子网掩码用于区分前面的网络号和后面的具体地址,前面为1和后面为0.<br>网关也是个ip,是通向其他网络的IP.</p>
+<p>举个例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IP: 192.168.1.100/24</span><br><span class="line">子网掩码:255.255.255.0</span><br></pre></td></tr></table></figure></p>
+<p>24代表掩码前面的1的个数,也表示这个子网可以容纳256个局域网IP.</p>
+<p>如何得到网关(gateway):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">一般来说采用dhcp不需要关注,当配置静态ip时就需要配网关了.</span><br><span class="line">一般取该子网第一个或最后一个可用IP.</span><br><span class="line">方法:</span><br><span class="line">使用IP和掩码相与得: 192.168.1.0</span><br><span class="line">一般1和255不用,所以可以取2或则254,那么网关为:192.168.1.2或192.168.1.254</span><br></pre></td></tr></table></figure></p>
+<h1 id="在虚拟机里的ubuntu配置静态IP"><a href="#在虚拟机里的ubuntu配置静态IP" class="headerlink" title="在虚拟机里的ubuntu配置静态IP"></a>在虚拟机里的ubuntu配置静态IP</h1><p>在配之前查看下原来的IP:发现IP是10.0.2.15/24<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ ip addr</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000</span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: enp0s3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000</span><br><span class="line">    link/ether 08:00:27:dd:c4:25 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3</span><br><span class="line">       valid_lft 84947sec preferred_lft 84947sec</span><br><span class="line">    inet6 fe80::2466:c20b:788d:f576/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure></p>
+<p>设置静态IP:修改为14</p>
+<p>文件/etc/network/interfaces</p>
+<p>原来:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br></pre></td></tr></table></figure></p>
+<p>现在:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo vim /etc/network/interfaces</span><br><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line">auto enp0s3</span><br><span class="line"></span><br><span class="line">iface enp0s3 inet static</span><br><span class="line">address 10.0.2.14</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 10.0.2.2</span><br></pre></td></tr></table></figure></p>
+<p>重启服务:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jimo@jimo-ubuntu:~$ sudo /etc/init.d/networking restart</span><br><span class="line">[ ok ] Restarting networking (via systemctl): networking.service.</span><br></pre></td></tr></table></figure></p>
+<p>再重启一下连接.</p>
+<h1 id="更简单的"><a href="#更简单的" class="headerlink" title="更简单的"></a>更简单的</h1><p>直接在界面上操作</p>
+<img src="/2018/01/26/linux/007-ubuntu-static-ip/000.png">
+<p>然后需要重启一下连接.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>记录下ip,掩码,网关的基础知识和ubuntu下的配置.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/26/linux/007-ubuntu-static-ip/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/26/linux/007-ubuntu-static-ip/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjf6idnue001d4jkazkg5uh9g" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ip/">ip</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-react/000-import-js-function" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/21/react/000-import-js-function/" class="article-date">
@@ -149,7 +239,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjf68nhdg001u45ka12rzu1ac" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjf6idnuf001g4jkaf15jax8j" class="article-share-link">
           Share
         </a>
         
@@ -238,7 +328,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjf68nhe2002w45ka6rp6dvjl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjf6idntc00024jkamynjvs8m" class="article-share-link">
           Share
         </a>
         
@@ -320,7 +410,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjf68nhdb001l45ka8ru0yt4r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjf6idnui001n4jkawvjg9mth" class="article-share-link">
           Share
         </a>
         
@@ -410,7 +500,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjf68nhdw002m45ka5q4m5odu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjf6idnuz002m4jkaztl483er" class="article-share-link">
           Share
         </a>
         
@@ -643,7 +733,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjf68nhdu002j45kad65ealen" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjf6idnuy002k4jkakx651zso" class="article-share-link">
           Share
         </a>
         
@@ -723,7 +813,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjf68nhc2000145kanq7liu57" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjf6idnt900014jkarvzcc6f5" class="article-share-link">
           Share
         </a>
         
@@ -809,7 +899,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjf68nhdt002h45kaxxijzfeu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjf6idnux002i4jkaruz9mlo4" class="article-share-link">
           Share
         </a>
         
@@ -888,7 +978,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjf68nhcr000g45kaz4jtqnb2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjf6idnty000h4jkal7t9rd9b" class="article-share-link">
           Share
         </a>
         
@@ -969,7 +1059,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjf68nhds002f45kacgz97q4x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjf6idnuw002f4jka4c4r94ix" class="article-share-link">
           Share
         </a>
         
@@ -1058,7 +1148,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjf68nhdb001i45ka8v8p11yd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjf6idnuh001l4jkat5q75gq7" class="article-share-link">
           Share
         </a>
         
@@ -1156,7 +1246,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjf68nhdp002a45kayt1pf0p5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjf6idnuu002a4jka96uct1m6" class="article-share-link">
           Share
         </a>
         
@@ -1236,7 +1326,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjf68nhd9001d45ka64kvhqy9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjf6idnu5000v4jkatg3ve7k6" class="article-share-link">
           Share
         </a>
         
@@ -1329,7 +1419,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjf68nhdp002845kaz8j8lkrq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjf6idnut00284jkatxfh63ys" class="article-share-link">
           Share
         </a>
         
@@ -1412,7 +1502,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjf68nhdn002645ka1v2agude" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjf6idnur00264jkac463u045" class="article-share-link">
           Share
         </a>
         
@@ -1499,7 +1589,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjf68nhda001g45karb4aegga" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjf6idnug001i4jka3her6s8t" class="article-share-link">
           Share
         </a>
         
@@ -1595,7 +1685,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjf68nhdm002545kat9xzrrsj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjf6idnur00254jka6pjyjdqh" class="article-share-link">
           Share
         </a>
         
@@ -1669,7 +1759,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjf68nhdi001z45kamaduvgrx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjf6idnun001y4jkaa17b95jh" class="article-share-link">
           Share
         </a>
         
@@ -1778,7 +1868,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjf68nhdq002d45kawfx61q3f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjf6idnuv002d4jkar6esmk4s" class="article-share-link">
           Share
         </a>
         
@@ -1898,86 +1988,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjf68nhcq000d45kaczgl8lpe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjf6idntx000g4jka3hl74e8u" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/006-vim" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/31/linux/006-vim/" class="article-date">
-  <time datetime="2017-12-31T03:29:37.000Z" itemprop="datePublished">2017-12-31</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/31/linux/006-vim/">vim</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>下面是我的vim配置,简单粗暴.</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">" ================1.编码设置================</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" 自动语法高亮  </span></span><br><span class="line"> <span class="keyword">syntax</span> <span class="keyword">on</span>  </span><br><span class="line"><span class="comment">" 检测文件类型  </span></span><br><span class="line"><span class="keyword">filetype</span> <span class="keyword">on</span>  </span><br><span class="line"><span class="comment">" 检测文件类型插件  </span></span><br><span class="line"><span class="keyword">filetype</span> plugin <span class="keyword">on</span>  </span><br><span class="line"><span class="comment">" 不设定在插入状态无法用退格键和 Delete 键删除回车符  </span></span><br><span class="line"><span class="keyword">set</span> backspace=<span class="built_in">indent</span>,eol,start  </span><br><span class="line"><span class="keyword">set</span> whichwrap+=&lt;,&gt;,h,<span class="keyword">l</span>  </span><br><span class="line"><span class="comment">" 显示行号  </span></span><br><span class="line"><span class="keyword">set</span> <span class="keyword">number</span>  </span><br><span class="line"><span class="comment">" 上下可视行数  </span></span><br><span class="line"><span class="keyword">set</span> scrolloff=<span class="number">6</span>  </span><br><span class="line"><span class="comment">" replace tab with space  </span></span><br><span class="line"><span class="keyword">set</span> expandtab  </span><br><span class="line"><span class="comment">" 设定 tab 长度为 4  </span></span><br><span class="line"><span class="keyword">set</span> tabstop=<span class="number">4</span>  </span><br><span class="line"><span class="comment">" 设置按BackSpace的时候可以一次删除掉4个空格  </span></span><br><span class="line"><span class="keyword">set</span> softtabstop=<span class="number">4</span>  </span><br><span class="line"><span class="comment">" 设定 &lt;&lt; 和 &gt;&gt; 命令移动时的宽度为 4  </span></span><br><span class="line"><span class="keyword">set</span> <span class="built_in">shiftwidth</span>=<span class="number">4</span></span><br><span class="line"><span class="keyword">set</span> smarttab  </span><br><span class="line"><span class="keyword">set</span> <span class="keyword">history</span>=<span class="number">1024</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" 搜索时高亮显示被找到的文本  </span></span><br><span class="line"><span class="keyword">set</span> hlsearch </span><br><span class="line"><span class="comment">" 智能自动缩进  </span></span><br><span class="line"><span class="keyword">set</span> smartindent</span><br><span class="line"><span class="comment">"显示括号配对情况  </span></span><br><span class="line"><span class="keyword">set</span> showmatch</span><br><span class="line"><span class="comment">" 解决自动换行格式下, 如高度在折行之后超过窗口高度结果这一行看不到的问题  </span></span><br><span class="line"><span class="keyword">set</span> <span class="keyword">display</span>=lastline</span><br><span class="line"><span class="comment">"编码设置  </span></span><br><span class="line"><span class="keyword">set</span> encoding=utf-<span class="number">8</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" =================2.样式设置==================</span></span><br><span class="line"><span class="comment">" 设定配色方案  </span></span><br><span class="line"><span class="keyword">colorscheme</span> molokai</span><br><span class="line"></span><br><span class="line"><span class="comment">" =================3.自动补全设置==================</span></span><br><span class="line"><span class="comment">" 使用vbundle</span></span><br><span class="line"><span class="keyword">set</span> rtp+=~/.<span class="keyword">vim</span>/bundle/Vundle.<span class="keyword">vim</span></span><br><span class="line"><span class="keyword">call</span> vundle#begin()</span><br><span class="line"></span><br><span class="line"><span class="comment">" let Vundle manage Vundle, required</span></span><br><span class="line">Plugin <span class="string">'VundleVim/Vundle.vim'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" 自动补全插件</span></span><br><span class="line">Bundle <span class="string">'Valloric/YouCompleteMe'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> vundle#end()            <span class="comment">" required</span></span><br><span class="line"><span class="keyword">filetype</span> plugin <span class="built_in">indent</span> <span class="keyword">on</span>    <span class="comment">" required</span></span><br></pre></td></tr></table></figure>
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>下面是我的vim配置,简单粗暴.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/31/linux/006-vim/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/31/linux/006-vim/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjf68nhd6001845kaazxuh8nt" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
 
       </footer>
       </div>
@@ -2014,7 +2030,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.43px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15.71px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 17.14px;">java</a> <a href="/tags/javascript/" style="font-size: 11.43px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.86px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.57px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15.71px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 14.29px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.43px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.14px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 11.43px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 11.25px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -2036,6 +2052,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/25/tools/008-computer-basic/">不得不知的计算机基础知识</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/25/cloudcompute/001-virtualbox-network/">virtualbox局域网配置</a>
           </li>
         
@@ -2049,10 +2069,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/17/elasticsearch/004-configure/">05elasticsearch配置</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/15/elasticsearch/003-data-explore/">04elasticsearch搜索数据</a>
           </li>
         
       </ul>
