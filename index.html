@@ -146,7 +146,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjf6klr3k002ywpkaht9oz0a6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjf7n9riu003rorkawrda573z" class="article-share-link">
           Share
         </a>
         
@@ -202,6 +202,13 @@ ga('send', 'pageview');
 <ol>
 <li>另一台除了enp0s8的静态IP变了,其余一样.</li>
 </ol>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在ubuntu里会出现2张网卡,但内部通讯的网卡成了默认的,也就是enp0s8:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ip r</span><br><span class="line">default via 192.168.56.1 dev enp0s8  proto static  metric 100 </span><br><span class="line">default via 10.0.2.2 dev enp0s3  proto static  metric 101 </span><br><span class="line">10.0.2.0/24 dev enp0s3  proto kernel  scope link  src 10.0.2.15  metric 100 </span><br><span class="line">169.254.0.0/16 dev enp0s8  scope link  metric 1000 </span><br><span class="line">192.168.56.0/24 dev enp0s8  proto kernel  scope link  src 192.168.56.11  metric 100 </span><br><span class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1 linkdown</span><br></pre></td></tr></table></figure></p>
+<p>这时候会导致虚拟机之间可以通信,但无法访问外网.</p>
+<p>所以我们需要修改网卡顺序,经过查找,ifmetric这个工具可以解决.</p>
+<p>1.先安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install ifmetric</span><br></pre></td></tr></table></figure></p>
+<p>2.修改<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo ifmetric enp0s3</span><br></pre></td></tr></table></figure></p>
+<p>3.查看路由<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ip r</span><br><span class="line">default via 10.0.2.2 dev enp0s3  proto static </span><br><span class="line">default via 192.168.56.1 dev enp0s8  proto static  metric 100 </span><br><span class="line">10.0.2.0/24 dev enp0s3  proto kernel  scope link  src 10.0.2.15 </span><br><span class="line">169.254.0.0/16 dev enp0s8  scope link  metric 1000 </span><br><span class="line">192.168.56.0/24 dev enp0s8  proto kernel  scope link  src 192.168.56.11  metric 100 </span><br><span class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1 linkdown</span><br></pre></td></tr></table></figure></p>
+<p>这时候可以访问外网,虚拟机也可以通讯了.</p>
 
       
     </div> -->
@@ -239,7 +246,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjf6klr240006wpkaow3sns4x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjf7n9rgb0002orka25h8l5v8" class="article-share-link">
           Share
         </a>
         
@@ -325,7 +332,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjf6klr31001vwpkaljnohatq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjf7n9ri9002korkafe9n3pms" class="article-share-link">
           Share
         </a>
         
@@ -403,7 +410,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjf6klr2h000pwpkajarmn9o1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjf7n9rgs000jorkaia1an8kg" class="article-share-link">
           Share
         </a>
         
@@ -478,7 +485,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjf6klr2d000hwpkajs4v1xiw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjf7n9rgl000borkawkzev3xl" class="article-share-link">
           Share
         </a>
         
@@ -572,7 +579,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjf6klr2c000gwpkat4jcwryf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjf7n9rgk0009orkaclp0ci58" class="article-share-link">
           Share
         </a>
         
@@ -656,7 +663,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjf6klr2a000dwpka56eql30l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjf7n9rgj0008orkawt3xu8n7" class="article-share-link">
           Share
         </a>
         
@@ -732,7 +739,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjf6klr2i000rwpkamfizhxkh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjf7n9rhg001horkarobzbr81" class="article-share-link">
           Share
         </a>
         
@@ -816,7 +823,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjf6klr2z001swpka4zd8nmn4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjf7n9ri8002horkaio75j203" class="article-share-link">
           Share
         </a>
         
@@ -909,7 +916,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjf6klr28000bwpkagqfh2yw6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjf7n9rgi0006orkasgspt6cc" class="article-share-link">
           Share
         </a>
         
@@ -994,7 +1001,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjf6klr260009wpkawtcsq0wq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjf7n9rjk005qorkazvaj6gji" class="article-share-link">
           Share
         </a>
         
@@ -1090,7 +1097,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjf6klr2l000xwpkalc0d2ka2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjf7n9rhi001korkac9xng7ow" class="article-share-link">
           Share
         </a>
         
@@ -1169,7 +1176,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjf6klr220004wpkazc9dyko3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjf7n9rg70001orkaedn0n2tn" class="article-share-link">
           Share
         </a>
         
@@ -1248,7 +1255,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjf6klr2k000vwpka94mge3kf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjf7n9rhh001jorkaqdp8f0vd" class="article-share-link">
           Share
         </a>
         
@@ -1332,7 +1339,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjf6klr2j000twpka5kfhi7n0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjf7n9rhf001gorkarabsjzyt" class="article-share-link">
           Share
         </a>
         
@@ -1410,7 +1417,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjf6klr3j002wwpkafim1uv9u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjf7n9rit003oorka6ulz3yz2" class="article-share-link">
           Share
         </a>
         
@@ -1493,7 +1500,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjf6klr3j002uwpka1llglwfw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjf7n9ris003morkaw327kqw7" class="article-share-link">
           Share
         </a>
         
@@ -1583,7 +1590,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjf6klr3i002swpkaov1759nm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjf7n9rir003korka95qyeeat" class="article-share-link">
           Share
         </a>
         
@@ -1677,7 +1684,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjf6klr2z001qwpkaj7y97kzz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjf7n9ri7002forka4fa901pv" class="article-share-link">
           Share
         </a>
         
@@ -1758,7 +1765,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjf6klr230005wpka19q1ekk5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjf7n9rgf0004orkaycmi88j3" class="article-share-link">
           Share
         </a>
         
