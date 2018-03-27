@@ -84,6 +84,87 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-cloudcompute/000-install-openstack-unbuntu" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" class="article-date">
+  <time datetime="2018-01-26T11:57:01.000Z" itemprop="datePublished">2018-01-26</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/">在ubuntu上安装openstack</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文讲述了在ubuntu16.04上安装openstack的注意事项.</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>安装<a href="https://docs.openstack.org/developer/devstack/index.html" target="_blank" rel="noopener">官网</a>的步骤,<br>有可能会成功.经过反复试验,在不翻墙的情况下还是可以安装成功了.</p>
+<p>下面是步骤:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 1.stack用户</span><br><span class="line"><span class="meta">$</span> sudo useradd -s /bin/bash -d /opt/stack -m stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 2.分配权限</span><br><span class="line"><span class="meta">$</span> echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 3.采用stack用户</span><br><span class="line"><span class="meta">$</span> sudo su - stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 4.在stack环境下</span><br><span class="line"><span class="meta">$</span> git clone https://git.openstack.org/openstack-dev/devstack</span><br><span class="line"><span class="meta">$</span> cd devstack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 5.创建local.conf文件,并填入下面的文件</span><br><span class="line">[[local|localrc]]</span><br><span class="line">ADMIN_PASSWORD=secret</span><br><span class="line">DATABASE_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line">RABBIT_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line">SERVICE_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 6.官网说可以直接执行stack.sh了,但经过反复验证,有一个资源下载很慢</span><br><span class="line"><span class="meta">#</span> 就是会去下载此linux镜像:cirros-0.3.5-x86_64-disk.img</span><br><span class="line"><span class="meta">#</span> 可以下载好了,在/opt/stack下建一个files文件夹,放上此文件,不过也不一定</span><br><span class="line"><span class="meta">#</span> 也就12M,慢慢下也能下完</span><br></pre></td></tr></table></figure></p>
+<p>成功的结果:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">=========================</span><br><span class="line">DevStack Component Timing</span><br><span class="line"> (times are in seconds)  </span><br><span class="line">=========================</span><br><span class="line">run_process           89</span><br><span class="line">test_with_retry        4</span><br><span class="line">apt-get-update        17</span><br><span class="line">pip_install          164</span><br><span class="line">osc                  197</span><br><span class="line">wait_for_service      40</span><br><span class="line">dbsync                62</span><br><span class="line">apt-get               16</span><br><span class="line">-------------------------</span><br><span class="line">Unaccounted time     1100</span><br><span class="line">=========================</span><br><span class="line">Total runtime        1689</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">This is your host IP address: 192.168.1.126</span><br><span class="line">This is your host IPv6 address: ::1</span><br><span class="line">Horizon is now available at http://192.168.1.126/dashboard</span><br><span class="line">Keystone is serving at http://192.168.1.126/identity/</span><br><span class="line">The default users are: admin and demo</span><br><span class="line">The password: 1234</span><br><span class="line"></span><br><span class="line">WARNING: </span><br><span class="line">Using lib/neutron-legacy is deprecated, and it will be removed in the future</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Services are running under systemd unit files.</span><br><span class="line">For more information see: </span><br><span class="line">https://docs.openstack.org/devstack/latest/systemd.html</span><br><span class="line"></span><br><span class="line">DevStack Version: queens</span><br><span class="line">Change: 66c893f25c6eb50edef47ec86a6d97fa58d2ea05 Merge "Bump the Cinder LVM backing file size to 24Gb." 2018-01-25 19:26:49 +0000</span><br><span class="line">OS Version: Ubuntu 16.04 xenial</span><br><span class="line"></span><br><span class="line">2018-01-26 10:01:51.399 | stack.sh completed in 1689 seconds.</span><br></pre></td></tr></table></figure></p>
+<p>可以看到接近半小时才整完,而且是反复很多次.</p>
+<p>另外,出错了需要先执行./unstack.sh,再执行stack.sh.</p>
+<p>只要有耐心,一定能装好.</p>
+<p>可以在本地登录:</p>
+<img src="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/000.png">
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文讲述了在ubuntu16.04上安装openstack的注意事项.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjf8yufb30007c4kabuwyj6fg" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/007-ubuntu-static-ip" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/26/linux/007-ubuntu-static-ip/" class="article-date">
@@ -160,7 +241,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjf7neztx001estkamzhmrnui" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjf8yufbw001mc4ka7auv3vpx" class="article-share-link">
           Share
         </a>
         
@@ -239,7 +320,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjf7nezu5001xstkaxv2yw1g1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjf8yufc50022c4kacc99ponl" class="article-share-link">
           Share
         </a>
         
@@ -328,7 +409,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjf7nezsz0002stka89fk317u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjf8yufab0001c4kaxkqfv5j7" class="article-share-link">
           Share
         </a>
         
@@ -410,7 +491,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjf7nezu1001ostkaciu9ceat" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjf8yufc0001tc4kak6lwfglj" class="article-share-link">
           Share
         </a>
         
@@ -500,7 +581,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjf7nezuk002pstkazcrqg0b4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjf8yufcj002uc4kad17wuaqn" class="article-share-link">
           Share
         </a>
         
@@ -733,7 +814,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjf7nezui002nstkavjlkledc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjf8yufci002sc4kayjy7jqy7" class="article-share-link">
           Share
         </a>
         
@@ -813,7 +894,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjf7nezsw0001stkar0gyatoa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjf8yufdj0066c4ka3lgq0byn" class="article-share-link">
           Share
         </a>
         
@@ -899,7 +980,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjf7nezuh002mstkaiftfjptt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjf8yufch002pc4kaqj2o6wps" class="article-share-link">
           Share
         </a>
         
@@ -978,7 +1059,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjf7nezti000lstka8spmn5ck" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjf8yufbf000oc4ka4477xrtw" class="article-share-link">
           Share
         </a>
         
@@ -1059,7 +1140,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjf7nezug002kstkalee5xk3j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjf8yufcg002nc4kaqr4pugn2" class="article-share-link">
           Share
         </a>
         
@@ -1148,7 +1229,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjf7nezu0001lstka4b10cwuy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjf8yufby001rc4ka6r6eenbm" class="article-share-link">
           Share
         </a>
         
@@ -1246,7 +1327,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjf7nezue002fstka23ns6sca" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjf8yufcd002ic4kaxq2n9092" class="article-share-link">
           Share
         </a>
         
@@ -1326,7 +1407,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjf7nezty001gstkaz26owal6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjf8yufbv001jc4kadtzxadd3" class="article-share-link">
           Share
         </a>
         
@@ -1419,7 +1500,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjf7nezud002estkaladq8yxh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjf8yufcc002gc4kavt0m5g5j" class="article-share-link">
           Share
         </a>
         
@@ -1502,7 +1583,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjf7nezuc002bstka2jmf8tcx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjf8yufcb002fc4ka4cn3oh32" class="article-share-link">
           Share
         </a>
         
@@ -1589,7 +1670,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjf7neztz001jstkavqmsm1dm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjf8yufbx001oc4ka2kxiz2uh" class="article-share-link">
           Share
         </a>
         
@@ -1685,7 +1766,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjf7nezub002astkallint3nu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjf8yufca002dc4ka52wilr64" class="article-share-link">
           Share
         </a>
         
@@ -1759,7 +1840,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjf7nezu80022stkaom0ct89j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjf8yufc70027c4ka56vp4sf0" class="article-share-link">
           Share
         </a>
         
@@ -1868,132 +1949,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjf7nezuf002istkamx1jjrn6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjf8yufce002kc4kaokcbr9oa" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-git/000-multi-git-account" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/31/git/000-multi-git-account/" class="article-date">
-  <time datetime="2017-12-31T03:36:45.000Z" itemprop="datePublished">2017-12-31</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/31/git/000-multi-git-account/">一台电脑如何配置多个github账户</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>一台电脑如何配置多个github账户<br>有一个github账户时很简单,不管采用ssh还是https方式提交都没问题,但多个账户时最好采用ssh.</p>
-<p>现在的情况是:以前只有一个账户,全部都采用https的方式,现在多了一个账户,该怎么办?</p>
-<p>下面是我的做法,是通用的.</p>
-<h2 id="如何区别使用的哪种方式"><a href="#如何区别使用的哪种方式" class="headerlink" title="如何区别使用的哪种方式"></a>如何区别使用的哪种方式</h2><p>很简单,2种方法</p>
-<ol>
-<li>在github界面查看:当初是怎样克隆的就是哪种方式.</li>
-</ol>
-<img src="/2017/12/31/git/000-multi-git-account/1-ssh.png">
-<ol>
-<li><p>命令查看:</p>
-<ol>
-<li><p>ssh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --list</span><br><span class="line">...</span><br><span class="line">remote.origin.url=git@github.com:jimolonely/myshell.git</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>https</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --list</span><br><span class="line">...</span><br><span class="line">remote.origin.url=https://github.com/jimolonely/myshell.git</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-</ol>
-<h2 id="如何使用ssh方式"><a href="#如何使用ssh方式" class="headerlink" title="如何使用ssh方式"></a>如何使用ssh方式</h2><p>这个就很容易了.分为6步.</p>
-<ol>
-<li><p>去掉以前的key cache,可有可无,因为可能有其他的ssh key</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh-add -D # 删除所有 </span><br><span class="line"><span class="meta">$</span> ssh-add -l</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>生成key</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh-keygen -t rsa -C "xxx@foxmail.com"</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/home/jimo/.ssh/id_rsa): /home/jimo/.ssh/id_rsa_jimo</span><br><span class="line">Enter passphrase (empty for no passphrase): </span><br><span class="line">Enter same passphrase again: </span><br><span class="line">Your identification has been saved in /home/jimo/.ssh/id_rsa_jimo.</span><br><span class="line">Your public key has been saved in /home/jimo/.ssh/id_rsa_jimo.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:a95OgBQ9DBkNw4RM8NKi/NXbbQmJyjHYiwk2UaO+i7k wp147188@foxmail.com</span><br><span class="line">The key's randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|  .*.+BO         |</span><br><span class="line">|  oo+ oo=        |</span><br><span class="line">| oo o .  .       |</span><br><span class="line">|o..oo.... .      |</span><br><span class="line">|.* . =.oSo       |</span><br><span class="line">|. = = = ooo .    |</span><br><span class="line">| . + + .o..+     |</span><br><span class="line">|...    o o.      |</span><br><span class="line">|Eo      ..o      |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line">同理生成另外一个.</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>添加到ssh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh-add id_rsa_code</span><br><span class="line">Identity added: id_rsa_code (id_rsa_code)</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh-add id_rsa_jimo</span><br><span class="line">Identity added: id_rsa_jimo (id_rsa_jimo)</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh-add -l</span><br><span class="line">2048 SHA256:UtdQCo1Ca7Gf4ITAsyxxXpjaLXan28CAv1O2QBylWTc id_rsa_code (RSA)</span><br><span class="line">2048 SHA256:a95OgBQ9DBkNw4RM8NKi/NXbbQmJyjHYiwk2UaO+i7k id_rsa_jimo (RSA)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将公钥(id_rsa_code.pub里的)复制到<a href="https://github.com/settings/keys" target="_blank" rel="noopener">github账户ssh里</a></p>
-</li>
-<li><p>测试:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh -T github.com</span><br><span class="line">Hi jimolonely! You've successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh -T github-code</span><br><span class="line">Hi mycodefarm! You've successfully authenticated, but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>配置,在~/.ssh/config下配置:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ cat config </span><br><span class="line"><span class="meta">#</span> Default github account</span><br><span class="line">Host github.com</span><br><span class="line"> HostName github.com</span><br><span class="line"> User git</span><br><span class="line"> IdentityFile /home/jimo/.ssh/id_rsa_jimo</span><br><span class="line"></span><br><span class="line"><span class="meta"> #</span> second account</span><br><span class="line">Host github-code</span><br><span class="line"> HostName github.com</span><br><span class="line"> User git</span><br><span class="line"> IdentityFile /home/jimo/.ssh/id_rsa_code</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="如何使用很关键"><a href="#如何使用很关键" class="headerlink" title="如何使用很关键"></a>如何使用很关键</h2><p>到这里,克隆或则添加origin的时候需要注意,使用config里自己定义的Host.</p>
-<p>比如: 创建了一个新账户,叫test,本来克隆该用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:mycodefarm/test.git</span><br></pre></td></tr></table></figure></p>
-<p>但现在需要使用github-code替代 github.com<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github-code:mycodefarm/test.git</span><br></pre></td></tr></table></figure></p>
-<p>另外遇到:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc test]$ git commit -m &apos;first&apos;</span><br><span class="line"></span><br><span class="line">*** 请告诉我你是谁。</span><br><span class="line"></span><br><span class="line">运行</span><br><span class="line"></span><br><span class="line">  git config --global user.email &quot;you@example.com&quot;</span><br><span class="line">  git config --global user.name &quot;Your Name&quot;</span><br><span class="line"></span><br><span class="line">来设置您账号的缺省身份标识。</span><br><span class="line">如果仅在本仓库设置身份标识，则省略 --global 参数。</span><br></pre></td></tr></table></figure></p>
-<p>需要在每个项目单独配置用户名和邮箱,但首先删除全局配置:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global --unset user.name</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc test]$ git config user.name &quot;mycodefarm&quot; &amp;&amp; git config user.email &quot;xx@xx.com&quot;</span><br></pre></td></tr></table></figure></p>
-<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>现在可以混用https和ssh提交了.</p>
-<p>但最好全部改为ssh,因为如果使用了credential.helper store,会把密码存储在~/.git-credentials下,不太好.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>一台电脑如何配置多个github账户<br>有一个github账户时很简单,不管采用ssh还是https方式提交都没问题,但多个账户时最好采用ssh.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/31/git/000-multi-git-account/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/31/git/000-multi-git-account/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjf7nezth000jstkay2m4a4nw" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a></li></ul>
 
       </footer>
       </div>
@@ -2020,7 +1981,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -2030,7 +1991,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 11.25px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 11.25px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -2052,6 +2013,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/27/db/000-mysql-error-1698/">ERROR 1698 (28000):Access denied for user</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/25/tools/008-computer-basic/">不得不知的计算机基础知识</a>
           </li>
         
@@ -2065,10 +2030,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/22/java/000-date-util/">Java中日期常用操作</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/17/elasticsearch/004-configure/">05elasticsearch配置</a>
           </li>
         
       </ul>
