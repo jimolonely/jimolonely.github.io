@@ -18,20 +18,20 @@ ga('send', 'pageview');
 
 
   
-  <title>01elasticsearch基础概念 | 在我的世界</title>
+  <title>Linux内核 | 在我的世界</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="elasticsearch必备概念. 基础概念来自：http://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html Near Realtime (NRT)有大约1秒的延时 Clusternode的集合 node单一的数据存储和搜索的服务器 Index类似于数据库的索引 Type索引的类别，逐渐被">
-<meta name="keywords" content="elasticsearch">
+  <meta name="description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性">
+<meta name="keywords" content="linux,linux kernel">
 <meta property="og:type" content="article">
-<meta property="og:title" content="01elasticsearch基础概念">
-<meta property="og:url" content="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/index.html">
+<meta property="og:title" content="Linux内核">
+<meta property="og:url" content="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/index.html">
 <meta property="og:site_name" content="在我的世界">
-<meta property="og:description" content="elasticsearch必备概念. 基础概念来自：http://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html Near Realtime (NRT)有大约1秒的延时 Clusternode的集合 node单一的数据存储和搜索的服务器 Index类似于数据库的索引 Type索引的类别，逐渐被">
+<meta property="og:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-03-22T01:14:01.041Z">
+<meta property="og:updated_time" content="2018-03-29T07:11:01.044Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="01elasticsearch基础概念">
-<meta name="twitter:description" content="elasticsearch必备概念. 基础概念来自：http://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html Near Realtime (NRT)有大约1秒的延时 Clusternode的集合 node单一的数据存储和搜索的服务器 Index类似于数据库的索引 Type索引的类别，逐渐被">
+<meta name="twitter:title" content="Linux内核">
+<meta name="twitter:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性">
   
     <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
   
@@ -84,10 +84,10 @@ ga('send', 'pageview');
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-elasticsearch/000-basic-concept" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-linux/008-linux-kernel1" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/03/11/elasticsearch/000-basic-concept/" class="article-date">
-  <time datetime="2018-03-11T05:43:29.000Z" itemprop="datePublished">2018-03-11</time>
+    <a href="/2018/03/29/linux/008-linux-kernel1/" class="article-date">
+  <time datetime="2018-03-29T06:56:37.000Z" itemprop="datePublished">2018-03-29</time>
 </a>
       
   </div>
@@ -98,7 +98,7 @@ ga('send', 'pageview');
           
   
     <h1 class="article-title" itemprop="name">
-      01elasticsearch基础概念
+      Linux内核
     </h1>
   
 
@@ -106,19 +106,28 @@ ga('send', 'pageview');
         
           <!-- <div class="article-entry" itemprop="articleBody">
       
-        <p>elasticsearch必备概念.</p>
-<h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><p>来自：<a href="http://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html" target="_blank" rel="noopener">http://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html</a></p>
-<h2 id="Near-Realtime-NRT"><a href="#Near-Realtime-NRT" class="headerlink" title="Near Realtime (NRT)"></a>Near Realtime (NRT)</h2><p>有大约1秒的延时</p>
-<h2 id="Cluster"><a href="#Cluster" class="headerlink" title="Cluster"></a>Cluster</h2><p>node的集合</p>
-<h2 id="node"><a href="#node" class="headerlink" title="node"></a>node</h2><p>单一的数据存储和搜索的服务器</p>
-<h2 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h2><p>类似于数据库的索引</p>
-<h2 id="Type"><a href="#Type" class="headerlink" title="Type"></a>Type</h2><p>索引的类别，逐渐被淘汰</p>
-<h2 id="Document"><a href="#Document" class="headerlink" title="Document"></a>Document</h2><p>能够被索引的最小单元，以json格式描述和表示。</p>
-<h2 id="Shards-amp-Replica"><a href="#Shards-amp-Replica" class="headerlink" title="Shards &amp; Replica"></a>Shards &amp; Replica</h2><p>Shard：碎片，构成索引的单元，让大的索引可分割，以实现横向拓展；<br>Replica：Shard的备份，为了应对Shard节点的掉线，同时可并行化。</p>
-<p>默认：每个Index有5个shard和1个replica，如果将这个Index部署在2个节点上，则共有10个shard。</p>
-<h1 id="学习elasticsearch"><a href="#学习elasticsearch" class="headerlink" title="学习elasticsearch"></a>学习elasticsearch</h1><p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html" target="_blank" rel="noopener">文档</a></p>
-<p><a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/foreword_id.html" target="_blank" rel="noopener">书</a></p>
-<a href="/2018/03/11/elasticsearch/001-cluster-explore/" title="02-集群探索">02-集群探索</a>
+        <h1 id="1-常识"><a href="#1-常识" class="headerlink" title="1.常识"></a>1.常识</h1><h3 id="1-1-背景"><a href="#1-1-背景" class="headerlink" title="1.1 背景"></a>1.1 背景</h3><ol>
+<li>Unix的历史</li>
+<li>Linux的历史</li>
+<li>Linux和Unix比较</li>
+<li>Linux内核版本开发的版本号规则</li>
+</ol>
+<h3 id="1-2-准备"><a href="#1-2-准备" class="headerlink" title="1.2 准备"></a>1.2 准备</h3><ol>
+<li>使用git跟随源码</li>
+<li>安装源码,打补丁,了解源码文件结构</li>
+<li>配置,编译,安装内核</li>
+<li>内核开发的特点<ol>
+<li>内核开发不能使用任何外部库,比如C库.</li>
+<li>GNU C</li>
+<li>无内存保护机制</li>
+<li>难以执行浮点运算</li>
+<li>进程堆栈小</li>
+<li>同步并发</li>
+<li>考虑移植性</li>
+</ol>
+</li>
+</ol>
+
       
     </div> -->
           <div class="article-entry" itemprop="articleBody">
@@ -127,30 +136,39 @@ ga('send', 'pageview');
                                                 
                                                     
                                                       
-                                                        <p>elasticsearch必备概念.</p>
-<h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><p>来自：<a href="http://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html" target="_blank" rel="noopener">http://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html</a></p>
-<h2 id="Near-Realtime-NRT"><a href="#Near-Realtime-NRT" class="headerlink" title="Near Realtime (NRT)"></a>Near Realtime (NRT)</h2><p>有大约1秒的延时</p>
-<h2 id="Cluster"><a href="#Cluster" class="headerlink" title="Cluster"></a>Cluster</h2><p>node的集合</p>
-<h2 id="node"><a href="#node" class="headerlink" title="node"></a>node</h2><p>单一的数据存储和搜索的服务器</p>
-<h2 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h2><p>类似于数据库的索引</p>
-<h2 id="Type"><a href="#Type" class="headerlink" title="Type"></a>Type</h2><p>索引的类别，逐渐被淘汰</p>
-<h2 id="Document"><a href="#Document" class="headerlink" title="Document"></a>Document</h2><p>能够被索引的最小单元，以json格式描述和表示。</p>
-<h2 id="Shards-amp-Replica"><a href="#Shards-amp-Replica" class="headerlink" title="Shards &amp; Replica"></a>Shards &amp; Replica</h2><p>Shard：碎片，构成索引的单元，让大的索引可分割，以实现横向拓展；<br>Replica：Shard的备份，为了应对Shard节点的掉线，同时可并行化。</p>
-<p>默认：每个Index有5个shard和1个replica，如果将这个Index部署在2个节点上，则共有10个shard。</p>
-<h1 id="学习elasticsearch"><a href="#学习elasticsearch" class="headerlink" title="学习elasticsearch"></a>学习elasticsearch</h1><p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html" target="_blank" rel="noopener">文档</a></p>
-<p><a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/foreword_id.html" target="_blank" rel="noopener">书</a></p>
-<a href="/2018/03/11/elasticsearch/001-cluster-explore/" title="02-集群探索">02-集群探索</a>
+                                                        <h1 id="1-常识"><a href="#1-常识" class="headerlink" title="1.常识"></a>1.常识</h1><h3 id="1-1-背景"><a href="#1-1-背景" class="headerlink" title="1.1 背景"></a>1.1 背景</h3><ol>
+<li>Unix的历史</li>
+<li>Linux的历史</li>
+<li>Linux和Unix比较</li>
+<li>Linux内核版本开发的版本号规则</li>
+</ol>
+<h3 id="1-2-准备"><a href="#1-2-准备" class="headerlink" title="1.2 准备"></a>1.2 准备</h3><ol>
+<li>使用git跟随源码</li>
+<li>安装源码,打补丁,了解源码文件结构</li>
+<li>配置,编译,安装内核</li>
+<li>内核开发的特点<ol>
+<li>内核开发不能使用任何外部库,比如C库.</li>
+<li>GNU C</li>
+<li>无内存保护机制</li>
+<li>难以执行浮点运算</li>
+<li>进程堆栈小</li>
+<li>同步并发</li>
+<li>考虑移植性</li>
+</ol>
+</li>
+</ol>
+
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfcalli8000923kay7bdvtmi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfcallj1001d23kadovyry6k" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li></ul>
 
       </footer>
       </div>
@@ -158,19 +176,10 @@ ga('send', 'pageview');
         
 <nav id="article-nav">
   
-    <a href="/2018/03/11/elasticsearch/001-cluster-explore/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          02elasticsearch集群探索
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/03/09/lang/002-redis/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2018/03/27/db/000-mysql-error-1698/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">我的redis之路</div>
+      <div class="article-nav-title">ERROR 1698 (28000):Access denied for user</div>
     </a>
   
 </nav>
