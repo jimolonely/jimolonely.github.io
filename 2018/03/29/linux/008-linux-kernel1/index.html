@@ -20,18 +20,18 @@ ga('send', 'pageview');
   
   <title>Linux内核 | 在我的世界</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性">
+  <meta name="description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性    2.进程2.1 进程是什么正在执行的程序代码的">
 <meta name="keywords" content="linux,linux kernel">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux内核">
 <meta property="og:url" content="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/index.html">
 <meta property="og:site_name" content="在我的世界">
-<meta property="og:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性">
+<meta property="og:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性    2.进程2.1 进程是什么正在执行的程序代码的">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-03-29T07:11:01.044Z">
+<meta property="og:updated_time" content="2018-03-29T13:02:25.551Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux内核">
-<meta name="twitter:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性">
+<meta name="twitter:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性    2.进程2.1 进程是什么正在执行的程序代码的">
   
     <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
   
@@ -127,6 +127,27 @@ ga('send', 'pageview');
 </ol>
 </li>
 </ol>
+<h1 id="2-进程"><a href="#2-进程" class="headerlink" title="2.进程"></a>2.进程</h1><h3 id="2-1-进程是什么"><a href="#2-1-进程是什么" class="headerlink" title="2.1 进程是什么"></a>2.1 进程是什么</h3><p>正在执行的程序代码的实时结果.线程是特殊的进程,每个线程都有独立的PC,进程栈和进程寄存器.</p>
+<h3 id="2-2-进程描述符"><a href="#2-2-进程描述符" class="headerlink" title="2.2 进程描述符"></a>2.2 进程描述符</h3><ol>
+<li>双向循环链表</li>
+<li>进程描述符:存在放栈顶或栈底,或者不同的架构使用专门的寄存器.</li>
+<li>进程的5种状态:就绪,运行,阻塞/不可中断,跟踪,停止</li>
+<li>进程上下文</li>
+<li>进程家族树:PID=1的init根进程</li>
+</ol>
+<p>系统最大进程数配置,理论可达几百万:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat /proc/sys/kernel/pid_max </span><br><span class="line">32768</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-3-进程创建"><a href="#2-3-进程创建" class="headerlink" title="2.3 进程创建"></a>2.3 进程创建</h3><ol>
+<li>fork() + exec()</li>
+<li>Copy-on-write: 只有在写入时才复制,在之前子进程和父进程共享空间.</li>
+<li>fork(),vfork()<h3 id="2-4-linux中的线程"><a href="#2-4-linux中的线程" class="headerlink" title="2.4 linux中的线程"></a>2.4 linux中的线程</h3></li>
+<li>就是进程,只是和进程共享资源</li>
+<li>创建线程: clone(指定共享的资源)</li>
+<li>内核线程:只运行在内核空间的线程,kthread</li>
+</ol>
+<h3 id="2-5-进程终结"><a href="#2-5-进程终结" class="headerlink" title="2.5 进程终结"></a>2.5 进程终结</h3><ol>
+<li>删除进程描述符</li>
+<li>孤儿(僵死)进程的寻父之旅.</li>
+</ol>
 
       
     </div> -->
@@ -157,13 +178,34 @@ ga('send', 'pageview');
 </ol>
 </li>
 </ol>
+<h1 id="2-进程"><a href="#2-进程" class="headerlink" title="2.进程"></a>2.进程</h1><h3 id="2-1-进程是什么"><a href="#2-1-进程是什么" class="headerlink" title="2.1 进程是什么"></a>2.1 进程是什么</h3><p>正在执行的程序代码的实时结果.线程是特殊的进程,每个线程都有独立的PC,进程栈和进程寄存器.</p>
+<h3 id="2-2-进程描述符"><a href="#2-2-进程描述符" class="headerlink" title="2.2 进程描述符"></a>2.2 进程描述符</h3><ol>
+<li>双向循环链表</li>
+<li>进程描述符:存在放栈顶或栈底,或者不同的架构使用专门的寄存器.</li>
+<li>进程的5种状态:就绪,运行,阻塞/不可中断,跟踪,停止</li>
+<li>进程上下文</li>
+<li>进程家族树:PID=1的init根进程</li>
+</ol>
+<p>系统最大进程数配置,理论可达几百万:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat /proc/sys/kernel/pid_max </span><br><span class="line">32768</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-3-进程创建"><a href="#2-3-进程创建" class="headerlink" title="2.3 进程创建"></a>2.3 进程创建</h3><ol>
+<li>fork() + exec()</li>
+<li>Copy-on-write: 只有在写入时才复制,在之前子进程和父进程共享空间.</li>
+<li>fork(),vfork()<h3 id="2-4-linux中的线程"><a href="#2-4-linux中的线程" class="headerlink" title="2.4 linux中的线程"></a>2.4 linux中的线程</h3></li>
+<li>就是进程,只是和进程共享资源</li>
+<li>创建线程: clone(指定共享的资源)</li>
+<li>内核线程:只运行在内核空间的线程,kthread</li>
+</ol>
+<h3 id="2-5-进程终结"><a href="#2-5-进程终结" class="headerlink" title="2.5 进程终结"></a>2.5 进程终结</h3><ol>
+<li>删除进程描述符</li>
+<li>孤儿(僵死)进程的寻父之旅.</li>
+</ol>
 
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfcdsrnc001jw8ka0m12ziwq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfcj5k3d001j34karblrs4m6" class="article-share-link">
           Share
         </a>
         
