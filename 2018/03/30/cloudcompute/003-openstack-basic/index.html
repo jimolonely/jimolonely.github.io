@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111673440-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>openstack基础 | 在我的世界</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="这是我学习的路径. 基础术语UserCredentialsAuthenticationTokenTenantServiceEndpointRole 架构 网络结构每个节点有3张网卡,一个用于内网,一个外网,一个心跳. 学会使用Horizon界面创建实例,配置网络等. 也可以使用命令行1234567[root@localhost ~]# source keystonerc_demo [root@lo">
+<meta name="keywords" content="云计算,openstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="openstack基础">
+<meta property="og:url" content="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/index.html">
+<meta property="og:site_name" content="在我的世界">
+<meta property="og:description" content="这是我学习的路径. 基础术语UserCredentialsAuthenticationTokenTenantServiceEndpointRole 架构 网络结构每个节点有3张网卡,一个用于内网,一个外网,一个心跳. 学会使用Horizon界面创建实例,配置网络等. 也可以使用命令行1234567[root@localhost ~]# source keystonerc_demo [root@lo">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://http/2018/03/30/cloudcompute/003-openstack-basic/000.png">
+<meta property="og:updated_time" content="2018-03-30T08:42:28.473Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="openstack基础">
+<meta name="twitter:description" content="这是我学习的路径. 基础术语UserCredentialsAuthenticationTokenTenantServiceEndpointRole 架构 网络结构每个节点有3张网卡,一个用于内网,一个外网,一个心跳. 学会使用Horizon界面创建实例,配置网络等. 也可以使用命令行1234567[root@localhost ~]# source keystonerc_demo [root@lo">
+<meta name="twitter:image" content="http://http/2018/03/30/cloudcompute/003-openstack-basic/000.png">
+  
+    <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我的世界</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">你是谁,你从哪里来,你活着为了什么?</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">home</a>
+        
+          <a class="main-nav-link" href="/archives">archives</a>
+        
+          <a class="main-nav-link" href="/about">about</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://http://jimolonely.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-cloudcompute/003-openstack-basic" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/30/cloudcompute/003-openstack-basic/" class="article-date">
+  <time datetime="2018-03-30T07:45:45.000Z" itemprop="datePublished">2018-03-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 class="article-title" itemprop="name">
+      openstack基础
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这是我学习的路径.</p>
+<h1 id="基础术语"><a href="#基础术语" class="headerlink" title="基础术语"></a>基础术语</h1><p>User<br>Credentials<br>Authentication<br>Token<br>Tenant<br>Service<br>Endpoint<br>Role</p>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><img src="/2018/03/30/cloudcompute/003-openstack-basic/000.png">
+<h1 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h1><p>每个节点有3张网卡,一个用于内网,一个外网,一个心跳.</p>
+<h1 id="学会使用Horizon界面"><a href="#学会使用Horizon界面" class="headerlink" title="学会使用Horizon界面"></a>学会使用Horizon界面</h1><p>创建实例,配置网络等.</p>
+<h1 id="也可以使用命令行"><a href="#也可以使用命令行" class="headerlink" title="也可以使用命令行"></a>也可以使用命令行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# source keystonerc_demo </span><br><span class="line">[root@localhost ~(keystone_demo)]# nova list</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| ID                                   | Name    | Status  | Task State | Power State | Networks         |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| 19498801-c774-4297-8a75-bff9c2503c5e | cissor1 | SHUTOFF | -          | Shutdown    | private=10.0.0.7 |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br></pre></td></tr></table></figure>
+<p>常用命令参考<a href="https://docs.openstack.org/mitaka/user-guide/cli_cheat_sheet.html" target="_blank" rel="noopener">文档</a></p>
+<p>通过debug标志可以看到整个API的请求过程:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~(keystone_demo)]# nova --debug list</span><br><span class="line">...</span><br><span class="line">REQ: curl -g -i -X GET http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail -H "OpenStack-API-Version: compute 2.53" -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-OpenStack-Nova-API-Version: 2.53" -H "X-Auth-Token: &#123;SHA1&#125;a6994f0daf077433ede7e26fd93007a12472e7e5"</span><br><span class="line">DEBUG (connectionpool:395) http://10.0.2.15:8774 "GET /v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail HTTP/1.1" 200 1443</span><br><span class="line">DEBUG (session:419) RESP: [200] Content-Length: 1443 Content-Type: application/json Openstack-Api-Version: compute 2.53 X-Openstack-Nova-Api-Version: 2.53 Vary: OpenStack-API-Version, X-OpenStack-Nova-API-Version X-Openstack-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 X-Compute-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 Date: Fri, 30 Mar 2018 08:33:39 GMT Connection: keep-alive </span><br><span class="line">RESP BODY: &#123;"servers": [&#123;"OS-EXT-STS:task_state": null, "addresses": &#123;"private": [&#123;"OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:7d:96:7e", "version": 4, "addr": "10.0.0.7", "OS-EXT-IPS:type": "fixed"&#125;]&#125;, "links": [&#123;"href": "http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "self"&#125;, &#123;"href": "http://10.0.2.15:8774/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "bookmark"&#125;], "image": "", "OS-EXT-STS:vm_state": "stopped", "OS-SRV-USG:launched_at": "2018-03-30T03:05:47.000000", "flavor": &#123;"ephemeral": 0, "ram": 512, "original_name": "m1.tiny", "vcpus": 1, "extra_specs": &#123;&#125;, "swap": 0, "disk": 1&#125;, "id": "19498801-c774-4297-8a75-bff9c2503c5e", "security_groups": [&#123;"name": "default"&#125;], "OS-SRV-USG:terminated_at": null, "user_id": "d069531f171b422289a106e106572aa7", "OS-DCF:diskConfig": "AUTO", "accessIPv4": "", "accessIPv6": "", "OS-EXT-STS:power_state": 4, "OS-EXT-AZ:availability_zone": "nova", "config_drive": "", "status": "SHUTOFF", "updated": "2018-03-30T03:10:19Z", "hostId": "a6480a085edf3a7b6698b4f6972bf20fba65501c4dbaeae382d274f0", "description": null, "tags": [], "key_name": null, "locked": false, "name": "cissor1", "created": "2018-03-30T03:05:04Z", "tenant_id": "ab4c85f86cc04230894ba9eaa0c412e4", "os-extended-volumes:volumes_attached": [&#123;"id": "9736b299-0d18-4389-a7e9-67c864023a9e", "delete_on_termination": false&#125;], "metadata": &#123;&#125;&#125;]&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                                                
+                                                    
+                                                      
+                                                        <p>这是我学习的路径.</p>
+<h1 id="基础术语"><a href="#基础术语" class="headerlink" title="基础术语"></a>基础术语</h1><p>User<br>Credentials<br>Authentication<br>Token<br>Tenant<br>Service<br>Endpoint<br>Role</p>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><img src="/2018/03/30/cloudcompute/003-openstack-basic/000.png">
+<h1 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h1><p>每个节点有3张网卡,一个用于内网,一个外网,一个心跳.</p>
+<h1 id="学会使用Horizon界面"><a href="#学会使用Horizon界面" class="headerlink" title="学会使用Horizon界面"></a>学会使用Horizon界面</h1><p>创建实例,配置网络等.</p>
+<h1 id="也可以使用命令行"><a href="#也可以使用命令行" class="headerlink" title="也可以使用命令行"></a>也可以使用命令行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# source keystonerc_demo </span><br><span class="line">[root@localhost ~(keystone_demo)]# nova list</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| ID                                   | Name    | Status  | Task State | Power State | Networks         |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| 19498801-c774-4297-8a75-bff9c2503c5e | cissor1 | SHUTOFF | -          | Shutdown    | private=10.0.0.7 |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br></pre></td></tr></table></figure>
+<p>常用命令参考<a href="https://docs.openstack.org/mitaka/user-guide/cli_cheat_sheet.html" target="_blank" rel="noopener">文档</a></p>
+<p>通过debug标志可以看到整个API的请求过程:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~(keystone_demo)]# nova --debug list</span><br><span class="line">...</span><br><span class="line">REQ: curl -g -i -X GET http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail -H "OpenStack-API-Version: compute 2.53" -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-OpenStack-Nova-API-Version: 2.53" -H "X-Auth-Token: &#123;SHA1&#125;a6994f0daf077433ede7e26fd93007a12472e7e5"</span><br><span class="line">DEBUG (connectionpool:395) http://10.0.2.15:8774 "GET /v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail HTTP/1.1" 200 1443</span><br><span class="line">DEBUG (session:419) RESP: [200] Content-Length: 1443 Content-Type: application/json Openstack-Api-Version: compute 2.53 X-Openstack-Nova-Api-Version: 2.53 Vary: OpenStack-API-Version, X-OpenStack-Nova-API-Version X-Openstack-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 X-Compute-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 Date: Fri, 30 Mar 2018 08:33:39 GMT Connection: keep-alive </span><br><span class="line">RESP BODY: &#123;"servers": [&#123;"OS-EXT-STS:task_state": null, "addresses": &#123;"private": [&#123;"OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:7d:96:7e", "version": 4, "addr": "10.0.0.7", "OS-EXT-IPS:type": "fixed"&#125;]&#125;, "links": [&#123;"href": "http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "self"&#125;, &#123;"href": "http://10.0.2.15:8774/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "bookmark"&#125;], "image": "", "OS-EXT-STS:vm_state": "stopped", "OS-SRV-USG:launched_at": "2018-03-30T03:05:47.000000", "flavor": &#123;"ephemeral": 0, "ram": 512, "original_name": "m1.tiny", "vcpus": 1, "extra_specs": &#123;&#125;, "swap": 0, "disk": 1&#125;, "id": "19498801-c774-4297-8a75-bff9c2503c5e", "security_groups": [&#123;"name": "default"&#125;], "OS-SRV-USG:terminated_at": null, "user_id": "d069531f171b422289a106e106572aa7", "OS-DCF:diskConfig": "AUTO", "accessIPv4": "", "accessIPv6": "", "OS-EXT-STS:power_state": 4, "OS-EXT-AZ:availability_zone": "nova", "config_drive": "", "status": "SHUTOFF", "updated": "2018-03-30T03:10:19Z", "hostId": "a6480a085edf3a7b6698b4f6972bf20fba65501c4dbaeae382d274f0", "description": null, "tags": [], "key_name": null, "locked": false, "name": "cissor1", "created": "2018-03-30T03:05:04Z", "tenant_id": "ab4c85f86cc04230894ba9eaa0c412e4", "os-extended-volumes:volumes_attached": [&#123;"id": "9736b299-0d18-4389-a7e9-67c864023a9e", "delete_on_termination": false&#125;], "metadata": &#123;&#125;&#125;]&#125;</span><br></pre></td></tr></table></figure></p>
+
+          </div>
+          
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfdpa0s30009agkarjxwrmg3" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a></li></ul>
+
+      </footer>
+      </div>
+      
+        
+<nav id="article-nav">
+  
+  
+    <a href="/2018/03/30/cloudcompute/002-packstack/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">packstack安装openstack</div>
+    </a>
+  
+</nav>
+
+          
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/29/linux/008-linux-kernel1/">Linux内核</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/27/db/000-mysql-error-1698/">ERROR 1698 (28000):Access denied for user</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/25/tools/008-computer-basic/">不得不知的计算机基础知识</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Jackpler<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

@@ -84,6 +84,87 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-cloudcompute/003-openstack-basic" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/30/cloudcompute/003-openstack-basic/" class="article-date">
+  <time datetime="2018-03-30T07:45:45.000Z" itemprop="datePublished">2018-03-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这是我学习的路径.</p>
+<h1 id="基础术语"><a href="#基础术语" class="headerlink" title="基础术语"></a>基础术语</h1><p>User<br>Credentials<br>Authentication<br>Token<br>Tenant<br>Service<br>Endpoint<br>Role</p>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><img src="/2018/03/30/cloudcompute/003-openstack-basic/000.png">
+<h1 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h1><p>每个节点有3张网卡,一个用于内网,一个外网,一个心跳.</p>
+<h1 id="学会使用Horizon界面"><a href="#学会使用Horizon界面" class="headerlink" title="学会使用Horizon界面"></a>学会使用Horizon界面</h1><p>创建实例,配置网络等.</p>
+<h1 id="也可以使用命令行"><a href="#也可以使用命令行" class="headerlink" title="也可以使用命令行"></a>也可以使用命令行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# source keystonerc_demo </span><br><span class="line">[root@localhost ~(keystone_demo)]# nova list</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| ID                                   | Name    | Status  | Task State | Power State | Networks         |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| 19498801-c774-4297-8a75-bff9c2503c5e | cissor1 | SHUTOFF | -          | Shutdown    | private=10.0.0.7 |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br></pre></td></tr></table></figure>
+<p>常用命令参考<a href="https://docs.openstack.org/mitaka/user-guide/cli_cheat_sheet.html" target="_blank" rel="noopener">文档</a></p>
+<p>通过debug标志可以看到整个API的请求过程:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~(keystone_demo)]# nova --debug list</span><br><span class="line">...</span><br><span class="line">REQ: curl -g -i -X GET http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail -H "OpenStack-API-Version: compute 2.53" -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-OpenStack-Nova-API-Version: 2.53" -H "X-Auth-Token: &#123;SHA1&#125;a6994f0daf077433ede7e26fd93007a12472e7e5"</span><br><span class="line">DEBUG (connectionpool:395) http://10.0.2.15:8774 "GET /v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail HTTP/1.1" 200 1443</span><br><span class="line">DEBUG (session:419) RESP: [200] Content-Length: 1443 Content-Type: application/json Openstack-Api-Version: compute 2.53 X-Openstack-Nova-Api-Version: 2.53 Vary: OpenStack-API-Version, X-OpenStack-Nova-API-Version X-Openstack-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 X-Compute-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 Date: Fri, 30 Mar 2018 08:33:39 GMT Connection: keep-alive </span><br><span class="line">RESP BODY: &#123;"servers": [&#123;"OS-EXT-STS:task_state": null, "addresses": &#123;"private": [&#123;"OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:7d:96:7e", "version": 4, "addr": "10.0.0.7", "OS-EXT-IPS:type": "fixed"&#125;]&#125;, "links": [&#123;"href": "http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "self"&#125;, &#123;"href": "http://10.0.2.15:8774/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "bookmark"&#125;], "image": "", "OS-EXT-STS:vm_state": "stopped", "OS-SRV-USG:launched_at": "2018-03-30T03:05:47.000000", "flavor": &#123;"ephemeral": 0, "ram": 512, "original_name": "m1.tiny", "vcpus": 1, "extra_specs": &#123;&#125;, "swap": 0, "disk": 1&#125;, "id": "19498801-c774-4297-8a75-bff9c2503c5e", "security_groups": [&#123;"name": "default"&#125;], "OS-SRV-USG:terminated_at": null, "user_id": "d069531f171b422289a106e106572aa7", "OS-DCF:diskConfig": "AUTO", "accessIPv4": "", "accessIPv6": "", "OS-EXT-STS:power_state": 4, "OS-EXT-AZ:availability_zone": "nova", "config_drive": "", "status": "SHUTOFF", "updated": "2018-03-30T03:10:19Z", "hostId": "a6480a085edf3a7b6698b4f6972bf20fba65501c4dbaeae382d274f0", "description": null, "tags": [], "key_name": null, "locked": false, "name": "cissor1", "created": "2018-03-30T03:05:04Z", "tenant_id": "ab4c85f86cc04230894ba9eaa0c412e4", "os-extended-volumes:volumes_attached": [&#123;"id": "9736b299-0d18-4389-a7e9-67c864023a9e", "delete_on_termination": false&#125;], "metadata": &#123;&#125;&#125;]&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>这是我学习的路径.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/003-openstack-basic/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/003-openstack-basic/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfdpa0s30009agkarjxwrmg3" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-cloudcompute/002-packstack" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/30/cloudcompute/002-packstack/" class="article-date">
@@ -154,7 +235,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfdhwrcn00082gkardqot6lu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfdpa0s20008agkapy8s7gvl" class="article-share-link">
           Share
         </a>
         
@@ -269,7 +350,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfdhwrdn001k2gkao37ftn36" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfdpa0t3001nagkac06t8p2k" class="article-share-link">
           Share
         </a>
         
@@ -346,7 +427,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfdhwrco00092gkab69f9bo0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfdpa0s6000bagkalmr3tfwi" class="article-share-link">
           Share
         </a>
         
@@ -458,7 +539,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfdhwrek00352gka1dg36ziu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfdpa0u40037agka2n4oubjj" class="article-share-link">
           Share
         </a>
         
@@ -559,7 +640,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfdhwrcl00062gkahvznibv9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfdpa0s10006agkaziigk1nz" class="article-share-link">
           Share
         </a>
         
@@ -645,7 +726,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfdhwrdy00212gkat3ewzp1a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfdpa0te0023agka688emume" class="article-share-link">
           Share
         </a>
         
@@ -723,7 +804,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfdhwrd4000t2gkay1pg14db" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfdpa0sn000vagka4erajtv9" class="article-share-link">
           Share
         </a>
         
@@ -798,7 +879,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfdhwrd0000l2gkam1dn7hw2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfdpa0sj000oagkagl9hhe0c" class="article-share-link">
           Share
         </a>
         
@@ -892,7 +973,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfdhwrcy000j2gkak6tdxiz0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfdpa0si000lagkaalvx4iq5" class="article-share-link">
           Share
         </a>
         
@@ -976,7 +1057,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfdhwrcx000h2gkaxfd80agz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfdpa0sh000jagka960zp5qu" class="article-share-link">
           Share
         </a>
         
@@ -1052,7 +1133,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfdhwrd6000v2gka6wx6y5br" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfdpa0sp000xagka05jx5ahe" class="article-share-link">
           Share
         </a>
         
@@ -1136,7 +1217,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfdhwrdw001w2gkac1wjuryp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfdpa0td0021agkabvvyc9dc" class="article-share-link">
           Share
         </a>
         
@@ -1229,7 +1310,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfdhwrcv000g2gkahxrpn3td" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfdpa0sf000hagka0c8vy025" class="article-share-link">
           Share
         </a>
         
@@ -1314,7 +1395,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfdhwrct000d2gkaogjjht5l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfdpa0sb000gagka0jyavjkl" class="article-share-link">
           Share
         </a>
         
@@ -1410,7 +1491,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfdhwrd900102gkadpx8gqma" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfdpa0ss0011agkau8hmyqtd" class="article-share-link">
           Share
         </a>
         
@@ -1489,7 +1570,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfdhwrci00042gkakbfwxr60" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfdpa0rz0004agkaudyomwco" class="article-share-link">
           Share
         </a>
         
@@ -1568,7 +1649,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfdhwrd8000y2gka2813mzra" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfdpa0sr0010agka0mv4qn8d" class="article-share-link">
           Share
         </a>
         
@@ -1652,7 +1733,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfdhwrd7000x2gkaycbrwv7o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfdpa0sq000yagka0xi6c703" class="article-share-link">
           Share
         </a>
         
@@ -1730,95 +1811,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfdhwrej00332gkao0ejq9no" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfdpa0u20035agkah3cjotgf" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/magnet/">magnet</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/006-gradle" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/05/tools/006-gradle/" class="article-date">
-  <time datetime="2018-03-05T02:30:57.000Z" itemprop="datePublished">2018-03-05</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/05/tools/006-gradle/">gradle必经之路</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这篇讲了如何学习gradle以及会遇到的问题.</p>
-<h1 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h1><p>对<a href="/2018/03/06/lang/000-groovy/" title="Groovy">Groovy</a>语言有了解,对Java开发了解.</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>参考<a href="https://gradle.org/install/" target="_blank" rel="noopener">https://gradle.org/install/</a></p>
-<h1 id="下载gradle慢"><a href="#下载gradle慢" class="headerlink" title="下载gradle慢"></a>下载gradle慢</h1><p>如果是下载gradle本身慢,<br>比如遇到:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc basic-demo]$ ./gradlew copy</span><br><span class="line">Downloading https://services.gradle.org/distributions/gradle-4.5.1-bin.zip</span><br><span class="line">....</span><br></pre></td></tr></table></figure></p>
-<p>一般只有30k,所以去下载:<a href="https://services.gradle.org/distributions/gradle-4.5.1-bin.zip" target="_blank" rel="noopener">https://services.gradle.org/distributions/gradle-4.5.1-bin.zip</a><br>,然后修改该项目的配置文件:basic-demo/gradle/wrapper/gradle-wrapper.properties<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">distributionBase=GRADLE_USER_HOME</span><br><span class="line">distributionPath=wrapper/dists</span><br><span class="line">zipStoreBase=GRADLE_USER_HOME</span><br><span class="line">zipStorePath=wrapper/dists</span><br><span class="line"><span class="meta">#</span>distributionUrl=https\://services.gradle.org/distributions/gradle-4.5.1-bin.zip</span><br><span class="line">distributionUrl=gradle-4.5.1-bin.zip</span><br></pre></td></tr></table></figure></p>
-<p>当然这个路径可以自由修改.</p>
-<p>然后编译就简单了:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc basic-demo]$ ./gradlew copy</span><br><span class="line">Downloading file:/home/xxx/basic-demo/gradle/wrapper/gradle-4.5.1-bin.zip</span><br><span class="line">.....................................................................</span><br><span class="line">Unzipping /home/jimo/.gradle/wrapper/dists/gradle-4.5.1-bin/3o6uzay4hcvg4k8e46n74bbqi/gradle-4.5.1-bin.zip to /home/jimo/.gradle/wrapper/dists/gradle-4.5.1-bin/3o6uzay4hcvg4k8e46n74bbqi</span><br><span class="line">Set executable permissions for: /home/jimo/.gradle/wrapper/dists/gradle-4.5.1-bin/3o6uzay4hcvg4k8e46n74bbqi/gradle-4.5.1/bin/gradle</span><br><span class="line"></span><br><span class="line">BUILD SUCCESSFUL in 1s</span><br><span class="line">1 actionable task: 1 executed</span><br></pre></td></tr></table></figure></p>
-<h1 id="下载jar包慢"><a href="#下载jar包慢" class="headerlink" title="下载jar包慢"></a>下载jar包慢</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        maven &#123; url 'http://maven.aliyun.com/nexus/content/groups/public/' &#125;</span><br><span class="line">        jcenter()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">allprojects &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        maven &#123; url 'http://maven.aliyun.com/nexus/content/groups/public/' &#125;</span><br><span class="line">        jcenter()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="怎么学习"><a href="#怎么学习" class="headerlink" title="怎么学习"></a>怎么学习</h1><p>用官网提供的例子即可:<a href="https://gradle.org/guides/#getting-started" target="_blank" rel="noopener">https://gradle.org/guides/#getting-started</a></p>
-<p><a href="https://www.w3cschool.cn/gradle/ms7n1hu2.html" target="_blank" rel="noopener">W3C提供的教程也可以</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这篇讲了如何学习gradle以及会遇到的问题.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/05/tools/006-gradle/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/05/tools/006-gradle/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjfdhwrei00312gkas3lfbea5" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
 
       </footer>
       </div>
@@ -1855,7 +1853,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 11.25px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 12.5px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1877,6 +1875,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
           </li>
         
@@ -1890,10 +1892,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/25/tools/008-computer-basic/">不得不知的计算机基础知识</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/25/cloudcompute/001-virtualbox-network/">virtualbox局域网配置</a>
           </li>
         
       </ul>
