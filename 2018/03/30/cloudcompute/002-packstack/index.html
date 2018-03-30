@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111673440-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>packstack安装openstack | 在我的世界</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="安装openstack的一些方法. 1.从源码安装可以参考 2.按照官方文档官方文档是这样开始的 :install openstack 3.使用packstackpackstack安装可以参考官网 它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的. 在CentOS上:1234$ sudo yum install -y centos-release-openstack-qu">
+<meta name="keywords" content="linux,云计算,openstack,centos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="packstack安装openstack">
+<meta property="og:url" content="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/index.html">
+<meta property="og:site_name" content="在我的世界">
+<meta property="og:description" content="安装openstack的一些方法. 1.从源码安装可以参考 2.按照官方文档官方文档是这样开始的 :install openstack 3.使用packstackpackstack安装可以参考官网 它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的. 在CentOS上:1234$ sudo yum install -y centos-release-openstack-qu">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://http/2018/03/30/cloudcompute/002-packstack/000.png">
+<meta property="og:updated_time" content="2018-03-30T05:12:06.497Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="packstack安装openstack">
+<meta name="twitter:description" content="安装openstack的一些方法. 1.从源码安装可以参考 2.按照官方文档官方文档是这样开始的 :install openstack 3.使用packstackpackstack安装可以参考官网 它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的. 在CentOS上:1234$ sudo yum install -y centos-release-openstack-qu">
+<meta name="twitter:image" content="http://http/2018/03/30/cloudcompute/002-packstack/000.png">
+  
+    <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我的世界</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">你是谁,你从哪里来,你活着为了什么?</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">home</a>
+        
+          <a class="main-nav-link" href="/archives">archives</a>
+        
+          <a class="main-nav-link" href="/about">about</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://http://jimolonely.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-cloudcompute/002-packstack" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/30/cloudcompute/002-packstack/" class="article-date">
+  <time datetime="2018-03-30T04:49:34.000Z" itemprop="datePublished">2018-03-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 class="article-title" itemprop="name">
+      packstack安装openstack
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>安装openstack的一些方法.</p>
+<h1 id="1-从源码安装"><a href="#1-从源码安装" class="headerlink" title="1.从源码安装"></a>1.从源码安装</h1><p>可以参考</p>
+<h1 id="2-按照官方文档"><a href="#2-按照官方文档" class="headerlink" title="2.按照官方文档"></a>2.按照官方文档</h1><p>官方文档是这样开始的 :<a href="https://docs.openstack.org/install-guide/environment.html" target="_blank" rel="noopener">install openstack</a></p>
+<h1 id="3-使用packstack"><a href="#3-使用packstack" class="headerlink" title="3.使用packstack"></a>3.使用packstack</h1><p>packstack安装可以参考<a href="https://www.rdoproject.org/install/packstack/" target="_blank" rel="noopener">官网</a></p>
+<p>它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的.</p>
+<p>在CentOS上:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install -y centos-release-openstack-queens</span><br><span class="line"><span class="meta">$</span> sudo yum update -y</span><br><span class="line"><span class="meta">$</span> sudo yum install -y openstack-packstack</span><br><span class="line"><span class="meta">$</span> sudo packstack --allinone</span><br></pre></td></tr></table></figure></p>
+<p>最后一步需要的时间最长,其中下面是主要花的时间:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pplying 10.0.2.15_controller.pp</span><br><span class="line">10.0.2.15_controller.pp:                             [ DONE ]      </span><br><span class="line">Applying 10.0.2.15_network.pp</span><br><span class="line">10.0.2.15_network.pp:                                [ DONE ]   </span><br><span class="line">Applying 10.0.2.15_compute.pp</span><br><span class="line">10.0.2.15_compute.pp:                                [ DONE ]   </span><br><span class="line">Applying Puppet manifests                            [ DONE ]</span><br><span class="line">Finalizing                                           [ DONE ]</span><br><span class="line"></span><br><span class="line"> **** Installation completed successfully ******</span><br></pre></td></tr></table></figure></p>
+<p>其默认创建了2个用户:admin和demo,其密码在用户目录下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls key*</span><br><span class="line">keystonerc_admin  keystonerc_demo</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# cat keystonerc_demo </span><br><span class="line">unset OS_SERVICE_TOKEN</span><br><span class="line">export OS_USERNAME=demo</span><br><span class="line">export OS_PASSWORD='6c43ac4dbcc141e3'</span><br><span class="line">export PS1='[\u@\h \W(keystone_demo)]\$ '</span><br><span class="line">export OS_AUTH_URL=http://10.0.2.15:5000/v3</span><br><span class="line">    </span><br><span class="line">export OS_PROJECT_NAME=demo</span><br><span class="line">export OS_USER_DOMAIN_NAME=Default</span><br><span class="line">export OS_PROJECT_DOMAIN_NAME=Default</span><br><span class="line">export OS_IDENTITY_API_VERSION=3</span><br></pre></td></tr></table></figure></p>
+<p>启动openstack只需在浏览器输入自己的ip/dashboard:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">To access the OpenStack Dashboard browse to http://10.0.2.15/dashboard</span><br></pre></td></tr></table></figure></p>
+<p>如果重启了系统,只需要再运行上次的answer-file下的配置:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls packstack*</span><br><span class="line">packstack-answers-20180329-220625.txt</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# packstack --answer-file packstack-answers-20180329-220625.txt </span><br><span class="line">Welcome to the Packstack setup utility</span><br><span class="line"></span><br><span class="line">The installation log file is available at: /var/tmp/packstack/20180330-004508-tneRpU/openstack-setup.log</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>使用demo用户登录然后可以创建一个实例试试:<br><img src="/2018/03/30/cloudcompute/002-packstack/000.png"></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                                                
+                                                    
+                                                      
+                                                        <p>安装openstack的一些方法.</p>
+<h1 id="1-从源码安装"><a href="#1-从源码安装" class="headerlink" title="1.从源码安装"></a>1.从源码安装</h1><p>可以参考</p>
+<h1 id="2-按照官方文档"><a href="#2-按照官方文档" class="headerlink" title="2.按照官方文档"></a>2.按照官方文档</h1><p>官方文档是这样开始的 :<a href="https://docs.openstack.org/install-guide/environment.html" target="_blank" rel="noopener">install openstack</a></p>
+<h1 id="3-使用packstack"><a href="#3-使用packstack" class="headerlink" title="3.使用packstack"></a>3.使用packstack</h1><p>packstack安装可以参考<a href="https://www.rdoproject.org/install/packstack/" target="_blank" rel="noopener">官网</a></p>
+<p>它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的.</p>
+<p>在CentOS上:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install -y centos-release-openstack-queens</span><br><span class="line"><span class="meta">$</span> sudo yum update -y</span><br><span class="line"><span class="meta">$</span> sudo yum install -y openstack-packstack</span><br><span class="line"><span class="meta">$</span> sudo packstack --allinone</span><br></pre></td></tr></table></figure></p>
+<p>最后一步需要的时间最长,其中下面是主要花的时间:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pplying 10.0.2.15_controller.pp</span><br><span class="line">10.0.2.15_controller.pp:                             [ DONE ]      </span><br><span class="line">Applying 10.0.2.15_network.pp</span><br><span class="line">10.0.2.15_network.pp:                                [ DONE ]   </span><br><span class="line">Applying 10.0.2.15_compute.pp</span><br><span class="line">10.0.2.15_compute.pp:                                [ DONE ]   </span><br><span class="line">Applying Puppet manifests                            [ DONE ]</span><br><span class="line">Finalizing                                           [ DONE ]</span><br><span class="line"></span><br><span class="line"> **** Installation completed successfully ******</span><br></pre></td></tr></table></figure></p>
+<p>其默认创建了2个用户:admin和demo,其密码在用户目录下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls key*</span><br><span class="line">keystonerc_admin  keystonerc_demo</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# cat keystonerc_demo </span><br><span class="line">unset OS_SERVICE_TOKEN</span><br><span class="line">export OS_USERNAME=demo</span><br><span class="line">export OS_PASSWORD='6c43ac4dbcc141e3'</span><br><span class="line">export PS1='[\u@\h \W(keystone_demo)]\$ '</span><br><span class="line">export OS_AUTH_URL=http://10.0.2.15:5000/v3</span><br><span class="line">    </span><br><span class="line">export OS_PROJECT_NAME=demo</span><br><span class="line">export OS_USER_DOMAIN_NAME=Default</span><br><span class="line">export OS_PROJECT_DOMAIN_NAME=Default</span><br><span class="line">export OS_IDENTITY_API_VERSION=3</span><br></pre></td></tr></table></figure></p>
+<p>启动openstack只需在浏览器输入自己的ip/dashboard:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">To access the OpenStack Dashboard browse to http://10.0.2.15/dashboard</span><br></pre></td></tr></table></figure></p>
+<p>如果重启了系统,只需要再运行上次的answer-file下的配置:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls packstack*</span><br><span class="line">packstack-answers-20180329-220625.txt</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# packstack --answer-file packstack-answers-20180329-220625.txt </span><br><span class="line">Welcome to the Packstack setup utility</span><br><span class="line"></span><br><span class="line">The installation log file is available at: /var/tmp/packstack/20180330-004508-tneRpU/openstack-setup.log</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>使用demo用户登录然后可以创建一个实例试试:<br><img src="/2018/03/30/cloudcompute/002-packstack/000.png"></p>
+
+          </div>
+          
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfdhr9gi0006wokaa1dsluaa" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos/">centos</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a></li></ul>
+
+      </footer>
+      </div>
+      
+        
+<nav id="article-nav">
+  
+  
+    <a href="/2018/03/29/linux/008-linux-kernel1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Linux内核</div>
+    </a>
+  
+</nav>
+
+          
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 11.25px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 12.5px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/29/linux/008-linux-kernel1/">Linux内核</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/27/db/000-mysql-error-1698/">ERROR 1698 (28000):Access denied for user</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/25/tools/008-computer-basic/">不得不知的计算机基础知识</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/25/cloudcompute/001-virtualbox-network/">virtualbox局域网配置</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Jackpler<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

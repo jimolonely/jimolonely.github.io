@@ -84,6 +84,90 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-cloudcompute/002-packstack" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/30/cloudcompute/002-packstack/" class="article-date">
+  <time datetime="2018-03-30T04:49:34.000Z" itemprop="datePublished">2018-03-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>安装openstack的一些方法.</p>
+<h1 id="1-从源码安装"><a href="#1-从源码安装" class="headerlink" title="1.从源码安装"></a>1.从源码安装</h1><p>可以参考</p>
+<h1 id="2-按照官方文档"><a href="#2-按照官方文档" class="headerlink" title="2.按照官方文档"></a>2.按照官方文档</h1><p>官方文档是这样开始的 :<a href="https://docs.openstack.org/install-guide/environment.html" target="_blank" rel="noopener">install openstack</a></p>
+<h1 id="3-使用packstack"><a href="#3-使用packstack" class="headerlink" title="3.使用packstack"></a>3.使用packstack</h1><p>packstack安装可以参考<a href="https://www.rdoproject.org/install/packstack/" target="_blank" rel="noopener">官网</a></p>
+<p>它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的.</p>
+<p>在CentOS上:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install -y centos-release-openstack-queens</span><br><span class="line"><span class="meta">$</span> sudo yum update -y</span><br><span class="line"><span class="meta">$</span> sudo yum install -y openstack-packstack</span><br><span class="line"><span class="meta">$</span> sudo packstack --allinone</span><br></pre></td></tr></table></figure></p>
+<p>最后一步需要的时间最长,其中下面是主要花的时间:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pplying 10.0.2.15_controller.pp</span><br><span class="line">10.0.2.15_controller.pp:                             [ DONE ]      </span><br><span class="line">Applying 10.0.2.15_network.pp</span><br><span class="line">10.0.2.15_network.pp:                                [ DONE ]   </span><br><span class="line">Applying 10.0.2.15_compute.pp</span><br><span class="line">10.0.2.15_compute.pp:                                [ DONE ]   </span><br><span class="line">Applying Puppet manifests                            [ DONE ]</span><br><span class="line">Finalizing                                           [ DONE ]</span><br><span class="line"></span><br><span class="line"> **** Installation completed successfully ******</span><br></pre></td></tr></table></figure></p>
+<p>其默认创建了2个用户:admin和demo,其密码在用户目录下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls key*</span><br><span class="line">keystonerc_admin  keystonerc_demo</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# cat keystonerc_demo </span><br><span class="line">unset OS_SERVICE_TOKEN</span><br><span class="line">export OS_USERNAME=demo</span><br><span class="line">export OS_PASSWORD='6c43ac4dbcc141e3'</span><br><span class="line">export PS1='[\u@\h \W(keystone_demo)]\$ '</span><br><span class="line">export OS_AUTH_URL=http://10.0.2.15:5000/v3</span><br><span class="line">    </span><br><span class="line">export OS_PROJECT_NAME=demo</span><br><span class="line">export OS_USER_DOMAIN_NAME=Default</span><br><span class="line">export OS_PROJECT_DOMAIN_NAME=Default</span><br><span class="line">export OS_IDENTITY_API_VERSION=3</span><br></pre></td></tr></table></figure></p>
+<p>启动openstack只需在浏览器输入自己的ip/dashboard:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">To access the OpenStack Dashboard browse to http://10.0.2.15/dashboard</span><br></pre></td></tr></table></figure></p>
+<p>如果重启了系统,只需要再运行上次的answer-file下的配置:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls packstack*</span><br><span class="line">packstack-answers-20180329-220625.txt</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# packstack --answer-file packstack-answers-20180329-220625.txt </span><br><span class="line">Welcome to the Packstack setup utility</span><br><span class="line"></span><br><span class="line">The installation log file is available at: /var/tmp/packstack/20180330-004508-tneRpU/openstack-setup.log</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>使用demo用户登录然后可以创建一个实例试试:<br><img src="/2018/03/30/cloudcompute/002-packstack/000.png"></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>安装openstack的一些方法.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/002-packstack/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/002-packstack/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfdhr9gi0006wokaa1dsluaa" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos/">centos</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/008-linux-kernel1" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/29/linux/008-linux-kernel1/" class="article-date">
@@ -185,7 +269,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfcj5k3d001j34karblrs4m6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfdhr9hj001iwoka2abg8et7" class="article-share-link">
           Share
         </a>
         
@@ -262,7 +346,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfcj5k2l000834kai68thp9a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfdhr9gk0008wokajxxlwu29" class="article-share-link">
           Share
         </a>
         
@@ -374,7 +458,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfcj5k3x002q34kau0u6bcpe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfdhr9kc0059wokaaz14s39i" class="article-share-link">
           Share
         </a>
         
@@ -475,7 +559,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfcj5k2i000534ka4ci5bfgj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfdhr9gh0005wokamw4gu5lj" class="article-share-link">
           Share
         </a>
         
@@ -561,7 +645,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfcj5k3k001z34kacazu4lxw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfdhr9hs001ywokaiau0mf99" class="article-share-link">
           Share
         </a>
         
@@ -639,7 +723,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfcj5k30000r34ka64ir42j2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfdhr9gy000qwoka7wfgqt34" class="article-share-link">
           Share
         </a>
         
@@ -714,7 +798,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfcj5k2z000p34kapt0qpd46" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfdhr9gs000jwoka4byqgvoq" class="article-share-link">
           Share
         </a>
         
@@ -808,7 +892,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfcj5k2t000h34karorq625l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfdhr9gr000hwokaft3lyjn9" class="article-share-link">
           Share
         </a>
         
@@ -892,7 +976,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfcj5k2r000g34kai6k8j53m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfdhr9gp000gwoka388f6t9v" class="article-share-link">
           Share
         </a>
         
@@ -968,7 +1052,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfcj5k31000s34ka2g9soqpr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfdhr9h2000swokaf5134n76" class="article-share-link">
           Share
         </a>
         
@@ -1052,7 +1136,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfcj5k3k001y34ka1w8ofpbh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfdhr9hr001wwoka1fs6amqb" class="article-share-link">
           Share
         </a>
         
@@ -1145,7 +1229,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfcj5k2q000d34kamgv4sz48" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfdhr9go000dwokakpjy2t4x" class="article-share-link">
           Share
         </a>
         
@@ -1230,7 +1314,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfcj5k2o000b34ka97wacmpk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfdhr9gm000bwokadzoo2dwh" class="article-share-link">
           Share
         </a>
         
@@ -1326,7 +1410,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfcj5k34000w34kafpkbxx73" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfdhr9h6000wwoka52kxn75o" class="article-share-link">
           Share
         </a>
         
@@ -1405,7 +1489,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfcj5k2j000634kax9p9sr1x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfdhr9gb0002wokar20fe6w2" class="article-share-link">
           Share
         </a>
         
@@ -1484,7 +1568,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfcj5k33000v34ka2ntdous8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfdhr9h5000vwokaup9g4mh8" class="article-share-link">
           Share
         </a>
         
@@ -1568,7 +1652,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfcj5k32000u34ka1b6kswab" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfdhr9h3000twoka4kvcjcd2" class="article-share-link">
           Share
         </a>
         
@@ -1646,7 +1730,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfcj5k3w002p34kambirod4z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfdhr9kb0057wokar6rz8mgg" class="article-share-link">
           Share
         </a>
         
@@ -1729,102 +1813,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjfcj5k3v002n34ka31kg8s2h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjfdhr9k90054wokaea8r2jg5" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/005-latex2" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/02/07/tools/005-latex2/" class="article-date">
-  <time datetime="2018-02-07T00:45:25.000Z" itemprop="datePublished">2018-02-07</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/02/07/tools/005-latex2/">不得不会的latex2</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文将使用10分钟入门latex.</p>
-<h1 id="环境介绍"><a href="#环境介绍" class="headerlink" title="环境介绍"></a>环境介绍</h1><p>使用texlive2017,vs code作为开发工具.</p>
-<p>vscode的用户自定义配置如下,为了支持中文:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">"latex-workshop.latex.toolchain": [</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="attr">"command"</span>: <span class="string">"xelatex"</span>,</span><br><span class="line">         <span class="attr">"args"</span>: [</span><br><span class="line">             <span class="string">"-synctex=1"</span>,</span><br><span class="line">             <span class="string">"-interaction=nonstopmode"</span>,</span><br><span class="line">             <span class="string">"-file-line-error"</span>,</span><br><span class="line">             <span class="string">"-pdf"</span>,</span><br><span class="line">             <span class="string">"%DOC%"</span></span><br><span class="line">         ]</span><br><span class="line">     &#125;</span><br><span class="line"> ]</span><br></pre></td></tr></table></figure></p>
-<p>安装的插件是:LaTeX Workshop.</p>
-<h1 id="最小结构"><a href="#最小结构" class="headerlink" title="最小结构"></a>最小结构</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\documentclass&#123;article&#125;</span><br><span class="line"></span><br><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包,支持中文</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line">  LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，</span><br><span class="line">  由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="增加标题-作者-日期"><a href="#增加标题-作者-日期" class="headerlink" title="增加标题,作者,日期"></a>增加标题,作者,日期</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">\title&#123;Latex学习&#125;</span><br><span class="line">\author&#123;jackpler \thanks&#123;jimo&#125;&#125;</span><br><span class="line">\date&#123;2019-01-01&#125; % 或则\today</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line">  \maketitle % 这才显示出来</span><br></pre></td></tr></table></figure>
-<h1 id="粗体-斜体-下划线"><a href="#粗体-斜体-下划线" class="headerlink" title="粗体,斜体,下划线"></a>粗体,斜体,下划线</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由\underline&#123;美国&#125;计算机科学家\textbf&#123;莱斯利·兰伯特&#125;在\textit&#123;20世纪80年代初期&#125;开发</span><br></pre></td></tr></table></figure>
-<p>现在可以看下效果了:</p>
-<img src="/2018/02/07/tools/005-latex2/000.png">
-<h1 id="插入图片"><a href="#插入图片" class="headerlink" title="插入图片"></a>插入图片</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\usepackage&#123;graphicx&#125;</span><br><span class="line">\graphicspath&#123;&#123;images/&#125;&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line"></span><br><span class="line">  \includegraphics&#123;0&#125;</span><br><span class="line">  </span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/001.png">
-<h1 id="图表标题-标签和引用"><a href="#图表标题-标签和引用" class="headerlink" title="图表标题,标签和引用"></a>图表标题,标签和引用</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;figure&#125;[h]</span><br><span class="line">    \centering</span><br><span class="line">    \includegraphics[width=0.5\textwidth]&#123;0&#125;</span><br><span class="line">    \caption&#123;我的头像&#125;</span><br><span class="line">    \label&#123;fig:me&#125;</span><br><span class="line">  \end&#123;figure&#125;</span><br><span class="line"></span><br><span class="line">  请查看在\pageref&#123;fig:me&#125;页的Figure \ref&#123;fig:me&#125;</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/002.png">
-<h1 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;itemize&#125;</span><br><span class="line">  \item 我是个男人</span><br><span class="line">  \item 我不是个女人</span><br><span class="line">\end&#123;itemize&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;enumerate&#125;</span><br><span class="line">  \item 我是个男人</span><br><span class="line">  \item 我不是个女人</span><br><span class="line">\end&#123;enumerate&#125;</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/003.png">
-<h1 id="数学公式"><a href="#数学公式" class="headerlink" title="数学公式"></a>数学公式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">物理学著名公式(行内): $E=m^2$</span><br><span class="line"></span><br><span class="line">行间公式: $$E=m^2$$</span><br><span class="line"></span><br><span class="line">$$T^&#123;i_1 i_2 \dots i_p&#125;_&#123;j_1 j_2 \dots j_q&#125; = T(x^&#123;i_1&#125;,\dots,x^&#123;i_p&#125;,e_&#123;j_1&#125;,\dots,e_&#123;j_q&#125;)$$</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/004.png">
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文将使用10分钟入门latex.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/02/07/tools/005-latex2/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/02/07/tools/005-latex2/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjfcj5k3u002l34kauvsxz3n8" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
 
       </footer>
       </div>
@@ -1851,7 +1845,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1861,7 +1855,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 11.25px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 11.25px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 12.5px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1883,6 +1877,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
+          </li>
+        
+          <li>
             <a href="/2018/03/29/linux/008-linux-kernel1/">Linux内核</a>
           </li>
         
@@ -1896,10 +1894,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/25/cloudcompute/001-virtualbox-network/">virtualbox局域网配置</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/24/python/005-module-import/">ModuleNotFoundError:No module named xxx</a>
           </li>
         
       </ul>
