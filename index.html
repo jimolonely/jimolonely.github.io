@@ -106,14 +106,18 @@ ga('send', 'pageview');
         
           <!-- <div class="article-entry" itemprop="articleBody">
       
-        <p>这是我学习的路径.</p>
+        <p>这是我学习openstack的路径.</p>
+<h1 id="安装openstack"><a href="#安装openstack" class="headerlink" title="安装openstack"></a>安装openstack</h1><p>参考</p>
 <h1 id="基础术语"><a href="#基础术语" class="headerlink" title="基础术语"></a>基础术语</h1><p>User<br>Credentials<br>Authentication<br>Token<br>Tenant<br>Service<br>Endpoint<br>Role</p>
 <h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><img src="/2018/03/30/cloudcompute/003-openstack-basic/000.png">
 <h1 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h1><p>每个节点有3张网卡,一个用于内网,一个外网,一个心跳.</p>
-<h1 id="学会使用Horizon界面"><a href="#学会使用Horizon界面" class="headerlink" title="学会使用Horizon界面"></a>学会使用Horizon界面</h1><p>创建实例,配置网络等.</p>
-<h1 id="也可以使用命令行"><a href="#也可以使用命令行" class="headerlink" title="也可以使用命令行"></a>也可以使用命令行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# source keystonerc_demo </span><br><span class="line">[root@localhost ~(keystone_demo)]# nova list</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| ID                                   | Name    | Status  | Task State | Power State | Networks         |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| 19498801-c774-4297-8a75-bff9c2503c5e | cissor1 | SHUTOFF | -          | Shutdown    | private=10.0.0.7 |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br></pre></td></tr></table></figure>
+<h1 id="学会如何使用openstack"><a href="#学会如何使用openstack" class="headerlink" title="学会如何使用openstack"></a>学会如何使用openstack</h1><p>装好了,也有了基本概念,最快上手的方式就是使用起来.<br>根据<a href="https://docs.openstack.org/mitaka/user-guide/intro-user.html" target="_blank" rel="noopener">官网</a>介绍,使用的方式可多了.</p>
+<p>Horizon界面,CLI,python SDK等等.</p>
+<h1 id="学会使用Horizon界面"><a href="#学会使用Horizon界面" class="headerlink" title="学会使用Horizon界面"></a>学会使用Horizon界面</h1><p>创建实例,配置网络等.<br><a href="https://docs.openstack.org/mitaka/user-guide/dashboard.html" target="_blank" rel="noopener">文档</a>.</p>
+<h1 id="使用命令行"><a href="#使用命令行" class="headerlink" title="使用命令行"></a>使用命令行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# source keystonerc_demo </span><br><span class="line">[root@localhost ~(keystone_demo)]# nova list</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| ID                                   | Name    | Status  | Task State | Power State | Networks         |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| 19498801-c774-4297-8a75-bff9c2503c5e | cissor1 | SHUTOFF | -          | Shutdown    | private=10.0.0.7 |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br></pre></td></tr></table></figure>
 <p>常用命令参考<a href="https://docs.openstack.org/mitaka/user-guide/cli_cheat_sheet.html" target="_blank" rel="noopener">文档</a></p>
 <p>通过debug标志可以看到整个API的请求过程:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~(keystone_demo)]# nova --debug list</span><br><span class="line">...</span><br><span class="line">REQ: curl -g -i -X GET http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail -H "OpenStack-API-Version: compute 2.53" -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-OpenStack-Nova-API-Version: 2.53" -H "X-Auth-Token: &#123;SHA1&#125;a6994f0daf077433ede7e26fd93007a12472e7e5"</span><br><span class="line">DEBUG (connectionpool:395) http://10.0.2.15:8774 "GET /v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail HTTP/1.1" 200 1443</span><br><span class="line">DEBUG (session:419) RESP: [200] Content-Length: 1443 Content-Type: application/json Openstack-Api-Version: compute 2.53 X-Openstack-Nova-Api-Version: 2.53 Vary: OpenStack-API-Version, X-OpenStack-Nova-API-Version X-Openstack-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 X-Compute-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 Date: Fri, 30 Mar 2018 08:33:39 GMT Connection: keep-alive </span><br><span class="line">RESP BODY: &#123;"servers": [&#123;"OS-EXT-STS:task_state": null, "addresses": &#123;"private": [&#123;"OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:7d:96:7e", "version": 4, "addr": "10.0.0.7", "OS-EXT-IPS:type": "fixed"&#125;]&#125;, "links": [&#123;"href": "http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "self"&#125;, &#123;"href": "http://10.0.2.15:8774/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "bookmark"&#125;], "image": "", "OS-EXT-STS:vm_state": "stopped", "OS-SRV-USG:launched_at": "2018-03-30T03:05:47.000000", "flavor": &#123;"ephemeral": 0, "ram": 512, "original_name": "m1.tiny", "vcpus": 1, "extra_specs": &#123;&#125;, "swap": 0, "disk": 1&#125;, "id": "19498801-c774-4297-8a75-bff9c2503c5e", "security_groups": [&#123;"name": "default"&#125;], "OS-SRV-USG:terminated_at": null, "user_id": "d069531f171b422289a106e106572aa7", "OS-DCF:diskConfig": "AUTO", "accessIPv4": "", "accessIPv6": "", "OS-EXT-STS:power_state": 4, "OS-EXT-AZ:availability_zone": "nova", "config_drive": "", "status": "SHUTOFF", "updated": "2018-03-30T03:10:19Z", "hostId": "a6480a085edf3a7b6698b4f6972bf20fba65501c4dbaeae382d274f0", "description": null, "tags": [], "key_name": null, "locked": false, "name": "cissor1", "created": "2018-03-30T03:05:04Z", "tenant_id": "ab4c85f86cc04230894ba9eaa0c412e4", "os-extended-volumes:volumes_attached": [&#123;"id": "9736b299-0d18-4389-a7e9-67c864023a9e", "delete_on_termination": false&#125;], "metadata": &#123;&#125;&#125;]&#125;</span><br></pre></td></tr></table></figure></p>
+<p>更多<a href="https://docs.openstack.org/mitaka/user-guide/cli.html" target="_blank" rel="noopener">官方文档</a></p>
 
       
     </div> -->
@@ -129,7 +133,7 @@ ga('send', 'pageview');
                                 
                                   
                                     <p>
-                                      <p>这是我学习的路径.</p>
+                                      <p>这是我学习openstack的路径.</p>
 
                                         <p>
                                           
@@ -151,7 +155,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfdpa0s30009agkarjxwrmg3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfdpm3m00009n2kasj1opqkh" class="article-share-link">
           Share
         </a>
         
@@ -235,7 +239,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfdpa0s20008agkapy8s7gvl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfdpm3lz0008n2ka5z2gxp8u" class="article-share-link">
           Share
         </a>
         
@@ -350,7 +354,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfdpa0t3001nagkac06t8p2k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfdpm3n1001nn2kacjazqocx" class="article-share-link">
           Share
         </a>
         
@@ -427,7 +431,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfdpa0s6000bagkalmr3tfwi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfdpm3m3000bn2kandhck8un" class="article-share-link">
           Share
         </a>
         
@@ -539,7 +543,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfdpa0u40037agka2n4oubjj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfdpm3nt0037n2ka7sd7i32l" class="article-share-link">
           Share
         </a>
         
@@ -640,7 +644,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfdpa0s10006agkaziigk1nz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfdpm3ly0006n2ka36ytrsrc" class="article-share-link">
           Share
         </a>
         
@@ -726,7 +730,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfdpa0te0023agka688emume" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfdpm3n90023n2kayzm6oti1" class="article-share-link">
           Share
         </a>
         
@@ -804,7 +808,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfdpa0sn000vagka4erajtv9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfdpm3mk000vn2kanxv6vgqi" class="article-share-link">
           Share
         </a>
         
@@ -879,7 +883,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfdpa0sj000oagkagl9hhe0c" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfdpm3mf000on2kawwhualwy" class="article-share-link">
           Share
         </a>
         
@@ -973,7 +977,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfdpa0si000lagkaalvx4iq5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfdpm3me000ln2kau8i751em" class="article-share-link">
           Share
         </a>
         
@@ -1057,7 +1061,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfdpa0sh000jagka960zp5qu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfdpm3md000jn2kax3tyu25o" class="article-share-link">
           Share
         </a>
         
@@ -1133,7 +1137,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfdpa0sp000xagka05jx5ahe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfdpm3ml000xn2ka7m0mab3t" class="article-share-link">
           Share
         </a>
         
@@ -1217,7 +1221,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfdpa0td0021agkabvvyc9dc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfdpm3n90021n2kajbjf5wev" class="article-share-link">
           Share
         </a>
         
@@ -1310,7 +1314,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfdpa0sf000hagka0c8vy025" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfdpm3mc000hn2kahh5lwds0" class="article-share-link">
           Share
         </a>
         
@@ -1395,7 +1399,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfdpa0sb000gagka0jyavjkl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfdpm3ma000gn2kaetf70h7l" class="article-share-link">
           Share
         </a>
         
@@ -1491,7 +1495,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfdpa0ss0011agkau8hmyqtd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfdpm3mo0011n2ka199v0yk4" class="article-share-link">
           Share
         </a>
         
@@ -1570,7 +1574,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfdpa0rz0004agkaudyomwco" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfdpm3lw0004n2kao9070zt3" class="article-share-link">
           Share
         </a>
         
@@ -1649,7 +1653,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfdpa0sr0010agka0mv4qn8d" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfdpm3mn0010n2kaw919rfez" class="article-share-link">
           Share
         </a>
         
@@ -1733,7 +1737,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfdpa0sq000yagka0xi6c703" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfdpm3mm000yn2ka8ddcduf5" class="article-share-link">
           Share
         </a>
         
@@ -1811,7 +1815,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfdpa0u20035agkah3cjotgf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfdpm3ns0035n2kajk6lxa07" class="article-share-link">
           Share
         </a>
         
