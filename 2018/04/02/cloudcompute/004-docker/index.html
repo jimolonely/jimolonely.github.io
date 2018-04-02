@@ -18,19 +18,19 @@ ga('send', 'pageview');
 
 
   
-  <title>docker的问题 | 在我的世界</title>
+  <title>docker那些事 | 在我的世界</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="docker的那些事. 安装如果安装时使用的root用户,那么普通用户使用时就收到限制,会出现:12$ docker imagesGot permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdoc">
 <meta name="keywords" content="docker">
 <meta property="og:type" content="article">
-<meta property="og:title" content="docker的问题">
+<meta property="og:title" content="docker那些事">
 <meta property="og:url" content="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/index.html">
 <meta property="og:site_name" content="在我的世界">
 <meta property="og:description" content="docker的那些事. 安装如果安装时使用的root用户,那么普通用户使用时就收到限制,会出现:12$ docker imagesGot permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdoc">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-02T03:51:07.424Z">
+<meta property="og:updated_time" content="2018-04-02T04:08:44.254Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="docker的问题">
+<meta name="twitter:title" content="docker那些事">
 <meta name="twitter:description" content="docker的那些事. 安装如果安装时使用的root用户,那么普通用户使用时就收到限制,会出现:12$ docker imagesGot permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdoc">
   
     <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
@@ -98,7 +98,7 @@ ga('send', 'pageview');
           
   
     <h1 class="article-title" itemprop="name">
-      docker的问题
+      docker那些事
     </h1>
   
 
@@ -109,6 +109,12 @@ ga('send', 'pageview');
         <p>docker的那些事.</p>
 <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>如果安装时使用的root用户,那么普通用户使用时就收到限制,会出现:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker images</span><br><span class="line">Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdocker.sock/v1.37/images/json: dial unix /var/run/docker.sock: connect: permission denied</span><br></pre></td></tr></table></figure></p>
 <p>解决办法很简单,将当前用户加入docker用户组:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo usermod -aG docker $USER</span><br><span class="line"><span class="meta">$</span> sudo systemctl restart docker</span><br><span class="line"><span class="meta">$</span> newgrp docker</span><br><span class="line"><span class="meta">$</span> docker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置镜像源"><a href="#配置镜像源" class="headerlink" title="配置镜像源"></a>配置镜像源</h1><p>可以参考<a href="https://ieevee.com/tech/2016/09/28/docker-mirror.html" target="_blank" rel="noopener">镜像对比文档</a></p>
+<p>我就先使用阿里云了,登进去<a href="https://cr.console.aliyun.com/" target="_blank" rel="noopener">https://cr.console.aliyun.com/</a>,<br>选择镜像加速器就可以看到自己的地址和配置方法了.</p>
+<h1 id="docker的存储目录"><a href="#docker的存储目录" class="headerlink" title="docker的存储目录"></a>docker的存储目录</h1><p>默认:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo ls /var/lib/docker/</span><br><span class="line">[sudo] jimo 的密码：</span><br><span class="line">builder  containerd  containers  image	network  overlay2  plugins  runtimes  swarm  tmp  trust  volumes</span><br></pre></td></tr></table></figure></p>
+<h1 id="学习docker"><a href="#学习docker" class="headerlink" title="学习docker"></a>学习docker</h1><ol>
+<li><a href="https://www.rails365.net/articles/docker-de-rong-qi-san" target="_blank" rel="noopener">docker</a></li>
+</ol>
 
       
     </div> -->
@@ -121,13 +127,19 @@ ga('send', 'pageview');
                                                         <p>docker的那些事.</p>
 <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>如果安装时使用的root用户,那么普通用户使用时就收到限制,会出现:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker images</span><br><span class="line">Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdocker.sock/v1.37/images/json: dial unix /var/run/docker.sock: connect: permission denied</span><br></pre></td></tr></table></figure></p>
 <p>解决办法很简单,将当前用户加入docker用户组:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo usermod -aG docker $USER</span><br><span class="line"><span class="meta">$</span> sudo systemctl restart docker</span><br><span class="line"><span class="meta">$</span> newgrp docker</span><br><span class="line"><span class="meta">$</span> docker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置镜像源"><a href="#配置镜像源" class="headerlink" title="配置镜像源"></a>配置镜像源</h1><p>可以参考<a href="https://ieevee.com/tech/2016/09/28/docker-mirror.html" target="_blank" rel="noopener">镜像对比文档</a></p>
+<p>我就先使用阿里云了,登进去<a href="https://cr.console.aliyun.com/" target="_blank" rel="noopener">https://cr.console.aliyun.com/</a>,<br>选择镜像加速器就可以看到自己的地址和配置方法了.</p>
+<h1 id="docker的存储目录"><a href="#docker的存储目录" class="headerlink" title="docker的存储目录"></a>docker的存储目录</h1><p>默认:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo ls /var/lib/docker/</span><br><span class="line">[sudo] jimo 的密码：</span><br><span class="line">builder  containerd  containers  image	network  overlay2  plugins  runtimes  swarm  tmp  trust  volumes</span><br></pre></td></tr></table></figure></p>
+<h1 id="学习docker"><a href="#学习docker" class="headerlink" title="学习docker"></a>学习docker</h1><ol>
+<li><a href="https://www.rails365.net/articles/docker-de-rong-qi-san" target="_blank" rel="noopener">docker</a></li>
+</ol>
 
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjfhp6i37000bdikaqtp3ahdv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjfhpt78m000d9cka7vd6e0nw" class="article-share-link">
           Share
         </a>
         
@@ -194,7 +206,7 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2018/04/02/cloudcompute/004-docker/">docker的问题</a>
+            <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事</a>
           </li>
         
           <li>
