@@ -84,6 +84,102 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/009-write-my-own-os" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/02/linux/009-write-my-own-os/" class="article-date">
+  <time datetime="2018-04-02T02:04:45.000Z" itemprop="datePublished">2018-04-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/02/linux/009-write-my-own-os/">写自己的操作系统1</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>从零写自己的操作系统.</p>
+<h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>来自youtube上一位腼腆的牛人推出的<a href="http://wyoos.org/" target="_blank" rel="noopener">视频</a>.</p>
+<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><p>完成一个自己的系统的iso文件,在屏幕上打印一句话,效果如下:</p>
+<img src="/2018/04/02/linux/009-write-my-own-os/000.png">
+<h1 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h1><ol>
+<li>makefle</li>
+<li>ASM汇编</li>
+<li>链接</li>
+<li>C++</li>
+</ol>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>types.h: 声明数据类型<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> __TYPES_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __TYPES_H</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">char</span>                     <span class="keyword">int8_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">char</span>           <span class="keyword">uint8_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">short</span>                   <span class="keyword">int16_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">short</span>         <span class="keyword">uint16_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span>                     <span class="keyword">int32_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">int</span>           <span class="keyword">uint32_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="keyword">int</span>           <span class="keyword">int64_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="keyword">uint64_t</span>;</span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+<p>kernel.cpp:打印逻辑<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"types.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printf</span><span class="params">(<span class="keyword">char</span>* str)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">uint16_t</span>* VideoMemory = (<span class="keyword">uint16_t</span>*)<span class="number">0xb8000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; str[i] != <span class="string">'\0'</span>; ++i)</span><br><span class="line">        VideoMemory[i] = (VideoMemory[i] &amp; <span class="number">0xFF00</span>) | str[i];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*constructor)</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> constructor start_ctors;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> constructor end_ctors;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">callConstructors</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(constructor* i = &amp;start_ctors; i != &amp;end_ctors; i++)</span><br><span class="line">        (*i)();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">kernelMain</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* multiboot_structure, <span class="keyword">uint32_t</span> <span class="comment">/*multiboot_magic*/</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Hello World! --- jimo - OS1"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>loader.s:从硬件启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">.set MAGIC, 0x1badb002</span><br><span class="line">.set FLAGS, (1&lt;&lt;0 | 1&lt;&lt;1)</span><br><span class="line">.set CHECKSUM, -(MAGIC + FLAGS)</span><br><span class="line"></span><br><span class="line">.section .multiboot</span><br><span class="line">    .long MAGIC</span><br><span class="line">    .long FLAGS</span><br><span class="line">    .long CHECKSUM</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.section .text</span><br><span class="line">.extern kernelMain</span><br><span class="line">#.extern callConstructors</span><br><span class="line">.global loader</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">loader:</span><br><span class="line">    mov $kernel_stack, %esp</span><br><span class="line">    call callConstructors</span><br><span class="line">    push %eax</span><br><span class="line">    push %ebx</span><br><span class="line">    call kernelMain</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">_stop:</span><br><span class="line">    cli</span><br><span class="line">    hlt</span><br><span class="line">    jmp _stop</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.section .bss</span><br><span class="line">.space 2*1024*1024; # 2 MiB</span><br><span class="line">kernel_stack:</span><br></pre></td></tr></table></figure></p>
+<p>linker.ld:用于链接,手写<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">ENTRY(loader)</span><br><span class="line">OUTPUT_FORMAT(elf32-i386)</span><br><span class="line">OUTPUT_ARCH(i386:i386)</span><br><span class="line"></span><br><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">  . = 0x0100000;</span><br><span class="line"></span><br><span class="line">  .text :</span><br><span class="line">  &#123;</span><br><span class="line">    *(.multiboot)</span><br><span class="line">    *(.text*)</span><br><span class="line">    *(.rodata)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .data  :</span><br><span class="line">  &#123;</span><br><span class="line">    start_ctors = .;</span><br><span class="line">    KEEP(*( .init_array ));</span><br><span class="line">    KEEP(*(SORT_BY_INIT_PRIORITY( .init_array.* )));</span><br><span class="line">    end_ctors = .;</span><br><span class="line"></span><br><span class="line">    *(.data)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .bss  :</span><br><span class="line">  &#123;</span><br><span class="line">    *(.bss)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /DISCARD/ : &#123; *(.fini_array*) *(.comment) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>makefile:方便make<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">GCCPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore</span><br><span class="line">ASPARAMS = --32</span><br><span class="line">LDPARAMS = -melf_i386</span><br><span class="line"></span><br><span class="line">objects = loader.o kernel.o</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">%.o: %.cpp</span></span><br><span class="line">	gcc <span class="variable">$(GCCPARAMS)</span> -c -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">%.o: %.s</span></span><br><span class="line">	as <span class="variable">$(ASPARAMS)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">mykernel.bin: linker.ld <span class="variable">$(objects)</span></span></span><br><span class="line">	ld <span class="variable">$(LDPARAMS)</span> -T <span class="variable">$&lt;</span> -o <span class="variable">$@</span> <span class="variable">$(objects)</span></span><br><span class="line"></span><br><span class="line"><span class="section">install: mykernel.bin</span></span><br><span class="line">	sudo cp <span class="variable">$&lt;</span> /boot/mykernel.bin</span><br><span class="line"></span><br><span class="line"><span class="section">mykernel.iso: mykernel.bin</span></span><br><span class="line">	rm -rf iso</span><br><span class="line">	mkdir iso</span><br><span class="line">	mkdir iso/boot</span><br><span class="line">	mkdir iso/boot/grub</span><br><span class="line">	cp mykernel.bin iso/boot/mykernel.bin</span><br><span class="line">	echo 'set timeout=0'                      &gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo 'set default=0'                     &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo ''                                  &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo 'menuentry <span class="string">"My Operating System"</span> &#123;' &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '  multiboot /boot/mykernel.bin'    &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '  boot'                            &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '&#125;'                                 &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">	rm -rf iso</span><br><span class="line"></span><br><span class="line"><span class="section">run: mykernel.iso</span></span><br><span class="line">	(killall VirtualBox &amp;&amp; sleep 1) || true</span><br><span class="line">	VirtualBox --startvm 'my-os' &amp;</span><br></pre></td></tr></table></figure></p>
+<h1 id="编译与链接"><a href="#编译与链接" class="headerlink" title="编译与链接"></a>编译与链接</h1><p>1.编译cpp<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make kernel.o</span><br><span class="line">gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -c -o kernel.o kernel.cpp</span><br><span class="line">kernel.cpp: 在函数‘void kernelMain(const void*, uint32_t)’中:</span><br><span class="line">kernel.cpp:26:41: 警告：ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]</span><br><span class="line">     printf("Hello World! --- jimo - OS1");</span><br></pre></td></tr></table></figure></p>
+<p>2.编译loader<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make loader.o</span><br><span class="line">as --32 -o loader.o loader.s</span><br><span class="line">loader.s: Assembler messages:</span><br><span class="line">loader.s: 警告：end of file not at end of a line; newline inserted</span><br></pre></td></tr></table></figure></p>
+<p>3.链接<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make mykernel.bin</span><br><span class="line">gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -c -o kernel.o kernel.cpp</span><br><span class="line">kernel.cpp: 在函数‘void kernelMain(const void*, unsigned int)’中:</span><br><span class="line">kernel.cpp:24:41: 警告：ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]</span><br><span class="line">     printf("Hello World! --- jimo - OS1");</span><br><span class="line">                                         ^</span><br><span class="line">ld -melf_i386 -T linker.ld -o mykernel.bin loader.o kernel.o</span><br></pre></td></tr></table></figure></p>
+<p>4.制作ISO文件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make mykernel.iso</span><br><span class="line">rm -rf iso</span><br><span class="line">mkdir iso</span><br><span class="line">mkdir iso/boot</span><br><span class="line">mkdir iso/boot/grub</span><br><span class="line">cp mykernel.bin iso/boot/mykernel.bin</span><br><span class="line">echo 'set timeout=0'                      &gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo 'set default=0'                     &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo ''                                  &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo 'menuentry "My Operating System" &#123;' &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '  multiboot /boot/mykernel.bin'    &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '  boot'                            &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '&#125;'                                 &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">xorriso 1.4.8 : RockRidge filesystem manipulator, libburnia project.</span><br><span class="line"></span><br><span class="line">Drive current: -outdev 'stdio:mykernel.iso'</span><br><span class="line">Media current: stdio file, overwriteable</span><br><span class="line">Media status : is blank</span><br><span class="line">Media summary: 0 sessions, 0 data blocks, 0 data, 25.7g free</span><br><span class="line">Added to ISO image: directory '/'='/tmp/grub.lWPSfY'</span><br><span class="line">xorriso : UPDATE : 633 files added in 1 seconds</span><br><span class="line">Added to ISO image: directory '/'='/home/jimo/workspace/temp/os/iso'</span><br><span class="line">xorriso : UPDATE : 637 files added in 1 seconds</span><br><span class="line">xorriso : NOTE : Copying to System Area: 512 bytes from file '/usr/lib/grub/i386-pc/boot_hybrid.img'</span><br><span class="line">ISO image produced: 8831 sectors</span><br><span class="line">Written to medium : 8831 sectors at LBA 0</span><br><span class="line">Writing to 'stdio:mykernel.iso' completed successfully.</span><br><span class="line"></span><br><span class="line">rm -rf iso</span><br></pre></td></tr></table></figure></p>
+<p>如果这一步出现错误,比如没有xorriso,那么请安装<a href="https://dev.lovelyhq.com/libburnia" target="_blank" rel="noopener">libisoburn</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">grub-mkrescue：错误： xorriso not found.</span><br></pre></td></tr></table></figure></p>
+<p>这是当前目录下有iso文件了:</p>
+<img src="/2018/04/02/linux/009-write-my-own-os/001.png">
+<p>5.导入虚拟机新建就ok了.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>从零写自己的操作系统.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/02/linux/009-write-my-own-os/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/02/linux/009-write-my-own-os/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjfhm012u001z6okadftr7ef0" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-cloudcompute/003-openstack-basic" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/30/cloudcompute/003-openstack-basic/" class="article-date">
@@ -155,7 +251,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfgfaq7q000fpyka7b78k7hg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfhm011m000e6okaikywz8a1" class="article-share-link">
           Share
         </a>
         
@@ -239,7 +335,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfgfaq7n000cpykahiyd1vwe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfhm011n000f6oka2z0rtaqy" class="article-share-link">
           Share
         </a>
         
@@ -354,7 +450,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfgfaq8m001wpyka41mbcr65" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfhm012t001w6okaomtqhhq6" class="article-share-link">
           Share
         </a>
         
@@ -431,7 +527,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfgfaq7y000ipyka6a2lou0v" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfhm011s000g6okaql8vrv76" class="article-share-link">
           Share
         </a>
         
@@ -544,7 +640,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfgfaq9f003epyka4gez47hh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfhm013l003h6okaecc74gss" class="article-share-link">
           Share
         </a>
         
@@ -645,7 +741,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfgfaq7o000epyka658k00gc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfhm011l000c6okanqvasrri" class="article-share-link">
           Share
         </a>
         
@@ -731,7 +827,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfgfaq8u002epykalnp0zb66" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfhm0131002g6oka479bk9wa" class="article-share-link">
           Share
         </a>
         
@@ -809,7 +905,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfgfaq890010pykaqiogdebd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfhm012e00126oka2igviq9x" class="article-share-link">
           Share
         </a>
         
@@ -884,7 +980,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfgfaq84000spyka277zm24u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfhm0129000s6okahswrn8h3" class="article-share-link">
           Share
         </a>
         
@@ -978,7 +1074,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfgfaq83000qpykafku9rzuf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfhm0128000q6oka9dz7ueor" class="article-share-link">
           Share
         </a>
         
@@ -1062,7 +1158,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfgfaq81000npykaz0cud051" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfhm0127000n6okacevlol0c" class="article-share-link">
           Share
         </a>
         
@@ -1138,7 +1234,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfgfaq8a0013pykasx7irqht" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfhm012f00156okatf5ws1jn" class="article-share-link">
           Share
         </a>
         
@@ -1222,7 +1318,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfgfaq8t002bpykacbllhzo6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfhm012z002b6okakmcr5s2p" class="article-share-link">
           Share
         </a>
         
@@ -1315,7 +1411,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfgfaq80000lpykabgptdkw2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfhm0126000l6okabpjugsoz" class="article-share-link">
           Share
         </a>
         
@@ -1400,7 +1496,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfgfaq7z000jpyka4y47gs39" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfhm0120000j6okab3y2avx0" class="article-share-link">
           Share
         </a>
         
@@ -1496,7 +1592,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfgfaq8d001apykah3udkwm8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfhm012h001a6okadi9iuvv4" class="article-share-link">
           Share
         </a>
         
@@ -1575,7 +1671,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfgfaq6t0001pykaweqqb55m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfhm010x00016okauxpx9mxx" class="article-share-link">
           Share
         </a>
         
@@ -1654,7 +1750,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfgfaq8c0018pyka1t4r1xih" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfhm012g00186oka7gjtu0qv" class="article-share-link">
           Share
         </a>
         
@@ -1738,90 +1834,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfgfaq8b0015pykakiivftdf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfhm012f00166oka0w2ruxbv" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groovy/">groovy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/007-magnet" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/05/tools/007-magnet/" class="article-date">
-  <time datetime="2018-03-05T08:47:54.000Z" itemprop="datePublished">2018-03-05</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/05/tools/007-magnet/">不得不知的magnet链接</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>什么是磁力链接?</p>
-<h1 id="magnet链接"><a href="#magnet链接" class="headerlink" title="magnet链接"></a>magnet链接</h1><p>解析请看<a href="https://linux.cn/article-9388-1.html" target="_blank" rel="noopener">https://linux.cn/article-9388-1.html</a></p>
-<h1 id="一个magnet网站"><a href="#一个magnet网站" class="headerlink" title="一个magnet网站"></a>一个magnet网站</h1><p><a href="https://kickass.cd" target="_blank" rel="noopener">https://kickass.cd</a></p>
-<p>因为遍布广告,所以程序员会找到想要的链接地址,如下图:</p>
-<img src="/2018/03/05/tools/007-magnet/000.png">
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>什么是磁力链接?</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/05/tools/007-magnet/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/05/tools/007-magnet/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfgfaq9d003cpykajxgyjxk6" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/magnet/">magnet</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
 
       </footer>
       </div>
@@ -1867,7 +1885,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
     </div>
   </div>
 
@@ -1878,6 +1896,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/04/02/linux/009-write-my-own-os/">写自己的操作系统1</a>
+          </li>
         
           <li>
             <a href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
@@ -1893,10 +1915,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/27/db/000-mysql-error-1698/">ERROR 1698 (28000):Access denied for user</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/25/tools/008-computer-basic/">不得不知的计算机基础知识</a>
           </li>
         
       </ul>
