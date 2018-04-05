@@ -121,6 +121,8 @@ ga('send', 'pageview');
 <p>查看节点:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc services]$ docker-machine ssh myvm1 "docker node ls"</span><br><span class="line">ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION</span><br><span class="line">h5djq52r65l5pdd7y9qgkf8t0 *   myvm1               Ready               Active              Leader              18.03.0-ce</span><br><span class="line">id4h8ujbzwbpne3j1txd6fcmj     myvm2               Ready               Active                                  18.03.0-ce</span><br></pre></td></tr></table></figure></p>
 <h1 id="查看环境变量"><a href="#查看环境变量" class="headerlink" title="查看环境变量"></a>查看环境变量</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker-machine env myvm1</span><br><span class="line">export DOCKER_TLS_VERIFY="1"</span><br><span class="line">export DOCKER_HOST="tcp://192.168.99.100:2376"</span><br><span class="line">export DOCKER_CERT_PATH="/home/jimo/.docker/machine/machines/myvm1"</span><br><span class="line">export DOCKER_MACHINE_NAME="myvm1"</span><br><span class="line"><span class="meta">#</span> Run this command to configure your shell: </span><br><span class="line"><span class="meta">#</span> eval $(docker-machine env myvm1)</span><br></pre></td></tr></table></figure>
 <p>确定当前活跃的是myvm1<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> eval $(docker-machine env myvm1)</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> docker-machine ls</span><br><span class="line">NAME    ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS</span><br><span class="line">myvm1   *        virtualbox   Running   tcp://192.168.99.100:2376           v18.03.0-ce   </span><br><span class="line">myvm2   -        virtualbox   Running   tcp://192.168.99.101:2376           v18.03.0-ce</span><br></pre></td></tr></table></figure></p>
+<h1 id="部署本地APP到swarm"><a href="#部署本地APP到swarm" class="headerlink" title="部署本地APP到swarm"></a>部署本地APP到swarm</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker stack deploy -c docker-compose.yml getstartedlab</span><br><span class="line">Creating network getstartedlab_webnet</span><br><span class="line">Creating service getstartedlab_web</span><br></pre></td></tr></table></figure>
+<p>查看:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker stack ps getstartedlab</span><br><span class="line">ID                  NAME                  IMAGE                        NODE                DESIRED STATE       CURRENT STATE                  ERROR               PORTS</span><br><span class="line">lu9e6l8grpdx        getstartedlab_web.1   jackpler/get-started:part1   myvm1               Running             Preparing about a minute ago                       </span><br><span class="line">yhk1catbc1bw        getstartedlab_web.2   jackpler/get-started:part1   myvm2               Running             Preparing about a minute ago                       </span><br><span class="line">55ci41l42fsw        getstartedlab_web.3   jackpler/get-started:part1   myvm2               Running             Preparing about a minute ago                       </span><br><span class="line">ijnzkgub9t5l        getstartedlab_web.4   jackpler/get-started:part1   myvm1               Running             Preparing about a minute ago                       </span><br><span class="line">o7c1c6rcp2ge        getstartedlab_web.5   jackpler/get-started:part1   myvm2               Running             Preparing about a minute ago</span><br></pre></td></tr></table></figure></p>
 
       
     </div> -->
@@ -158,7 +160,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjfm2dso1000dt1ka3cjqca9d" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjfm3c8cu000dbgkatlfxb9i2" class="article-share-link">
           Share
         </a>
         
@@ -235,7 +237,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjfm2dsp2002et1kawrawtarn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjfm3c8du002cbgkawoeitu04" class="article-share-link">
           Share
         </a>
         
@@ -318,7 +320,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjfm2dsnz000bt1kao8mnwfxm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjfm3c8cs000bbgka8dnpp4ku" class="article-share-link">
           Share
         </a>
         
@@ -414,7 +416,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjfm2dsot001ut1kam8ivx7mz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjfm3c8dk001sbgka81ymb6fa" class="article-share-link">
           Share
         </a>
         
@@ -499,7 +501,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfm2dsnw0009t1ka0d2n4nld" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfm3c8cp0008bgka53sesgj7" class="article-share-link">
           Share
         </a>
         
@@ -583,7 +585,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfm2dsnu0006t1kaokkujjef" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfm3c8co0006bgkamzrn8fhr" class="article-share-link">
           Share
         </a>
         
@@ -700,7 +702,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfm2dsor001st1kau53ajq0u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfm3c8di001qbgkav983ttlr" class="article-share-link">
           Share
         </a>
         
@@ -777,7 +779,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfm2dso3000gt1kah5m4rgg5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfm3c8cv000gbgkavw9q4fcd" class="article-share-link">
           Share
         </a>
         
@@ -890,7 +892,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfm2dspl003gt1kaq0t1qimw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfm3c8ed003hbgkatk3xvie4" class="article-share-link">
           Share
         </a>
         
@@ -991,7 +993,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfm2dsnv0008t1ka3dqh8736" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfm3c8cm0005bgkaedtqvvgm" class="article-share-link">
           Share
         </a>
         
@@ -1077,7 +1079,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfm2dsp0002ct1ka5z8qgyn2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfm3c8ds002abgkaxjvck8hw" class="article-share-link">
           Share
         </a>
         
@@ -1155,7 +1157,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfm2dsoe000yt1karr9wvpyk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfm3c8d5000ybgkanejgb3ur" class="article-share-link">
           Share
         </a>
         
@@ -1230,7 +1232,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfm2dsoa000rt1kaez2o9osx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfm3c8d1000rbgkax3xknpsi" class="article-share-link">
           Share
         </a>
         
@@ -1324,7 +1326,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfm2dso9000pt1kansk113nn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfm3c8d0000pbgkahkgxel7o" class="article-share-link">
           Share
         </a>
         
@@ -1408,7 +1410,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfm2dso8000ot1ka91tgm7ok" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfm3c8cz000obgkazyimysw0" class="article-share-link">
           Share
         </a>
         
@@ -1484,7 +1486,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfm2dsog0011t1kazrfz317k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfm3c8d70013bgka2xrkla48" class="article-share-link">
           Share
         </a>
         
@@ -1568,7 +1570,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfm2dsoz0029t1ka0qb7yd8i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfm3c8dr0027bgkaoqaxtj5e" class="article-share-link">
           Share
         </a>
         
@@ -1661,7 +1663,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfm2dso7000jt1kax21cc94o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfm3c8cy000lbgka7738ryyu" class="article-share-link">
           Share
         </a>
         
@@ -1746,7 +1748,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfm2dso5000ht1karh9zs411" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfm3c8cx000jbgkak5b0xgpa" class="article-share-link">
           Share
         </a>
         
@@ -1842,7 +1844,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfm2dsoi0015t1ka0juf3fb1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfm3c8d90016bgkaqr32b5pi" class="article-share-link">
           Share
         </a>
         
