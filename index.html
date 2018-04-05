@@ -84,6 +84,91 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-cloudcompute/005-docker" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/05/cloudcompute/005-docker/" class="article-date">
+  <time datetime="2018-04-05T00:01:31.000Z" itemprop="datePublished">2018-04-05</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/05/cloudcompute/005-docker/">docker那些事-swarm</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>docker那些事-swarm.</p>
+<h1 id="docker-swarm是什么"><a href="#docker-swarm是什么" class="headerlink" title="docker-swarm是什么"></a>docker-swarm是什么</h1><p>只需记住一点:<strong>swarm里的manager才可以执行命令,worker只是为了扩容</strong>.</p>
+<h1 id="创建虚拟机集群"><a href="#创建虚拟机集群" class="headerlink" title="创建虚拟机集群"></a>创建虚拟机集群</h1><ol>
+<li>安装virtualbox</li>
+<li>安装docker-machine</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker-machine create --driver virtualbox myvm1</span><br><span class="line">docker-machine create --driver virtualbox myvm2</span><br></pre></td></tr></table></figure>
+<p>会发现在用户目录下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc machine]$ pwd</span><br><span class="line">/home/jimo/.docker/machine</span><br><span class="line"><span class="meta">$</span> tree</span><br><span class="line">.</span><br><span class="line">├── cache</span><br><span class="line">│   └── boot2docker.iso</span><br><span class="line">├── certs</span><br><span class="line">│   ├── ca-key.pem</span><br><span class="line">│   ├── ca.pem</span><br><span class="line">│   ├── cert.pem</span><br><span class="line">│   └── key.pem</span><br><span class="line">└── machines</span><br><span class="line">    ├── myvm1</span><br><span class="line">    │   ├── boot2docker.iso</span><br><span class="line">    │   ├── ca.pem</span><br><span class="line">    │   ├── cert.pem</span><br><span class="line">    │   ├── config.json</span><br><span class="line">    │   ├── disk.vmdk</span><br><span class="line">    │   ├── id_rsa</span><br><span class="line">    │   ├── id_rsa.pub</span><br><span class="line">    │   ├── key.pem</span><br><span class="line">    │   ├── myvm1</span><br><span class="line">    │   │   ├── Logs</span><br><span class="line">    │   │   │   └── VBox.log</span><br><span class="line">    │   │   ├── myvm1.vbox</span><br><span class="line">    │   │   └── myvm1.vbox-prev</span><br><span class="line">    │   ├── server-key.pem</span><br><span class="line">    │   └── server.pem</span><br><span class="line">    └── myvm2</span><br><span class="line">        ├── boot2docker.iso</span><br><span class="line">        ├── config.json</span><br><span class="line">        ├── disk.vmdk</span><br><span class="line">        ├── id_rsa</span><br><span class="line">        ├── id_rsa.pub</span><br><span class="line">        └── myvm2</span><br><span class="line">            ├── Logs</span><br><span class="line">            │   └── VBox.log</span><br><span class="line">            ├── myvm2.vbox</span><br><span class="line">            └── myvm2.vbox-prev</span><br><span class="line"></span><br><span class="line">9 directories, 26 files</span><br></pre></td></tr></table></figure></p>
+<h1 id="查看IP"><a href="#查看IP" class="headerlink" title="查看IP"></a>查看IP</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker-machine ls</span><br><span class="line">NAME    ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS</span><br><span class="line">myvm1   -        virtualbox   Running   tcp://192.168.99.100:2376           v18.03.0-ce   </span><br><span class="line">myvm2   -        virtualbox   Running   tcp://192.168.99.101:2376           v18.03.0-ce</span><br></pre></td></tr></table></figure>
+<h1 id="初始化swarm并添加节点"><a href="#初始化swarm并添加节点" class="headerlink" title="初始化swarm并添加节点"></a>初始化swarm并添加节点</h1><p>初始化管理节点:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker-machine ssh myvm1 "docker swarm init --advertise-addr 192.168.99.100:2377"</span><br><span class="line">Swarm initialized: current node (h5djq52r65l5pdd7y9qgkf8t0) is now a manager.</span><br><span class="line"></span><br><span class="line">To add a worker to this swarm, run the following command:</span><br><span class="line"></span><br><span class="line">    docker swarm join --token SWMTKN-1-0s3thc4ypv4dzgc45npuod5qsj7bxsll69mqx5fluz63l9e5f2-9hzc6upuktak78i2flgz3ktxg 192.168.99.100:2377</span><br><span class="line"></span><br><span class="line">To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.</span><br></pre></td></tr></table></figure></p>
+<p>将myvm2作为worker加入swarm:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker-machine ssh myvm2 "docker swarm join --token \</span><br><span class="line"><span class="meta">&gt;</span> SWMTKN-1-0s3thc4ypv4dzgc45npuod5qsj7bxsll69mqx5fluz63l9e5f2-9hzc6upuktak78i2flgz3ktxg 192.168.99.100:2377 "</span><br><span class="line">This node joined a swarm as a worker.</span><br></pre></td></tr></table></figure></p>
+<p>查看节点:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc services]$ docker-machine ssh myvm1 "docker node ls"</span><br><span class="line">ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION</span><br><span class="line">h5djq52r65l5pdd7y9qgkf8t0 *   myvm1               Ready               Active              Leader              18.03.0-ce</span><br><span class="line">id4h8ujbzwbpne3j1txd6fcmj     myvm2               Ready               Active                                  18.03.0-ce</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>docker那些事-swarm.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/05/cloudcompute/005-docker/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/05/cloudcompute/005-docker/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjflt6b10000d6kka1oqto003" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-python/006-python-warning" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/03/python/006-python-warning/" class="article-date">
@@ -147,7 +232,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjfjbowah002lc6ka5p2a7xng" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjflt6b20002c6kkaljpfyj5k" class="article-share-link">
           Share
         </a>
         
@@ -175,7 +260,7 @@ ga('send', 'pageview');
           
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/02/cloudcompute/004-docker/">docker那些事</a>
+      <a class="article-title" href="/2018/04/02/cloudcompute/004-docker/">docker那些事-进入</a>
     </h1>
   
 
@@ -230,7 +315,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjfjbow9c000gc6kazdih6m3m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjflt6b0y000b6kka0h41yfxa" class="article-share-link">
           Share
         </a>
         
@@ -326,7 +411,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjfjbowa70021c6kar168f76f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjflt6b1q001t6kkaywzy52qu" class="article-share-link">
           Share
         </a>
         
@@ -411,7 +496,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfjbow99000fc6ka9dgw3o4d" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjflt6b0v00096kka2e8f8hhg" class="article-share-link">
           Share
         </a>
         
@@ -495,7 +580,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfjbow96000ec6karqwvenc0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjflt6b0u00086kkatuef6l7u" class="article-share-link">
           Share
         </a>
         
@@ -612,7 +697,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfjbowa6001zc6kajcw3olc5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjflt6b1p001s6kka4buucg77" class="article-share-link">
           Share
         </a>
         
@@ -689,7 +774,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfjbow9e000ic6kayshzgmcq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjflt6b11000g6kkapcbtge81" class="article-share-link">
           Share
         </a>
         
@@ -802,7 +887,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfjbowb6003mc6kadfk15vtl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjflt6b2j003h6kka1vc3x3vt" class="article-share-link">
           Share
         </a>
         
@@ -903,7 +988,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfjbow94000cc6kaj8oz2pi8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjflt6b0t00066kkaazk7rr9j" class="article-share-link">
           Share
         </a>
         
@@ -989,7 +1074,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfjbowaf002jc6ka34unv8e2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjflt6b1z002a6kkab7w735yw" class="article-share-link">
           Share
         </a>
         
@@ -1067,7 +1152,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfjbow9t0013c6katxpzkemr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjflt6b1b000y6kkafba9et1h" class="article-share-link">
           Share
         </a>
         
@@ -1142,7 +1227,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfjbow9o000vc6kafof5rtvj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjflt6b17000r6kkapljws63m" class="article-share-link">
           Share
         </a>
         
@@ -1236,7 +1321,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfjbow9n000sc6kazyi9w47t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjflt6b16000p6kkaond0dvx2" class="article-share-link">
           Share
         </a>
         
@@ -1320,7 +1405,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfjbow9l000qc6kar1mihyy1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjflt6b16000o6kkad9h959cp" class="article-share-link">
           Share
         </a>
         
@@ -1396,7 +1481,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfjbow9u0015c6ka1trc07jk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjflt6b1c00106kka0qvam20r" class="article-share-link">
           Share
         </a>
         
@@ -1480,7 +1565,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfjbowae002gc6kakhkjzvf3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjflt6b1y00276kkagfvrkgob" class="article-share-link">
           Share
         </a>
         
@@ -1573,7 +1658,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfjbow9j000nc6ka01vtfj0u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjflt6b15000l6kka6pz5z8sr" class="article-share-link">
           Share
         </a>
         
@@ -1658,7 +1743,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfjbow9i000lc6ka8vs5816p" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjflt6b14000j6kkaw7drzpfu" class="article-share-link">
           Share
         </a>
         
@@ -1754,91 +1839,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfjbow9x001dc6ka7g2rtg4y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjflt6b1f00156kkavjxxvomw" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-android/000-adb-root" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/06/android/000-adb-root/" class="article-date">
-  <time datetime="2018-03-06T07:22:57.000Z" itemprop="datePublished">2018-03-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/06/android/000-adb-root/">adb使用root权限调试</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>使用adb root调试Android手机.</p>
-<h1 id="使用环境"><a href="#使用环境" class="headerlink" title="使用环境"></a>使用环境</h1><p>使用Google手机模拟器.查看下设备:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb devices</span><br><span class="line">List of devices attached</span><br><span class="line">emulator-5554	device</span><br></pre></td></tr></table></figure></p>
-<p>直接用adb shell进入调试时会发现permission denied:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb shell</span><br><span class="line">generic_x86:/ $ pwd</span><br><span class="line">/</span><br><span class="line">generic_x86:/ $ ls</span><br><span class="line">ls: ./ueventd.rc: Permission denied</span><br><span class="line">ls: ./ueventd.ranchu.rc: Permission denied</span><br><span class="line">ls: ./init.zygote32.rc: Permission denied</span><br><span class="line">acct  bugreports  cache  charger  config  d  data  default.prop  dev  etc  mnt  oem  proc  root  sbin  sdcard  storage  sys  system  var  vendor</span><br></pre></td></tr></table></figure></p>
-<p>解决办法,先切换到root用户:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb root</span><br><span class="line">restarting adbd as root</span><br><span class="line"><span class="meta">$</span> adb root</span><br><span class="line">adbd is already running as root</span><br></pre></td></tr></table></figure></p>
-<p>再进入就ok了:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb shell</span><br><span class="line">generic_x86:/ # whoami</span><br><span class="line">root</span><br><span class="line">generic_x86:/ # ls data</span><br><span class="line">adb  app-asec       app-private    bootchart     data   lost+found  misc     nativetest   property        system     tombstones  var     </span><br><span class="line">anr  app-ephemeral  backup         cache         drm    media       misc_ce  ota          resource-cache  system_ce  user        vendor  </span><br><span class="line">app  app-lib        benchmarktest  dalvik-cache  local  mediadrm    misc_de  ota_package  ss              system_de  user_de</span><br></pre></td></tr></table></figure></p>
-<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>要在实体机上使用时必须root手机才行.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>使用adb root调试Android手机.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/06/android/000-adb-root/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/06/android/000-adb-root/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfjbow8f0001c6kaq33h7u96" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
 
       </footer>
       </div>
@@ -1875,7 +1881,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1897,11 +1903,15 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/05/cloudcompute/005-docker/">docker那些事-swarm</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/03/python/006-python-warning/">python中的那些警告</a>
           </li>
         
           <li>
-            <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事</a>
+            <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事-进入</a>
           </li>
         
           <li>
@@ -1910,10 +1920,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
           </li>
         
       </ul>

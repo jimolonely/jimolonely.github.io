@@ -84,6 +84,86 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-maven/000-package-execute-jar" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/05/maven/000-package-execute-jar/" class="article-date">
+  <time datetime="2018-01-05T03:34:08.000Z" itemprop="datePublished">2018-01-05</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/05/maven/000-package-execute-jar/">打包成可执行jar包</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>Maven手记,打包成可执行jar</p>
+<h2 id="打包成可执行jar"><a href="#打包成可执行jar" class="headerlink" title="打包成可执行jar"></a>打包成可执行jar</h2><p>官方文档：<a href="https://maven.apache.org/plugins/maven-jar-plugin/" target="_blank" rel="noopener">https://maven.apache.org/plugins/maven-jar-plugin/</a> </p>
+<p>在之前可能会遇到找不到主类的问题：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc target]$ java test-app-1.0-SNAPSHOT.jar</span><br><span class="line">Error: Could not find or load main class test-app-1.0-SNAPSHOT.jar</span><br><span class="line">[jimo@jimo-pc target]$ java -jar test-app-1.0-SNAPSHOT.jar</span><br><span class="line">no main manifest attribute, in test-app-1.0-SNAPSHOT.jar</span><br></pre></td></tr></table></figure></p>
+<p>解决办法：需要在pom.xml里配置<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;project&gt;</span><br><span class="line">  ...</span><br><span class="line">  &lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;3.0.2&lt;/version&gt;</span><br><span class="line">        &lt;configuration&gt;</span><br><span class="line">          &lt;archive&gt;</span><br><span class="line">            &lt;manifestFile&gt;$&#123;project.build.outputDirectory&#125;/META-INF/MANIFEST.MF&lt;/manifestFile&gt;</span><br><span class="line">          &lt;/archive&gt;</span><br><span class="line">        &lt;/configuration&gt;</span><br><span class="line">        ...</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br><span class="line">  ...</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure></p>
+<p>当然这种方法需要自定义清单文件，更简单的是直接定义入口类：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;3.0.2&lt;/version&gt;</span><br><span class="line">            &lt;configuration&gt;</span><br><span class="line">                &lt;archive&gt;</span><br><span class="line">                    &lt;manifest&gt;</span><br><span class="line">                        &lt;mainClass&gt;com.jimo.App&lt;/mainClass&gt;</span><br><span class="line">                    &lt;/manifest&gt;</span><br><span class="line">                &lt;/archive&gt;</span><br><span class="line">            &lt;/configuration&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br></pre></td></tr></table></figure></p>
+<p>其中com.jimo.App包含main方法，是整个程序的入口。</p>
+<p>然后重新构建jar包再执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc test-app]$ mvn clean install</span><br><span class="line">[jimo@jimo-pc target]$ java -jar test-app-1.0-SNAPSHOT.jar</span><br><span class="line">Hello World!</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>Maven手记,打包成可执行jar</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/05/maven/000-package-execute-jar/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/05/maven/000-package-execute-jar/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjflt6b1s001v6kka2xzh12m7" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-spark/03-spark-warning" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/03/spark/03-spark-warning/" class="article-date">
@@ -163,7 +243,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjfjbowaw0034c6kaooie124v" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjflt6b28002w6kkaalxwnmz2" class="article-share-link">
           Share
         </a>
         
@@ -246,7 +326,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjfjbowav0031c6kafl0tvw00" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjflt6b27002t6kkazq4a59j3" class="article-share-link">
           Share
         </a>
         
@@ -333,7 +413,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjfjbowaa0026c6kambctrevp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjflt6b1u00206kkaymn5ayb5" class="article-share-link">
           Share
         </a>
         
@@ -429,7 +509,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjfjbowat002zc6ka0lakg9s4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjflt6b26002r6kkaj6uwhy0j" class="article-share-link">
           Share
         </a>
         
@@ -503,7 +583,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjfjbowan002sc6ka9mm7810l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjflt6b23002j6kkaw8pkg4m7" class="article-share-link">
           Share
         </a>
         
@@ -612,7 +692,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjfjboway0039c6kawvkjl965" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjflt6b2a00306kkabx5xv1my" class="article-share-link">
           Share
         </a>
         
@@ -732,7 +812,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjfjbow9p000xc6kawk4q9pi8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjflt6b18000t6kka563t5p4s" class="article-share-link">
           Share
         </a>
         
@@ -806,7 +886,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjfjbowa5001uc6kajr6sc175" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjflt6b1n001n6kkao888k3d9" class="article-share-link">
           Share
         </a>
         
@@ -889,7 +969,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjfjbowal002qc6kakx1zzgw6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjflt6b22002h6kkam9f8rc0s" class="article-share-link">
           Share
         </a>
         
@@ -970,7 +1050,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjfjbowar002wc6ka29e8rq1j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjflt6b25002o6kkadi7pf1ld" class="article-share-link">
           Share
         </a>
         
@@ -1106,7 +1186,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjfjbowap002uc6kaxm42yt27" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjflt6b24002m6kkalwwd1vzk" class="article-share-link">
           Share
         </a>
         
@@ -1185,7 +1265,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjfjbowa3001pc6kaagnbabft" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjflt6b1m001k6kka395nauk3" class="article-share-link">
           Share
         </a>
         
@@ -1262,7 +1342,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjfjbowa3001rc6kazxfjl4zk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjflt6b1l001i6kka9u0rijcq" class="article-share-link">
           Share
         </a>
         
@@ -1340,7 +1420,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="cjfjbowa1001mc6kari6waiej" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="cjflt6b1k001f6kkavj65aqeb" class="article-share-link">
           Share
         </a>
         
@@ -1420,7 +1500,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="cjfjbow9z001hc6kal2pl87i2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="cjflt6b1j001d6kkajzrongkg" class="article-share-link">
           Share
         </a>
         
@@ -1583,7 +1663,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="cjfjbowa0001kc6kasraj7eig" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="cjflt6b1i001a6kka4i3cy16r" class="article-share-link">
           Share
         </a>
         
@@ -1672,7 +1752,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="cjfjbow9y001fc6ka3m350mg3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="cjflt6b1g00186kkabrg7lmjv" class="article-share-link">
           Share
         </a>
         
@@ -1757,7 +1837,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/24/design-pattern/command/" data-id="cjfjbow9f000jc6ka39t2ned1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/24/design-pattern/command/" data-id="cjflt6b13000h6kka5o5l8q5l" class="article-share-link">
           Share
         </a>
         
@@ -1829,7 +1909,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjfjbow9s0011c6kahkn23706" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjflt6b1a000x6kkah1h35oc0" class="article-share-link">
           Share
         </a>
         
@@ -1871,7 +1951,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1893,11 +1973,15 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/05/cloudcompute/005-docker/">docker那些事-swarm</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/03/python/006-python-warning/">python中的那些警告</a>
           </li>
         
           <li>
-            <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事</a>
+            <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事-进入</a>
           </li>
         
           <li>
@@ -1906,10 +1990,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
           </li>
         
       </ul>
