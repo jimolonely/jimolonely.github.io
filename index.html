@@ -84,6 +84,84 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-db/001-sqlserver-datetime-to-string" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/14/db/001-sqlserver-datetime-to-string/" class="article-date">
+  <time datetime="2018-04-14T06:48:39.000Z" itemprop="datePublished">2018-04-14</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/14/db/001-sqlserver-datetime-to-string/">sqlserver中datetime转string</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>sqlserver中datetime转string.</p>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>在stack上很容易找到答案:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> @myDateTime DATETIME</span><br><span class="line"><span class="keyword">SET</span> @myDateTime = <span class="string">'2008-05-03 00:00:00'</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">CONVERT</span>(<span class="built_in">VARCHAR</span>, @myDateTime, <span class="number">112</span>) <span class="comment">--20080503</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="更多的代码意思"><a href="#更多的代码意思" class="headerlink" title="更多的代码意思"></a>更多的代码意思</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> @<span class="keyword">now</span> datetime</span><br><span class="line"><span class="keyword">SET</span> @<span class="keyword">now</span> = <span class="keyword">GETDATE</span>()</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">0</span>) <span class="keyword">as</span> <span class="keyword">output</span>, <span class="number">0</span> <span class="keyword">as</span> <span class="keyword">style</span> </span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">1</span>), <span class="number">1</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">2</span>), <span class="number">2</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">3</span>), <span class="number">3</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">4</span>), <span class="number">4</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">5</span>), <span class="number">5</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">6</span>), <span class="number">6</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">7</span>), <span class="number">7</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">8</span>), <span class="number">8</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">9</span>), <span class="number">9</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">10</span>), <span class="number">10</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">11</span>), <span class="number">11</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">12</span>), <span class="number">12</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">13</span>), <span class="number">13</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">14</span>), <span class="number">14</span></span><br><span class="line"><span class="comment">--15 to 19 not valid</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">20</span>), <span class="number">20</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">21</span>), <span class="number">21</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">22</span>), <span class="number">22</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">23</span>), <span class="number">23</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">24</span>), <span class="number">24</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">25</span>), <span class="number">25</span></span><br><span class="line"><span class="comment">--26 to 99 not valid</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">100</span>), <span class="number">100</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">101</span>), <span class="number">101</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">102</span>), <span class="number">102</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">103</span>), <span class="number">103</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">104</span>), <span class="number">104</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">105</span>), <span class="number">105</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">106</span>), <span class="number">106</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">107</span>), <span class="number">107</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">108</span>), <span class="number">108</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">109</span>), <span class="number">109</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">110</span>), <span class="number">110</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">111</span>), <span class="number">111</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">112</span>), <span class="number">112</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">113</span>), <span class="number">113</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">114</span>), <span class="number">114</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">120</span>), <span class="number">120</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">121</span>), <span class="number">121</span></span><br><span class="line"><span class="comment">--122 to 125 not valid</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">126</span>), <span class="number">126</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">127</span>), <span class="number">127</span></span><br><span class="line"><span class="comment">--128, 129 not valid</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">130</span>), <span class="number">130</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">convert</span>(<span class="keyword">nvarchar</span>(<span class="keyword">MAX</span>), @<span class="keyword">now</span>, <span class="number">131</span>), <span class="number">131</span></span><br><span class="line"><span class="comment">--132 not valid</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">BY</span> <span class="keyword">style</span></span><br></pre></td></tr></table></figure>
+<p>结果:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">output                   style</span><br><span class="line">Apr 28 2014  9:31AM          0</span><br><span class="line">04/28/14                     1</span><br><span class="line">14.04.28                     2</span><br><span class="line">28/04/14                     3</span><br><span class="line">28.04.14                     4</span><br><span class="line">28-04-14                     5</span><br><span class="line">28 Apr 14                    6</span><br><span class="line">Apr 28, 14                   7</span><br><span class="line">09:31:28                     8</span><br><span class="line">Apr 28 2014  9:31:28:580AM   9</span><br><span class="line">04-28-14                     10</span><br><span class="line">14/04/28                     11</span><br><span class="line">140428                       12</span><br><span class="line">28 Apr 2014 09:31:28:580     13</span><br><span class="line">09:31:28:580                 14</span><br><span class="line">2014-04-28 09:31:28          20</span><br><span class="line">2014-04-28 09:31:28.580      21</span><br><span class="line">04/28/14  9:31:28 AM         22</span><br><span class="line">2014-04-28                   23</span><br><span class="line">09:31:28                     24</span><br><span class="line">2014-04-28 09:31:28.580      25</span><br><span class="line">Apr 28 2014  9:31AM          100</span><br><span class="line">04/28/2014                   101</span><br><span class="line">2014.04.28                   102</span><br><span class="line">28/04/2014                   103</span><br><span class="line">28.04.2014                   104</span><br><span class="line">28-04-2014                   105</span><br><span class="line">28 Apr 2014                  106</span><br><span class="line">Apr 28, 2014                 107</span><br><span class="line">09:31:28                     108</span><br><span class="line">Apr 28 2014  9:31:28:580AM   109</span><br><span class="line">04-28-2014                   110</span><br><span class="line">2014/04/28                   111</span><br><span class="line">20140428                     112</span><br><span class="line">28 Apr 2014 09:31:28:580     113</span><br><span class="line">09:31:28:580                 114</span><br><span class="line">2014-04-28 09:31:28          120</span><br><span class="line">2014-04-28 09:31:28.580      121</span><br><span class="line">2014-04-28T09:31:28.580      126</span><br><span class="line">2014-04-28T09:31:28.580      127</span><br><span class="line">28 جمادى الثانية 1435  9:31:28:580AM    130</span><br><span class="line">28/06/1435  9:31:28:580AM    131</span><br></pre></td></tr></table></figure></p>
+<p>然后根据自己需要选择就行了.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>sqlserver中datetime转string.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/14/db/001-sqlserver-datetime-to-string/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/14/db/001-sqlserver-datetime-to-string/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjfz0yrlc000g45kar1x2v6qp" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sqlserver/">sqlserver</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-cloudcompute/005-docker" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/05/cloudcompute/005-docker/" class="article-date">
@@ -160,7 +238,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjfvxw47400085ukafp1sz7xj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjfz0yrl8000b45kaxtqzjz87" class="article-share-link">
           Share
         </a>
         
@@ -237,7 +315,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjfvxw48d002d5ukai3nboa6a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjfz0yrme002d45kal1z3yckh" class="article-share-link">
           Share
         </a>
         
@@ -320,7 +398,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjfvxw47300065uka0qfjgull" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjfz0yrl5000945kadlk8ms2f" class="article-share-link">
           Share
         </a>
         
@@ -416,7 +494,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjfvxw47z001n5ukasc2u3gbt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjfz0yrm4001u45kailk5epng" class="article-share-link">
           Share
         </a>
         
@@ -501,7 +579,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfvxw47200055ukargh7ea7w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjfz0yrl4000845ka9nig31ux" class="article-share-link">
           Share
         </a>
         
@@ -585,7 +663,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfvxw47100045ukarp1veugf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjfz0yrl3000645kak2zguyrp" class="article-share-link">
           Share
         </a>
         
@@ -702,7 +780,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfvxw47y001k5uka4vtkhals" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjfz0yrm2001r45kaxijwtous" class="article-share-link">
           Share
         </a>
         
@@ -779,7 +857,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfvxw47a000e5ukahr7twpua" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjfz0yrla000d45kaoprdggkl" class="article-share-link">
           Share
         </a>
         
@@ -892,7 +970,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfvxw48z003i5ukas8k1qhg9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjfz0yrmz003j45ka3lqqgxka" class="article-share-link">
           Share
         </a>
         
@@ -993,7 +1071,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfvxw46w00025ukady2hfxr2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjfz0yrl2000545kaufxtadgb" class="article-share-link">
           Share
         </a>
         
@@ -1079,7 +1157,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfvxw48b002b5ukagc6tzb97" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjfz0yrmd002b45kaycenovvw" class="article-share-link">
           Share
         </a>
         
@@ -1157,7 +1235,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfvxw47n000y5uka1vlebthe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjfz0yrlo001145kacpdzcqjg" class="article-share-link">
           Share
         </a>
         
@@ -1232,7 +1310,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfvxw47j000r5ukah8j0cu3x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjfz0yrlk000v45ka90ij085l" class="article-share-link">
           Share
         </a>
         
@@ -1326,7 +1404,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfvxw47i000o5ukac3zhsybq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjfz0yrlj000r45kapyypqgkn" class="article-share-link">
           Share
         </a>
         
@@ -1410,7 +1488,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfvxw47h000m5ukamnzjw7co" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjfz0yrlh000p45katdkhzmqi" class="article-share-link">
           Share
         </a>
         
@@ -1486,7 +1564,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfvxw47o00105ukakt1jeqx6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjfz0yrlp001345ka3ws1o2v9" class="article-share-link">
           Share
         </a>
         
@@ -1573,7 +1651,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfvxw48a00285uka0bxniwto" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjfz0yrmc002845kauzrmfs4c" class="article-share-link">
           Share
         </a>
         
@@ -1666,7 +1744,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfvxw47f000j5ukaexalqidv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjfz0yrlg000o45ka9thdw34e" class="article-share-link">
           Share
         </a>
         
@@ -1751,7 +1829,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfvxw47d000h5uka031bzbyv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfz0yrlf000l45kahrhttq45" class="article-share-link">
           Share
         </a>
         
@@ -1765,107 +1843,11 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-lang/002-redis" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/09/lang/002-redis/" class="article-date">
-  <time datetime="2018-03-09T01:07:39.000Z" itemprop="datePublished">2018-03-09</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/09/lang/002-redis/">我的redis之路</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这是一条不归路.</p>
-<h1 id="掌握基本命令"><a href="#掌握基本命令" class="headerlink" title="掌握基本命令"></a>掌握基本命令</h1><p>跟着官方的web版练习<a href="http://try.redis.io/" target="_blank" rel="noopener">Try Redis</a>即可,我做的文件/2018/03/09/lang/002-redis/try-redis.txt</p>
-<p>现在应该学会了以下命令和数据结构:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">set/setnx</span><br><span class="line">incr</span><br><span class="line">del</span><br><span class="line">expire</span><br><span class="line">ttl</span><br><span class="line">(list) lpush/rpush/lrange/lpop/rpop/llen</span><br><span class="line">(set) sadd/srem/sismember/smembers/sunion</span><br><span class="line">(sorted set) zadd/zrange</span><br><span class="line">(hash) hset/hgetall/hmset/hget/hincrby/hdel</span><br></pre></td></tr></table></figure></p>
-<h1 id="熟悉基本功能"><a href="#熟悉基本功能" class="headerlink" title="熟悉基本功能"></a>熟悉基本功能</h1><h1 id="了解redis应用场景"><a href="#了解redis应用场景" class="headerlink" title="了解redis应用场景"></a>了解redis应用场景</h1><ol>
-<li>缓存(会话缓存或FPC全页缓存)</li>
-<li>队列</li>
-<li>排行榜/计数榜(得益于其原子递增操作)</li>
-<li>pub/sub</li>
-</ol>
-<h1 id="写个应用"><a href="#写个应用" class="headerlink" title="写个应用"></a>写个应用</h1><p>利用其发布/订阅功能写个聊天应用.</p>
-<h3 id="1-安装redis"><a href="#1-安装redis" class="headerlink" title="1.安装redis"></a>1.安装redis</h3><p>按照官网<a href="https://redis.io/download" target="_blank" rel="noopener">https://redis.io/download</a>做2分钟搞定.</p>
-<h3 id="2-来看一下demo"><a href="#2-来看一下demo" class="headerlink" title="2.来看一下demo"></a>2.来看一下demo</h3><p>一个客户端发布,另一个订阅</p>
-<p>先开订阅者:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ./redis-cli </span><br><span class="line">127.0.0.1:6379&gt; SUBSCRIBE test-channel</span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) "subscribe"</span><br><span class="line">2) "test-channel"</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure></p>
-<p>发布者再发送消息:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; PUBLISH test-channel hello</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; PUBLISH test-channel "how are you"</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure></p>
-<p>这时候订阅者会收到消息:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1) "message"</span><br><span class="line">2) "test-channel"</span><br><span class="line">3) "hello"</span><br><span class="line">1) "message"</span><br><span class="line">2) "test-channel"</span><br><span class="line">3) "how are you"</span><br></pre></td></tr></table></figure></p>
-<p>更多可以参考文档<a href="https://redis.io/topics/pubsub" target="_blank" rel="noopener">https://redis.io/topics/pubsub</a>.<br>其最后给出了以一个<a href="https://gist.github.com/pietern/348262" target="_blank" rel="noopener">ruby写的多人聊天室</a>,我们要用java来写.</p>
-<h3 id="3-java版聊天室"><a href="#3-java版聊天室" class="headerlink" title="3.java版聊天室"></a>3.java版聊天室</h3><p>关于java操作redis的库有很多,我们使用<a href="https://github.com/xetorthio/jedis/" target="_blank" rel="noopener">Jedis</a>.</p>
-<p>关于Jedis获取redis实例的操作见:<a href="https://github.com/xetorthio/jedis/wiki/Getting-started" target="_blank" rel="noopener">https://github.com/xetorthio/jedis/wiki/Getting-started</a><br>操作发布/订阅见:<a href="https://github.com/xetorthio/jedis/wiki/AdvancedUsage" target="_blank" rel="noopener">https://github.com/xetorthio/jedis/wiki/AdvancedUsage</a></p>
-<p>现在的需求:聊天室是多人的,可以发送接受消息.<br>分解开来:用户A发送的消息会推送给所有用户,每当有一个用户上线就需要多一个订阅者和发送者.</p>
-<p>服务器:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jimo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.Jedis;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.JedisPool;</span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.JedisPoolConfig;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChatServer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> JedisPool pool;</span><br><span class="line">    <span class="keyword">private</span> PSListener listener;</span><br><span class="line"></span><br><span class="line">    ChatServer() &#123;</span><br><span class="line">        pool = <span class="keyword">new</span> JedisPool(<span class="keyword">new</span> JedisPoolConfig(), <span class="string">"localhost"</span>);</span><br><span class="line">        listener = <span class="keyword">new</span> PSListener();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pool.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 每增加用户就开一个线程防止阻塞</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userName</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addUser</span><span class="params">(String userName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                JedisPool pool1 = <span class="keyword">new</span> JedisPool(<span class="keyword">new</span> JedisPoolConfig(), <span class="string">"localhost"</span>);</span><br><span class="line">                <span class="keyword">try</span> (Jedis jedis = pool1.getResource()) &#123;</span><br><span class="line">                    jedis.psubscribe(listener, <span class="string">"chat*"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将消息推送给所有用户</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> msg</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendMsg</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (Jedis jedis = pool.getResource()) &#123;</span><br><span class="line">            jedis.publish(<span class="string">"chat4"</span>, msg);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>测试:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jimo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ChatServer chatServer = <span class="keyword">new</span> ChatServer();</span><br><span class="line"></span><br><span class="line">        chatServer.addUser(<span class="string">"chat1"</span>);</span><br><span class="line">        chatServer.addUser(<span class="string">"chat2"</span>);</span><br><span class="line">        chatServer.sendMsg(<span class="string">"hello"</span>);</span><br><span class="line">        chatServer.sendMsg(<span class="string">"xixihaha"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        chatServer.stop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>Listener:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jimo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> redis.clients.jedis.JedisPubSub;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PSListener</span> <span class="keyword">extends</span> <span class="title">JedisPubSub</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onMessage</span><span class="params">(String channel, String message)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"收到channel["</span> + channel + <span class="string">"]的消息:"</span> + message);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPMessage</span><span class="params">(String pattern, String channel, String message)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"p收到channel["</span> + channel + <span class="string">"]的消息:"</span> + message);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSubscribe</span><span class="params">(String channel, <span class="keyword">int</span> subscribedChannels)</span> </span>&#123;</span><br><span class="line">        System.out.println(channel + <span class="string">"被订阅"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onUnsubscribe</span><span class="params">(String channel, <span class="keyword">int</span> subscribedChannels)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPUnsubscribe</span><span class="params">(String pattern, <span class="keyword">int</span> subscribedChannels)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPSubscribe</span><span class="params">(String pattern, <span class="keyword">int</span> subscribedChannels)</span> </span>&#123;</span><br><span class="line">        System.out.println(subscribedChannels + <span class="string">"被订阅:"</span> + pattern);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面的代码是有问题的,自己发送的消息也会被推送回来.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这是一条不归路.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/09/lang/002-redis/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/09/lang/002-redis/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfvxw483001u5ukablxgqst1" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
 
 
   <nav id="page-nav">
     
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -1879,7 +1861,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1889,7 +1871,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sqlserver/" style="font-size: 10px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1911,6 +1893,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/14/db/001-sqlserver-datetime-to-string/">sqlserver中datetime转string</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/05/cloudcompute/005-docker/">docker那些事-swarm</a>
           </li>
         
@@ -1924,10 +1910,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/02/linux/009-write-my-own-os/">写自己的操作系统1</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
           </li>
         
       </ul>

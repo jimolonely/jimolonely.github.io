@@ -23,7 +23,7 @@ ga('send', 'pageview');
   <meta name="description" content="who,where,what">
 <meta property="og:type" content="website">
 <meta property="og:title" content="在我的世界">
-<meta property="og:url" content="http://yoursite.com/page/4/index.html">
+<meta property="og:url" content="http://http://jimolonely.github.io/page/4/index.html">
 <meta property="og:site_name" content="在我的世界">
 <meta property="og:description" content="who,where,what">
 <meta property="og:locale" content="zh-CN">
@@ -76,7 +76,7 @@ ga('send', 'pageview');
         <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://http://jimolonely.github.io"></form>
       </div>
     </div>
   </div>
@@ -84,10 +84,10 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
-    <article id="post-spark/03-spark-warning" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-hexo/deploy-hexo-on-github" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/03/spark/03-spark-warning/" class="article-date">
-  <time datetime="2018-01-03T12:20:05.000Z" itemprop="datePublished">2018-01-03</time>
+    <a href="/2017/12/23/hexo/deploy-hexo-on-github/" class="article-date">
+  <time datetime="2017-12-23T14:08:04.000Z" itemprop="datePublished">2017-12-23</time>
 </a>
       
   </div>
@@ -98,7 +98,7 @@ ga('send', 'pageview');
           
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/03/spark/03-spark-warning/">spark挖坑详解</a>
+      <a class="article-title" href="/2017/12/23/hexo/deploy-hexo-on-github/">部署hexo到github</a>
     </h1>
   
 
@@ -106,56 +106,35 @@ ga('send', 'pageview');
         
           <!-- <div class="article-entry" itemprop="articleBody">
       
-        <p>这是一些官方文档没给完的坑.</p>
-<h1 id="命令行参数"><a href="#命令行参数" class="headerlink" title="命令行参数"></a>命令行参数</h1><ol>
-<li>指定jdbc驱动</li>
-</ol>
-<p>打开shell<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-shell --driver-class-path /home/jimo/lib/sqljdbc42.jar</span><br></pre></td></tr></table></figure></p>
-<p>运行submit<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-submit --class "CodeDataFromRDB" --master local[1] --driver-class-path /home/jimo/lib/sqljdbc42.jar /home/jimo/target/scala-2.11/aprioritest_2.11-0.1.jar</span><br></pre></td></tr></table></figure></p>
-<h1 id="spark-jdbc"><a href="#spark-jdbc" class="headerlink" title="spark jdbc"></a>spark jdbc</h1><p>官方地址:</p>
-<p>例子代码:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder().appName(<span class="string">s"<span class="subst">$&#123;this.getClass.getSimpleName&#125;</span>"</span>).getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">//连接数据库</span></span><br><span class="line"><span class="keyword">val</span> connProperties = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line">connProperties.put(<span class="string">"user"</span>, <span class="string">"xxx"</span>)</span><br><span class="line">connProperties.put(<span class="string">"password"</span>, <span class="string">"xxx"</span>)</span><br><span class="line"><span class="keyword">val</span> dbUrl = <span class="string">"jdbc:sqlserver://host:1433;databaseName=mydb"</span></span><br><span class="line"><span class="comment">//构造成绩表DF</span></span><br><span class="line"><span class="keyword">var</span> tableName = <span class="string">"exam_mark"</span></span><br><span class="line"><span class="keyword">val</span> markDF = spark.read.jdbc(dbUrl, tableName, connProperties)</span><br><span class="line">markDF.createOrReplaceTempView(tableName)</span><br><span class="line"><span class="comment">//学生记录</span></span><br><span class="line">tableName = <span class="string">"student_record"</span></span><br><span class="line"><span class="keyword">val</span> studentRecordDF = spark.read.jdbc(dbUrl, tableName, connProperties)</span><br><span class="line">studentRecordDF.createOrReplaceTempView(tableName)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> dataDF = spark.sql(<span class="string">"select student_id,course_code,cast((CASE when mark&gt;=90 then 'A' "</span> +</span><br><span class="line">  <span class="string">"when mark&gt;=80 then 'B' when mark&gt;=70 then 'C' when mark&gt;=60 then 'D' else 'E' end) as String) as mark from exam_mark "</span> +</span><br><span class="line">  <span class="string">"where mark&lt;&gt;0 and student_id like '2014%' and student_id in("</span> +</span><br><span class="line">  <span class="string">"select student_id from student_record where speciality_code='0408')"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>就上面那段sql语句的坑:</p>
-<ol>
-<li>为什么要cast,因为不这样mark得出的结果是null</li>
-<li>cast as String,在sqlserver里是cast as varchar,然而这样也行.</li>
-</ol>
-<p>上面得出的结果是:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dataDF.show(<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">+----------+-----------+----+</span><br><span class="line">|student_id|course_code|mark|</span><br><span class="line">+----------+-----------+----+</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">0471024</span>|   <span class="type">D</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">3223700</span>|   <span class="type">B</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">7047924</span>|   <span class="type">B</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">3273526</span>|   <span class="type">A</span>|</span><br></pre></td></tr></table></figure></p>
-<h1 id="RDD-到-DataSet"><a href="#RDD-到-DataSet" class="headerlink" title="RDD 到 DataSet"></a>RDD 到 DataSet</h1><h1 id="分区的问题"><a href="#分区的问题" class="headerlink" title="分区的问题"></a>分区的问题</h1><p>下面这样写会产生200个txt文件<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">markDS.write.text(<span class="string">"/home/data/d.txt"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>可以这样:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">markDS.repartition(<span class="number">1</span>).write.text(<span class="string">"/home/data/d.txt"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>还有一些是coalesce()</p>
-<p>他们的区别是什么?</p>
-<h1 id="map之后的结果包含括号的问题"><a href="#map之后的结果包含括号的问题" class="headerlink" title="map之后的结果包含括号的问题"></a>map之后的结果包含括号的问题</h1><h1 id="去除某一列的重复元素"><a href="#去除某一列的重复元素" class="headerlink" title="去除某一列的重复元素"></a>去除某一列的重复元素</h1><p>原数据:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">marks = spark.sql(<span class="string">"select distinct(student_id),mark1,mark2,mark3,mark4,mark5,mark6 as reault from mark"</span>)</span><br><span class="line">marks.show(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br><span class="line">|student_id|mark1|mark2|mark3|mark4|mark5|reault|</span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br><span class="line">|  <span class="number">19990520</span>| <span class="number">80.0</span>| <span class="number">89.0</span>| <span class="number">67.0</span>| <span class="number">82.0</span>| <span class="number">64.0</span>|  <span class="number">87.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">68.0</span>| <span class="number">60.0</span>| <span class="number">58.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">68.0</span>| <span class="number">60.0</span>| <span class="number">65.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">44.0</span>| <span class="number">60.0</span>| <span class="number">58.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">44.0</span>| <span class="number">60.0</span>| <span class="number">65.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br></pre></td></tr></table></figure></p>
-<p>要去除student_id这一列的重复值:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">marks = marks.dropDuplicates([<span class="string">'student_id'</span>])</span><br></pre></td></tr></table></figure></p>
-
+        <p>飞快搭建hexo+github博客.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">Read More</a>
+          </p>
+        
       
     </div> -->
           <div class="article-entry" itemprop="articleBody">
             
               
                 
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这是一些官方文档没给完的坑.</p>
-
-                                        <p>
-                                          
-                                            
+                  
+                    <p>
+                      <p>飞快搭建hexo+github博客.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
+                    </p>
+                    
                                               
                                                       
           </div>
     <p class="article-more-link">
-      <a href="/2018/01/03/spark/03-spark-warning/#more">
+      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
         Read More
       </a>
     </p>
     <!-- <div class="article-more-link">
-      <a href="/2018/01/03/spark/03-spark-warning/#more">
+      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
         read more
       </a>
     </div> -->
@@ -163,819 +142,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/03/spark/03-spark-warning/" data-id="cjf27w9p100293hka6uklijqv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjfz0yrlm000y45kawlbgricj" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-spark/02-write-csv" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/03/spark/02-write-csv/" class="article-date">
-  <time datetime="2018-01-03T03:04:46.000Z" itemprop="datePublished">2018-01-03</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/03/spark/02-write-csv/">CSV data source does not support array&lt;string&gt; data type</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
-<h1 id="例子数据"><a href="#例子数据" class="headerlink" title="例子数据"></a>例子数据</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----------+----------+-------------------+</span><br><span class="line">|antecedent|consequent|         confidence|</span><br><span class="line">+----------+----------+-------------------+</span><br><span class="line">|   [C47_D]|    [C3_B]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C13_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C23_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C24_D]|0.35714285714285715|</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>前面2个是数组.</p>
-<h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><p>多种,下面看2种</p>
-<ol>
-<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions.udf</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stringify = udf((vs: <span class="type">Seq</span>[<span class="type">String</span>]) =&gt; <span class="string">s""</span><span class="string">"$&#123;vs.mkString("</span>,<span class="string">")&#125;"</span><span class="string">""</span>)</span><br><span class="line">    df.withColumn(<span class="string">"antecedent"</span>, stringify($<span class="string">"antecedent"</span>))</span><br><span class="line">      .withColumn(<span class="string">"consequent"</span>, stringify($<span class="string">"consequent"</span>))</span><br><span class="line">      .write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
-</li>
-<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Asso</span>(<span class="params">antecedent: <span class="type">String</span>, consequent: <span class="type">String</span>, confidence: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">df</span>.<span class="title">rdd</span>.<span class="title">map</span> </span>&#123; line =&gt; <span class="type">Asso</span>(line(<span class="number">0</span>).toString, line(<span class="number">1</span>).toString, line(<span class="number">2</span>).toString) &#125;.</span><br><span class="line">      toDF().write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/03/spark/02-write-csv/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/03/spark/02-write-csv/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/03/spark/02-write-csv/" data-id="cjf27w9oz00273hkanesbatxh" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-python/000-pyodbc" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/02/python/000-pyodbc/" class="article-date">
-  <time datetime="2018-01-02T12:03:01.000Z" itemprop="datePublished">2018-01-02</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/02/python/000-pyodbc/">python使用pyodbc</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>使用pyodbc</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pyodbc</span><br></pre></td></tr></table></figure>
-<p>如果出现:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">src/pyodbc.h:56:10: 致命错误：sql.h：没有那个文件或目录</span><br><span class="line">     #include &lt;sql.h&gt;</span><br><span class="line">              ^~~~~~~</span><br><span class="line">    编译中断。</span><br><span class="line">    error: command 'gcc' failed with exit status 1</span><br></pre></td></tr></table></figure></p>
-<p>则再安装:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo pacman -S unixodbc</span><br></pre></td></tr></table></figure></p>
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><ol>
-<li><p>需要安装驱动,我使用freetds,如果linux没有自带安装源可以下载:<a href="http://www.freetds.org/" target="_blank" rel="noopener">http://www.freetds.org/</a></p>
-</li>
-<li><p>配置/etc/odbcinst.ini:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat /etc/odbcinst.ini </span><br><span class="line">[SQL Server]</span><br><span class="line">Description = FreeTDS ODBC driver for MSSQL</span><br><span class="line"></span><br><span class="line">Driver = /usr/lib/libtdsodbc.so</span><br><span class="line"></span><br><span class="line">Setup = /usr/lib/libtdsS.so</span><br><span class="line"></span><br><span class="line">FileUsage = 1</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>测试</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> pyodbc</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;cnxn = pyodbc.connect(<span class="string">'DRIVER=&#123;SQL Server&#125;;SERVER=host\\sql;DATABASE=testDB;UID=sa;PWD=myPassword'</span>)</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>使用pyodbc</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/02/python/000-pyodbc/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/02/python/000-pyodbc/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/python/000-pyodbc/" data-id="cjf27w9om001h3hkapup6ul07" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-spark/01-rdd" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/02/spark/01-rdd/" class="article-date">
-  <time datetime="2018-01-02T07:04:20.000Z" itemprop="datePublished">2018-01-02</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/02/spark/01-rdd/">理解RDD</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>RDD虽然是spark抽象出来的概念,但不得不理解.</p>
-<h1 id="什么是RDD"><a href="#什么是RDD" class="headerlink" title="什么是RDD"></a>什么是RDD</h1><p>RDD(resilient distributed datasets),弹性分布式数据集.<br>spark的核心概念,简单说就是分布式的元素集合.</p>
-<h1 id="RDD操作"><a href="#RDD操作" class="headerlink" title="RDD操作"></a>RDD操作</h1><ol>
-<li><p>转化操作:并不进行实际运算</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> lines = sc.textFile(<span class="string">"README.md"</span>)</span><br><span class="line">lines: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">String</span>] = <span class="type">README</span>.md <span class="type">MapPartitionsRDD</span>[<span class="number">1</span>] at textFile at &lt;console&gt;:<span class="number">2</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> pythonLines = lines.filter(line=&gt;line.contains(<span class="string">"Python"</span>))</span><br><span class="line">res3: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">String</span>] = <span class="type">MapPartitionsRDD</span>[<span class="number">2</span>] at filter at &lt;console&gt;:<span class="number">27</span></span><br><span class="line">``` </span><br><span class="line"><span class="number">2.</span> 行动操作(<span class="type">Action</span>):做实际运算</span><br><span class="line">```scala</span><br><span class="line">scala&gt; pythonLines.count()</span><br><span class="line">res5: <span class="type">Long</span> = <span class="number">3</span></span><br><span class="line"></span><br><span class="line">scala&gt; pythonLines.take(<span class="number">10</span>).foreach(line=&gt;println(line))</span><br><span class="line">high-level <span class="type">APIs</span> in <span class="type">Scala</span>, <span class="type">Java</span>, <span class="type">Python</span>, and <span class="type">R</span>, and an optimized engine that</span><br><span class="line">## <span class="type">Interactive</span> <span class="type">Python</span> <span class="type">Shell</span></span><br><span class="line"><span class="type">Alternatively</span>, <span class="keyword">if</span> you prefer <span class="type">Python</span>, you can use the <span class="type">Python</span> shell:</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>惰性求值:在调用行动操作前不会开始计算.</p>
-</li>
-</ol>
-<h1 id="常见操作"><a href="#常见操作" class="headerlink" title="常见操作"></a>常见操作</h1><ol>
-<li><p>常见转化操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">filter</span><br><span class="line">map</span><br><span class="line">flatMap</span><br><span class="line">distinct</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>伪集合操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">union</span><br><span class="line">intersection</span><br><span class="line">substract</span><br><span class="line">cartesian</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>行动操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">collect</span><br><span class="line">count</span><br><span class="line">take</span><br><span class="line">top</span><br><span class="line">reduce</span><br><span class="line">fold</span><br><span class="line">aggregate</span><br><span class="line">foreach</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h1><p>由于RDD是惰性求值的,所以我们多次使用行动操作时每次都会重算,所以缓存起来比较好.<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.storage.<span class="type">StorageLevel</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = input.map(x=&gt;x*x)</span><br><span class="line">result.persist(<span class="type">StorageLevel</span>.<span class="type">DISK_ONLY</span>)</span><br><span class="line">println(result.count())</span><br><span class="line">println(result.collect().mkString(<span class="string">","</span>))</span><br></pre></td></tr></table></figure></p>
-<p>持久化级别有几种:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MEMORY_ONLY</span><br><span class="line">MEMORY_AND_DISK</span><br><span class="line">DISK_ONLY</span><br></pre></td></tr></table></figure></p>
-<p>内存写不下会放到磁盘,spark使用的LRU算法.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>RDD虽然是spark抽象出来的概念,但不得不理解.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/02/spark/01-rdd/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/02/spark/01-rdd/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/spark/01-rdd/" data-id="cjf27w9oy00263hkajxuuo602" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-scala/001-method-vs-function" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/02/scala/001-method-vs-function/" class="article-date">
-  <time datetime="2018-01-02T01:36:26.000Z" itemprop="datePublished">2018-01-02</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/02/scala/001-method-vs-function/">scala中方法和函数的区别</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>在Java中确实没有区别,但在scala中不得不拿出来说一下.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>在Java中确实没有区别,但在scala中不得不拿出来说一下.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/02/scala/001-method-vs-function/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/02/scala/001-method-vs-function/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/02/scala/001-method-vs-function/" data-id="cjf27w9ou001y3hka9jaag6fo" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/000-latex" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/01/tools/000-latex/" class="article-date">
-  <time datetime="2018-01-01T05:51:55.000Z" itemprop="datePublished">2018-01-01</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/01/tools/000-latex/">不得不会的latex</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-什么是latex"><a href="#1-什么是latex" class="headerlink" title="1.什么是latex"></a>1.什么是latex</h1><p>LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</p>
-<p>参看<a href="https://zh.wikipedia.org/wiki/LaTeX" target="_blank" rel="noopener">wiki</a></p>
-<h1 id="2-latex可以做什么"><a href="#2-latex可以做什么" class="headerlink" title="2.latex可以做什么"></a>2.latex可以做什么</h1><ol>
-<li>书籍排版</li>
-<li>论文</li>
-<li>数学符号</li>
-<li>化学公式</li>
-<li>五线谱</li>
-<li>象棋</li>
-<li>电路图</li>
-</ol>
-<p>只要有相应的语法规则和宏包,就可以表示出来.</p>
-<h1 id="3-编写latex的工具"><a href="#3-编写latex的工具" class="headerlink" title="3.编写latex的工具"></a>3.编写latex的工具</h1><p>可以参考wiki做的对比:<a href="https://en.wikipedia.org/wiki/Comparison_of_TeX_editors" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Comparison_of_TeX_editors</a></p>
-<p>也有在线的网页版本(个人免费),<a href="https://cn.sharelatex.com/user/subscription/plans" target="_blank" rel="noopener">shareLatex</a></p>
-<p>常用的在linux:Texmaker,TeXstuio.</p>
-<p>和一些加插件的编辑器: sublime,visual studio,atom,emacx,vim等.</p>
-<p>更多参考知乎:<a href="https://www.zhihu.com/question/19954023" target="_blank" rel="noopener">知乎</a></p>
-<p>使用vscode时需要注意,需要先安装texlive环境.<br>windows环境没问题,linux下有多个包:</p>
-<img src="/2018/01/01/tools/000-latex/001.png">
-<p>安装上面最基本就可以了,后面还可增加.</p>
-<h1 id="4-让vscode支持中文"><a href="#4-让vscode支持中文" class="headerlink" title="4.让vscode支持中文"></a>4.让vscode支持中文</h1><h2 id="4-1"><a href="#4-1" class="headerlink" title="4.1"></a>4.1</h2><p>其他配置都不用改,直接修改文档:</p>
-<ol>
-<li><p>最前面加上:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%!TEX program = pdflatex</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在要使用中文的地方加上:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;bsmi&#125;</span><br><span class="line">Hello World! 有没有改错,这就是中文</span><br><span class="line">\end&#123;CJK&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>然而这种方法会出现字体支持不全的情况,简体中文很多都没有.</p>
-<h2 id="4-2"><a href="#4-2" class="headerlink" title="4.2"></a>4.2</h2><p>这个方法需要安装xelatex,一般都有了.</p>
-<p>然后设置编译环境:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&quot;latex-workshop.latex.toolchain&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;command&quot;: &quot;xelatex&quot;,</span><br><span class="line">            &quot;args&quot;: [</span><br><span class="line">                &quot;-synctex=1&quot;,</span><br><span class="line">                &quot;-interaction=nonstopmode&quot;,</span><br><span class="line">                &quot;-file-line-error&quot;,</span><br><span class="line">                &quot;-pdf&quot;,</span><br><span class="line">                &quot;%DOC%&quot;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">&quot;editor.fontFamily&quot;: &quot;&apos;Droid Sans Fallback&apos;,&apos;Droid Sans Mono&apos;, &apos;monospace&apos;, monospace&quot;</span><br></pre></td></tr></table></figure></p>
-<p>文档中声明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br></pre></td></tr></table></figure></p>
-<p>如果中文不能正常显示,那么就需要手动指定字体:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为Droid Sans Fallback</span><br></pre></td></tr></table></figure></p>
-<p>如果没有对应的字体,就需要下载了.</p>
-<p>最后一个简单的例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[30pt,a4paper]&#123;article&#125;</span><br><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为 Droid Sans Fallback</span><br><span class="line"></span><br><span class="line">\title&#123; hehe第一篇 latex&#125;</span><br><span class="line">\author&#123;jimo \thanks&#123;latex&#125;&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line"></span><br><span class="line">\maketitle</span><br><span class="line"></span><br><span class="line">中文求显示,有没有搞错,这就是中文</span><br><span class="line"></span><br><span class="line">First document. This is a</span><br><span class="line">simple example, with no extra parameters or packages included.</span><br><span class="line"></span><br><span class="line">% 注释不会显示</span><br><span class="line"></span><br><span class="line">\textbf&#123;bold&#125; \underline&#123;underline&#125; \textbf&#123;\textit&#123;italic-bold&#125;&#125;</span><br><span class="line"></span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="5-先看一张图"><a href="#5-先看一张图" class="headerlink" title="5.先看一张图"></a>5.先看一张图</h1><img src="/2018/01/01/tools/000-latex/000.png">
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="1-什么是latex"><a href="#1-什么是latex" class="headerlink" title="1.什么是latex"></a>1.什么是latex</h1><p>LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/01/tools/000-latex/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/01/tools/000-latex/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2018/01/01/tools/000-latex/" data-id="cjf27w9p3002d3hka1gvqg4jw" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-git/000-multi-git-account" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/31/git/000-multi-git-account/" class="article-date">
-  <time datetime="2017-12-31T03:36:45.000Z" itemprop="datePublished">2017-12-31</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/31/git/000-multi-git-account/">一台电脑如何配置多个github账户</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>一台电脑如何配置多个github账户<br>有一个github账户时很简单,不管采用ssh还是https方式提交都没问题,但多个账户时最好采用ssh.</p>
-<p>现在的情况是:以前只有一个账户,全部都采用https的方式,现在多了一个账户,该怎么办?</p>
-<p>下面是我的做法,是通用的.</p>
-<h2 id="如何区别使用的哪种方式"><a href="#如何区别使用的哪种方式" class="headerlink" title="如何区别使用的哪种方式"></a>如何区别使用的哪种方式</h2><p>很简单,2种方法</p>
-<ol>
-<li>在github界面查看:当初是怎样克隆的就是哪种方式.</li>
-</ol>
-<img src="/2017/12/31/git/000-multi-git-account/1-ssh.png">
-<ol>
-<li><p>命令查看:</p>
-<ol>
-<li><p>ssh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --list</span><br><span class="line">...</span><br><span class="line">remote.origin.url=git@github.com:jimolonely/myshell.git</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>https</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --list</span><br><span class="line">...</span><br><span class="line">remote.origin.url=https://github.com/jimolonely/myshell.git</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-</ol>
-<h2 id="如何使用ssh方式"><a href="#如何使用ssh方式" class="headerlink" title="如何使用ssh方式"></a>如何使用ssh方式</h2><p>这个就很容易了.分为6步.</p>
-<ol>
-<li><p>去掉以前的key cache,可有可无,因为可能有其他的ssh key</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh-add -D # 删除所有 </span><br><span class="line"><span class="meta">$</span> ssh-add -l</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>生成key</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh-keygen -t rsa -C "xxx@foxmail.com"</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/home/jimo/.ssh/id_rsa): /home/jimo/.ssh/id_rsa_jimo</span><br><span class="line">Enter passphrase (empty for no passphrase): </span><br><span class="line">Enter same passphrase again: </span><br><span class="line">Your identification has been saved in /home/jimo/.ssh/id_rsa_jimo.</span><br><span class="line">Your public key has been saved in /home/jimo/.ssh/id_rsa_jimo.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:a95OgBQ9DBkNw4RM8NKi/NXbbQmJyjHYiwk2UaO+i7k wp147188@foxmail.com</span><br><span class="line">The key's randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|  .*.+BO         |</span><br><span class="line">|  oo+ oo=        |</span><br><span class="line">| oo o .  .       |</span><br><span class="line">|o..oo.... .      |</span><br><span class="line">|.* . =.oSo       |</span><br><span class="line">|. = = = ooo .    |</span><br><span class="line">| . + + .o..+     |</span><br><span class="line">|...    o o.      |</span><br><span class="line">|Eo      ..o      |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line">同理生成另外一个.</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>添加到ssh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh-add id_rsa_code</span><br><span class="line">Identity added: id_rsa_code (id_rsa_code)</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh-add id_rsa_jimo</span><br><span class="line">Identity added: id_rsa_jimo (id_rsa_jimo)</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh-add -l</span><br><span class="line">2048 SHA256:UtdQCo1Ca7Gf4ITAsyxxXpjaLXan28CAv1O2QBylWTc id_rsa_code (RSA)</span><br><span class="line">2048 SHA256:a95OgBQ9DBkNw4RM8NKi/NXbbQmJyjHYiwk2UaO+i7k id_rsa_jimo (RSA)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将公钥(id_rsa_code.pub里的)复制到<a href="https://github.com/settings/keys" target="_blank" rel="noopener">github账户ssh里</a></p>
-</li>
-<li><p>测试:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh -T github.com</span><br><span class="line">Hi jimolonely! You've successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh -T github-code</span><br><span class="line">Hi mycodefarm! You've successfully authenticated, but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>配置,在~/.ssh/config下配置:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ cat config </span><br><span class="line"><span class="meta">#</span> Default github account</span><br><span class="line">Host github.com</span><br><span class="line"> HostName github.com</span><br><span class="line"> User git</span><br><span class="line"> IdentityFile /home/jimo/.ssh/id_rsa_jimo</span><br><span class="line"></span><br><span class="line"><span class="meta"> #</span> second account</span><br><span class="line">Host github-code</span><br><span class="line"> HostName github.com</span><br><span class="line"> User git</span><br><span class="line"> IdentityFile /home/jimo/.ssh/id_rsa_code</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="如何使用很关键"><a href="#如何使用很关键" class="headerlink" title="如何使用很关键"></a>如何使用很关键</h2><p>到这里,克隆或则添加origin的时候需要注意,使用config里自己定义的Host.</p>
-<p>比如: 创建了一个新账户,叫test,本来克隆该用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:mycodefarm/test.git</span><br></pre></td></tr></table></figure></p>
-<p>但现在需要使用github-code替代 github.com<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github-code:mycodefarm/test.git</span><br></pre></td></tr></table></figure></p>
-<p>另外遇到:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc test]$ git commit -m &apos;first&apos;</span><br><span class="line"></span><br><span class="line">*** 请告诉我你是谁。</span><br><span class="line"></span><br><span class="line">运行</span><br><span class="line"></span><br><span class="line">  git config --global user.email &quot;you@example.com&quot;</span><br><span class="line">  git config --global user.name &quot;Your Name&quot;</span><br><span class="line"></span><br><span class="line">来设置您账号的缺省身份标识。</span><br><span class="line">如果仅在本仓库设置身份标识，则省略 --global 参数。</span><br></pre></td></tr></table></figure></p>
-<p>需要在每个项目单独配置用户名和邮箱,但首先删除全局配置:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global --unset user.name</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc test]$ git config user.name &quot;mycodefarm&quot; &amp;&amp; git config user.email &quot;xx@xx.com&quot;</span><br></pre></td></tr></table></figure></p>
-<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>现在可以混用https和ssh提交了.</p>
-<p>但最好全部改为ssh,因为如果使用了credential.helper store,会把密码存储在~/.git-credentials下,不太好.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>一台电脑如何配置多个github账户<br>有一个github账户时很简单,不管采用ssh还是https方式提交都没问题,但多个账户时最好采用ssh.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/31/git/000-multi-git-account/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/31/git/000-multi-git-account/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/git/000-multi-git-account/" data-id="cjf27w9o2000h3hkaij27651s" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/006-vim" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/31/linux/006-vim/" class="article-date">
-  <time datetime="2017-12-31T03:29:37.000Z" itemprop="datePublished">2017-12-31</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/31/linux/006-vim/">vim</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>下面是我的vim配置,简单粗暴.</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">" ================1.编码设置================</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" 自动语法高亮  </span></span><br><span class="line"> <span class="keyword">syntax</span> <span class="keyword">on</span>  </span><br><span class="line"><span class="comment">" 检测文件类型  </span></span><br><span class="line"><span class="keyword">filetype</span> <span class="keyword">on</span>  </span><br><span class="line"><span class="comment">" 检测文件类型插件  </span></span><br><span class="line"><span class="keyword">filetype</span> plugin <span class="keyword">on</span>  </span><br><span class="line"><span class="comment">" 不设定在插入状态无法用退格键和 Delete 键删除回车符  </span></span><br><span class="line"><span class="keyword">set</span> backspace=<span class="built_in">indent</span>,eol,start  </span><br><span class="line"><span class="keyword">set</span> whichwrap+=&lt;,&gt;,h,<span class="keyword">l</span>  </span><br><span class="line"><span class="comment">" 显示行号  </span></span><br><span class="line"><span class="keyword">set</span> <span class="keyword">number</span>  </span><br><span class="line"><span class="comment">" 上下可视行数  </span></span><br><span class="line"><span class="keyword">set</span> scrolloff=<span class="number">6</span>  </span><br><span class="line"><span class="comment">" replace tab with space  </span></span><br><span class="line"><span class="keyword">set</span> expandtab  </span><br><span class="line"><span class="comment">" 设定 tab 长度为 4  </span></span><br><span class="line"><span class="keyword">set</span> tabstop=<span class="number">4</span>  </span><br><span class="line"><span class="comment">" 设置按BackSpace的时候可以一次删除掉4个空格  </span></span><br><span class="line"><span class="keyword">set</span> softtabstop=<span class="number">4</span>  </span><br><span class="line"><span class="comment">" 设定 &lt;&lt; 和 &gt;&gt; 命令移动时的宽度为 4  </span></span><br><span class="line"><span class="keyword">set</span> <span class="built_in">shiftwidth</span>=<span class="number">4</span></span><br><span class="line"><span class="keyword">set</span> smarttab  </span><br><span class="line"><span class="keyword">set</span> <span class="keyword">history</span>=<span class="number">1024</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" 搜索时高亮显示被找到的文本  </span></span><br><span class="line"><span class="keyword">set</span> hlsearch </span><br><span class="line"><span class="comment">" 智能自动缩进  </span></span><br><span class="line"><span class="keyword">set</span> smartindent</span><br><span class="line"><span class="comment">"显示括号配对情况  </span></span><br><span class="line"><span class="keyword">set</span> showmatch</span><br><span class="line"><span class="comment">" 解决自动换行格式下, 如高度在折行之后超过窗口高度结果这一行看不到的问题  </span></span><br><span class="line"><span class="keyword">set</span> <span class="keyword">display</span>=lastline</span><br><span class="line"><span class="comment">"编码设置  </span></span><br><span class="line"><span class="keyword">set</span> encoding=utf-<span class="number">8</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" =================2.样式设置==================</span></span><br><span class="line"><span class="comment">" 设定配色方案  </span></span><br><span class="line"><span class="keyword">colorscheme</span> molokai</span><br><span class="line"></span><br><span class="line"><span class="comment">" =================3.自动补全设置==================</span></span><br><span class="line"><span class="comment">" 使用vbundle</span></span><br><span class="line"><span class="keyword">set</span> rtp+=~/.<span class="keyword">vim</span>/bundle/Vundle.<span class="keyword">vim</span></span><br><span class="line"><span class="keyword">call</span> vundle#begin()</span><br><span class="line"></span><br><span class="line"><span class="comment">" let Vundle manage Vundle, required</span></span><br><span class="line">Plugin <span class="string">'VundleVim/Vundle.vim'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">" 自动补全插件</span></span><br><span class="line">Bundle <span class="string">'Valloric/YouCompleteMe'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> vundle#end()            <span class="comment">" required</span></span><br><span class="line"><span class="keyword">filetype</span> plugin <span class="built_in">indent</span> <span class="keyword">on</span>    <span class="comment">" required</span></span><br></pre></td></tr></table></figure>
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>下面是我的vim配置,简单粗暴.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/31/linux/006-vim/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/31/linux/006-vim/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/31/linux/006-vim/" data-id="cjf27w9oi001a3hkanhxorb44" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-scala/000-case-class-cs-class" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/29/scala/000-case-class-cs-class/" class="article-date">
-  <time datetime="2017-12-29T13:29:43.000Z" itemprop="datePublished">2017-12-29</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/29/scala/000-case-class-cs-class/">case class和class的区别</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="case-class和class的区别"><a href="#case-class和class的区别" class="headerlink" title="case class和class的区别"></a><a href="https://www.scala-exercises.org/scala_tutorial/classes_vs_case_classes" target="_blank" rel="noopener">case class和class的区别</a></h2><p>以以下两个class为例:</p>
-<p>class<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BankAccount</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> balance = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">deposit</span></span>(amount: <span class="type">Int</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (amount &gt; <span class="number">0</span>) balance = balance + amount</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">withdraw</span></span>(amount: <span class="type">Int</span>): <span class="type">Int</span> =</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> &lt; amount &amp;&amp; amount &lt;= balance) &#123;</span><br><span class="line">      balance = balance - amount</span><br><span class="line">      balance</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">Error</span>(<span class="string">"insufficient funds"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>case class<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Note</span>(<span class="params">name: <span class="type">String</span>, duration: <span class="type">String</span>, octave: <span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="1-创建方式"><a href="#1-创建方式" class="headerlink" title="1.创建方式"></a>1.创建方式</h2><p>一个要new,一个不用<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> aliceAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure></p>
-<h2 id="2-对象比较"><a href="#2-对象比较" class="headerlink" title="2.对象比较"></a>2.对象比较</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> aliceAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"><span class="keyword">val</span> bobAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"></span><br><span class="line">aliceAccount == bobAccount <span class="comment">//false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>) <span class="comment">//不变性</span></span><br><span class="line"><span class="keyword">val</span> cThree = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">c3 == cThree <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
-<h2 id="3-模式匹配"><a href="#3-模式匹配" class="headerlink" title="3.模式匹配"></a>3.模式匹配</h2><p>只有case class支持:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c3 <span class="keyword">match</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="type">Note</span>(name, duration, octave) =&gt; <span class="string">s"The duration of c3 is <span class="subst">$duration</span>"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="4-扩展性"><a href="#4-扩展性" class="headerlink" title="4.扩展性"></a>4.扩展性</h2><p>class可继承,而case class是不变的</p>
-<h2 id="5-为什么需要case-class"><a href="#5-为什么需要case-class" class="headerlink" title="5.为什么需要case class"></a>5.为什么需要case class</h2><p>总的来说,case class就是class的特例,提取出来是因为实践中大量使用case class.</p>
-<p>对于上面那个Note,扩展成class如下:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span>(<span class="params">_name: <span class="type">String</span>, _duration: <span class="type">String</span>, _octave: <span class="type">Int</span></span>) <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor parameters are promoted to members</span></span><br><span class="line">  <span class="keyword">val</span> name = _name</span><br><span class="line">  <span class="keyword">val</span> duration = _duration</span><br><span class="line">  <span class="keyword">val</span> octave = _octave</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Equality redefinition</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">equals</span></span>(other: <span class="type">Any</span>): <span class="type">Boolean</span> = other <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> that: <span class="type">Note</span> =&gt;</span><br><span class="line">      (that canEqual <span class="keyword">this</span>) &amp;&amp;</span><br><span class="line">        name == that.name &amp;&amp;</span><br><span class="line">        duration == that.duration &amp;&amp;</span><br><span class="line">        octave == that.octave</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">canEqual</span></span>(other: <span class="type">Any</span>): <span class="type">Boolean</span> = other.isInstanceOf[<span class="type">Note</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Java hashCode redefinition according to equality</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">hashCode</span></span>(): <span class="type">Int</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> state = <span class="type">Seq</span>(name, duration, octave)</span><br><span class="line">    state.map(_.hashCode()).foldLeft(<span class="number">0</span>)((a, b) =&gt; <span class="number">31</span> * a + b)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// toString redefinition to return the value of an instance instead of its memory addres</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">toString</span> </span>= <span class="string">s"Note(<span class="subst">$name</span>,<span class="subst">$duration</span>,<span class="subst">$octave</span>)"</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create a copy of a case class, with potentially modified field values</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">copy</span></span>(name: <span class="type">String</span> = name, duration: <span class="type">String</span> = duration, octave: <span class="type">Int</span> = octave): <span class="type">Note</span> =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Note</span>(name, duration, octave)</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Note</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor that allows the omission of the `new` keyword</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(name: <span class="type">String</span>, duration: <span class="type">String</span>, octave: <span class="type">Int</span>): <span class="type">Note</span> =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Note</span>(name, duration, octave)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Extractor for pattern matching</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">unapply</span></span>(note: <span class="type">Note</span>): <span class="type">Option</span>[(<span class="type">String</span>, <span class="type">String</span>, <span class="type">Int</span>)] =</span><br><span class="line">    <span class="keyword">if</span> (note eq <span class="literal">null</span>) <span class="type">None</span></span><br><span class="line">    <span class="keyword">else</span> <span class="type">Some</span>((note.name, note.duration, note.octave))</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>例子:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line">c3.toString shouldBe <span class="string">"Note(C,Quarter,3)"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> d = <span class="type">Note</span>(<span class="string">"D"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line">c3.equals(d) shouldBe <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> c4 = c3.copy(octave = <span class="number">4</span>)</span><br><span class="line">c4.toString shouldBe <span class="string">"Note(C,Quarter,4)"</span></span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h2 id="case-class和class的区别"><a href="#case-class和class的区别" class="headerlink" title="case class和class的区别"></a><a href="https://www.scala-exercises.org/scala_tutorial/classes_vs_case_classes" target="_blank" rel="noopener">case class和class的区别</a></h2><p>以以下两个class为例:</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/29/scala/000-case-class-cs-class/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/29/scala/000-case-class-cs-class/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/29/scala/000-case-class-cs-class/" data-id="cjf27w9ot001w3hkaoze3lf96" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-spark/00-quick-start" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/28/spark/00-quick-start/" class="article-date">
-  <time datetime="2017-12-28T08:11:16.000Z" itemprop="datePublished">2017-12-28</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/28/spark/00-quick-start/">spark快速使用</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="start"><a href="#start" class="headerlink" title="start"></a>start</h1><p>来自<a href="https://spark.apache.org/docs/latest/quick-start.html" target="_blank" rel="noopener">https://spark.apache.org/docs/latest/quick-start.html</a></p>
-<p>注意版本就行了。</p>
-<h2 id="命令行操作"><a href="#命令行操作" class="headerlink" title="命令行操作"></a>命令行操作</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-shell </span><br><span class="line">Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties</span><br><span class="line">...</span><br><span class="line">Spark context Web UI available at http://192.168.1.109:4040</span><br><span class="line">Spark context available as 'sc' (master = local[*], app id = local-1512393157767).</span><br><span class="line">Spark session available as 'spark'.</span><br><span class="line">Welcome to</span><br><span class="line">      ____              __</span><br><span class="line">     / __/__  ___ _____/ /__</span><br><span class="line">    _\ \/ _ \/ _ `/ __/  '_/</span><br><span class="line">   /___/ .__/\_,_/_/ /_/\_\   version 2.2.0</span><br><span class="line">      /_/</span><br><span class="line">         </span><br><span class="line">Using Scala version 2.11.8 (OpenJDK 64-Bit Server VM, Java 1.8.0_144)</span><br><span class="line">Type in expressions to have them evaluated.</span><br><span class="line">Type :help for more information.</span><br></pre></td></tr></table></figure>
-<h2 id="自定义程序"><a href="#自定义程序" class="headerlink" title="自定义程序"></a>自定义程序</h2><p>整个目录结构：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc SimpleApp]$ find .</span><br><span class="line">.</span><br><span class="line">./build.sbt</span><br><span class="line">./src</span><br><span class="line">./src/main</span><br><span class="line">./src/main/scala</span><br><span class="line">./src/main/scala/SimpleApp.scala</span><br></pre></td></tr></table></figure></p>
-<p>SimpleApp.scala<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">SimpleApp</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) &#123;</span><br><span class="line">    <span class="keyword">val</span> logFile = <span class="string">"YOUR_SPARK_HOME/README.md"</span> <span class="comment">// 随便一个文件</span></span><br><span class="line">    <span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder.appName(<span class="string">"Simple Application"</span>).getOrCreate()</span><br><span class="line">    <span class="keyword">val</span> logData = spark.read.textFile(logFile).cache()</span><br><span class="line">    <span class="keyword">val</span> numAs = logData.filter(line =&gt; line.contains(<span class="string">"a"</span>)).count()</span><br><span class="line">    <span class="keyword">val</span> numBs = logData.filter(line =&gt; line.contains(<span class="string">"b"</span>)).count()</span><br><span class="line">    println(<span class="string">s"Lines with a: <span class="subst">$numAs</span>, Lines with b: <span class="subst">$numBs</span>"</span>)</span><br><span class="line">    spark.stop()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>build.sbt,版本很重要<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">name := &quot;Simple Project&quot;</span><br><span class="line"></span><br><span class="line">version := &quot;1.0&quot;</span><br><span class="line"></span><br><span class="line">scalaVersion := &quot;2.11.8&quot;</span><br><span class="line"></span><br><span class="line">libraryDependencies += &quot;org.apache.spark&quot; %% &quot;spark-sql&quot; % &quot;2.2.0&quot;</span><br></pre></td></tr></table></figure></p>
-<p>打包：可以由于国内网速比较慢，可以配下sbt的镜像<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sbt package</span><br><span class="line">...</span><br><span class="line">[info] Packaging &#123;..&#125;/&#123;..&#125;/target/scala-2.11/simple-project_2.11-1.0.jar</span><br></pre></td></tr></table></figure></p>
-<p>运行spark,上面程序的作用就是统计含有a和b字母的行数<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-submit --class "SimpleApp" --master local[4] /home/jimo/workspace/SimpleApp/target/scala-2.11/simple-project_2.11-1.0.jar </span><br><span class="line"></span><br><span class="line">Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties</span><br><span class="line">...</span><br><span class="line">Lines with a: 61, Lines with b: 30</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="start"><a href="#start" class="headerlink" title="start"></a>start</h1><p>来自<a href="https://spark.apache.org/docs/latest/quick-start.html" target="_blank" rel="noopener">https://spark.apache.org/docs/latest/quick-start.html</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/28/spark/00-quick-start/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/28/spark/00-quick-start/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://yoursite.com/2017/12/28/spark/00-quick-start/" data-id="cjf27w9ox00233hka4vcun3lv" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
 
       </footer>
       </div>
@@ -988,7 +160,7 @@ ga('send', 'pageview');
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
   </nav>
 
 </section>
@@ -1002,7 +174,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1012,7 +184,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/elasticsearch/" style="font-size: 12.5px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 18.75px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/openstack/" style="font-size: 10px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 16.25px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 10px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sqlserver/" style="font-size: 10px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1021,7 +193,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
     </div>
   </div>
 
@@ -1034,23 +206,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2018/03/22/java/000-date-util/">Java中日期常用操作</a>
+            <a href="/2018/04/14/db/001-sqlserver-datetime-to-string/">sqlserver中datetime转string</a>
           </li>
         
           <li>
-            <a href="/2018/03/17/elasticsearch/004-configure/">elasticsearch配置</a>
+            <a href="/2018/04/05/cloudcompute/005-docker/">docker那些事-swarm</a>
           </li>
         
           <li>
-            <a href="/2018/03/15/elasticsearch/003-data-explore/">elasticsearch搜索数据</a>
+            <a href="/2018/04/03/python/006-python-warning/">python中的那些警告</a>
           </li>
         
           <li>
-            <a href="/2018/03/14/elasticsearch/002-modify-data/">elasticsearch修改数据</a>
+            <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事-进入</a>
           </li>
         
           <li>
-            <a href="/2018/03/13/js/000-echarts-graph/">echarts中的graph demo</a>
+            <a href="/2018/04/02/linux/009-write-my-own-os/">写自己的操作系统1</a>
           </li>
         
       </ul>
