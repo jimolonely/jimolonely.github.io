@@ -84,6 +84,95 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/001-music21" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/06/python/001-music21/" class="article-date">
+  <time datetime="2018-01-06T07:32:29.000Z" itemprop="datePublished">2018-01-06</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/06/python/001-music21/">music21</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
+<h1 id="music21是什么"><a href="#music21是什么" class="headerlink" title="music21是什么"></a>music21是什么</h1><p>music21是一个基于python的计算机辅助音乐学工具包。该系统自2008年以来一直在不断发展壮大。<br>music21中的方法和传统已被用在许多以前的软件系统中。</p>
+<p>music21中的21指的是在MIT中所有的课程都有数字和音乐，还有其他一些人文科学部门，编号为21. </p>
+<p>MIT的音乐部门以及哈佛大学，史密斯学院和圣约克山学院帮助把这个工具包从最简单的根源变成了一个成熟的系统。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接用pip就行,更多安装参考官方文档<a href="http://web.mit.edu/music21/doc/installing/index.html" target="_blank" rel="noopener">music</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> pip install music21</span><br></pre></td></tr></table></figure></p>
+<h1 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h1><h3 id="1-展示一个音符"><a href="#1-展示一个音符" class="headerlink" title="1. 展示一个音符"></a>1. 展示一个音符</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> music21 <span class="keyword">import</span> *</span><br><span class="line">In [<span class="number">2</span>]: n = note.Note(<span class="string">"D#3"</span>)</span><br><span class="line">In [<span class="number">3</span>]: n.duration.type = <span class="string">'half'</span></span><br><span class="line">In [<span class="number">4</span>]: n.show()</span><br></pre></td></tr></table></figure>
+<p>你以为会出现图片,但由于没有打开mxl文件的应用会报错:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SubConverterException: Cannot find a valid application path <span class="keyword">for</span> format musicxml. Specify this <span class="keyword">in</span> your Environment by calling environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/path/to/application'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这时安装<a href="https://musescore.org/zh-hans" target="_blank" rel="noopener">musescore</a>,这个跨平台的开源乐谱编辑器.其路径默认在/usr/bin/musescore</p>
+<p>然后配置路径再显示: (注意:这个environment是music21下的)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">7</span>]: environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/usr/bin/musescore'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: n.show()</span><br><span class="line">qt5ct: using qt5ct plugin</span><br></pre></td></tr></table></figure></p>
+<p>应该会打开musescore软件:</p>
+<img src="/2018/01/06/python/001-music21/000.png">
+<h3 id="2-播放midi"><a href="#2-播放midi" class="headerlink" title="2.播放midi"></a>2.播放midi</h3><p>同样需要配置midi播放器:这里使用timidity<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">9</span>]: littleMelody = converter.parse(<span class="string">"tinynotation: 3/4 c4 d8 f g16 a g f#"</span>)</span><br><span class="line">In [<span class="number">13</span>]: environment.set(<span class="string">'midiPath'</span>, <span class="string">'/usr/bin/timidity'</span>)</span><br><span class="line">In [<span class="number">14</span>]: littleMelody.show(<span class="string">'midi'</span>)</span><br><span class="line">Requested buffer size <span class="number">32768</span>, fragment size <span class="number">8192</span></span><br><span class="line">ALSA pcm <span class="string">'default'</span> set buffer size <span class="number">32768</span>, period size <span class="number">8192</span> bytes</span><br><span class="line">Playing /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">MIDI file: /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">Format: <span class="number">1</span>  Tracks: <span class="number">1</span>  Divisions: <span class="number">1024</span></span><br><span class="line">Sequence: </span><br><span class="line">No instrument mapped to tone bank <span class="number">0</span>, program <span class="number">0</span> - this instrument will <span class="keyword">not</span> be heard</span><br><span class="line">No pre-resampling cache hit</span><br><span class="line">Last <span class="number">1</span> MIDI events are ignored</span><br><span class="line">Playing time: ~<span class="number">4</span> seconds</span><br><span class="line">Notes cut: <span class="number">0</span></span><br><span class="line">Notes lost totally: <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到,默认这些临时文件都在/tmp/music21/下.</p>
+<h3 id="3-其他"><a href="#3-其他" class="headerlink" title="3.其他"></a>3.其他</h3><p>还可以生成图片,读取mxl文件,生成和弦等.</p>
+<p>如果不想配置软件,就直接去tmp目录下查看文件.</p>
+<p>学习还是官方文档最好:<a href="http://web.mit.edu/music21/doc/index.html" target="_blank" rel="noopener">music21-doc</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/06/python/001-music21/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/06/python/001-music21/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjfz1kga00025q6kaukwg143h" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/music/">music</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-spark/04-pyspark-jupyter" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/05/spark/04-pyspark-jupyter/" class="article-date">
@@ -168,7 +257,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjfz0zdqh00305nkayyjm8mhv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjfz1kgai0032q6kaxxbf7jl7" class="article-share-link">
           Share
         </a>
         
@@ -248,7 +337,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjfz0zdq0001x5nkam3mspyh2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjfz1kg9y0020q6ka2lahndti" class="article-share-link">
           Share
         </a>
         
@@ -341,7 +430,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjfz0zdqg002x5nkasuqmawcu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjfz1kgah0030q6ka9ob0jvss" class="article-share-link">
           Share
         </a>
         
@@ -424,7 +513,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjfz0zdqf002v5nkasejpwnhw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjfz1kgag002yq6ka23cx7c8q" class="article-share-link">
           Share
         </a>
         
@@ -511,7 +600,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjfz0zdq100205nkaa7qihtis" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjfz1kg9z0022q6kachyrel9p" class="article-share-link">
           Share
         </a>
         
@@ -607,7 +696,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjfz0zdqe002s5nkaotynokrr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjfz1kgaf002wq6kafygtiepb" class="article-share-link">
           Share
         </a>
         
@@ -681,7 +770,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjfz0zdqa002l5nkaf1g730x3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjfz1kgac002oq6kazrvm2vax" class="article-share-link">
           Share
         </a>
         
@@ -790,7 +879,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjfz0zdqi00325nkay2ibhjrt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjfz1kgaj0035q6kaa8wdyck6" class="article-share-link">
           Share
         </a>
         
@@ -910,7 +999,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjfz0zdpg000v5nka86ddfv4u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjfz1kg9e000xq6ka8czo7nk1" class="article-share-link">
           Share
         </a>
         
@@ -984,7 +1073,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjfz0zdpw001o5nkaf30a3iw6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjfz1kg9u001sq6karhj62uom" class="article-share-link">
           Share
         </a>
         
@@ -1067,7 +1156,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjfz0zdq9002i5nkawkm2mta1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjfz1kgab002mq6kaylh8bhte" class="article-share-link">
           Share
         </a>
         
@@ -1148,7 +1237,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjfz0zdqd002q5nkasq41nlsx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjfz1kgae002tq6kaivcmnzsc" class="article-share-link">
           Share
         </a>
         
@@ -1284,7 +1373,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjfz0zdqb002n5nkavidzv5bz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjfz1kgad002rq6kabke9an90" class="article-share-link">
           Share
         </a>
         
@@ -1363,7 +1452,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjfz0zdpv001m5nkado0opvsq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjfz1kg9t001pq6kalw7wkkhg" class="article-share-link">
           Share
         </a>
         
@@ -1440,7 +1529,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjfz0zdpu001j5nka64ei0la2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjfz1kg9s001nq6ka9n92lcpv" class="article-share-link">
           Share
         </a>
         
@@ -1518,7 +1607,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="cjfz0zdpt001h5nka8meofynu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="cjfz1kg9r001kq6ka92adahnz" class="article-share-link">
           Share
         </a>
         
@@ -1598,7 +1687,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="cjfz0zdpr001f5nkatthe0ufn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="cjfz1kg9q001iq6ka0lic834z" class="article-share-link">
           Share
         </a>
         
@@ -1761,7 +1850,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="cjfz0zdpq001d5nka7n9mqid8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="cjfz1kg9p001fq6kacc8mz4m3" class="article-share-link">
           Share
         </a>
         
@@ -1850,97 +1939,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="cjfz0zdpp001a5nka3ljfpkzf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="cjfz1kg9o001dq6kalk937wo7" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-design-pattern/command" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/24/design-pattern/command/" class="article-date">
-  <time datetime="2017-12-24T03:48:17.000Z" itemprop="datePublished">2017-12-24</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/24/design-pattern/command/">command模式实现undo/redo操作</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文将实现一个带有undo/redo操作的计算器来理解command模式.</p>
-<p>首先看看原先的command类图:</p>
-<img src="/2017/12/24/design-pattern/command/000.png">
-<p>然后看看我们这个计算器类图:</p>
-<img src="/2017/12/24/design-pattern/command/001.png">
-<p>下面是代码,简单包懂.</p>
-<p>我们有个计算器:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="comment">//相当于Receiver,真正做事情的对象</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Calculator</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> a;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> b;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> Operation &#123;</span><br><span class="line">        ADD, SUB, MUL, DIV</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Operation operation;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Calculator</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b, Operation operation)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.a = a;</span><br><span class="line">        <span class="keyword">this</span>.b = b;</span><br><span class="line">        <span class="keyword">this</span>.operation = operation;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (operation) &#123;</span><br><span class="line">            <span class="keyword">case</span> ADD:</span><br><span class="line">                result = a + b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SUB:</span><br><span class="line">                result = a - b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MUL:</span><br><span class="line">                result = a * b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> DIV:</span><br><span class="line">                <span class="keyword">if</span> (b == <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"除数为0"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                result = a / b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"计算:"</span> + a + getOp() + b + <span class="string">"="</span> + result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String op = getOp();</span><br><span class="line">        <span class="keyword">return</span> a + op + b + <span class="string">"="</span> + result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getOp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String op = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">switch</span> (operation) &#123;</span><br><span class="line">            <span class="keyword">case</span> ADD:</span><br><span class="line">                op = <span class="string">"+"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SUB:</span><br><span class="line">                op = <span class="string">"-"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MUL:</span><br><span class="line">                op = <span class="string">"*"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> DIV:</span><br><span class="line">                op = <span class="string">"/"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> op;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>总的命令接口:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span></span>;<span class="comment">//执行或重做</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span></span>;<span class="comment">//撤销</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>具体的命令实现:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ComputeCommand</span> <span class="keyword">implements</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Calculator calculator;</span><br><span class="line">    <span class="keyword">private</span> Calculator preCalculator;<span class="comment">//上一步的计算,用于回退</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ComputeCommand</span><span class="params">(Calculator calculator)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.calculator = calculator;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.preCalculator = calculator;</span><br><span class="line">        calculator.compute();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//这里的撤销是执行上一次运算</span></span><br><span class="line">        preCalculator.compute();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> calculator.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>然后是Invoker,这里为User类:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Stack;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用计算器的用户,对于Invoker</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Stack&lt;Command&gt; undos;</span><br><span class="line">    <span class="keyword">private</span> Stack&lt;Command&gt; redos;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.undos = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">        <span class="keyword">this</span>.redos = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (undos.size() == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"没有撤销步骤"</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Command cmd = undos.pop();</span><br><span class="line"><span class="comment">//        cmd.undo();//撤销不需要再计算了,假如是累计计算撤销才有用</span></span><br><span class="line">        redos.push(cmd);</span><br><span class="line">        System.out.println(<span class="string">"撤销:"</span> + cmd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">redo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (redos.size() == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"没有重做步骤"</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Command cmd = redos.pop();</span><br><span class="line">        cmd.execute();</span><br><span class="line">        undos.push(cmd);</span><br><span class="line">        System.out.println(<span class="string">"重做:"</span> + cmd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//这才是用户调用的接口</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compute</span><span class="params">(Calculator.Operation operation, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        ComputeCommand computeCommand = <span class="keyword">new</span> ComputeCommand(<span class="keyword">new</span> Calculator(a, b, operation));</span><br><span class="line">        computeCommand.execute();</span><br><span class="line">        undos.add(computeCommand);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>最后是Client,相当于整个应用界面:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.compute(Calculator.Operation.ADD, <span class="number">100</span>, <span class="number">20</span>);</span><br><span class="line">        user.compute(Calculator.Operation.SUB, -<span class="number">100</span>, <span class="number">50</span>);</span><br><span class="line">        user.compute(Calculator.Operation.MUL, <span class="number">10</span>, <span class="number">30</span>);</span><br><span class="line">        user.undo();</span><br><span class="line">        user.undo();</span><br><span class="line">        user.redo();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>运行结果:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">计算:100+20=120</span><br><span class="line">计算:-100-50=-150</span><br><span class="line">计算:10*30=300</span><br><span class="line">撤销:10*30=300</span><br><span class="line">撤销:-100-50=-150</span><br><span class="line">计算:-100-50=-150</span><br><span class="line">重做:-100-50=-150</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文将实现一个带有undo/redo操作的计算器来理解command模式.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/24/design-pattern/command/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/24/design-pattern/command/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/24/design-pattern/command/" data-id="cjfz0zdpb000j5nkaaa7z2k6s" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
 
       </footer>
       </div>
@@ -1977,7 +1981,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sqlserver/" style="font-size: 10px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sqlserver/" style="font-size: 11.25px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1999,6 +2003,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/14/db/002-sqlserver-datetime-to-constellation/">sqlserver中生日转星座</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/14/db/001-sqlserver-datetime-to-string/">sqlserver中datetime转string</a>
           </li>
         
@@ -2012,10 +2020,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事-进入</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/02/linux/009-write-my-own-os/">写自己的操作系统1</a>
           </li>
         
       </ul>
