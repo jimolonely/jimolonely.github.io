@@ -84,6 +84,99 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-elasticsearch/001-cluster-explore" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/11/elasticsearch/001-cluster-explore/" class="article-date">
+  <time datetime="2018-03-11T05:47:11.000Z" itemprop="datePublished">2018-03-11</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/11/elasticsearch/001-cluster-explore/">02elasticsearch集群探索</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这篇关于elasticsearch集群.</p>
+<h1 id="探索集群"><a href="#探索集群" class="headerlink" title="探索集群"></a>探索集群</h1><p>elasticearch提供了标准的接口供访问。</p>
+<p>安装很简单，先把集群跑起来：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ ls</span><br><span class="line">bin  config  lib  LICENSE.txt  modules  NOTICE.txt  plugins  README.textile</span><br><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ bin/elasticsearch</span><br></pre></td></tr></table></figure></p>
+<h2 id="Cluster-Health"><a href="#Cluster-Health" class="headerlink" title="Cluster Health"></a>Cluster Health</h2><p>健康状态：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl http://localhost:9200/_cat/health?v</span><br><span class="line">epoch      timestamp cluster       status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent</span><br><span class="line">1512218799 20:46:39  elasticsearch green           1         1      0   0    0    0        0             0                  -                100.0%</span><br></pre></td></tr></table></figure></p>
+<p>注意的就是颜色：</p>
+<ul>
+<li>Green - everything is good (cluster is fully functional)</li>
+<li>Yellow - all data is available but some replicas are not yet allocated (cluster is fully functional)</li>
+<li>Red - some data is not available for whatever reason (cluster is partially functional)</li>
+</ul>
+<p>获得节点列表：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl http://localhost:9200/_cat/nodes?v</span><br><span class="line">ip        heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name</span><br><span class="line">127.0.0.1           22          44   8    0.49    0.45     0.45 mdi       *      I9nSfCF</span><br></pre></td></tr></table></figure></p>
+<h2 id="List-All-Indices"><a href="#List-All-Indices" class="headerlink" title="List All Indices"></a>List All Indices</h2><p>列出所有索引：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl http://localhost:9200/_cat/indices?v</span><br><span class="line">health status index uuid pri rep docs.count docs.deleted store.size pri.store.size</span><br></pre></td></tr></table></figure></p>
+<p>看起来一个都没有。</p>
+<h2 id="Create-an-Index"><a href="#Create-an-Index" class="headerlink" title="Create an Index"></a>Create an Index</h2><p>既然没有就创建一个：采用PUT方式<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPUT 'localhost:9200/customer?pretty&amp;pretty'</span><br><span class="line">&#123;</span><br><span class="line">  "acknowledged" : true,</span><br><span class="line">  "shards_acknowledged" : true,</span><br><span class="line">  "index" : "customer"</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span> 结果</span><br><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XGET 'localhost:9200/_cat/indices?v&amp;pretty'</span><br><span class="line">health status index    uuid                   pri rep docs.count docs.deleted store.size pri.store.size</span><br><span class="line">yellow open   customer AmBi42pqTlOf9UbIMgvWWw   5   1          0            0      1.1kb          1.1kb</span><br></pre></td></tr></table></figure></p>
+<p>可以看到上面pri（primary shard）和rep（replica）的默认数量。该Index还没有document关联。</p>
+<h2 id="Index-and-Query-a-Document"><a href="#Index-and-Query-a-Document" class="headerlink" title="Index and Query a Document"></a>Index and Query a Document</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> -d 是指定数据，下面创建了一篇ID为1的document</span><br><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPUT 'localhost:9200/customer/doc/1?pretty&amp;pretty' -H 'Content-Type: application/json' -d' &#123; "name": "John Doe" &#125; '</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "1",</span><br><span class="line">  "_version" : 1,</span><br><span class="line">  "result" : "created",</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 2,</span><br><span class="line">    "successful" : 1,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "_seq_no" : 0,</span><br><span class="line">  "_primary_term" : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查询：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XGET 'localhost:9200/customer/doc/1?pretty&amp;pretty'</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "1",</span><br><span class="line">  "_version" : 1,</span><br><span class="line">  "found" : true,</span><br><span class="line">  "_source" : &#123;</span><br><span class="line">    "name" : "John Doe"</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Delete-an-Index"><a href="#Delete-an-Index" class="headerlink" title="Delete an Index"></a>Delete an Index</h2><p>删除索引：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XDELETE 'localhost:9200/customer?pretty&amp;pretty'</span><br><span class="line">&#123;</span><br><span class="line">  "acknowledged" : true</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span> 结果：</span><br><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XGET 'localhost:9200/_cat/indices?v&amp;pretty'</span><br><span class="line">health status index uuid pri rep docs.count docs.deleted store.size pri.store.size</span><br></pre></td></tr></table></figure></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>API命令的格式：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /customer</span><br><span class="line">PUT /customer/doc/1</span><br><span class="line">&#123;</span><br><span class="line">  "name": "John Doe"</span><br><span class="line">&#125;</span><br><span class="line">GET /customer/doc/1</span><br><span class="line">DELETE /customer</span><br></pre></td></tr></table></figure></p>
+<p>模式：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;REST Verb&gt; /&lt;Index&gt;/&lt;Type&gt;/&lt;ID&gt;</span><br></pre></td></tr></table></figure></p>
+<a href="/2018/03/14/elasticsearch/002-modify-data/" title="03-数据修改">03-数据修改</a>
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>这篇关于elasticsearch集群.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/11/elasticsearch/001-cluster-explore/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/11/elasticsearch/001-cluster-explore/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjg09fysz000pq7katgpvlnk0" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-elasticsearch/000-basic-concept" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/11/elasticsearch/000-basic-concept/" class="article-date">
@@ -155,7 +248,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjfz1kg99000oq6kawj88qkh4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjg09fysy000oq7kayxia91xs" class="article-share-link">
           Share
         </a>
         
@@ -251,7 +344,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjfz1kg9n001aq6ka3zg7my4i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjg09fyt9001aq7kaysym87i2" class="article-share-link">
           Share
         </a>
         
@@ -330,7 +423,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjfz1kg8t0004q6kaufc3es7k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjg09fysa0004q7ka9cggm50i" class="article-share-link">
           Share
         </a>
         
@@ -409,7 +502,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjfz1kg9l0018q6ka16u4c3x4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjg09fyt80018q7kave4tnntn" class="article-share-link">
           Share
         </a>
         
@@ -493,7 +586,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjfz1kg9j0015q6kaxg1kkn1v" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjg09fyt70015q7kaga0heqxf" class="article-share-link">
           Share
         </a>
         
@@ -571,7 +664,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjfz1kgar003jq6kak6b3kbl0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjg09fyuc003kq7kabd7jhzp7" class="article-share-link">
           Share
         </a>
         
@@ -654,7 +747,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjfz1kgap003gq6kak14gq0wi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjg09fyu9003gq7kabjhb5hp7" class="article-share-link">
           Share
         </a>
         
@@ -744,7 +837,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjfz1kgap003fq6kap89xtbkn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjg09fyub003jq7kan15y6l43" class="article-share-link">
           Share
         </a>
         
@@ -838,7 +931,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjfz1kga2002aq6kaoka2gngp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjg09fytp002aq7katwjonc3f" class="article-share-link">
           Share
         </a>
         
@@ -919,7 +1012,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjfz1kg8v0005q6kagtzn1zwq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjg09fysd0005q7ka79pzowyo" class="article-share-link">
           Share
         </a>
         
@@ -1009,7 +1102,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjfz1kg9v001tq6ka9glumq2k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjg09fyth001tq7ka4sglzy2i" class="article-share-link">
           Share
         </a>
         
@@ -1088,7 +1181,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjfz1kga8002jq6kavrc4f3gk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjg09fytu002mq7ka3sjtd6hf" class="article-share-link">
           Share
         </a>
         
@@ -1177,7 +1270,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjfz1kg8q0002q6ka1z0u6g24" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjg09fys60002q7ka9e00xiak" class="article-share-link">
           Share
         </a>
         
@@ -1259,7 +1352,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjfz1kga10027q6kagi98mdqs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjg09fyto0027q7kaaoyd0hbz" class="article-share-link">
           Share
         </a>
         
@@ -1349,7 +1442,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjfz1kgan003cq6kaaniv8rr5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjg09fyu8003fq7ka307nfddh" class="article-share-link">
           Share
         </a>
         
@@ -1582,7 +1675,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjfz1kgam003aq6kaieeqaigo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjg09fyu6003cq7kaueet9l1m" class="article-share-link">
           Share
         </a>
         
@@ -1662,7 +1755,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjfz1kg8m0001q6ka4k9yqrc2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjg09fyrv0001q7kaaldmu324" class="article-share-link">
           Share
         </a>
         
@@ -1748,7 +1841,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjfz1kgal0038q6kamq9x8mpl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjg09fyu5003aq7kanrmibycd" class="article-share-link">
           Share
         </a>
         
@@ -1827,93 +1920,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjfz1kg9f000yq6kaujj82ugw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjg09fyt3000yq7kabwcor9yw" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/001-asciidoc" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/07/tools/001-asciidoc/" class="article-date">
-  <time datetime="2018-01-07T09:00:18.000Z" itemprop="datePublished">2018-01-07</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/07/tools/001-asciidoc/">asciidoc转pdf</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Asciidoc"><a href="#Asciidoc" class="headerlink" title="Asciidoc"></a>Asciidoc</h1><p>本文将要说明如何快速应对新知识的摄取方式.比如如何将Asciidoc转化为pdf.</p>
-<h2 id="1-是什么"><a href="#1-是什么" class="headerlink" title="1.是什么"></a>1.是什么</h2><p>asciidoc是什么? google一下:<a href="http://asciidoc.org/" target="_blank" rel="noopener">http://asciidoc.org/</a></p>
-<p>就是类似于markdown的一种文本编辑语言,看到github上有用这种方式写书的,需要学习下.</p>
-<h2 id="2-怎么做"><a href="#2-怎么做" class="headerlink" title="2.怎么做"></a>2.怎么做</h2><p>先安装<a href="https://github.com/asciidoctor/asciidoctor-pdf" target="_blank" rel="noopener">asciidoc-pdf</a>:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 1.检查ruby</span><br><span class="line">[jimo@jimo-pc blockchain]$ ruby -v</span><br><span class="line">ruby 2.4.2p198 (2017-09-14 revision 59899) [x86_64-linux]</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 2.检查gem</span><br><span class="line">[jimo@jimo-pc blockchain]$ gem -v</span><br><span class="line">2.6.13</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 3.安装</span><br><span class="line"><span class="meta">$</span> gem install asciidoctor-pdf --pre</span><br><span class="line">WARNING:  You don't have /home/jimo/.gem/ruby/2.4.0/bin in your PATH,</span><br><span class="line">	  gem executables will not run.</span><br><span class="line">Successfully installed asciidoctor-pdf-1.5.0.alpha.16</span><br><span class="line">invalid options: -ri</span><br><span class="line">(invalid options are ignored)</span><br><span class="line">Parsing documentation for asciidoctor-pdf-1.5.0.alpha.16</span><br><span class="line">Done installing documentation for asciidoctor-pdf after 0 seconds</span><br><span class="line">1 gem installed</span><br></pre></td></tr></table></figure></p>
-<p>可以看到有个警告,所以把路径/home/jimo/.gem/ruby/2.4.0/bin加到PATH就行了.</p>
-<p>然后转换:<br>直接转换失败了,先转成html,再用浏览器打印成pdf即可.</p>
-<p>进入源码目录:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc bitcoinbook-second_edition_print_1]$ asciidoctor book.asciidoc</span><br></pre></td></tr></table></figure></p>
-<p>更多问题可参考:<a href="https://github.com/bitcoinbook/bitcoinbook/issues/399" target="_blank" rel="noopener">https://github.com/bitcoinbook/bitcoinbook/issues/399</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="Asciidoc"><a href="#Asciidoc" class="headerlink" title="Asciidoc"></a>Asciidoc</h1><p>本文将要说明如何快速应对新知识的摄取方式.比如如何将Asciidoc转化为pdf.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/07/tools/001-asciidoc/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/07/tools/001-asciidoc/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjfz1kgak0036q6ka73qw3dy8" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
 
       </footer>
       </div>
@@ -1940,7 +1952,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1950,7 +1962,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sqlserver/" style="font-size: 11.25px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sqlserver/" style="font-size: 11.25px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1972,6 +1984,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/15/python/007-use-pandas/">pandas那些常用操作</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/14/db/002-sqlserver-datetime-to-constellation/">sqlserver中生日转星座</a>
           </li>
         
@@ -1985,10 +2001,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/03/python/006-python-warning/">python中的那些警告</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/02/cloudcompute/004-docker/">docker那些事-进入</a>
           </li>
         
       </ul>
