@@ -113,6 +113,7 @@ ga('send', 'pageview');
 <h1 id="pandas条件选择"><a href="#pandas条件选择" class="headerlink" title="pandas条件选择"></a>pandas条件选择</h1><p>针对选择某些值满足条件的行<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 大于90分为学霸</span></span><br><span class="line">good = marks[marks[<span class="string">'pmark'</span>]&gt;<span class="number">90</span>]</span><br></pre></td></tr></table></figure></p>
 <h1 id="去重"><a href="#去重" class="headerlink" title="去重"></a>去重</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop_duplicates.html" target="_blank" rel="noopener">官网</a>,<br>可以指定列,否则为全部列.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算学院挂科人数</span></span><br><span class="line">g = df[df[<span class="string">'pmark'</span>]&lt;<span class="number">60</span>].drop_duplicates(subset=[<span class="string">'student_id'</span>]).groupby(<span class="string">'sex'</span>,as_index=<span class="keyword">False</span>).agg(&#123;<span class="string">'pmark'</span>:<span class="string">'count'</span>&#125;)</span><br><span class="line">g.head()</span><br></pre></td></tr></table></figure></p>
 <h1 id="给pandas增加列"><a href="#给pandas增加列" class="headerlink" title="给pandas增加列"></a>给pandas增加列</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pandas.DataFrame.from_csv(<span class="string">'my_data.csv'</span>)  <span class="comment"># fake data</span></span><br><span class="line">df[<span class="string">'diff_A_B'</span>] = df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#or</span></span><br><span class="line">df2 = df.assign(diff_col=df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>])</span><br></pre></td></tr></table></figure>
+<p>更复杂一点,根据已有列且带有条件的生成:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">29</span>]:</span><br><span class="line">df[<span class="string">'points'</span>] = np.where( ( (df[<span class="string">'gender'</span>] == <span class="string">'male'</span>) &amp; (df[<span class="string">'pet1'</span>] == df[<span class="string">'pet2'</span>] ) ) | ( (df[<span class="string">'gender'</span>] == <span class="string">'female'</span>) &amp; (df[<span class="string">'pet1'</span>].isin([<span class="string">'cat'</span>,<span class="string">'dog'</span>] ) ) ), <span class="number">5</span>, <span class="number">0</span>)</span><br><span class="line">df</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">Out[29]:</span></span><br><span class="line"><span class="string">     gender      pet1      pet2  points</span></span><br><span class="line"><span class="string">0      male       dog       dog       5</span></span><br><span class="line"><span class="string">1      male       cat       cat       5</span></span><br><span class="line"><span class="string">2      male       dog       cat       0</span></span><br><span class="line"><span class="string">3    female       cat  squirrel       5</span></span><br><span class="line"><span class="string">4    female       dog       dog       5</span></span><br><span class="line"><span class="string">5    female  squirrel       cat       0</span></span><br><span class="line"><span class="string">6  squirrel       dog       cat       0</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 或则</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> x[<span class="string">'gender'</span>] == <span class="string">'male'</span> <span class="keyword">and</span> x[<span class="string">'pet1'</span>] == x[<span class="string">'pet2'</span>]: <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">elif</span> x[<span class="string">'gender'</span>] == <span class="string">'female'</span> <span class="keyword">and</span> (x[<span class="string">'pet1'</span>] == <span class="string">'cat'</span> <span class="keyword">or</span> x[<span class="string">'pet1'</span>] == <span class="string">'dog'</span>): <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">data[<span class="string">'points'</span>] = data.apply(f, axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
 
       
     </div> -->
@@ -150,7 +151,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjg1m1kml002mnxkazhe82fwp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjg29og2h002hj5ka6mqba8l2" class="article-share-link">
           Share
         </a>
         
@@ -227,7 +228,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjg1m1klk000jnxkaqlmo2aiq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjg29og1d000hj5kaowz27e40" class="article-share-link">
           Share
         </a>
         
@@ -305,7 +306,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjg1m1klj000hnxkardrup7sj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjg29og1c000gj5katdywftym" class="article-share-link">
           Share
         </a>
         
@@ -395,7 +396,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjg1m1klg000dnxkamggc31pa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjg29og1a000bj5kagak5dpi1" class="article-share-link">
           Share
         </a>
         
@@ -472,7 +473,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjg1m1kmj002jnxkau8ihzsln" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjg29og2g002ej5ka5aof9j3b" class="article-share-link">
           Share
         </a>
         
@@ -555,7 +556,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjg1m1kle000bnxkaoq2oq89l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjg29og180009j5kavkr7pofi" class="article-share-link">
           Share
         </a>
         
@@ -651,7 +652,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjg1m1kma001xnxka2htileed" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjg29og27001vj5kasl4hzm91" class="article-share-link">
           Share
         </a>
         
@@ -736,7 +737,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjg1m1klc0009nxkato3rtjbb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjg29og170008j5kalivsirqg" class="article-share-link">
           Share
         </a>
         
@@ -820,7 +821,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjg1m1klb0008nxka6uol15qb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjg29og130006j5kajbz7qb79" class="article-share-link">
           Share
         </a>
         
@@ -937,7 +938,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjg1m1km9001vnxkaha0dj2lu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjg29og26001sj5ka4hcp47nv" class="article-share-link">
           Share
         </a>
         
@@ -1014,7 +1015,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjg1m1klh000gnxkaidvyedah" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjg29og1b000dj5ka3n9creli" class="article-share-link">
           Share
         </a>
         
@@ -1127,7 +1128,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjg1m1kn2003mnxkawraw8wi8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjg29og31003jj5kapch5bzfp" class="article-share-link">
           Share
         </a>
         
@@ -1228,7 +1229,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjg1m1kla0006nxkabnfuqhc6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjg29og0z0005j5kati5mjc30" class="article-share-link">
           Share
         </a>
         
@@ -1314,7 +1315,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjg1m1kmj002hnxkasjb37g7w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjg29og2f002cj5kawovsxz35" class="article-share-link">
           Share
         </a>
         
@@ -1392,7 +1393,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjg1m1klu0011nxkaim8z5sxr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjg29og1p0010j5kav9yd5r9q" class="article-share-link">
           Share
         </a>
         
@@ -1467,7 +1468,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjg1m1klo000tnxkaut0sf7n3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjg29og1k000sj5kaez2i75bu" class="article-share-link">
           Share
         </a>
         
@@ -1561,7 +1562,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjg1m1kln000rnxkah7ol4ont" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjg29og1i000qj5kaooep1laq" class="article-share-link">
           Share
         </a>
         
@@ -1645,7 +1646,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjg1m1kln000pnxkaj8u54x26" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjg29og1i000pj5ka2zjw7svm" class="article-share-link">
           Share
         </a>
         
@@ -1721,7 +1722,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjg1m1klv0013nxkaxyp8yylu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjg29og1o000yj5ka3mjb1bbx" class="article-share-link">
           Share
         </a>
         
@@ -1771,6 +1772,7 @@ ga('send', 'pageview');
 <h1 id="列出文件夹内容"><a href="#列出文件夹内容" class="headerlink" title="列出文件夹内容"></a>列出文件夹内容</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: os.listdir(<span class="string">'./'</span>)</span><br><span class="line">Out[<span class="number">2</span>]: </span><br><span class="line">[<span class="string">'0307_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0307_links.txt'</span>,</span><br><span class="line"> <span class="string">'0901_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0901_links.txt'</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
 <h1 id="sorted函数"><a href="#sorted函数" class="headerlink" title="sorted函数"></a>sorted函数</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">4</span>]: l = [&#123;<span class="string">'a'</span>:<span class="number">1</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">4</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line">Out[<span class="number">5</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure>
 <p>注意,这并不会改变原有列表:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">6</span>]: l</span><br><span class="line">Out[<span class="number">6</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: l = sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: l</span><br><span class="line">Out[<span class="number">8</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure></p>
+<h1 id="修改dict的key值"><a href="#修改dict的key值" class="headerlink" title="修改dict的key值"></a>修改dict的key值</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: d = &#123;<span class="string">'女'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: d[<span class="string">'female'</span>] = d.pop(<span class="string">'女'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: d</span><br><span class="line">Out[<span class="number">3</span>]: &#123;<span class="string">'female'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div> -->
@@ -1808,7 +1810,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjg1m1kmi002fnxkaiqvo1nby" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjg29og2e002aj5kavt2ihuey" class="article-share-link">
           Share
         </a>
         
