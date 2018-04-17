@@ -84,6 +84,94 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/004-python-common-use" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/12/python/004-python-common-use/" class="article-date">
+  <time datetime="2018-03-12T02:36:29.000Z" itemprop="datePublished">2018-03-12</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/12/python/004-python-common-use/">python中的常用操作</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>真的很常用诶.</p>
+<h1 id="对dict排序"><a href="#对dict排序" class="headerlink" title="对dict排序"></a>对dict排序</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># regular unsorted dictionary</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;<span class="string">'banana'</span>: <span class="number">3</span>, <span class="string">'apple'</span>:<span class="number">4</span>, <span class="string">'pear'</span>: <span class="number">1</span>, <span class="string">'orange'</span>: <span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># dictionary sorted by key -- OrderedDict(sorted(d.items()) also works</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>OrderedDict(sorted(d.items(), key=<span class="keyword">lambda</span> t: t[<span class="number">0</span>]))</span><br><span class="line">OrderedDict([(<span class="string">'apple'</span>, <span class="number">4</span>), (<span class="string">'banana'</span>, <span class="number">3</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'pear'</span>, <span class="number">1</span>)])</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># dictionary sorted by value</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>OrderedDict(sorted(d.items(), key=<span class="keyword">lambda</span> t: t[<span class="number">1</span>]))</span><br><span class="line">OrderedDict([(<span class="string">'pear'</span>, <span class="number">1</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'banana'</span>, <span class="number">3</span>), (<span class="string">'apple'</span>, <span class="number">4</span>)])</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># dictionary sorted by length of the key string</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>OrderedDict(sorted(d.items(), key=<span class="keyword">lambda</span> t: len(t[<span class="number">0</span>])))</span><br><span class="line">OrderedDict([(<span class="string">'pear'</span>, <span class="number">1</span>), (<span class="string">'apple'</span>, <span class="number">4</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'banana'</span>, <span class="number">3</span>)])</span><br></pre></td></tr></table></figure>
+<p>简单点:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">d = &#123;<span class="number">2</span>:<span class="number">3</span>, <span class="number">1</span>:<span class="number">89</span>, <span class="number">4</span>:<span class="number">5</span>, <span class="number">3</span>:<span class="number">0</span>&#125;</span><br><span class="line">sd = sorted(d.items())</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> sd:</span><br><span class="line">    <span class="keyword">print</span> k, v</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">1 89</span></span><br><span class="line"><span class="string">2 3</span></span><br><span class="line"><span class="string">3 0</span></span><br><span class="line"><span class="string">4 5</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="统计list中元素个数"><a href="#统计list中元素个数" class="headerlink" title="统计list中元素个数"></a>统计list中元素个数</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">34</span>,<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">1</span>,<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: Counter(a)</span><br><span class="line">Out[<span class="number">3</span>]: Counter(&#123;<span class="number">1</span>: <span class="number">3</span>, <span class="number">2</span>: <span class="number">2</span>, <span class="number">3</span>: <span class="number">1</span>, <span class="number">5</span>: <span class="number">1</span>, <span class="number">6</span>: <span class="number">1</span>, <span class="number">34</span>: <span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+<h1 id="那些解析"><a href="#那些解析" class="headerlink" title="那些解析"></a>那些解析</h1><p>解析json字符串<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">j = json.loads(<span class="string">'&#123;"one" : "1", "two" : "2", "three" : "3"&#125;'</span>)</span><br><span class="line"><span class="keyword">print</span> j[<span class="string">'two'</span>]</span><br></pre></td></tr></table></figure></p>
+<p>写入和读取python数据结构到文件:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Writing JSON data</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'data.json'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    json.dump(data, f)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Reading data back</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'data.json'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    data = json.load(f)</span><br></pre></td></tr></table></figure></p>
+<p>对于中文,如果想写入文件时不进行编码,可以指定ensure_ascii=False<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">json.dump(obj,f,ensure_ascii=<span class="keyword">False</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="python里计时"><a href="#python里计时" class="headerlink" title="python里计时"></a>python里计时</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">start = time.time()</span><br><span class="line">print(<span class="string">"hello"</span>)</span><br><span class="line">end = time.time()</span><br><span class="line">print(end - start)</span><br></pre></td></tr></table></figure>
+<h1 id="slice-dict"><a href="#slice-dict" class="headerlink" title="slice dict"></a>slice dict</h1><p>dict本来不能像list那样slice,但itertools可以:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">14</span>]: a = &#123;<span class="string">'a'</span>:<span class="number">1</span>,<span class="string">'b'</span>:<span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">15</span>]: a[:]</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">TypeError                                 Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-15</span><span class="number">-6</span>ced218e2c37&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 a[:]</span><br><span class="line"></span><br><span class="line">TypeError: unhashable type: <span class="string">'slice'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">16</span>]: <span class="keyword">import</span> itertools</span><br><span class="line"></span><br><span class="line">In [<span class="number">17</span>]: dict(itertools.islice(a.items(),<span class="number">1</span>))</span><br><span class="line">Out[<span class="number">17</span>]: &#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="检查NAN"><a href="#检查NAN" class="headerlink" title="检查NAN"></a>检查NAN</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> math</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x=float(<span class="string">'nan'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>math.isnan(x)</span><br><span class="line"><span class="keyword">True</span></span><br></pre></td></tr></table></figure>
+<h1 id="快速清除文件内容"><a href="#快速清除文件内容" class="headerlink" title="快速清除文件内容"></a>快速清除文件内容</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open(<span class="string">'file.txt'</span>,<span class="string">'w).close()</span></span><br></pre></td></tr></table></figure>
+<h1 id="列出文件夹内容"><a href="#列出文件夹内容" class="headerlink" title="列出文件夹内容"></a>列出文件夹内容</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: os.listdir(<span class="string">'./'</span>)</span><br><span class="line">Out[<span class="number">2</span>]: </span><br><span class="line">[<span class="string">'0307_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0307_links.txt'</span>,</span><br><span class="line"> <span class="string">'0901_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0901_links.txt'</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h1 id="sorted函数"><a href="#sorted函数" class="headerlink" title="sorted函数"></a>sorted函数</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">4</span>]: l = [&#123;<span class="string">'a'</span>:<span class="number">1</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">4</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line">Out[<span class="number">5</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure>
+<p>注意,这并不会改变原有列表:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">6</span>]: l</span><br><span class="line">Out[<span class="number">6</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: l = sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: l</span><br><span class="line">Out[<span class="number">8</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure></p>
+<h1 id="修改dict的key值"><a href="#修改dict的key值" class="headerlink" title="修改dict的key值"></a>修改dict的key值</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: d = &#123;<span class="string">'女'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: d[<span class="string">'female'</span>] = d.pop(<span class="string">'女'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: d</span><br><span class="line">Out[<span class="number">3</span>]: &#123;<span class="string">'female'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>真的很常用诶.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/12/python/004-python-common-use/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/12/python/004-python-common-use/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjg31ive7002cajkasfp7jdn4" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-elasticsearch/001-cluster-explore" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/11/elasticsearch/001-cluster-explore/" class="article-date">
@@ -163,7 +251,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjg29og1h000oj5kavyx1osa7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjg31ivda000pajka2c44yoq3" class="article-share-link">
           Share
         </a>
         
@@ -248,7 +336,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjg29og1e000jj5kacledtvhg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjg31ivd9000oajkakj1uftai" class="article-share-link">
           Share
         </a>
         
@@ -344,7 +432,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjg29og1s0018j5ka9diww3hp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjg31ivdp001dajkafzdjbxdk" class="article-share-link">
           Share
         </a>
         
@@ -423,7 +511,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjg29og0u0002j5kaf1sf4vx3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjg31ivcr0004ajkayj0tnyc5" class="article-share-link">
           Share
         </a>
         
@@ -502,7 +590,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjg29og1r0015j5kat443fvo9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjg31ivdn0018ajkakisx3rth" class="article-share-link">
           Share
         </a>
         
@@ -586,7 +674,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjg29og1q0013j5kajb4ua4f9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjg31ivdl0015ajka8uz3eavz" class="article-share-link">
           Share
         </a>
         
@@ -664,7 +752,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjg29og30003ij5kamcjnqo92" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjg31ivgm0063ajka9qebht21" class="article-share-link">
           Share
         </a>
         
@@ -747,7 +835,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjg29og2y003fj5ka5helyi6r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjg31ivgg005wajkatc6pvlad" class="article-share-link">
           Share
         </a>
         
@@ -837,7 +925,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjg29og2x003ej5kaoy9xmzm1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjg31ivgl0061ajka4wdd1ysv" class="article-share-link">
           Share
         </a>
         
@@ -931,7 +1019,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjg29og2d0027j5ka1v2nfnh9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjg31ive6002aajka9vd3e08k" class="article-share-link">
           Share
         </a>
         
@@ -1012,7 +1100,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjg29og0x0004j5ka6r74ya3o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjg31ivct0005ajka6oe4okj1" class="article-share-link">
           Share
         </a>
         
@@ -1102,7 +1190,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjg29og24001qj5kanpl14qpi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjg31ivdx001tajkaiqlb954p" class="article-share-link">
           Share
         </a>
         
@@ -1181,7 +1269,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjg29og2i002jj5kadvlcz2zu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjg31ived002rajkazjzkmy9g" class="article-share-link">
           Share
         </a>
         
@@ -1270,7 +1358,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjg29og45007cj5kadasla6ag" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjg31ivcn0002ajkap283twdj" class="article-share-link">
           Share
         </a>
         
@@ -1352,7 +1440,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjg29og2c0025j5kax0mo2za7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjg31ive40027ajkap8u39p6o" class="article-share-link">
           Share
         </a>
         
@@ -1442,7 +1530,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjg29og2w003bj5ka6tnr8sdf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjg31ivge005tajka1tr04lqp" class="article-share-link">
           Share
         </a>
         
@@ -1675,7 +1763,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjg29og2v0039j5kaltr60lqh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjg31ivgd005rajkax5ybnnai" class="article-share-link">
           Share
         </a>
         
@@ -1755,7 +1843,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjg29og0q0001j5ka8j4ohaet" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjg31ivck0001ajkaysb4yygp" class="article-share-link">
           Share
         </a>
         
@@ -1841,91 +1929,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjg29og2u0036j5kawl803vwl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjg31ivgb005oajkatxdusyzs" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-hadoop/000-config-environment" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/hadoop/000-config-environment/" class="article-date">
-  <time datetime="2018-01-10T08:57:35.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/hadoop/000-config-environment/">配置hadoop环境变量</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="http://ftp.cuhk.edu.hk/pub/packages/apache.org/hadoop/common/current/hadoop-3.0.0.tar.gz" target="_blank" rel="noopener">下载</a><br>完后的hadoop需要配置各个组件的的环境变量.</p>
-<p>参考<a href="https://wiki.apache.org/hadoop/HowToSetupYourDevelopmentEnvironment" target="_blank" rel="noopener">wiki-hadoop</a></p>
-<h1 id="在linux中"><a href="#在linux中" class="headerlink" title="在linux中"></a>在linux中</h1><p>一般作为开发环境才需要配置.</p>
-<p>以前是这样,打开.bashrc或者.bash_profile<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_COMMON_HOME=xxx/hadoop-2.9.0/share/hadoop/common</span><br><span class="line">export HADOOP_HDFS_HOME=xxx/hadoop-2.9.0/share/hadoop/hdfs</span><br><span class="line">export HADOOP_MAPRED_HOME=xxx/hadoop-2.9.0/share/hadoop/mapreduce</span><br><span class="line">export HADOOP_YARN_HOME=xxx/hadoop-2.9.0/share/hadoop/yarn</span><br><span class="line">export PATH=$HADOOP_COMMON_HOME/bin:$HADOOP_HDFS_HOME/bin:$HADOOP_MAPRED_HOME/bin:$PATH</span><br></pre></td></tr></table></figure></p>
-<p>但是如果并没有安装hadoop,而只是下载了源码,其实那几个命令都在hadoop/bin下了,所以只需要配:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME=/home/jimo/workspace/temp/hadoop/hadoop-3.0.0</span><br><span class="line">export PATH=$HADOOP_HOME/bin:$PATH</span><br></pre></td></tr></table></figure></p>
-<h1 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h1><p><a href="https://wiki.apache.org/hadoop/HadoopUnderIDEA" target="_blank" rel="noopener">配置IDEA的Hadoop开发环境</a><br><a href="https://wiki.apache.org/hadoop/EclipseEnvironment" target="_blank" rel="noopener">配置Eclipse的Hadoop开发环境</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p><a href="http://ftp.cuhk.edu.hk/pub/packages/apache.org/hadoop/common/current/hadoop-3.0.0.tar.gz" target="_blank" rel="noopener">下载</a><br>完后的hadoop需要配置各个组件的的环境变量.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/10/hadoop/000-config-environment/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/10/hadoop/000-config-environment/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjg29og1m000vj5kawxzltv0y" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
 
       </footer>
       </div>
@@ -1984,6 +1993,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/17/python/008-python-error/">python中的常见错误</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/15/python/007-use-pandas/">pandas那些常用操作</a>
           </li>
         
@@ -1997,10 +2010,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/05/cloudcompute/005-docker/">docker那些事-swarm</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/03/python/006-python-warning/">python中的那些警告</a>
           </li>
         
       </ul>
