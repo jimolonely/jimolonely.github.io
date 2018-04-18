@@ -18,18 +18,20 @@ ga('send', 'pageview');
 
 
   
-  <title>Tag: centos | 在我的世界</title>
+  <title>sql中最重要的原理 | 在我的世界</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="who,where,what">
-<meta property="og:type" content="website">
-<meta property="og:title" content="在我的世界">
-<meta property="og:url" content="http://http://jimolonely.github.io/tags/centos/index.html">
+  <meta name="description" content="经过时间的沉淀和项目的练习,才知道哪些关键sql原理不得不知. sql的执行顺序 from子句组装来自不同数据源的数据； where子句基于指定的条件对记录行进行筛选； group by子句将数据划分为多个分组； 使用聚集函数进行计算； 使用having子句筛选分组； 计算所有的表达式； select 的字段； 使用order by对结果集进行排序。123456789(8)SELECT (9) D">
+<meta name="keywords" content="sql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql中最重要的原理">
+<meta property="og:url" content="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/index.html">
 <meta property="og:site_name" content="在我的世界">
-<meta property="og:description" content="who,where,what">
+<meta property="og:description" content="经过时间的沉淀和项目的练习,才知道哪些关键sql原理不得不知. sql的执行顺序 from子句组装来自不同数据源的数据； where子句基于指定的条件对记录行进行筛选； group by子句将数据划分为多个分组； 使用聚集函数进行计算； 使用having子句筛选分组； 计算所有的表达式； select 的字段； 使用order by对结果集进行排序。123456789(8)SELECT (9) D">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-18T02:22:02.252Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在我的世界">
-<meta name="twitter:description" content="who,where,what">
+<meta name="twitter:title" content="sql中最重要的原理">
+<meta name="twitter:description" content="经过时间的沉淀和项目的练习,才知道哪些关键sql原理不得不知. sql的执行顺序 from子句组装来自不同数据源的数据； where子句基于指定的条件对记录行进行筛选； group by子句将数据划分为多个分组； 使用聚集函数进行计算； 使用having子句筛选分组； 计算所有的表达式； select 的字段； 使用order by对结果集进行排序。123456789(8)SELECT (9) D">
   
     <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
   
@@ -82,40 +84,90 @@ ga('send', 'pageview');
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2018/03/30/cloudcompute/002-packstack/" class="archive-article-date">
-  <time datetime="2018-03-30T04:49:34.000Z" itemprop="datePublished">3月 30</time>
+        <section id="main"><article id="post-db/003-sql-must-know" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/18/db/003-sql-must-know/" class="article-date">
+  <time datetime="2018-04-18T02:17:02.000Z" itemprop="datePublished">2018-04-18</time>
 </a>
       
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
+    <h1 class="article-title" itemprop="name">
+      sql中最重要的原理
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>经过时间的沉淀和项目的练习,才知道哪些关键sql原理不得不知.</p>
+<h1 id="sql的执行顺序"><a href="#sql的执行顺序" class="headerlink" title="sql的执行顺序"></a>sql的执行顺序</h1><ol>
+<li>from子句组装来自不同数据源的数据；</li>
+<li>where子句基于指定的条件对记录行进行筛选；</li>
+<li>group by子句将数据划分为多个分组；</li>
+<li>使用聚集函数进行计算；</li>
+<li>使用having子句筛选分组；</li>
+<li>计算所有的表达式；</li>
+<li>select 的字段；</li>
+<li>使用order by对结果集进行排序。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(8)SELECT (9) DISTINCT (11) &lt;TOP_specification&gt; &lt;select_list&gt;</span><br><span class="line">(1) FROM &lt;left_table&gt;</span><br><span class="line">(3) &lt;join_type&gt; JOIN &lt;right_table&gt;</span><br><span class="line">(2) ON &lt;join_condition&gt;</span><br><span class="line">(4) WHERE &lt;where_condition&gt;</span><br><span class="line">(5) GROUP BY &lt;group_by_list&gt;</span><br><span class="line">(6) WITH &#123;CUBE | ROLLUP&#125;</span><br><span class="line">(7) HAVING &lt;having_condition&gt;</span><br><span class="line">(10) ORDER BY &lt;order_by_list&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
 
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                                                
+                                                    
+                                                      
+                                                        <p>经过时间的沉淀和项目的练习,才知道哪些关键sql原理不得不知.</p>
+<h1 id="sql的执行顺序"><a href="#sql的执行顺序" class="headerlink" title="sql的执行顺序"></a>sql的执行顺序</h1><ol>
+<li>from子句组装来自不同数据源的数据；</li>
+<li>where子句基于指定的条件对记录行进行筛选；</li>
+<li>group by子句将数据划分为多个分组；</li>
+<li>使用聚集函数进行计算；</li>
+<li>使用having子句筛选分组；</li>
+<li>计算所有的表达式；</li>
+<li>select 的字段；</li>
+<li>使用order by对结果集进行排序。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(8)SELECT (9) DISTINCT (11) &lt;TOP_specification&gt; &lt;select_list&gt;</span><br><span class="line">(1) FROM &lt;left_table&gt;</span><br><span class="line">(3) &lt;join_type&gt; JOIN &lt;right_table&gt;</span><br><span class="line">(2) ON &lt;join_condition&gt;</span><br><span class="line">(4) WHERE &lt;where_condition&gt;</span><br><span class="line">(5) GROUP BY &lt;group_by_list&gt;</span><br><span class="line">(6) WITH &#123;CUBE | ROLLUP&#125;</span><br><span class="line">(7) HAVING &lt;having_condition&gt;</span><br><span class="line">(10) ORDER BY &lt;order_by_list&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+          </div>
+          
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjg4h1pjb000lmqkafggk9dyg" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sql/">sql</a></li></ul>
+
+      </footer>
+      </div>
+      
+        
+<nav id="article-nav">
+  
+  
+    <a href="/2018/04/17/python/008-python-error/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">python中的常见错误</div>
+    </a>
+  
+</nav>
+
+          
+</article>
 
 </section>
         
