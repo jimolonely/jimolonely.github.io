@@ -156,7 +156,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjganz2nw000hd0kadfs92jiq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjgaqt69c000lnwka4318zf4r" class="article-share-link">
           Share
         </a>
         
@@ -231,7 +231,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/17/python/008-python-error/" data-id="cjganz2ov002id0ka2rbom83i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/17/python/008-python-error/" data-id="cjgaqt6ad002onwkazs1nw13g" class="article-share-link">
           Share
         </a>
         
@@ -276,6 +276,8 @@ ga('send', 'pageview');
 <h1 id="去重"><a href="#去重" class="headerlink" title="去重"></a>去重</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop_duplicates.html" target="_blank" rel="noopener">官网</a>,<br>可以指定列,否则为全部列.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算学院挂科人数</span></span><br><span class="line">g = df[df[<span class="string">'pmark'</span>]&lt;<span class="number">60</span>].drop_duplicates(subset=[<span class="string">'student_id'</span>]).groupby(<span class="string">'sex'</span>,as_index=<span class="keyword">False</span>).agg(&#123;<span class="string">'pmark'</span>:<span class="string">'count'</span>&#125;)</span><br><span class="line">g.head()</span><br></pre></td></tr></table></figure></p>
 <h1 id="给pandas增加列"><a href="#给pandas增加列" class="headerlink" title="给pandas增加列"></a>给pandas增加列</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pandas.DataFrame.from_csv(<span class="string">'my_data.csv'</span>)  <span class="comment"># fake data</span></span><br><span class="line">df[<span class="string">'diff_A_B'</span>] = df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#or</span></span><br><span class="line">df2 = df.assign(diff_col=df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>])</span><br></pre></td></tr></table></figure>
 <p>更复杂一点,根据已有列且带有条件的生成:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">29</span>]:</span><br><span class="line">df[<span class="string">'points'</span>] = np.where( ( (df[<span class="string">'gender'</span>] == <span class="string">'male'</span>) &amp; (df[<span class="string">'pet1'</span>] == df[<span class="string">'pet2'</span>] ) ) | ( (df[<span class="string">'gender'</span>] == <span class="string">'female'</span>) &amp; (df[<span class="string">'pet1'</span>].isin([<span class="string">'cat'</span>,<span class="string">'dog'</span>] ) ) ), <span class="number">5</span>, <span class="number">0</span>)</span><br><span class="line">df</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">Out[29]:</span></span><br><span class="line"><span class="string">     gender      pet1      pet2  points</span></span><br><span class="line"><span class="string">0      male       dog       dog       5</span></span><br><span class="line"><span class="string">1      male       cat       cat       5</span></span><br><span class="line"><span class="string">2      male       dog       cat       0</span></span><br><span class="line"><span class="string">3    female       cat  squirrel       5</span></span><br><span class="line"><span class="string">4    female       dog       dog       5</span></span><br><span class="line"><span class="string">5    female  squirrel       cat       0</span></span><br><span class="line"><span class="string">6  squirrel       dog       cat       0</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 或则</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> x[<span class="string">'gender'</span>] == <span class="string">'male'</span> <span class="keyword">and</span> x[<span class="string">'pet1'</span>] == x[<span class="string">'pet2'</span>]: <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">elif</span> x[<span class="string">'gender'</span>] == <span class="string">'female'</span> <span class="keyword">and</span> (x[<span class="string">'pet1'</span>] == <span class="string">'cat'</span> <span class="keyword">or</span> x[<span class="string">'pet1'</span>] == <span class="string">'dog'</span>): <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">data[<span class="string">'points'</span>] = data.apply(f, axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="重点学习groupby-apply"><a href="#重点学习groupby-apply" class="headerlink" title="重点学习groupby.apply()"></a>重点学习groupby.apply()</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.apply.html" target="_blank" rel="noopener">API</a></p>
+<p>例子1:将学生成绩数据按学号分组后把所有课程分数放在一个list里,再转为dict<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list).to_dict()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;'001':[100,90,80],'002':[90,90,90]...&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># or 直接转为list,返回二维数组</span></span><br><span class="line">list(dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list))</span><br></pre></td></tr></table></figure></p>
 
       
     </div> -->
@@ -313,7 +315,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjganz2ou002gd0kadudua4bg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjgaqt6ac002mnwka80gn6dxp" class="article-share-link">
           Share
         </a>
         
@@ -390,7 +392,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjganz2nu000gd0kavjg9fjyd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjgaqt69c000jnwkaz8bmpt37" class="article-share-link">
           Share
         </a>
         
@@ -468,7 +470,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjganz2nt000dd0kauazo39dg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjgaqt69a000hnwka0w1bcoyu" class="article-share-link">
           Share
         </a>
         
@@ -558,7 +560,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjganz2nq0009d0ka6vgajpwe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjgaqt697000dnwkasdgv0x3x" class="article-share-link">
           Share
         </a>
         
@@ -635,7 +637,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjganz2ot002dd0kaathrilcj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjgaqt6ab002jnwkar0s2vzkk" class="article-share-link">
           Share
         </a>
         
@@ -718,7 +720,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjganz2nm0008d0ka0g2ayxiy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjgaqt695000bnwkar80bu0j3" class="article-share-link">
           Share
         </a>
         
@@ -814,7 +816,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjganz2ol001ud0ka040zqrgh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjgaqt6a20020nwkar3hhttfk" class="article-share-link">
           Share
         </a>
         
@@ -899,7 +901,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjganz2ni0006d0kabxmzsgbz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjgaqt6930009nwka65zdpeyu" class="article-share-link">
           Share
         </a>
         
@@ -983,7 +985,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjganz2ng0005d0kajvsyk9ua" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjgaqt6910008nwka4k85p89c" class="article-share-link">
           Share
         </a>
         
@@ -1100,7 +1102,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjganz2ok001rd0ka2w9qmt08" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjgaqt6a1001xnwka671vz095" class="article-share-link">
           Share
         </a>
         
@@ -1177,7 +1179,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjganz2nt000bd0ka1b74gn77" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjgaqt699000gnwkahsn24ucj" class="article-share-link">
           Share
         </a>
         
@@ -1290,7 +1292,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjganz2pg003nd0kajn0hcuzl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjgaqt6ay003rnwkajdb8l42a" class="article-share-link">
           Share
         </a>
         
@@ -1391,7 +1393,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjganz2ne0004d0kap37f269k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjgaqt68z0006nwkan9roeope" class="article-share-link">
           Share
         </a>
         
@@ -1477,7 +1479,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjganz2os002bd0ka1tk7d56k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjgaqt6aa002hnwka5niq9gsk" class="article-share-link">
           Share
         </a>
         
@@ -1555,7 +1557,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjganz2o70011d0ka8w4f8r7s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjgaqt69n0015nwkawxsf2ulq" class="article-share-link">
           Share
         </a>
         
@@ -1630,7 +1632,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjganz2o2000rd0kasrdncl83" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjgaqt69i000xnwkaxwgilye1" class="article-share-link">
           Share
         </a>
         
@@ -1724,7 +1726,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjganz2o1000od0ka433v3pqn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjgaqt69h000vnwkabt62nxd7" class="article-share-link">
           Share
         </a>
         
@@ -1808,7 +1810,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjganz2ny000ld0kaosbcsymk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjgaqt69g000tnwkamoagqd6a" class="article-share-link">
           Share
         </a>
         
