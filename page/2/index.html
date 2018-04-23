@@ -146,7 +146,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjgaqt69m0013nwkagx3j32zh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjgbpvil1001697kavo27dctq" class="article-share-link">
           Share
         </a>
         
@@ -193,7 +193,8 @@ ga('send', 'pageview');
 <h1 id="slice-dict"><a href="#slice-dict" class="headerlink" title="slice dict"></a>slice dict</h1><p>dict本来不能像list那样slice,但itertools可以:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">14</span>]: a = &#123;<span class="string">'a'</span>:<span class="number">1</span>,<span class="string">'b'</span>:<span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">15</span>]: a[:]</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">TypeError                                 Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-15</span><span class="number">-6</span>ced218e2c37&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 a[:]</span><br><span class="line"></span><br><span class="line">TypeError: unhashable type: <span class="string">'slice'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">16</span>]: <span class="keyword">import</span> itertools</span><br><span class="line"></span><br><span class="line">In [<span class="number">17</span>]: dict(itertools.islice(a.items(),<span class="number">1</span>))</span><br><span class="line">Out[<span class="number">17</span>]: &#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure></p>
 <h1 id="检查NAN"><a href="#检查NAN" class="headerlink" title="检查NAN"></a>检查NAN</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> math</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x=float(<span class="string">'nan'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>math.isnan(x)</span><br><span class="line"><span class="keyword">True</span></span><br></pre></td></tr></table></figure>
 <h1 id="快速清除文件内容"><a href="#快速清除文件内容" class="headerlink" title="快速清除文件内容"></a>快速清除文件内容</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open(<span class="string">'file.txt'</span>,<span class="string">'w).close()</span></span><br></pre></td></tr></table></figure>
-<h1 id="列出文件夹内容"><a href="#列出文件夹内容" class="headerlink" title="列出文件夹内容"></a>列出文件夹内容</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: os.listdir(<span class="string">'./'</span>)</span><br><span class="line">Out[<span class="number">2</span>]: </span><br><span class="line">[<span class="string">'0307_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0307_links.txt'</span>,</span><br><span class="line"> <span class="string">'0901_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0901_links.txt'</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h1 id="列出文件夹内容与正则过滤"><a href="#列出文件夹内容与正则过滤" class="headerlink" title="列出文件夹内容与正则过滤"></a>列出文件夹内容与正则过滤</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: os.listdir(<span class="string">'./'</span>)</span><br><span class="line">Out[<span class="number">2</span>]: </span><br><span class="line">[<span class="string">'0307_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0307_links.txt'</span>,</span><br><span class="line"> <span class="string">'0901_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0901_links.txt'</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>其实python提供有过滤的库函数fnmatch,glob等<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">path = <span class="string">"/home/relation-data-2015/"</span></span><br><span class="line">files = fnmatch.filter(os.listdir(path),<span class="string">'*_single_links.txt'</span>)</span><br><span class="line">files</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">['0101_single_links.txt',</span></span><br><span class="line"><span class="string"> '0901_single_links.txt',</span></span><br><span class="line"><span class="string"> '0201_single_links.txt',</span></span><br><span class="line"><span class="string"> '0307_single_links.txt',</span></span><br><span class="line"><span class="string"> '0402_single_links.txt',</span></span><br><span class="line"><span class="string"> '0215_single_links.txt',</span></span><br><span class="line"><span class="string"> '0408_single_links.txt',</span></span><br><span class="line"><span class="string"> '0501_single_links.txt']</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
 <h1 id="sorted函数"><a href="#sorted函数" class="headerlink" title="sorted函数"></a>sorted函数</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">4</span>]: l = [&#123;<span class="string">'a'</span>:<span class="number">1</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">4</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line">Out[<span class="number">5</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure>
 <p>注意,这并不会改变原有列表:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">6</span>]: l</span><br><span class="line">Out[<span class="number">6</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: l = sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: l</span><br><span class="line">Out[<span class="number">8</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure></p>
 <h1 id="修改dict的key值"><a href="#修改dict的key值" class="headerlink" title="修改dict的key值"></a>修改dict的key值</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: d = &#123;<span class="string">'女'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: d[<span class="string">'female'</span>] = d.pop(<span class="string">'女'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: d</span><br><span class="line">Out[<span class="number">3</span>]: &#123;<span class="string">'female'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br></pre></td></tr></table></figure>
@@ -235,7 +236,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjgaqt6a9002fnwka6eys5wgh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjgbpvilp002h97kae68kvoh5" class="article-share-link">
           Share
         </a>
         
@@ -328,7 +329,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjgaqt69f000rnwkayd7fze3i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjgbpvikt000r97kapj8k0o6q" class="article-share-link">
           Share
         </a>
         
@@ -413,7 +414,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjgaqt69e000pnwkaq1aswdlt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjgbpviks000q97kakfl32al0" class="article-share-link">
           Share
         </a>
         
@@ -509,7 +510,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjgaqt69s001dnwkay8q7dq2r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjgbpvil6001e97kag7t9g2mu" class="article-share-link">
           Share
         </a>
         
@@ -588,7 +589,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjgaqt68x0004nwkaouab3inc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjgbpvikg000997kaf46dsvlx" class="article-share-link">
           Share
         </a>
         
@@ -667,7 +668,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjgaqt69q001anwkajrc7paqp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjgbpvil4001b97ka6f6gszyu" class="article-share-link">
           Share
         </a>
         
@@ -751,7 +752,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjgaqt69p0018nwkarovp3xu4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjgbpvil3001997kap3gb4k7z" class="article-share-link">
           Share
         </a>
         
@@ -829,7 +830,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjgaqt6ax003pnwka4hj9fcjd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjgbpvimf003r97kah279lhlw" class="article-share-link">
           Share
         </a>
         
@@ -912,7 +913,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjgaqt6aw003nnwka41pwgvco" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjgbpvimd003o97ka0hseso3z" class="article-share-link">
           Share
         </a>
         
@@ -1002,7 +1003,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjgaqt6au003lnwkal9odbrjr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjgbpvime003q97kaj5p9h6b7" class="article-share-link">
           Share
         </a>
         
@@ -1096,7 +1097,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjgaqt6a8002cnwka6swcpb0l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjgbpvill002997ka7u3aj0of" class="article-share-link">
           Share
         </a>
         
@@ -1177,7 +1178,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjgaqt68y0005nwka8aj3zczi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjgbpviki000b97kalbcl5ex1" class="article-share-link">
           Share
         </a>
         
@@ -1267,7 +1268,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjgaqt6a0001vnwkapn4r4zg3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjgbpvile001u97ka40j3llad" class="article-share-link">
           Share
         </a>
         
@@ -1346,7 +1347,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjgaqt6af002rnwka9k6hvj76" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjgbpvilj002497kas32ssk2l" class="article-share-link">
           Share
         </a>
         
@@ -1435,7 +1436,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjgaqt68t0002nwkaakf8uf9s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjgbpvikf000897ka9vgve1im" class="article-share-link">
           Share
         </a>
         
@@ -1517,7 +1518,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjgaqt6a7002anwkasoh4lsgm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjgbpvilo002e97kab00jwvia" class="article-share-link">
           Share
         </a>
         
@@ -1607,7 +1608,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjgaqt6at003jnwka2rde94os" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjgbpvimc003m97ka68qvmp6c" class="article-share-link">
           Share
         </a>
         
@@ -1840,7 +1841,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjgaqt6aq003hnwkadpgbixfo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjgbpvimb003k97ka931nvwjh" class="article-share-link">
           Share
         </a>
         
@@ -1920,7 +1921,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjgaqt68p0001nwka97zsbus3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjgbpvikd000697ka6qdathjh" class="article-share-link">
           Share
         </a>
         
