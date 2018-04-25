@@ -156,7 +156,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjgbpvika000497ka9e7hzn0n" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjgesnb21000gykka2nqct522" class="article-share-link">
           Share
         </a>
         
@@ -195,6 +195,8 @@ ga('send', 'pageview');
         <p>python中的常见错误.</p>
 <h1 id="TypeError-Object-of-type-‘int64’-is-not-JSON-serializable"><a href="#TypeError-Object-of-type-‘int64’-is-not-JSON-serializable" class="headerlink" title="TypeError: Object of type ‘int64’ is not JSON serializable"></a>TypeError: Object of type ‘int64’ is not JSON serializable</h1><p>一般这是numpy的int类型无法被json化,所以需要将numpy的int转为原生类型.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># pandas返回的</span></span><br><span class="line">sex_cnt = marks[<span class="string">'sex'</span>].value_counts()</span><br><span class="line">type(sex_cnt[<span class="string">'男'</span>]) <span class="comment"># numpy.int64</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3种转化方法</span></span><br><span class="line"><span class="comment"># examples using a.item()</span></span><br><span class="line">type(np.float32(<span class="number">0</span>).item()) <span class="comment"># &lt;type 'float'&gt;</span></span><br><span class="line">type(np.float64(<span class="number">0</span>).item()) <span class="comment"># &lt;type 'float'&gt;</span></span><br><span class="line">type(np.uint32(<span class="number">0</span>).item())  <span class="comment"># &lt;type 'long'&gt;</span></span><br><span class="line"><span class="comment"># examples using np.asscalar(a)</span></span><br><span class="line">type(np.asscalar(np.int16(<span class="number">0</span>)))   <span class="comment"># &lt;type 'int'&gt;</span></span><br><span class="line">type(np.asscalar(np.cfloat(<span class="number">0</span>)))  <span class="comment"># &lt;type 'complex'&gt;</span></span><br><span class="line">type(np.asscalar(np.datetime64(<span class="number">0</span>, <span class="string">'D'</span>)))  <span class="comment"># &lt;type 'datetime.datetime'&gt;</span></span><br><span class="line">type(np.asscalar(np.timedelta64(<span class="number">0</span>, <span class="string">'D'</span>))) <span class="comment"># &lt;type 'datetime.timedelta'&gt;</span></span><br><span class="line"><span class="comment"># 强制转化</span></span><br><span class="line">int(np.int64(<span class="number">0</span>))</span><br></pre></td></tr></table></figure></p>
 <h1 id="ValueError-unsupported-format-character-‘xx’-at-index"><a href="#ValueError-unsupported-format-character-‘xx’-at-index" class="headerlink" title="ValueError: unsupported format character ‘xx’ at index"></a>ValueError: unsupported format character ‘xx’ at index</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">13</span>]: s = <span class="string">"%jimo %s"</span> % (<span class="string">'hehe'</span>)</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">ValueError                                Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-13</span>-f5b56b452ab7&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 s = "%jimo %s" % ('hehe')</span><br><span class="line"></span><br><span class="line">ValueError: unsupported format character <span class="string">'j'</span> (<span class="number">0x6a</span>) at index <span class="number">1</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">14</span>]: s = <span class="string">"%%jimo %s"</span> % (<span class="string">'hehe'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">15</span>]: s</span><br><span class="line">Out[<span class="number">15</span>]: <span class="string">'%jimo hehe'</span></span><br></pre></td></tr></table></figure>
+<h1 id="TypeError-‘dict-items’-object-is-not-subscriptable"><a href="#TypeError-‘dict-items’-object-is-not-subscriptable" class="headerlink" title="TypeError: ‘dict_items’ object is not subscriptable"></a>TypeError: ‘dict_items’ object is not subscriptable</h1><p>在python3中dict.keys()或items()返回的是个迭代器,所以不能slice.但可以转成list再迭代:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list(d.keys())[<span class="number">2</span>:<span class="number">4</span>]</span><br></pre></td></tr></table></figure></p>
+<h1 id="tuple-parameter-unpacking-is-not-supported-in-python-3"><a href="#tuple-parameter-unpacking-is-not-supported-in-python-3" class="headerlink" title="tuple parameter unpacking is not supported in python 3"></a>tuple parameter unpacking is not supported in python 3</h1><p>python3中tuple不能当做lambda参数.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">points = [ (<span class="number">1</span>,<span class="number">2</span>), (<span class="number">2</span>,<span class="number">3</span>)]</span><br><span class="line">min(points, key=<span class="keyword">lambda</span> (x, y): (x*x + y*y))</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 1</span></span><br><span class="line">min(points, key=<span class="keyword">lambda</span> p: (<span class="keyword">lambda</span> x,y: (x*x + y*y))(*p))</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 2</span></span><br><span class="line">min(points, key=<span class="keyword">lambda</span> x_y: x_y[<span class="number">0</span>] + x_y[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 3</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">key</span><span class="params">(p)</span>:</span> <span class="comment"># more specific name would be better</span></span><br><span class="line">    x, y = p</span><br><span class="line">    <span class="keyword">return</span> x**<span class="number">2</span> + y**<span class="number">3</span></span><br><span class="line"></span><br><span class="line">result = min(points, key=key)</span><br></pre></td></tr></table></figure></p>
 
       
     </div> -->
@@ -232,7 +234,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/17/python/008-python-error/" data-id="cjgbpvilu002t97ka7oef98az" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/17/python/008-python-error/" data-id="cjgesnb33002iykka99agiqlk" class="article-share-link">
           Share
         </a>
         
@@ -279,6 +281,7 @@ ga('send', 'pageview');
 <p>更复杂一点,根据已有列且带有条件的生成:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">29</span>]:</span><br><span class="line">df[<span class="string">'points'</span>] = np.where( ( (df[<span class="string">'gender'</span>] == <span class="string">'male'</span>) &amp; (df[<span class="string">'pet1'</span>] == df[<span class="string">'pet2'</span>] ) ) | ( (df[<span class="string">'gender'</span>] == <span class="string">'female'</span>) &amp; (df[<span class="string">'pet1'</span>].isin([<span class="string">'cat'</span>,<span class="string">'dog'</span>] ) ) ), <span class="number">5</span>, <span class="number">0</span>)</span><br><span class="line">df</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">Out[29]:</span></span><br><span class="line"><span class="string">     gender      pet1      pet2  points</span></span><br><span class="line"><span class="string">0      male       dog       dog       5</span></span><br><span class="line"><span class="string">1      male       cat       cat       5</span></span><br><span class="line"><span class="string">2      male       dog       cat       0</span></span><br><span class="line"><span class="string">3    female       cat  squirrel       5</span></span><br><span class="line"><span class="string">4    female       dog       dog       5</span></span><br><span class="line"><span class="string">5    female  squirrel       cat       0</span></span><br><span class="line"><span class="string">6  squirrel       dog       cat       0</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 或则</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> x[<span class="string">'gender'</span>] == <span class="string">'male'</span> <span class="keyword">and</span> x[<span class="string">'pet1'</span>] == x[<span class="string">'pet2'</span>]: <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">elif</span> x[<span class="string">'gender'</span>] == <span class="string">'female'</span> <span class="keyword">and</span> (x[<span class="string">'pet1'</span>] == <span class="string">'cat'</span> <span class="keyword">or</span> x[<span class="string">'pet1'</span>] == <span class="string">'dog'</span>): <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">data[<span class="string">'points'</span>] = data.apply(f, axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
 <h1 id="重点学习groupby-apply"><a href="#重点学习groupby-apply" class="headerlink" title="重点学习groupby.apply()"></a>重点学习groupby.apply()</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.apply.html" target="_blank" rel="noopener">API</a></p>
 <p>例子1:将学生成绩数据按学号分组后把所有课程分数放在一个list里,再转为dict<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list).to_dict()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;'001':[100,90,80],'002':[90,90,90]...&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># or 直接转为list,返回二维数组</span></span><br><span class="line">list(dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list))</span><br></pre></td></tr></table></figure></p>
+<h1 id="迭代DataFrame"><a href="#迭代DataFrame" class="headerlink" title="迭代DataFrame"></a>迭代DataFrame</h1><p>How to iterate over rows in a DataFrame in Pandas?<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">18</span>]: <span class="keyword">for</span> index, row <span class="keyword">in</span> df.iterrows():</span><br><span class="line">   ....:     <span class="keyword">print</span> row[<span class="string">'c1'</span>], row[<span class="string">'c2'</span>]</span><br></pre></td></tr></table></figure></p>
 
       
     </div> -->
@@ -316,7 +319,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjgbpvils002o97kanw4oeits" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjgesnb32002fykkafdvmbyyv" class="article-share-link">
           Share
         </a>
         
@@ -393,7 +396,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjgbpvik6000297kapsxu2uc5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjgesnb20000dykkahg8j0bdz" class="article-share-link">
           Share
         </a>
         
@@ -471,7 +474,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjgbpvikb000597ka0bgryir7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjgesnb1y000bykkah8srtzmn" class="article-share-link">
           Share
         </a>
         
@@ -561,7 +564,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjgbpvikr000o97kazbt62l0x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjgesnb1o0008ykkay1vfiz3n" class="article-share-link">
           Share
         </a>
         
@@ -638,7 +641,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjgbpvilr002m97ka56s9s7ib" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjgesnb31002dykkavxbu0cas" class="article-share-link">
           Share
         </a>
         
@@ -721,7 +724,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjgbpviko000k97ka2n7favyb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjgesnb1j0006ykkapk20j2cg" class="article-share-link">
           Share
         </a>
         
@@ -817,7 +820,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjgbpvili002297kafmyyalcn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjgesnb2s001uykka7dudzuau" class="article-share-link">
           Share
         </a>
         
@@ -902,7 +905,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjgbpvikn000i97ka83e9qg2j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjgesnb1h0005ykkatpss2inu" class="article-share-link">
           Share
         </a>
         
@@ -986,7 +989,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjgbpvikk000d97kav0t1mlje" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjgesnb1f0004ykkaltjdkrqc" class="article-share-link">
           Share
         </a>
         
@@ -1103,7 +1106,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjgbpvilf001x97katiyxea97" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/29/linux/008-linux-kernel1/" data-id="cjgesnb2r001sykka25y12wtv" class="article-share-link">
           Share
         </a>
         
@@ -1180,7 +1183,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjgbpvik2000197kaz0eq4pmd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjgesnb1u0009ykkamrztqupd" class="article-share-link">
           Share
         </a>
         
@@ -1293,7 +1296,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjgbpvimg003t97kadrvimdih" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjgesnb3q003kykka585rm0ts" class="article-share-link">
           Share
         </a>
         
@@ -1394,7 +1397,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjgbpvikl000g97ka8jwsbsyh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjgesnb1c0002ykka9annon7m" class="article-share-link">
           Share
         </a>
         
@@ -1480,7 +1483,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjgbpvilq002j97kaejf762ws" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjgesnb30002aykkaqd0xe3m2" class="article-share-link">
           Share
         </a>
         
@@ -1558,7 +1561,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjgbpviky001197kajrmn6hlc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjgesnb2d000wykkard7kb72d" class="article-share-link">
           Share
         </a>
         
@@ -1633,7 +1636,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjgbpvikx000y97kazqd783nn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjgesnb28000qykkavmr8evzp" class="article-share-link">
           Share
         </a>
         
@@ -1727,7 +1730,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjgbpvikv000u97kahbw9zz6p" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjgesnb27000pykka9qgs3jvd" class="article-share-link">
           Share
         </a>
         
@@ -1811,7 +1814,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjgbpviku000t97kah0eyua8s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjgesnb26000oykkayrlj8ksy" class="article-share-link">
           Share
         </a>
         
