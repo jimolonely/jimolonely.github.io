@@ -28,7 +28,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="在我的世界">
 <meta property="og:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性    2.进程2.1 进程是什么正在执行的程序代码的">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-27T03:26:21.793Z">
+<meta property="og:updated_time" content="2018-04-27T07:02:05.480Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux内核">
 <meta name="twitter:description" content="1.常识1.1 背景 Unix的历史 Linux的历史 Linux和Unix比较 Linux内核版本开发的版本号规则  1.2 准备 使用git跟随源码 安装源码,打补丁,了解源码文件结构 配置,编译,安装内核 内核开发的特点 内核开发不能使用任何外部库,比如C库. GNU C 无内存保护机制 难以执行浮点运算 进程堆栈小 同步并发 考虑移植性    2.进程2.1 进程是什么正在执行的程序代码的">
@@ -87,7 +87,7 @@ ga('send', 'pageview');
         <section id="main"><article id="post-linux/008-linux-kernel1" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/27/linux/008-linux-kernel1/" class="article-date">
-  <time datetime="2018-04-27T03:26:21.793Z" itemprop="datePublished">2018-04-27</time>
+  <time datetime="2018-04-27T07:02:05.480Z" itemprop="datePublished">2018-04-27</time>
 </a>
       
   </div>
@@ -170,6 +170,11 @@ ga('send', 'pageview');
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ps -eo state,uid,pid,ppid,rtprio,time,comm</span><br><span class="line">S   UID   PID  PPID RTPRIO     TIME COMMAND</span><br><span class="line">S     0     1     0      - 00:00:15 systemd</span><br><span class="line">S     0     8     2      - 00:00:00 rcu_sched</span><br><span class="line">S     0     9     2      - 00:00:00 rcu_bh</span><br><span class="line">S     0    10     2     99 00:00:00 migration/0</span><br><span class="line">S     0    11     2      - 00:00:00 lru-add-drain</span><br><span class="line">S     0    12     2     99 00:00:00 watchdog/0</span><br><span class="line">S     0    13     2      - 00:00:00 cpuhp/0</span><br><span class="line">S     0    14     2      - 00:00:00 cpuhp/1</span><br><span class="line">S     0    26     2      - 00:00:00 cpuhp/3</span><br><span class="line">S     0    27     2     99 00:00:00 watchdog/3</span><br><span class="line">S     0    28     2     99 00:00:00 migration/3</span><br><span class="line">S     0   239     2     50 00:02:22 irq/279-iwlwifi</span><br><span class="line">S     0   318     2     50 00:02:36 irq/51-DLLA6B2:</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
+<h3 id="3-4-时间片"><a href="#3-4-时间片" class="headerlink" title="3.4 时间片"></a>3.4 时间片</h3><ol>
+<li>太长或太短都不好</li>
+<li>IO密集型希望短,CPU密集型希望长</li>
+<li>Linux直接分配时间片到进程,这个进程获得的时间受系统负载和nice值的共同影响.</li>
+</ol>
 
       
     </div> -->
@@ -243,13 +248,18 @@ ga('send', 'pageview');
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ps -eo state,uid,pid,ppid,rtprio,time,comm</span><br><span class="line">S   UID   PID  PPID RTPRIO     TIME COMMAND</span><br><span class="line">S     0     1     0      - 00:00:15 systemd</span><br><span class="line">S     0     8     2      - 00:00:00 rcu_sched</span><br><span class="line">S     0     9     2      - 00:00:00 rcu_bh</span><br><span class="line">S     0    10     2     99 00:00:00 migration/0</span><br><span class="line">S     0    11     2      - 00:00:00 lru-add-drain</span><br><span class="line">S     0    12     2     99 00:00:00 watchdog/0</span><br><span class="line">S     0    13     2      - 00:00:00 cpuhp/0</span><br><span class="line">S     0    14     2      - 00:00:00 cpuhp/1</span><br><span class="line">S     0    26     2      - 00:00:00 cpuhp/3</span><br><span class="line">S     0    27     2     99 00:00:00 watchdog/3</span><br><span class="line">S     0    28     2     99 00:00:00 migration/3</span><br><span class="line">S     0   239     2     50 00:02:22 irq/279-iwlwifi</span><br><span class="line">S     0   318     2     50 00:02:36 irq/51-DLLA6B2:</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
+<h3 id="3-4-时间片"><a href="#3-4-时间片" class="headerlink" title="3.4 时间片"></a>3.4 时间片</h3><ol>
+<li>太长或太短都不好</li>
+<li>IO密集型希望短,CPU密集型希望长</li>
+<li>Linux直接分配时间片到进程,这个进程获得的时间受系统负载和nice值的共同影响.</li>
+</ol>
 
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjghej0e0001xktkasb1wowsr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjghm9dv9001x7cka0sg4h5ww" class="article-share-link">
           Share
         </a>
         
@@ -262,19 +272,10 @@ ga('send', 'pageview');
         
 <nav id="article-nav">
   
-    <a href="/2018/04/27/python/008-python-error/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          python中的常见错误
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/04/18/db/003-sql-must-know/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2018/04/27/hexo/deploy-hexo-on-github/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">sql中最重要的原理</div>
+      <div class="article-nav-title">部署hexo到github</div>
     </a>
   
 </nav>
@@ -325,6 +326,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/27/linux/008-linux-kernel1/">Linux内核</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/27/hexo/deploy-hexo-on-github/">部署hexo到github</a>
           </li>
         
@@ -334,10 +339,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/27/python/008-python-error/">python中的常见错误</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/27/linux/008-linux-kernel1/">Linux内核</a>
           </li>
         
           <li>
