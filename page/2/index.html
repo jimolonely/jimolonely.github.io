@@ -84,6 +84,100 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-elasticsearch/003-data-explore" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/15/elasticsearch/003-data-explore/" class="article-date">
+  <time datetime="2018-03-15T00:41:27.000Z" itemprop="datePublished">2018-03-15</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/15/elasticsearch/003-data-explore/">04elasticsearch搜索数据</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>对数据的各种查询.</p>
+<h1 id="Exploring-Your-Data"><a href="#Exploring-Your-Data" class="headerlink" title="Exploring Your Data"></a>Exploring Your Data</h1><p>来自<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/_exploring_your_data.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/current/_exploring_your_data.html</a></p>
+<p>下载数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc my-data]$ wget https://raw.githubusercontent.com/elastic/elasticsearch/master/docs/src/test/resources/accounts.json</span><br></pre></td></tr></table></figure></p>
+<p>导入数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc my-data]$ curl -H "Content-Type: application/json" -XPOST 'localhost:9200/bank/account/_bulk?pretty&amp;refresh' --data-binary "@accounts.json"</span><br><span class="line"><span class="meta">#</span> 查看结果</span><br><span class="line">[jimo@jimo-pc my-data]$ curl 'localhost:9200/_cat/indices?v'</span><br><span class="line">health status index    uuid                   pri rep docs.count docs.deleted store.size pri.store.size</span><br><span class="line">yellow open   customer 9nM78Xu0Rqe6YDDaQJOSAg   5   1          3            0     11.6kb         11.6kb</span><br><span class="line">yellow open   bank     JOqLgpkAQ7yxooKSePCBVA   5   1       1000            0    487.9kb        487.9kb</span><br></pre></td></tr></table></figure></p>
+<h2 id="The-Search-API"><a href="#The-Search-API" class="headerlink" title="The Search API"></a>The Search API</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc my-data]$ curl -XGET 'localhost:9200/bank/_search?q=*&amp;sort=account_number:asc&amp;pretty&amp;pretty'</span><br><span class="line">&#123;</span><br><span class="line">  "took" : 85,</span><br><span class="line">  "timed_out" : false,</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 5,</span><br><span class="line">    "successful" : 5,</span><br><span class="line">    "skipped" : 0,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "hits" : &#123;</span><br><span class="line">    "total" : 1000,</span><br><span class="line">    "max_score" : null,</span><br><span class="line">    "hits" : [</span><br><span class="line">      &#123;</span><br><span class="line">        "_index" : "bank",</span><br><span class="line">        "_type" : "account",</span><br><span class="line">        "_id" : "0",</span><br><span class="line">        "_score" : null,</span><br><span class="line">        "_source" : &#123;</span><br><span class="line">          "account_number" : 0,</span><br><span class="line">          "balance" : 16623,</span><br><span class="line">          "firstname" : "Bradshaw",</span><br><span class="line">          "lastname" : "Mckenzie",</span><br><span class="line">          "age" : 29,</span><br><span class="line">          "gender" : "F",</span><br><span class="line">          "address" : "244 Columbus Place",</span><br><span class="line">          "employer" : "Euron",</span><br><span class="line">          "email" : "bradshawmckenzie@euron.com",</span><br><span class="line">          "city" : "Hobucken",</span><br><span class="line">          "state" : "CO"</span><br><span class="line">        &#125;,</span><br><span class="line">        "sort" : [</span><br><span class="line">          0</span><br><span class="line">        ]</span><br><span class="line">      &#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>查询解析：localhost:9200/bank/_search?q=<em>&amp;sort=account_number:asc&amp;pretty&amp;pretty<br>以&amp;分开，q=</em>代表所有，asc升序。</p>
+<p>等价与：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d' &#123; "query": &#123; "match_all": &#123;&#125; &#125;, "sort": [ &#123; "account_number": "asc" &#125; ] &#125; '</span><br></pre></td></tr></table></figure></p>
+<h2 id="Introducing-the-Query-Language"><a href="#Introducing-the-Query-Language" class="headerlink" title="Introducing the Query Language"></a>Introducing the Query Language</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 可以传入数量，只查一个，默认size=10</span><br><span class="line">curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d' &#123; "query": &#123; "match_all": &#123;&#125; &#125;, "size": 1 &#125; '</span><br><span class="line"><span class="meta">#</span> 指定开始</span><br><span class="line">[jimo@jimo-pc my-data]$ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d' &#123; "query": &#123; "match_all": &#123;&#125; &#125;, "size": 2 ,"from":10&#125; '</span><br><span class="line"><span class="meta">#</span> 指定排序</span><br><span class="line">[jimo@jimo-pc my-data]$ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d' &#123; "query": &#123; "match_all": &#123;&#125; &#125;, "sort": &#123; "balance": &#123; "order": "desc" &#125; &#125; &#125; '</span><br></pre></td></tr></table></figure>
+<h2 id="Executing-Searches"><a href="#Executing-Searches" class="headerlink" title="Executing Searches"></a>Executing Searches</h2><p>使用_source过滤字段：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc my-data]$ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d' &#123; "query": &#123; "match_all": &#123;&#125; &#125;, "_source": ["account_number", "balance"] &#125; '</span><br><span class="line">&#123;</span><br><span class="line">  "took" : 12,</span><br><span class="line">  "timed_out" : false,</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 5,</span><br><span class="line">    "successful" : 5,</span><br><span class="line">    "skipped" : 0,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "hits" : &#123;</span><br><span class="line">    "total" : 1000,</span><br><span class="line">    "max_score" : 1.0,</span><br><span class="line">    "hits" : [</span><br><span class="line">      &#123;</span><br><span class="line">        "_index" : "bank",</span><br><span class="line">        "_type" : "account",</span><br><span class="line">        "_id" : "25",</span><br><span class="line">        "_score" : 1.0,</span><br><span class="line">        "_source" : &#123;</span><br><span class="line">          "account_number" : 25,</span><br><span class="line">          "balance" : 40540</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>精确查找：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc my-data]$ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d' &#123; "query": &#123; "match": &#123; "account_number": 20 &#125; &#125; &#125; '</span><br><span class="line">&#123;</span><br><span class="line">  "took" : 20,</span><br><span class="line">  "timed_out" : false,</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 5,</span><br><span class="line">    "successful" : 5,</span><br><span class="line">    "skipped" : 0,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "hits" : &#123;</span><br><span class="line">    "total" : 1,</span><br><span class="line">    "max_score" : 1.0,</span><br><span class="line">    "hits" : [</span><br><span class="line">      &#123;</span><br><span class="line">        "_index" : "bank",</span><br><span class="line">        "_type" : "account",</span><br><span class="line">        "_id" : "20",</span><br><span class="line">        "_score" : 1.0,</span><br><span class="line">        "_source" : &#123;</span><br><span class="line">          "account_number" : 20,</span><br><span class="line">          "balance" : 16418,</span><br><span class="line">          "firstname" : "Elinor",</span><br><span class="line">          "lastname" : "Ratliff",</span><br><span class="line">          "age" : 36,</span><br><span class="line">          "gender" : "M",</span><br><span class="line">          "address" : "282 Kings Place",</span><br><span class="line">          "employer" : "Scentric",</span><br><span class="line">          "email" : "elinorratliff@scentric.com",</span><br><span class="line">          "city" : "Ribera",</span><br><span class="line">          "state" : "WA"</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以空格分开代表OR，不区分大小写：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"mill lane"</span> &#125; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>那要包含这两个则使用：match_phrase<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123; <span class="attr">"match_phrase"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"mill lane"</span> &#125; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>逻辑查询</strong><br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">AND</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123;</span><br><span class="line">    <span class="attr">"bool"</span>: &#123;</span><br><span class="line">      <span class="attr">"must"</span>: [</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"mill"</span> &#125; &#125;,</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"lane"</span> &#125; &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">OR</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123;</span><br><span class="line">    <span class="attr">"bool"</span>: &#123;</span><br><span class="line">      <span class="attr">"should"</span>: [</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"mill"</span> &#125; &#125;,</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"lane"</span> &#125; &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">AND NOT</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123;</span><br><span class="line">    <span class="attr">"bool"</span>: &#123;</span><br><span class="line">      <span class="attr">"must_not"</span>: [</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"mill"</span> &#125; &#125;,</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"address"</span>: <span class="string">"lane"</span> &#125; &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">组合</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123;</span><br><span class="line">    <span class="attr">"bool"</span>: &#123;</span><br><span class="line">      <span class="attr">"must"</span>: [</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"age"</span>: <span class="string">"40"</span> &#125; &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">"must_not"</span>: [</span><br><span class="line">        &#123; <span class="attr">"match"</span>: &#123; <span class="attr">"state"</span>: <span class="string">"ID"</span> &#125; &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Executing-Filters"><a href="#Executing-Filters" class="headerlink" title="Executing Filters"></a>Executing Filters</h2><p>有个_score评分排名项：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">"hits" : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"_index"</span> : <span class="string">"bank"</span>,</span><br><span class="line">        <span class="attr">"_type"</span> : <span class="string">"account"</span>,</span><br><span class="line">        <span class="attr">"_id"</span> : <span class="string">"253"</span>,</span><br><span class="line">        <span class="attr">"_score"</span> : <span class="number">1.0</span>,</span><br><span class="line">        <span class="attr">"_source"</span> : &#123;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>可以使用filter来过滤：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123;</span><br><span class="line">    <span class="attr">"bool"</span>: &#123;</span><br><span class="line">      <span class="attr">"must"</span>: &#123; <span class="attr">"match_all"</span>: &#123;&#125; &#125;,</span><br><span class="line">      <span class="attr">"filter"</span>: &#123;</span><br><span class="line">        <span class="attr">"range"</span>: &#123;</span><br><span class="line">          <span class="attr">"balance"</span>: &#123;</span><br><span class="line">            <span class="attr">"gte"</span>: <span class="number">20000</span>,</span><br><span class="line">            <span class="attr">"lte"</span>: <span class="number">30000</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Executing-Aggregations"><a href="#Executing-Aggregations" class="headerlink" title="Executing Aggregations"></a>Executing Aggregations</h2><p>聚合类似于SQL的Group By<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc my-data]$ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'</span><br><span class="line"><span class="meta">&gt;</span> &#123;</span><br><span class="line"><span class="meta">&gt;</span>   "size": 0,</span><br><span class="line"><span class="meta">&gt;</span>   "aggs": &#123;</span><br><span class="line"><span class="meta">&gt;</span>     "group_by_state": &#123;</span><br><span class="line"><span class="meta">&gt;</span>       "terms": &#123;</span><br><span class="line"><span class="meta">&gt;</span>         "field": "state.keyword"</span><br><span class="line"><span class="meta">&gt;</span>       &#125;</span><br><span class="line"><span class="meta">&gt;</span>     &#125;</span><br><span class="line"><span class="meta">&gt;</span>   &#125;</span><br><span class="line"><span class="meta">&gt;</span> &#125;</span><br><span class="line"><span class="meta">&gt;</span> '</span><br><span class="line">&#123;</span><br><span class="line">  "took" : 38,</span><br><span class="line">  "timed_out" : false,</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 5,</span><br><span class="line">    "successful" : 5,</span><br><span class="line">    "skipped" : 0,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "hits" : &#123;</span><br><span class="line">    "total" : 1000,</span><br><span class="line">    "max_score" : 0.0,</span><br><span class="line">    "hits" : [ ]</span><br><span class="line">  &#125;,</span><br><span class="line">  "aggregations" : &#123;</span><br><span class="line">    "group_by_state" : &#123;</span><br><span class="line">      "doc_count_error_upper_bound" : 20,</span><br><span class="line">      "sum_other_doc_count" : 770,</span><br><span class="line">      "buckets" : [</span><br><span class="line">        &#123;</span><br><span class="line">          "key" : "ID",</span><br><span class="line">          "doc_count" : 27</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          "key" : "TX",</span><br><span class="line">          "doc_count" : 27</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          "key" : "AL",</span><br><span class="line">          "doc_count" : 25</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          "key" : "MD",</span><br><span class="line">          "doc_count" : 25</span><br><span class="line">        &#125;,</span><br></pre></td></tr></table></figure></p>
+<p>等价于：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> state, <span class="keyword">COUNT</span>(*) <span class="keyword">FROM</span> bank <span class="keyword">GROUP</span> <span class="keyword">BY</span> state <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">COUNT</span>(*) <span class="keyword">DESC</span></span><br></pre></td></tr></table></figure></p>
+<p>再进行聚合求他们balance的均值：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc my-data]$ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'</span><br><span class="line"><span class="meta">&gt;</span> &#123;</span><br><span class="line"><span class="meta">&gt;</span>   "size": 0,</span><br><span class="line"><span class="meta">&gt;</span>   "aggs": &#123;</span><br><span class="line"><span class="meta">&gt;</span>     "group_by_state": &#123;</span><br><span class="line"><span class="meta">&gt;</span>       "terms": &#123;</span><br><span class="line"><span class="meta">&gt;</span>         "field": "state.keyword"</span><br><span class="line"><span class="meta">&gt;</span>       &#125;,</span><br><span class="line"><span class="meta">&gt;</span>       "aggs": &#123;</span><br><span class="line"><span class="meta">&gt;</span>         "average_balance": &#123;</span><br><span class="line"><span class="meta">&gt;</span>           "avg": &#123;</span><br><span class="line"><span class="meta">&gt;</span>             "field": "balance"</span><br><span class="line"><span class="meta">&gt;</span>           &#125;</span><br><span class="line"><span class="meta">&gt;</span>         &#125;</span><br><span class="line"><span class="meta">&gt;</span>       &#125;</span><br><span class="line"><span class="meta">&gt;</span>     &#125;</span><br><span class="line"><span class="meta">&gt;</span>   &#125;</span><br><span class="line"><span class="meta">&gt;</span> &#125;</span><br><span class="line"><span class="meta">&gt;</span> '</span><br><span class="line">&#123;</span><br><span class="line">  "took" : 15,</span><br><span class="line">  "timed_out" : false,</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 5,</span><br><span class="line">    "successful" : 5,</span><br><span class="line">    "skipped" : 0,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "hits" : &#123;</span><br><span class="line">    "total" : 1000,</span><br><span class="line">    "max_score" : 0.0,</span><br><span class="line">    "hits" : [ ]</span><br><span class="line">  &#125;,</span><br><span class="line">  "aggregations" : &#123;</span><br><span class="line">    "group_by_state" : &#123;</span><br><span class="line">      "doc_count_error_upper_bound" : 20,</span><br><span class="line">      "sum_other_doc_count" : 770,</span><br><span class="line">      "buckets" : [</span><br><span class="line">        &#123;</span><br><span class="line">          "key" : "ID",</span><br><span class="line">          "doc_count" : 27,</span><br><span class="line">          "average_balance" : &#123;</span><br><span class="line">            "value" : 24368.777777777777</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          "key" : "TX",</span><br><span class="line">          "doc_count" : 27,</span><br><span class="line">          "average_balance" : &#123;</span><br><span class="line">            "value" : 27462.925925925927</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          "key" : "AL",</span><br><span class="line">          "doc_count" : 25,</span><br><span class="line">          "average_balance" : &#123;</span><br><span class="line">            "value" : 25739.56</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>再按均值降序排列：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"size"</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="attr">"aggs"</span>: &#123;</span><br><span class="line">    <span class="attr">"group_by_state"</span>: &#123;</span><br><span class="line">      <span class="attr">"terms"</span>: &#123;</span><br><span class="line">        <span class="attr">"field"</span>: <span class="string">"state.keyword"</span>,</span><br><span class="line">        <span class="attr">"order"</span>: &#123;</span><br><span class="line">          <span class="attr">"average_balance"</span>: <span class="string">"desc"</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">"aggs"</span>: &#123;</span><br><span class="line">        <span class="attr">"average_balance"</span>: &#123;</span><br><span class="line">          <span class="attr">"avg"</span>: &#123;</span><br><span class="line">            <span class="attr">"field"</span>: <span class="string">"balance"</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面是先对不同年龄段的人聚类，再按性别，再求平均收支的结果：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">操作：</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"size"</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="attr">"aggs"</span>: &#123;</span><br><span class="line">    <span class="attr">"group_by_age"</span>: &#123;</span><br><span class="line">      <span class="attr">"range"</span>: &#123;</span><br><span class="line">        <span class="attr">"field"</span>: <span class="string">"age"</span>,</span><br><span class="line">        <span class="attr">"ranges"</span>: [</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="attr">"from"</span>: <span class="number">20</span>,</span><br><span class="line">            <span class="attr">"to"</span>: <span class="number">30</span></span><br><span class="line">          &#125;,</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="attr">"from"</span>: <span class="number">30</span>,</span><br><span class="line">            <span class="attr">"to"</span>: <span class="number">40</span></span><br><span class="line">          &#125;,</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="attr">"from"</span>: <span class="number">40</span>,</span><br><span class="line">            <span class="attr">"to"</span>: <span class="number">50</span></span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">"aggs"</span>: &#123;</span><br><span class="line">        <span class="attr">"group_by_gender"</span>: &#123;</span><br><span class="line">          <span class="attr">"terms"</span>: &#123;</span><br><span class="line">            <span class="attr">"field"</span>: <span class="string">"gender.keyword"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="attr">"aggs"</span>: &#123;</span><br><span class="line">            <span class="attr">"average_balance"</span>: &#123;</span><br><span class="line">              <span class="attr">"avg"</span>: &#123;</span><br><span class="line">                <span class="attr">"field"</span>: <span class="string">"balance"</span></span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">结果：</span><br><span class="line">  "aggregations" : &#123;</span><br><span class="line">    "group_by_age" : &#123;</span><br><span class="line">      "buckets" : [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"key"</span> : <span class="string">"20.0-30.0"</span>,</span><br><span class="line">          <span class="attr">"from"</span> : <span class="number">20.0</span>,</span><br><span class="line">          <span class="attr">"to"</span> : <span class="number">30.0</span>,</span><br><span class="line">          <span class="attr">"doc_count"</span> : <span class="number">451</span>,</span><br><span class="line">          <span class="attr">"group_by_gender"</span> : &#123;</span><br><span class="line">            <span class="attr">"doc_count_error_upper_bound"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"sum_other_doc_count"</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"buckets"</span> : [</span><br><span class="line">              &#123;</span><br><span class="line">                <span class="attr">"key"</span> : <span class="string">"M"</span>,</span><br><span class="line">                <span class="attr">"doc_count"</span> : <span class="number">232</span>,</span><br><span class="line">                <span class="attr">"average_balance"</span> : &#123;</span><br><span class="line">                  <span class="attr">"value"</span> : <span class="number">27374.05172413793</span></span><br><span class="line">                &#125;</span><br><span class="line">              &#125;,</span><br><span class="line">              &#123;</span><br><span class="line">                <span class="attr">"key"</span> : <span class="string">"F"</span>,</span><br><span class="line">                <span class="attr">"doc_count"</span> : <span class="number">219</span>,</span><br><span class="line">                <span class="attr">"average_balance"</span> : &#123;</span><br><span class="line">                  <span class="attr">"value"</span> : <span class="number">25341.260273972603</span></span><br><span class="line">                &#125;</span><br><span class="line">              &#125;</span><br><span class="line">            ]</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<a href="/2018/03/17/elasticsearch/004-configure/" title="05-elasticsearch配置">05-elasticsearch配置</a>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>对数据的各种查询.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/15/elasticsearch/003-data-explore/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/15/elasticsearch/003-data-explore/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjghp8qgu000xf6kabchfjzyo" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-elasticsearch/002-modify-data" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/14/elasticsearch/002-modify-data/" class="article-date">
@@ -154,7 +248,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjghmb8d9000tbgkawjav5p8k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjghp8qgt000vf6ka6nbsactk" class="article-share-link">
           Share
         </a>
         
@@ -230,7 +324,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjghmb8dg0015bgka7n78ziza" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjghp8qh10018f6kaotnt1i86" class="article-share-link">
           Share
         </a>
         
@@ -321,7 +415,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjghmb8e6002ebgka3156h3do" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjghp8qhp002gf6kae6hytpc4" class="article-share-link">
           Share
         </a>
         
@@ -414,7 +508,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjghmb8d8000rbgkaamcoj1og" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjghp8qgt000tf6ka2lqqhgi1" class="article-share-link">
           Share
         </a>
         
@@ -499,7 +593,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjghmb8d7000pbgkawy3jwi6x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjghp8qgs000rf6kazcbgkejy" class="article-share-link">
           Share
         </a>
         
@@ -595,7 +689,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjghmb8dk001dbgka28qt482c" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjghp8qh4001df6kakivu3gli" class="article-share-link">
           Share
         </a>
         
@@ -674,7 +768,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjghmb8cn0004bgkari84e3jm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjghp8qgb0004f6kaect431gk" class="article-share-link">
           Share
         </a>
         
@@ -753,7 +847,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjghmb8dj001abgkaibl6jfnx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjghp8qh3001af6ka972q82pg" class="article-share-link">
           Share
         </a>
         
@@ -837,7 +931,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjghmb8di0018bgkamo8r0gf1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjghp8qh5001ff6ka3q26n2cw" class="article-share-link">
           Share
         </a>
         
@@ -915,7 +1009,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjghmb8ex003pbgkazyc96hep" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjghp8qie003qf6kaeddl3gdz" class="article-share-link">
           Share
         </a>
         
@@ -998,7 +1092,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjghmb8ev003lbgkaniv5qjmy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjghp8qic003of6kanmubeax4" class="article-share-link">
           Share
         </a>
         
@@ -1088,7 +1182,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjghmb8ew003nbgkafk7ra2u2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjghp8qib003mf6kav0vszyi4" class="article-share-link">
           Share
         </a>
         
@@ -1182,7 +1276,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjghmb8e5002bbgkaj6am08gr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjghp8qho002df6ka2nfwy0ye" class="article-share-link">
           Share
         </a>
         
@@ -1263,7 +1357,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjghmb8co0005bgkaggq1j33y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjghp8qgc0005f6katrepkzbf" class="article-share-link">
           Share
         </a>
         
@@ -1353,7 +1447,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjghmb8du001ubgkacl6fym37" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjghp8qhf001xf6kaya6juxqq" class="article-share-link">
           Share
         </a>
         
@@ -1432,7 +1526,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjghmb8ed002qbgka1kaaa7bb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjghp8qhv002sf6kajiy5jpgh" class="article-share-link">
           Share
         </a>
         
@@ -1521,7 +1615,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjghmb8cj0002bgka96w2flxm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjghp8qg70002f6kalag2ch1y" class="article-share-link">
           Share
         </a>
         
@@ -1603,7 +1697,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjghmb8e40029bgka71tievkw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjghp8qhn002bf6kak0nbyvhq" class="article-share-link">
           Share
         </a>
         
@@ -1693,245 +1787,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjghmb8er003hbgka3rby4m2h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjghp8qia003jf6kaps1h8eht" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">9</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/003-resources" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/12/tools/003-resources/" class="article-date">
-  <time datetime="2018-01-12T06:02:26.000Z" itemprop="datePublished">2018-01-12</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/12/tools/003-resources/">学习资源汇总</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这里收集了各个学科优秀的学习资源.</p>
-<h1 id="在线学习的网站"><a href="#在线学习的网站" class="headerlink" title="在线学习的网站"></a>在线学习的网站</h1><p>国内:</p>
-<ol>
-<li><a href="http://www.imooc.com/" target="_blank" rel="noopener">慕课网</a></li>
-<li><a href="http://www.taikr.com/" target="_blank" rel="noopener">泰课在线</a></li>
-<li><a href="https://www.shiyanlou.com/" target="_blank" rel="noopener">实验楼</a></li>
-<li><a href="http://study.163.com/" target="_blank" rel="noopener">网易云课堂</a></li>
-<li><a href="http://www.doyoudo.com/" target="_blank" rel="noopener">doyoudo-学PS,视频制作和音乐的好去处</a></li>
-<li><a href="http://www.runoob.com/" target="_blank" rel="noopener">菜鸟教程-IT技术</a></li>
-<li><a href="http://www.52sumiao.com/index.html" target="_blank" rel="noopener">我爱素描网</a></li>
-<li><a href="http://www.jikexueyuan.com/" target="_blank" rel="noopener">极客学院</a></li>
-<li><a href="https://www.jisuanke.com/" target="_blank" rel="noopener">计蒜课</a></li>
-<li><a href="http://www.icourse163.org/" target="_blank" rel="noopener">中国慕课-高校公开视频</a></li>
-<li><a href="http://www.maiziedu.com/course/?sgss=pp_06892_zh" target="_blank" rel="noopener">麦子学院</a></li>
-<li><a href="http://www.miguxue.com/" target="_blank" rel="noopener">咪咕学院</a></li>
-<li><a href="http://www.duolingo.cn/" target="_blank" rel="noopener">多邻国-学外语</a></li>
-<li><a href="http://www.webshipin.com/" target="_blank" rel="noopener">Web视频网</a></li>
-<li><a href="http://www.yiibai.com/" target="_blank" rel="noopener">易百教程-文本类教程</a></li>
-<li><a href="http://www.w3cplus.com/" target="_blank" rel="noopener">w3cplus-前端技术</a></li>
-</ol>
-<p>国外:</p>
-<ol>
-<li><a href="https://www.codeschool.com/" target="_blank" rel="noopener">Code School</a></li>
-<li><a href="https://www.freecodecamp.com/" target="_blank" rel="noopener">freecodecamp</a></li>
-<li><a href="https://www.codecademy.com/learn" target="_blank" rel="noopener">codecademy</a> </li>
-<li><a href="http://www.sololearn.com/" target="_blank" rel="noopener">sololearn-APP也很丰富</a></li>
-<li><a href="http://www.tutorialspoint.com/assembly_programming/" target="_blank" rel="noopener">tutorialspoint-资源很全</a></li>
-<li><a href="https://www.edx.org/" target="_blank" rel="noopener">EDX</a></li>
-<li><a href="https://www.skillshare.com/" target="_blank" rel="noopener">skillshare</a></li>
-<li><a href="https://www.udemy.com/" target="_blank" rel="noopener">Udemy</a></li>
-<li><a href="https://www.khanacademy.org/" target="_blank" rel="noopener">可汗学院</a></li>
-<li><a href="https://www.coursera.org/" target="_blank" rel="noopener">coursera</a></li>
-<li><a href="https://www.lynda.com/" target="_blank" rel="noopener">lynda</a></li>
-<li><a href="https://quizlet.com/zh-cn" target="_blank" rel="noopener">quizlet-记单词</a></li>
-</ol>
-<h1 id="一些工具网站"><a href="#一些工具网站" class="headerlink" title="一些工具网站"></a>一些工具网站</h1><ol>
-<li><a href="http://www.bejson.com/jsoneditoronline/" target="_blank" rel="noopener">JSON在线解析</a></li>
-<li><a href="https://applypixels.com/" target="_blank" rel="noopener">IOS图标制作</a></li>
-<li><a href="http://makeappicon.com/" target="_blank" rel="noopener">APP图标制作</a></li>
-<li><a href="http://cli.im/" target="_blank" rel="noopener">草料二维码生成器</a></li>
-<li><a href="https://translate.google.cn/" target="_blank" rel="noopener">Google中国翻译</a></li>
-<li><a href="http://www.uupoop.com/ps/" target="_blank" rel="noopener">在线PS</a></li>
-<li><a href="http://www.wwei.cn/" target="_blank" rel="noopener">微微二维码生成</a></li>
-<li><a href="http://24mail.chacuo.net/" target="_blank" rel="noopener">临时邮箱</a></li>
-<li><a href="http://www.apowersoft.cn/free-online-screen-recorder" target="_blank" rel="noopener">web在线录屏-只支持windows</a></li>
-<li><a href="http://pmd5.com/#" target="_blank" rel="noopener">MD5在线解密</a></li>
-<li><a href="https://www.ngrok.cc" target="_blank" rel="noopener">ngrok-外网映射工具</a></li>
-<li><a href="http://www.mikecrm.com/" target="_blank" rel="noopener">麦客-在线表单收集</a></li>
-<li><a href="file:///home/SoftwareNormal/BaiduPCS1.html" target="_blank" rel="noopener">Baidupcs-命令行的百度云</a></li>
-<li><a href="https://www.processon.com/" target="_blank" rel="noopener">免费在线制图</a></li>
-<li><a href="http://www.yworks.com/downloads" target="_blank" rel="noopener">yworks-跨平台绘图工具</a></li>
-<li><a href="https://smallpdf.com/" target="_blank" rel="noopener">smallpdf-在线pdf转换</a></li>
-<li><a href="http://cn.office-converter.com/" target="_blank" rel="noopener">强大的在线文件转化</a></li>
-<li><a href="http://www.ilovepdf.com/zh_cn/" target="_blank" rel="noopener">ilovepdf-又一个在线pdf转换工具</a></li>
-<li><a href="http://www.ge.tt/" target="_blank" rel="noopener">在线文件分享工具</a></li>
-<li><a href="https://www.gliffy.com/products/online/" target="_blank" rel="noopener">国外的在线绘图工具</a></li>
-<li><a href="http://naotu.baidu.com/home" target="_blank" rel="noopener">百度脑图-思维导图绘制</a></li>
-<li><a href="https://tinypng.com/" target="_blank" rel="noopener">图片压缩</a></li>
-<li><a href="https://apps.evozi.com/apk-downloader/" target="_blank" rel="noopener">下载GoogleAPP</a><a href="http://apkleecher.com/" target="_blank" rel="noopener">2</a><a href="https://apkpure.com/" target="_blank" rel="noopener">3</a></li>
-<li><a href="https://etcher.io/" target="_blank" rel="noopener">制作ISO</a></li>
-<li><a href="http://www.ofoct.com/zh/audio-converter/convert-wav-or-mp3-ogg-aac-wma-to-midi.html" target="_blank" rel="noopener">在线文件格式转换</a></li>
-<li><a href="http://www.theonionrouter.com/projects/torbrowser.html.en" target="_blank" rel="noopener">Tor Browser</a></li>
-<li><a href="http://www.vpnbook.com/freevpn" target="_blank" rel="noopener">Free VPN</a></li>
-<li><a href="http://dbeaver.jkiss.org/download/" target="_blank" rel="noopener">DBEaver-数据库管理工具</a></li>
-<li><a href="http://www.zamzar.com/" target="_blank" rel="noopener">文件格式转换</a></li>
-<li><a href="https://products.office.com/zh-CN/office-online/documents-spreadsheets-presentations-office-online" target="_blank" rel="noopener">Office Obline</a></li>
-<li><a href="https://www.shucunwang.com/RunCode/shell/#contact" target="_blank" rel="noopener">Shell在线编程</a></li>
-<li><a href="http://www.dooccn.com/cpp/" target="_blank" rel="noopener">C++在线解释器</a></li>
-<li><a href="https://www.json-generator.com/" target="_blank" rel="noopener">JSON生成器</a></li>
-<li><a href="https://experiments.withgoogle.com/ai/ai-duet/view/" target="_blank" rel="noopener">AI-音乐</a></li>
-<li><a href="https://cn.sharelatex.com/project" target="_blank" rel="noopener">在线Latex编辑器</a></li>
-<li><a href="http://www.speedtest.net/" target="_blank" rel="noopener">在线网速测试</a></li>
-<li><a href="https://applypixels.com/" target="_blank" rel="noopener">APP-Pixel</a></li>
-<li><a href="https://github.com/GangZhuo/BaiduPCS" target="_blank" rel="noopener">命令行百度云</a></li>
-</ol>
-<h1 id="在线编程比赛-游戏"><a href="#在线编程比赛-游戏" class="headerlink" title="在线编程比赛(游戏)"></a>在线编程比赛(游戏)</h1><ol>
-<li><a href="http://www.hihocoder.com/" target="_blank" rel="noopener">http://www.hihocoder.com/</a></li>
-<li><a href="http://cn.codecombat.com/" target="_blank" rel="noopener">http://cn.codecombat.com/</a></li>
-<li><a href="https://www.codehunt.com/" target="_blank" rel="noopener">https://www.codehunt.com/</a></li>
-<li><a href="https://screeps.com/" target="_blank" rel="noopener">https://screeps.com/</a></li>
-<li><a href="http://www.fightcodegame.com/" target="_blank" rel="noopener">http://www.fightcodegame.com/</a></li>
-<li><a href="https://www.codingame.com/start" target="_blank" rel="noopener">https://www.codingame.com/start</a></li>
-<li><a href="http://play.elevatorsaga.com/" target="_blank" rel="noopener">http://play.elevatorsaga.com/</a></li>
-<li><a href="https://www.topcoder.com/" target="_blank" rel="noopener">https://www.topcoder.com/</a></li>
-<li><a href="https://codepen.io/jimo_lonely/" target="_blank" rel="noopener">https://codepen.io/jimo_lonely/</a></li>
-<li><a href="http://www.programcreek.com/" target="_blank" rel="noopener">http://www.programcreek.com/</a></li>
-</ol>
-<h1 id="程序员的信息网"><a href="#程序员的信息网" class="headerlink" title="程序员的信息网"></a>程序员的信息网</h1><ol>
-<li><a href="https://www.openhub.net/" target="_blank" rel="noopener">https://www.openhub.net/</a></li>
-<li><a href="http://www.oschina.net/" target="_blank" rel="noopener">http://www.oschina.net/</a></li>
-<li><a href="http://www.cnbeta.com/" target="_blank" rel="noopener">http://www.cnbeta.com/</a></li>
-<li><a href="http://www.open-open.com/news/category/4" target="_blank" rel="noopener">http://www.open-open.com/news/category/4</a></li>
-<li><a href="https://github.com/" target="_blank" rel="noopener">github</a></li>
-<li><a href="http://blog.csdn.net/?ref=toolbar" target="_blank" rel="noopener">CSDN</a></li>
-<li><a href="https://www.quora.com/#" target="_blank" rel="noopener">Quora</a></li>
-<li><a href="https://coding.net/user/projects" target="_blank" rel="noopener">https://coding.net/user/projects</a></li>
-<li><a href="http://www.importnew.com/" target="_blank" rel="noopener">ImportNew</a></li>
-<li><a href="https://www.gitbook.com" target="_blank" rel="noopener">https://www.gitbook.com</a></li>
-<li><a href="http://www.ituring.com.cn/" target="_blank" rel="noopener">http://www.ituring.com.cn/</a></li>
-<li><a href="http://www.epubit.com.cn/" target="_blank" rel="noopener">http://www.epubit.com.cn/</a></li>
-<li><a href="https://linux.cn/" target="_blank" rel="noopener">https://linux.cn/</a></li>
-<li><a href="https://minapp.com/miniapp/" target="_blank" rel="noopener">https://minapp.com/miniapp/</a></li>
-<li><a href="http://blog.jobbole.com/" target="_blank" rel="noopener">http://blog.jobbole.com/</a></li>
-<li><a href="http://www.freebuf.com/" target="_blank" rel="noopener">http://www.freebuf.com/</a></li>
-<li><a href="https://www.t00ls.net/" target="_blank" rel="noopener">https://www.t00ls.net/</a></li>
-</ol>
-<h1 id="Android开发必备网站"><a href="#Android开发必备网站" class="headerlink" title="Android开发必备网站"></a>Android开发必备网站</h1><ol>
-<li><a href="http://developer.android.com/index.html" target="_blank" rel="noopener">http://developer.android.com/index.html</a></li>
-<li><a href="http://www.android-studio.org/" target="_blank" rel="noopener">http://www.android-studio.org/</a></li>
-<li><a href="http://www.androiddevtools.cn/" target="_blank" rel="noopener">http://www.androiddevtools.cn/</a></li>
-<li><a href="http://www.vysor.io/" target="_blank" rel="noopener">http://www.vysor.io/</a></li>
-<li><a href="http://makeappicon.com/" target="_blank" rel="noopener">APP图标制作</a></li>
-</ol>
-<h1 id="前端框架"><a href="#前端框架" class="headerlink" title="前端框架"></a>前端框架</h1><ol>
-<li><a href="http://purecss.io/tables/" target="_blank" rel="noopener">http://purecss.io/tables/</a></li>
-<li><a href="http://www.miniui.com/" target="_blank" rel="noopener">http://www.miniui.com/</a></li>
-<li><a href="http://jui.org/" target="_blank" rel="noopener">http://jui.org/</a></li>
-<li><a href="https://guides.emberjs.com/v2.4.0/getting-started/quick-start/" target="_blank" rel="noopener">https://guides.emberjs.com/v2.4.0/getting-started/quick-start/</a></li>
-<li><a href="http://www.jeasyui.com/index.php" target="_blank" rel="noopener">http://www.jeasyui.com/index.php</a></li>
-<li><a href="http://amazeui.org/" target="_blank" rel="noopener">http://amazeui.org/</a></li>
-<li><a href="http://www.bootcss.com/" target="_blank" rel="noopener">http://www.bootcss.com/</a></li>
-<li><a href="http://one-div.com/" target="_blank" rel="noopener">http://one-div.com/</a></li>
-<li><a href="http://demo.pixelcave.com/oneui/base_comp_images.php" target="_blank" rel="noopener">http://demo.pixelcave.com/oneui/base_comp_images.php</a></li>
-<li><a href="http://www.css88.com" target="_blank" rel="noopener">http://www.css88.com/</a></li>
-<li><a href="http://alibaba.github.io/weex/" target="_blank" rel="noopener">http://alibaba.github.io/weex/</a></li>
-<li><a href="https://bulma.io/" target="_blank" rel="noopener">https://bulma.io/</a></li>
-<li><a href="https://reactjs.org/docs/hello-world.html" target="_blank" rel="noopener">https://reactjs.org/docs/hello-world.html</a></li>
-<li><a href="https://ant.design/docs/react/introduce-cn" target="_blank" rel="noopener">https://ant.design/docs/react/introduce-cn</a></li>
-<li><a href="http://www.redux.org.cn/" target="_blank" rel="noopener">http://www.redux.org.cn/</a></li>
-</ol>
-<h1 id="Python开发相关"><a href="#Python开发相关" class="headerlink" title="Python开发相关"></a>Python开发相关</h1><ol>
-<li><a href="https://www.python.org/" target="_blank" rel="noopener">https://www.python.org/</a></li>
-<li><a href="http://beautifulsoup.readthedocs.io/zh_CN/latest/" target="_blank" rel="noopener">http://beautifulsoup.readthedocs.io/zh_CN/latest/</a></li>
-<li><a href="http://www.pygame.org/docs/ref/" target="_blank" rel="noopener">http://www.pygame.org/docs/ref/</a></li>
-<li><a href="http://webpy.org/" target="_blank" rel="noopener">http://webpy.org/</a></li>
-<li><a href="http://www.pythonchallenge.com/" target="_blank" rel="noopener">http://www.pythonchallenge.com/</a></li>
-<li><a href="https://www.continuum.io/downloads/" target="_blank" rel="noopener">https://www.continuum.io/downloads/</a></li>
-<li><a href="http://aosabook.org/en/index.html" target="_blank" rel="noopener">http://aosabook.org/en/index.html</a></li>
-<li><a href="https://kivy.org/#download" target="_blank" rel="noopener">https://kivy.org/#download</a></li>
-<li><a href="http://www.pythontutor.com/" target="_blank" rel="noopener">http://www.pythontutor.com/</a></li>
-<li><a href="https://docs.python.org/3/library/tkinter.html" target="_blank" rel="noopener">https://docs.python.org/3/library/tkinter.html</a></li>
-<li><a href="http://pyqt.sourceforge.net/Docs/PyQt5/" target="_blank" rel="noopener">http://pyqt.sourceforge.net/Docs/PyQt5/</a></li>
-</ol>
-<p>可视化库:</p>
-<ol>
-<li><a href="https://bokeh.pydata.org/en/latest/" target="_blank" rel="noopener">https://bokeh.pydata.org/en/latest/</a></li>
-<li><a href="https://d3js.org/" target="_blank" rel="noopener">https://d3js.org/</a></li>
-<li><a href="https://matplotlib.org/" target="_blank" rel="noopener">https://matplotlib.org/</a></li>
-</ol>
-<h1 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h1><ol>
-<li><a href="http://tinycorelinux.net/downloads.html" target="_blank" rel="noopener">http://tinycorelinux.net/downloads.html</a></li>
-<li><a href="http://www.codysafe.com/contact-us.html" target="_blank" rel="noopener">http://www.codysafe.com/contact-us.html</a></li>
-<li><a href="https://susestudio.com/" target="_blank" rel="noopener">https://susestudio.com/</a></li>
-<li><a href="http://www.mondorescue.org/" target="_blank" rel="noopener">http://www.mondorescue.org/</a></li>
-<li><a href="http://distrowatch.com/" target="_blank" rel="noopener">http://distrowatch.com/</a></li>
-</ol>
-<h1 id="云计算"><a href="#云计算" class="headerlink" title="云计算"></a>云计算</h1><ol>
-<li><a href="http://www.cnblogs.com/CloudMan6/" target="_blank" rel="noopener">http://www.cnblogs.com/CloudMan6/</a></li>
-<li><a href="https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f?lang=en" target="_blank" rel="noopener">https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f?lang=en</a><br>3.<a href="https://docs.openstack.org/liberty/zh_CN/install-guide-rdo/common/conventions.html" target="_blank" rel="noopener">https://docs.openstack.org/liberty/zh_CN/install-guide-rdo/common/conventions.html</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这里收集了各个学科优秀的学习资源.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/12/tools/003-resources/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/12/tools/003-resources/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjghmb8eq003fbgkaxbfdj5wu" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/resource/">resource</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">9</span></li></ul>
 
       </footer>
       </div>
@@ -1958,7 +1819,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1968,7 +1829,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 11.25px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 11.25px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1990,6 +1851,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/27/blockchain/000-learn-resources/">区块链学习路径与资源</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/27/linux/008-linux-kernel1/">Linux内核</a>
           </li>
         
@@ -2003,10 +1868,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/27/python/008-python-error/">python中的常见错误</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/18/db/003-sql-must-know/">sql中最重要的原理</a>
           </li>
         
       </ul>
