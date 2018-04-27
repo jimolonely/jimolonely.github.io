@@ -84,6 +84,84 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/003-split-file" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/27/linux/003-split-file/" class="article-date">
+  <time datetime="2017-12-27T08:35:58.000Z" itemprop="datePublished">2017-12-27</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/27/linux/003-split-file/">linux下分割合并文件命令</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>分割与合并文件操作.</p>
+<h2 id="分割与合并文件"><a href="#分割与合并文件" class="headerlink" title="分割与合并文件"></a>分割与合并文件</h2><p>有时候大文件分割后更方便传输。<br>以一张图片为例：<br>分割：默认分割<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 1.5M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">[jimo@jimo-pc shell]$ split 1.png </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 2.9M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
+<p>合并：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
+<p>指定每个文件大小：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ split 1.png -b 500KB </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo  972 11月 12 18:35 xad</span><br></pre></td></tr></table></figure></p>
+<p>类似的命令可以看csplit</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>分割与合并文件操作.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2017/12/27/linux/003-split-file/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2017/12/27/linux/003-split-file/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="cjghej0dt001mktkagsh553qo" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">19</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/002-system-info" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/27/linux/002-system-info/" class="article-date">
@@ -150,7 +228,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="cjghebfle001kdgkaejiifd52" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="cjghej0ds001kktkacyfl5hox" class="article-share-link">
           Share
         </a>
         
@@ -313,7 +391,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="cjghebfld001idgka6gcluw6e" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="cjghej0dr001iktkajhe4tkd4" class="article-share-link">
           Share
         </a>
         
@@ -402,7 +480,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="cjghebflc001fdgka77p4wved" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="cjghej0dq001fktka41dc7n7y" class="article-share-link">
           Share
         </a>
         
@@ -487,84 +565,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/24/design-pattern/command/" data-id="cjghebfkw000odgkaw9rknv40" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/24/design-pattern/command/" data-id="cjghej0dc000oktkaetyec654" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">8</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-hexo/deploy-hexo-on-github" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/23/hexo/deploy-hexo-on-github/" class="article-date">
-  <time datetime="2017-12-23T14:08:04.000Z" itemprop="datePublished">2017-12-23</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/23/hexo/deploy-hexo-on-github/">部署hexo到github</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>飞快搭建hexo+github博客.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
-        
-          <p class="article-more-link">
-            <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">Read More</a>
-          </p>
-        
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                  
-                    <p>
-                      <p>飞快搭建hexo+github博客.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
-                    </p>
-                    
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/23/hexo/deploy-hexo-on-github/" data-id="cjghebfl40011dgkatr7vq7gk" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -623,6 +629,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/27/hexo/deploy-hexo-on-github/">部署hexo到github</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/27/python/006-python-warning/">python中的那些警告</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/27/python/008-python-error/">python中的常见错误</a>
           </li>
         
@@ -632,14 +646,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/18/db/003-sql-must-know/">sql中最重要的原理</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/15/python/007-use-pandas/">pandas那些常用操作</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/14/db/002-sqlserver-datetime-to-constellation/">sqlserver中生日转星座</a>
           </li>
         
       </ul>

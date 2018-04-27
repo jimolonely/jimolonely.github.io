@@ -84,6 +84,90 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-elasticsearch/002-modify-data" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/14/elasticsearch/002-modify-data/" class="article-date">
+  <time datetime="2018-03-14T01:34:32.000Z" itemprop="datePublished">2018-03-14</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/14/elasticsearch/002-modify-data/">03elasticsearch修改数据</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>修改数据也是必修课.</p>
+<h1 id="Modifying-Your-Data"><a href="#Modifying-Your-Data" class="headerlink" title="Modifying Your Data"></a>Modifying Your Data</h1><p>从<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/_modifying_your_data.html" target="_blank" rel="noopener">modifying_your_data.html</a>开始</p>
+<p>再把数据建回来：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPUT 'localhost:9200/customer/doc/1?pretty&amp;pretty' -H 'Content-Type: application/json' -d'</span><br><span class="line"><span class="meta">&gt;</span> &#123;</span><br><span class="line"><span class="meta">&gt;</span>   "name": "John Doe"</span><br><span class="line"><span class="meta">&gt;</span> &#125;</span><br><span class="line"><span class="meta">&gt;</span> '</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "1",</span><br><span class="line">  "_version" : 1,</span><br><span class="line">  "result" : "created",</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 2,</span><br><span class="line">    "successful" : 1,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "_seq_no" : 0,</span><br><span class="line">  "_primary_term" : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当我们再次执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPUT 'localhost:9200/customer/doc/1?pretty&amp;pretty' -H 'Content-Type: application/json' -d' &#123; "name": "John Doe" &#125; '</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "1",</span><br><span class="line">  "_version" : 2,</span><br><span class="line">  "result" : "updated",</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 2,</span><br><span class="line">    "successful" : 1,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "_seq_no" : 1,</span><br><span class="line">  "_primary_term" : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>会发现版本、序列号变了，结果变为updated。</p>
+<p>我们再放一个ID=2的：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPUT 'localhost:9200/customer/doc/2?pretty&amp;pretty' -H 'Content-Type: application/json' -d' &#123; "name": "Jane Doe" &#125; '</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "2",</span><br><span class="line">  "_version" : 1,</span><br><span class="line">  "result" : "created",</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 2,</span><br><span class="line">    "successful" : 1,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "_seq_no" : 0,</span><br><span class="line">  "_primary_term" : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当我们不指定ID时，以POST方式提交，会有个随机ID值：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPOST 'localhost:9200/customer/doc?pretty&amp;pretty' -H 'Content-Type: application/json' -d' &#123; "name": "Jane Doe" &#125; '</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "KcZ4F2ABxI3idTrh9-Z0",</span><br><span class="line">  "_version" : 1,</span><br><span class="line">  "result" : "created",</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 2,</span><br><span class="line">    "successful" : 1,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "_seq_no" : 1,</span><br><span class="line">  "_primary_term" : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Updating-Documents"><a href="#Updating-Documents" class="headerlink" title="Updating Documents"></a>Updating Documents</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPOST 'localhost:9200/customer/doc/1/_update?pretty&amp;pretty' -H 'Content-Type: application/json' -d' &#123; "doc": &#123; "name": "Jane Doe" &#125; &#125; '</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "1",</span><br><span class="line">  "_version" : 3,</span><br><span class="line">  "result" : "updated",</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 2,</span><br><span class="line">    "successful" : 1,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "_seq_no" : 2,</span><br><span class="line">  "_primary_term" : 1</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span> 增加字段</span><br><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPOST 'localhost:9200/customer/doc/1/_update?pretty&amp;pretty' -H 'Content-Type: application/json' -d' &#123; "doc": &#123; "name": "Jane Doe", "age": 20 &#125; &#125; '</span><br><span class="line"><span class="meta">#</span> 做运算</span><br><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPOST 'localhost:9200/customer/doc/1/_update?pretty&amp;pretty' -H 'Content-Type: application/json' -d' &#123; "script" : "ctx._source.age += 5" &#125; '  </span><br><span class="line"><span class="meta">#</span> 现在的结果</span><br><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XGET 'localhost:9200/customer/doc/1?pretty&amp;pretty'</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "1",</span><br><span class="line">  "_version" : 5,</span><br><span class="line">  "found" : true,</span><br><span class="line">  "_source" : &#123;</span><br><span class="line">    "name" : "Jane Doe",</span><br><span class="line">    "age" : 25</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Deleting-Documents"><a href="#Deleting-Documents" class="headerlink" title="Deleting Documents"></a>Deleting Documents</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XDELETE 'localhost:9200/customer/doc/2?pretty&amp;pretty'</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "customer",</span><br><span class="line">  "_type" : "doc",</span><br><span class="line">  "_id" : "2",</span><br><span class="line">  "_version" : 2,</span><br><span class="line">  "result" : "deleted",</span><br><span class="line">  "_shards" : &#123;</span><br><span class="line">    "total" : 2,</span><br><span class="line">    "successful" : 1,</span><br><span class="line">    "failed" : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  "_seq_no" : 2,</span><br><span class="line">  "_primary_term" : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Batch-Processing"><a href="#Batch-Processing" class="headerlink" title="Batch Processing"></a>Batch Processing</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPOST 'localhost:9200/customer/doc/_bulk?pretty&amp;pretty' -H 'Content-Type: application/json' -d'</span><br><span class="line"><span class="meta">&gt;</span> &#123;"index":&#123;"_id":"1"&#125;&#125;</span><br><span class="line"><span class="meta">&gt;</span> &#123;"name": "John Doe" &#125;</span><br><span class="line"><span class="meta">&gt;</span> &#123;"index":&#123;"_id":"2"&#125;&#125;</span><br><span class="line"><span class="meta">&gt;</span> &#123;"name": "Jane Doe" &#125;</span><br><span class="line"><span class="meta">&gt;</span> '</span><br><span class="line">&#123;</span><br><span class="line">  "took" : 38,</span><br><span class="line">  "errors" : false,</span><br><span class="line">  "items" : [</span><br><span class="line">    &#123;</span><br><span class="line">      "index" : &#123;</span><br><span class="line">        "_index" : "customer",</span><br><span class="line">        "_type" : "doc",</span><br><span class="line">        "_id" : "1",</span><br><span class="line">        "_version" : 6,</span><br><span class="line">        "result" : "updated",</span><br><span class="line">        "_shards" : &#123;</span><br><span class="line">          "total" : 2,</span><br><span class="line">          "successful" : 1,</span><br><span class="line">          "failed" : 0</span><br><span class="line">        &#125;,</span><br><span class="line">        "_seq_no" : 5,</span><br><span class="line">        "_primary_term" : 1,</span><br><span class="line">        "status" : 200</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      "index" : &#123;</span><br><span class="line">        "_index" : "customer",</span><br><span class="line">        "_type" : "doc",</span><br><span class="line">        "_id" : "2",</span><br><span class="line">        "_version" : 1,</span><br><span class="line">        "result" : "created",</span><br><span class="line">        "_shards" : &#123;</span><br><span class="line">          "total" : 2,</span><br><span class="line">          "successful" : 1,</span><br><span class="line">          "failed" : 0</span><br><span class="line">        &#125;,</span><br><span class="line">        "_seq_no" : 3,</span><br><span class="line">        "_primary_term" : 1,</span><br><span class="line">        "status" : 201</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面再更新和删除：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc elasticsearch-6.0.0]$ curl -XPOST 'localhost:9200/customer/doc/_bulk?pretty&amp;pretty' -H 'Content-Type: application/json' -d'</span><br><span class="line"><span class="meta">&gt;</span> &#123;"update":&#123;"_id":"1"&#125;&#125;</span><br><span class="line"><span class="meta">&gt;</span> &#123;"doc": &#123; "name": "John Doe becomes Jane Doe" &#125; &#125;</span><br><span class="line"><span class="meta">&gt;</span> &#123;"delete":&#123;"_id":"2"&#125;&#125;</span><br><span class="line"><span class="meta">&gt;</span> '</span><br><span class="line">&#123;</span><br><span class="line">  "took" : 55,</span><br><span class="line">  "errors" : false,</span><br><span class="line">  "items" : [</span><br><span class="line">    &#123;</span><br><span class="line">      "update" : &#123;</span><br><span class="line">        "_index" : "customer",</span><br><span class="line">        "_type" : "doc",</span><br><span class="line">        "_id" : "1",</span><br><span class="line">        "_version" : 7,</span><br><span class="line">        "result" : "updated",</span><br><span class="line">        "_shards" : &#123;</span><br><span class="line">          "total" : 2,</span><br><span class="line">          "successful" : 1,</span><br><span class="line">          "failed" : 0</span><br><span class="line">        &#125;,</span><br><span class="line">        "_seq_no" : 6,</span><br><span class="line">        "_primary_term" : 1,</span><br><span class="line">        "status" : 200</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      "delete" : &#123;</span><br><span class="line">        "_index" : "customer",</span><br><span class="line">        "_type" : "doc",</span><br><span class="line">        "_id" : "2",</span><br><span class="line">        "_version" : 2,</span><br><span class="line">        "result" : "deleted",</span><br><span class="line">        "_shards" : &#123;</span><br><span class="line">          "total" : 2,</span><br><span class="line">          "successful" : 1,</span><br><span class="line">          "failed" : 0</span><br><span class="line">        &#125;,</span><br><span class="line">        "_seq_no" : 4,</span><br><span class="line">        "_primary_term" : 1,</span><br><span class="line">        "status" : 200</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<a href="/2018/03/15/elasticsearch/003-data-explore/" title="04-数据检索">04-数据检索</a>
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>修改数据也是必修课.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/14/elasticsearch/002-modify-data/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/14/elasticsearch/002-modify-data/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjghej0df000tktkaybf5rhxh" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-js/000-echarts-graph" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/13/js/000-echarts-graph/" class="article-date">
@@ -146,7 +230,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjghebfl60015dgkasew9e5g0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjghej0dl0015ktkazzbd7efy" class="article-share-link">
           Share
         </a>
         
@@ -237,7 +321,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjghebflu002fdgka004lpq8z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjghej0e8002fktkazw8f0v1v" class="article-share-link">
           Share
         </a>
         
@@ -330,7 +414,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjghebfky000rdgkaou4s7w05" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjghej0de000rktkai7kdl4ny" class="article-share-link">
           Share
         </a>
         
@@ -415,7 +499,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjghebfkx000pdgkajjugitb0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjghej0dd000pktkaxvpqm8zi" class="article-share-link">
           Share
         </a>
         
@@ -511,7 +595,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjghebflb001ddgka3vnuy8jp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjghej0dp001dktkaaqiakzth" class="article-share-link">
           Share
         </a>
         
@@ -590,7 +674,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjghebfkf0004dgkakm1o3pjb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjghej0cy0004ktkannshm8cj" class="article-share-link">
           Share
         </a>
         
@@ -669,7 +753,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjghebfl9001adgkah6454dy3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjghej0do001aktkais44ujiy" class="article-share-link">
           Share
         </a>
         
@@ -753,7 +837,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjghebfl80018dgkat4of6e05" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjghej0dn0018ktkaiy7n578y" class="article-share-link">
           Share
         </a>
         
@@ -831,7 +915,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjghebfmi003pdgka272qcud6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjghej0eu003pktkarnkj5er2" class="article-share-link">
           Share
         </a>
         
@@ -914,7 +998,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjghebfmh003ndgkaw97jug3o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjghej0et003nktkaitp2elrg" class="article-share-link">
           Share
         </a>
         
@@ -1004,7 +1088,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjghebfmg003ldgkaa365mrll" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjghej0er003lktkako7gq6sd" class="article-share-link">
           Share
         </a>
         
@@ -1098,7 +1182,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjghebflt002cdgka0yzvz24q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjghej0e7002cktkajxv2v0h4" class="article-share-link">
           Share
         </a>
         
@@ -1179,7 +1263,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjghebfkg0005dgkaoi1r5lb9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjghej0cz0005ktka3zggnbyf" class="article-share-link">
           Share
         </a>
         
@@ -1269,7 +1353,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjghebfll001vdgkaaex1ivkf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjghej0dz001vktka4jw7ov0r" class="article-share-link">
           Share
         </a>
         
@@ -1348,7 +1432,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjghebfm0002rdgkajcqcopsj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjghej0ed002rktkayo2i0zdz" class="article-share-link">
           Share
         </a>
         
@@ -1437,7 +1521,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjghebfkb0002dgkau8ztdg3o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjghej0cv0002ktkac6zhcgwb" class="article-share-link">
           Share
         </a>
         
@@ -1519,7 +1603,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjghebfls002adgkanxxm7ob5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjghej0e6002aktka18i58upb" class="article-share-link">
           Share
         </a>
         
@@ -1609,7 +1693,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjghebfme003jdgkafko09qbj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjghej0eq003jktkaojigmlwb" class="article-share-link">
           Share
         </a>
         
@@ -1842,92 +1926,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjghebfmc003hdgkayzrzedu9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjghej0ep003hktkamoqabfjc" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/resource/">resource</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">9</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-ai/000-perceptron" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/11/ai/000-perceptron/" class="article-date">
-  <time datetime="2018-01-11T07:38:42.000Z" itemprop="datePublished">2018-01-11</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/11/ai/000-perceptron/">神经元的实现</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文将使用python实现一个神经元(感知器).</p>
-<p>本文来自<a href="https://www.zybuluo.com/hanbingtao/note/433855" target="_blank" rel="noopener">https://www.zybuluo.com/hanbingtao/note/433855</a></p>
-<p>理论请参考上文.下面是python2和3的实现</p>
-<h1 id="python2"><a href="#python2" class="headerlink" title="python2"></a>python2</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, input_num, activator)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        初始化感知器，设置输入参数的个数，以及激活函数。</span></span><br><span class="line"><span class="string">        激活函数的类型为double -&gt; double</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        self.activator = activator</span><br><span class="line">        <span class="comment"># 权重向量初始化为0</span></span><br><span class="line">        self.weights = [<span class="number">0.0</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(input_num)]</span><br><span class="line">        <span class="comment"># 偏置项初始化为0</span></span><br><span class="line">        self.bias = <span class="number">0.0</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        打印学习到的权重、偏置项</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'weights\t:%s\nbias\t:%f\n'</span> % (self.weights, self.bias)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, input_vec)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        输入向量，输出感知器的计算结果</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把input_vec[x1,x2,x3...]和weights[w1,w2,w3,...]打包在一起</span></span><br><span class="line">        <span class="comment"># 变成[(x1,w1),(x2,w2),(x3,w3),...]</span></span><br><span class="line">        <span class="comment"># 然后利用map函数计算[x1*w1, x2*w2, x3*w3]</span></span><br><span class="line">        <span class="comment"># 最后利用reduce求和</span></span><br><span class="line">        <span class="keyword">return</span> self.activator(</span><br><span class="line">            reduce(<span class="keyword">lambda</span> a, b: a + b,</span><br><span class="line">                   map(<span class="keyword">lambda</span> (x, w): x * w,  </span><br><span class="line">                       zip(input_vec, self.weights))</span><br><span class="line">                , <span class="number">0.0</span>) + self.bias)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self, input_vecs, labels, iteration, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        输入训练数据：一组向量、与每个向量对应的label；以及训练轮数、学习率</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(iteration):</span><br><span class="line">            self._one_iteration(input_vecs, labels, rate)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_one_iteration</span><span class="params">(self, input_vecs, labels, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        一次迭代，把所有的训练数据过一遍</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把输入和输出打包在一起，成为样本的列表[(input_vec, label), ...]</span></span><br><span class="line">        <span class="comment"># 而每个训练样本是(input_vec, label)</span></span><br><span class="line">        samples = zip(input_vecs, labels)</span><br><span class="line">        <span class="comment"># 对每个样本，按照感知器规则更新权重</span></span><br><span class="line">        <span class="keyword">for</span> (input_vec, label) <span class="keyword">in</span> samples:</span><br><span class="line">            <span class="comment"># 计算感知器在当前权重下的输出</span></span><br><span class="line">            output = self.predict(input_vec)</span><br><span class="line">            <span class="comment"># 更新权重</span></span><br><span class="line">            self._update_weights(input_vec, output, label, rate)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_weights</span><span class="params">(self, input_vec, output, label, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        按照感知器规则更新权重</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把input_vec[x1,x2,x3,...]和weights[w1,w2,w3,...]打包在一起</span></span><br><span class="line">        <span class="comment"># 变成[(x1,w1),(x2,w2),(x3,w3),...]</span></span><br><span class="line">        <span class="comment"># 然后利用感知器规则更新权重</span></span><br><span class="line">        delta = label - output</span><br><span class="line">        self.weights = map(</span><br><span class="line">            <span class="keyword">lambda</span> (x, w): w + rate * delta * x,</span><br><span class="line">            zip(input_vec, self.weights))</span><br><span class="line">        <span class="comment"># 更新bias</span></span><br><span class="line">        self.bias += rate * delta</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    定义激活函数f</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_training_dataset</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    基于and真值表构建训练数据</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="comment"># 构建训练数据</span></span><br><span class="line">    <span class="comment"># 输入向量列表</span></span><br><span class="line">    input_vecs = [[<span class="number">1</span>,<span class="number">1</span>], [<span class="number">0</span>,<span class="number">0</span>], [<span class="number">1</span>,<span class="number">0</span>], [<span class="number">0</span>,<span class="number">1</span>]]</span><br><span class="line">    <span class="comment"># 期望的输出列表，注意要与输入一一对应</span></span><br><span class="line">    <span class="comment"># [1,1] -&gt; 1, [0,0] -&gt; 0, [1,0] -&gt; 0, [0,1] -&gt; 0</span></span><br><span class="line">    labels = [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]</span><br><span class="line">    <span class="keyword">return</span> input_vecs, labels    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_and_perceptron</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    使用and真值表训练感知器</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="comment"># 创建感知器，输入参数个数为2（因为and是二元函数），激活函数为f</span></span><br><span class="line">    p = Perceptron(<span class="number">2</span>, f)</span><br><span class="line">    <span class="comment"># 训练，迭代10轮, 学习速率为0.1</span></span><br><span class="line">    input_vecs, labels = get_training_dataset()</span><br><span class="line">    p.train(input_vecs, labels, <span class="number">10</span>, <span class="number">0.1</span>)</span><br><span class="line">    <span class="comment">#返回训练好的感知器</span></span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>: </span><br><span class="line">    <span class="comment"># 训练and感知器</span></span><br><span class="line">    and_perception = train_and_perceptron()</span><br><span class="line">    <span class="comment"># 打印训练获得的权重</span></span><br><span class="line">    <span class="keyword">print</span> and_perception</span><br><span class="line">    <span class="comment"># 测试</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'1 and 1 = %d'</span> % and_perception.predict([<span class="number">1</span>, <span class="number">1</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'0 and 0 = %d'</span> % and_perception.predict([<span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'1 and 0 = %d'</span> % and_perception.predict([<span class="number">1</span>, <span class="number">0</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'0 and 1 = %d'</span> % and_perception.predict([<span class="number">0</span>, <span class="number">1</span>])</span><br></pre></td></tr></table></figure>
-<h1 id="python3"><a href="#python3" class="headerlink" title="python3"></a>python3</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> reduce</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, input_num, activator)</span>:</span></span><br><span class="line">        self.activator = activator</span><br><span class="line">        self.weights = [<span class="number">0.0</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(input_num)]</span><br><span class="line">        self.bias = <span class="number">0.0</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self, input_vec, iteration, labels, rate)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(iteration):</span><br><span class="line">            self._one_iteration(input_vec, labels, rate)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_one_iteration</span><span class="params">(self, input_vec, labels, rate)</span>:</span></span><br><span class="line">        samples = zip(input_vec, labels)</span><br><span class="line">        <span class="keyword">for</span> (vec, label) <span class="keyword">in</span> samples:</span><br><span class="line">            output = self.predict(vec)</span><br><span class="line">            self._update_weights(vec, output, label, rate)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, vec)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.activator(</span><br><span class="line">            reduce(</span><br><span class="line">                <span class="keyword">lambda</span> a, b: a + b,</span><br><span class="line">                list(map(</span><br><span class="line">                    <span class="keyword">lambda</span> x, w: x * w,</span><br><span class="line">                    vec, self.weights</span><br><span class="line">                )), <span class="number">0.0</span></span><br><span class="line">            ) + self.bias</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_weights</span><span class="params">(self, vec, output, label, rate)</span>:</span></span><br><span class="line">        delta = label - output</span><br><span class="line">        self.weights = list(map(</span><br><span class="line">            <span class="keyword">lambda</span> x, w: w + rate * delta * x,  <span class="comment"># 在python2里是用的(x,w)形式</span></span><br><span class="line">            vec, self.weights</span><br><span class="line">        ))</span><br><span class="line">        self.bias += rate * delta</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'weights: %s\nbias: %s\n'</span> % (self.weights, self.bias)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">activator</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_data_sets</span><span class="params">()</span>:</span></span><br><span class="line">    x = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">1</span>, <span class="number">0</span>], [<span class="number">1</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">0</span>]]</span><br><span class="line">    labels = [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>]</span><br><span class="line">    <span class="keyword">return</span> x, labels</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">()</span>:</span></span><br><span class="line">    p = Perceptron(<span class="number">2</span>, activator)</span><br><span class="line">    x, labels = get_data_sets()</span><br><span class="line">    p.train(x, <span class="number">20</span>, labels, <span class="number">0.05</span>)</span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    p = train()</span><br><span class="line">    print(p)</span><br><span class="line">    <span class="comment"># 测试</span></span><br><span class="line">    print(<span class="string">'1 and 1 = %d'</span> % p.predict([<span class="number">1</span>, <span class="number">1</span>]))</span><br><span class="line">    print(<span class="string">'0 and 0 = %d'</span> % p.predict([<span class="number">0</span>, <span class="number">0</span>]))</span><br><span class="line">    print(<span class="string">'1 and 0 = %d'</span> % p.predict([<span class="number">1</span>, <span class="number">0</span>]))</span><br><span class="line">    print(<span class="string">'0 and 1 = %d'</span> % p.predict([<span class="number">0</span>, <span class="number">1</span>]))</span><br></pre></td></tr></table></figure>
-<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">weights: [0.1, 0.05]</span><br><span class="line">bias: -0.1</span><br><span class="line"></span><br><span class="line">1 and 1 = 1</span><br><span class="line">0 and 0 = 0</span><br><span class="line">1 and 0 = 0</span><br><span class="line">0 and 1 = 0</span><br></pre></td></tr></table></figure>
-<p>其实上面就是梯度下降的过程.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文将使用python实现一个神经元(感知器).</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/11/ai/000-perceptron/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/11/ai/000-perceptron/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjghebfk70001dgkau0r9kb0f" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
 
       </footer>
       </div>
@@ -1986,6 +1990,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/27/hexo/deploy-hexo-on-github/">部署hexo到github</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/27/python/006-python-warning/">python中的那些警告</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/27/python/008-python-error/">python中的常见错误</a>
           </li>
         
@@ -1995,14 +2007,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/18/db/003-sql-must-know/">sql中最重要的原理</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/15/python/007-use-pandas/">pandas那些常用操作</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/14/db/002-sqlserver-datetime-to-constellation/">sqlserver中生日转星座</a>
           </li>
         
       </ul>
