@@ -84,6 +84,178 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/002-flask-wordcloud" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/18/python/002-flask-wordcloud/" class="article-date">
+  <time datetime="2018-01-18T03:27:21.000Z" itemprop="datePublished">2018-01-18</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/18/python/002-flask-wordcloud/">Flask提供词云API</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>麻雀虽小,五脏俱全.</p>
+<h1 id="先看代码"><a href="#先看代码" class="headerlink" title="先看代码"></a>先看代码</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"><span class="keyword">from</span> flask_restful <span class="keyword">import</span> Resource, Api</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> wordcloud <span class="keyword">import</span> WordCloud</span><br><span class="line"><span class="keyword">from</span> flask_cors <span class="keyword">import</span> CORS</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">api = Api(app)</span><br><span class="line">CORS(app)</span><br><span class="line"></span><br><span class="line">base_url = <span class="string">'http://192.168.1.146:8081'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, stuId)</span>:</span></span><br><span class="line">        text = requests.get(base_url + <span class="string">"/fun/getStuAdviceToTeacher?stuId="</span>+str(stuId)).json()[<span class="string">'data'</span>]</span><br><span class="line">        <span class="keyword">return</span> self.student_cloud_imgstr(text)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">student_cloud_imgstr</span><span class="params">(self,txt)</span>:</span></span><br><span class="line">        wd = WordCloud(font_path=<span class="string">"SimHei.ttf"</span>, max_font_size=<span class="number">60</span>, \</span><br><span class="line">                    width=<span class="number">600</span>, height=<span class="number">400</span>).generate(txt)</span><br><span class="line">        b = BytesIO()</span><br><span class="line">        wd.to_image().save(b, <span class="string">"PNG"</span>)</span><br><span class="line">        img_str = base64.b64encode(b.getvalue())</span><br><span class="line">        <span class="keyword">return</span> img_str.decode(<span class="string">"ascii"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">api.add_resource(HelloWorld, <span class="string">'/fun/&lt;stuId&gt;'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="keyword">True</span>, port=<span class="number">8082</span>, host=<span class="string">'0.0.0.0'</span>)</span><br></pre></td></tr></table></figure>
+<p>下面将解释有什么问题.</p>
+<p>这是干嘛:是访问服务器获取文本,然后生成词云,并将词云图片转为Base64编码返回回去.</p>
+<h1 id="1-跨域访问"><a href="#1-跨域访问" class="headerlink" title="1.跨域访问"></a>1.跨域访问</h1><p>允许所有跨域<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask_cors <span class="keyword">import</span> CORS</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">CORS(app)</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-允许所有IP"><a href="#2-允许所有IP" class="headerlink" title="2.允许所有IP"></a>2.允许所有IP</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.run(host=<span class="string">'0.0.0.0'</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="3-词云如何转Base64"><a href="#3-词云如何转Base64" class="headerlink" title="3.词云如何转Base64"></a>3.词云如何转Base64</h1><p>这是python3环境<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wd = WordCloud(font_path=<span class="string">"SimHei.ttf"</span>, max_font_size=<span class="number">60</span>, \</span><br><span class="line">                    width=<span class="number">600</span>, height=<span class="number">400</span>).generate(txt)</span><br><span class="line">b = BytesIO()</span><br><span class="line">wd.to_image().save(b, <span class="string">"PNG"</span>)</span><br><span class="line">img_str = base64.b64encode(b.getvalue())</span><br><span class="line"><span class="keyword">return</span> img_str.decode(<span class="string">"ascii"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>在python2下:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cStringIO</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">b = cStringIO.StringIO()</span><br><span class="line">wc.to_image().save(b, format=<span class="string">"PNG"</span>)</span><br><span class="line">img_str = base64.b64encode(b.getvalue())</span><br><span class="line"><span class="keyword">return</span> img_str.decode(<span class="string">"ascii"</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="4-前端图片解析Base64"><a href="#4-前端图片解析Base64" class="headerlink" title="4.前端图片解析Base64"></a>4.前端图片解析Base64</h1><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"data:image/jpeg;base64,"</span>+<span class="attr">img_str</span>/&gt;</span>&gt;</span><br></pre></td></tr></table></figure>
+<img src="/2018/01/18/python/002-flask-wordcloud/00.jpeg">
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>麻雀虽小,五脏俱全.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/18/python/002-flask-wordcloud/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/18/python/002-flask-wordcloud/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjglhu3oj002gz6kapuce8er2" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flask/">flask</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wordcloud/">wordcloud</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-tools/004-install-texlive" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/12/tools/004-install-texlive/" class="article-date">
+  <time datetime="2018-01-12T07:46:23.000Z" itemprop="datePublished">2018-01-12</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/12/tools/004-install-texlive/">手动安装texlive</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将手动安装texlive环境,从下载到配置.</p>
+<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><p>CTAN有各个安装源<a href="https://ctan.org/mirrors" target="_blank" rel="noopener">https://ctan.org/mirrors</a></p>
+<p>我使用清华的:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> wget -c http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/Images/texlive2017-20170524.iso</span><br></pre></td></tr></table></figure></p>
+<p>下载有3个多GB.</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>在安装前清除遗留程序,解压或挂载后在root下执行安装程序:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> locate texlive | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> sudo ./install-tl</span><br></pre></td></tr></table></figure></p>
+<p>这是个漫长的过程,大概要12分钟.</p>
+<p>安装完后会提示各个路径:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Welcome to TeX Live!</span><br><span class="line"></span><br><span class="line">Documentation links: /usr/local/texlive/2017/index.html</span><br><span class="line">The TeX Live web site (https://tug.org/texlive/)</span><br><span class="line">contains updates and corrections.</span><br><span class="line"></span><br><span class="line">TeX Live is a joint project of the TeX user groups around the world;</span><br><span class="line">please consider supporting it by joining the group best for you.</span><br><span class="line">The list of groups is on the web at https://tug.org/usergroups.html.</span><br><span class="line"></span><br><span class="line">Add /usr/local/texlive/2017/texmf-dist/doc/man to MANPATH.</span><br><span class="line">Add /usr/local/texlive/2017/texmf-dist/doc/info to INFOPATH.</span><br><span class="line">Most importantly, add /usr/local/texlive/2017/bin/x86_64-linux</span><br><span class="line">to your PATH for current and future sessions.</span><br><span class="line"></span><br><span class="line">Logfile: /usr/local/texlive/2017/install-tl.log</span><br></pre></td></tr></table></figure></p>
+<p>比如文档路径:/usr/local/texlive/2017/index.html</p>
+<p>更重要的是环境变量:/usr/local/texlive/2017/bin/x86_64-linux</p>
+<h1 id="配置与测试"><a href="#配置与测试" class="headerlink" title="配置与测试"></a>配置与测试</h1><p>配置环境变量:追加.bashrc<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export TEXLIVE=/usr/local/texlive/2017/bin/x86_64-linux</span><br><span class="line">export PATH=$TEXLIVE:$PATH</span><br></pre></td></tr></table></figure></p>
+<p>测试:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> tex --version</span><br><span class="line">TeX 3.14159265 (TeX Live 2017)</span><br><span class="line">kpathsea version 6.2.3</span><br><span class="line">Copyright 2017 D.E. Knuth.</span><br><span class="line">There is NO warranty.  Redistribution of this software is</span><br><span class="line">covered by the terms of both the TeX copyright and</span><br><span class="line">the Lesser GNU General Public License.</span><br><span class="line">For more information about these matters, see the file</span><br><span class="line">named COPYING and the TeX source.</span><br><span class="line">Primary author of TeX: D.E. Knuth.</span><br></pre></td></tr></table></figure></p>
+<p>编辑个简单的文档保存为sample.tex:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[12pt,a4paper]&#123;report&#125;</span><br><span class="line"></span><br><span class="line">\title&#123;Title&#125;</span><br><span class="line">\author&#123;jackpler&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line">hello world!</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后测试:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> latex sample.tex  # 编译一个测试文件</span><br><span class="line"><span class="meta">$</span> pdftex sample.tex # 生成测试文档的pdf文件</span><br></pre></td></tr></table></figure></p>
+<h1 id="tlmgr使用"><a href="#tlmgr使用" class="headerlink" title="tlmgr使用"></a>tlmgr使用</h1><p>现在texlive自带tlmgr包管理工具进行管理,方便了.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 自动选择最近的仓库更新</span><br><span class="line"><span class="meta">$</span> sudo tlmgr option repository http://mirror.ctan.org/systems/texlive/tlnet    </span><br><span class="line"><span class="meta">#</span> 更新宏包管理器</span><br><span class="line"><span class="meta">$</span> sudo tlmgr update --self  </span><br><span class="line"><span class="meta">#</span> 更新所有已安装的宏包</span><br><span class="line"><span class="meta">$</span> sudo tlmgr update --all   </span><br><span class="line"><span class="meta">#</span> 安装新包</span><br><span class="line"><span class="meta">$</span> sudo tlmgr install 包名</span><br></pre></td></tr></table></figure></p>
+<p>更多包在<a href="https://ctan.org" target="_blank" rel="noopener">CTAN</a>上去找.</p>
+<h1 id="更多学习"><a href="#更多学习" class="headerlink" title="更多学习"></a>更多学习</h1><p>使用官方文档:<a href="https://www.tug.org/texlive/doc/texlive-zh-cn/texlive-zh-cn.pdf" target="_blank" rel="noopener">https://www.tug.org/texlive/doc/texlive-zh-cn/texlive-zh-cn.pdf</a></p>
+<p>完整的tlmgr命令文档<a href="http://tug.org/texlive/doc/tlmgr.html" target="_blank" rel="noopener">tlmgr</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将手动安装texlive环境,从下载到配置.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/12/tools/004-install-texlive/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/12/tools/004-install-texlive/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjglhu3p7003pz6kalimtkovg" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">9</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/003-resources" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/12/tools/003-resources/" class="article-date">
@@ -303,7 +475,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjgk5oh4d003kvgkamli76u55" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjglhu3p5003mz6kamjltppck" class="article-share-link">
           Share
         </a>
         
@@ -383,7 +555,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjgk5oh2r000evgkas39myial" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjglhu3mw0001z6ka7rylvrzj" class="article-share-link">
           Share
         </a>
         
@@ -469,12 +641,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjgk5oh49003fvgka4p7ck2kr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjglhu3p4003kz6karurnhafp" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">19</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">9</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">21</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">9</span></li></ul>
 
       </footer>
       </div>
@@ -548,12 +720,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjgk5oh370016vgkavzdx8qwr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjglhu3nt0012z6kaji0kn86w" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">19</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -629,7 +801,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjgk5oh4c003ivgkay0qexg4s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjglhu3p2003iz6ka8k7rnda2" class="article-share-link">
           Share
         </a>
         
@@ -718,7 +890,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjgk5oh3u002evgkaqmtf1knf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjglhu3oi002dz6ka9c4exsg8" class="article-share-link">
           Share
         </a>
         
@@ -816,7 +988,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjgk5oh460037vgka7a37gddc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjglhu3p0003ez6kaul20fsye" class="article-share-link">
           Share
         </a>
         
@@ -896,7 +1068,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjgk5oh3r0027vgka8ra6r93b" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjglhu3oh002bz6ka11ui2vpa" class="article-share-link">
           Share
         </a>
         
@@ -989,7 +1161,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjgk5oh450035vgka5st5dg6r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjglhu3oz003cz6kalo6taetk" class="article-share-link">
           Share
         </a>
         
@@ -1072,7 +1244,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjgk5oh440033vgka2btzigxs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjglhu3oy003az6ka0o7ldjt0" class="article-share-link">
           Share
         </a>
         
@@ -1159,7 +1331,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjgk5oh3t002bvgka9buodp5b" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjglhu3og0029z6ka2xopkbqi" class="article-share-link">
           Share
         </a>
         
@@ -1255,7 +1427,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjgk5oh42002yvgkah0d3hgb4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjglhu3ow0037z6kasasu4v2i" class="article-share-link">
           Share
         </a>
         
@@ -1329,7 +1501,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjgk5oh47003avgka3h00ww3v" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjglhu3ot0030z6ka71sn1hkq" class="article-share-link">
           Share
         </a>
         
@@ -1438,7 +1610,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjgk5oh4a003gvgkao5hrs6wk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjglhu3p1003hz6kah5r9i6us" class="article-share-link">
           Share
         </a>
         
@@ -1558,7 +1730,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjgk5oh2y000ovgkanlc6xz2i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjglhu3ns0011z6kabw0i0keg" class="article-share-link">
           Share
         </a>
         
@@ -1632,12 +1804,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjgk5oh3l001uvgkaa9tprekb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjglhu3o9001uz6ka08dwk5no" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">19</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">21</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -1715,7 +1887,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjgk5oh48003cvgka0nzwv8rl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjglhu3os002xz6kapb8jzjdj" class="article-share-link">
           Share
         </a>
         
@@ -1796,227 +1968,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjgk5oh41002vvgkaabesbs9j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjglhu3ov0035z6kal1wa8ac0" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">4</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-shell/000-use-awk" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/28/shell/000-use-awk/" class="article-date">
-  <time datetime="2017-12-28T07:56:47.000Z" itemprop="datePublished">2017-12-28</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/28/shell/000-use-awk/">awk使用详解</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h1><p>准确的说,awk是一种编程语言,所以值得拿出来看看.</p>
-<p>我希望通过写这篇日志让自己明白这个命令的用法,如果不幸帮助到别人,我会倍感失落.</p>
-<p>此教程来自<a href="https://www.tutorialspoint.com/awk/index.htm" target="_blank" rel="noopener">tutorialspoint-awk</a></p>
-<h2 id="理解awk执行流程"><a href="#理解awk执行流程" class="headerlink" title="理解awk执行流程"></a>理解awk执行流程</h2><img src="/2017/12/28/shell/000-use-awk/000.jpg">
-<p>例如:</p>
-<p>有文本内容marks.txt:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1)  Amit    Physics  80</span><br><span class="line">2)  Rahul   Maths    90</span><br><span class="line">3)  Shyam   Biology  87</span><br><span class="line">4)  Kedar   English  85</span><br><span class="line">5)  Hari    History  89</span><br></pre></td></tr></table></figure></p>
-<p>我们要加上标题栏可以使用BEGIN关键字:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN&#123;printf "Sr No\tName\tSub\tMarks\n"&#125; &#123;print&#125; END&#123;printf "end line\n"&#125;' marks.txt </span><br><span class="line"><span class="meta">#</span> 输出</span><br><span class="line">Sr No	Name	Sub	Marks</span><br><span class="line">1)  Amit    Physics  80</span><br><span class="line">2)  Rahul   Maths    90</span><br><span class="line">3)  Shyam   Biology  87</span><br><span class="line">4)  Kedar   English  85</span><br><span class="line">5)  Hari    History  89</span><br><span class="line">end line</span><br></pre></td></tr></table></figure></p>
-<h2 id="基本使用方式"><a href="#基本使用方式" class="headerlink" title="基本使用方式"></a>基本使用方式</h2><ol>
-<li><p>命令行</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk [options] file</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>输入脚本文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk [options] -f awk-script-file file ....</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>例如:command.awk内容:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;print&#125;</span><br></pre></td></tr></table></figure></p>
-<p>使用:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk -f command.awk marks.txt</span><br></pre></td></tr></table></figure></p>
-<h2 id="options选项"><a href="#options选项" class="headerlink" title="options选项"></a>options选项</h2><h3 id="v"><a href="#v" class="headerlink" title="-v"></a>-v</h3><p>v代表variable,指在程序执行前赋予变量值.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk -v name=Jerry 'BEGIN&#123;printf "Name = %s\n", name&#125;'</span><br><span class="line">Name = Jerry</span><br></pre></td></tr></table></figure></p>
-<h3 id="–dump-variables-file"><a href="#–dump-variables-file" class="headerlink" title="–dump-variables[=file]"></a>–dump-variables[=file]</h3><p>输出全局变量到文件,默认为awkvars.out.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk --dump-variables ''</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc shell]$ cat awkvars.out </span><br><span class="line">ARGC: 1</span><br><span class="line">ARGIND: 0</span><br><span class="line">ARGV: array, 1 elements</span><br><span class="line">BINMODE: 0</span><br><span class="line">CONVFMT: "%.6g"</span><br><span class="line">ENVIRON: array, 60 elements</span><br><span class="line">ERRNO: ""</span><br><span class="line">FIELDWIDTHS: ""</span><br><span class="line">FILENAME: ""</span><br><span class="line">FNR: 0</span><br><span class="line">FPAT: "[^[:space:]]+"</span><br><span class="line">FS: " "</span><br><span class="line">FUNCTAB: array, 41 elements</span><br><span class="line">IGNORECASE: 0</span><br><span class="line">LINT: 0</span><br><span class="line">NF: 0</span><br><span class="line">NR: 0</span><br><span class="line">OFMT: "%.6g"</span><br><span class="line">OFS: " "</span><br><span class="line">ORS: "\n"</span><br><span class="line">PREC: 53</span><br><span class="line">PROCINFO: array, 28 elements</span><br><span class="line">RLENGTH: 0</span><br><span class="line">ROUNDMODE: "N"</span><br><span class="line">RS: "\n"</span><br><span class="line">RSTART: 0</span><br><span class="line">RT: ""</span><br><span class="line">SUBSEP: "\034"</span><br><span class="line">SYMTAB: array, 28 elements</span><br><span class="line">TEXTDOMAIN: "messages"</span><br></pre></td></tr></table></figure></p>
-<h3 id="–lint"><a href="#–lint" class="headerlink" title="–lint"></a>–lint</h3><p>严格检查语法,将警告当做错误输出<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk '' /bin/ls</span><br><span class="line">[jimo@jimo-pc shell]$ awk --lint '' /bin/ls</span><br><span class="line">awk: 命令行:1: 警告：命令行中程序体为空</span><br><span class="line">awk: 命令行:1: 警告：源文件不以换行符结束</span><br><span class="line">awk: 警告：完全没有程序正文！</span><br></pre></td></tr></table></figure></p>
-<h3 id="–profile-file"><a href="#–profile-file" class="headerlink" title="–profile[=file]"></a>–profile[=file]</h3><p>这个选项在文件中生成一个相当漂亮的程序版本,默认文件是awkprof.out。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk --profile 'BEGIN&#123;printf"---|Header|--\n"&#125; &#123;print&#125; END&#123;printf"---|Footer|---\n"&#125;' marks.txt &gt; /dev/null</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc shell]$ cat awkprof.out </span><br><span class="line"><span class="meta">	#</span> gawk 配置, 创建 Thu Dec 21 20:45:30 2017</span><br><span class="line"></span><br><span class="line"><span class="meta">	#</span> BEGIN 规则</span><br><span class="line"></span><br><span class="line">	BEGIN &#123;</span><br><span class="line">     1  	printf "---|Header|--\n"</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">	#</span> 规则</span><br><span class="line"></span><br><span class="line">     5  &#123;</span><br><span class="line">     5  	print $0</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">	#</span> END 规则</span><br><span class="line"></span><br><span class="line">	END &#123;</span><br><span class="line">     1  	printf "---|Footer|---\n"</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="基本使用实例"><a href="#基本使用实例" class="headerlink" title="基本使用实例"></a>基本使用实例</h2><p>使用文件:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ cat marks.txt </span><br><span class="line">1)  Amit    Physics  80</span><br><span class="line">2)  Rahul   Maths    90</span><br><span class="line">3)  Shyam   Biology  87</span><br><span class="line">4)  Kedar   English  85</span><br><span class="line">5)  Hari    History  89</span><br></pre></td></tr></table></figure></p>
-<h3 id="打印列"><a href="#打印列" class="headerlink" title="打印列"></a>打印列</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk '&#123;print $3 "\t" $4&#125;' marks.txt </span><br><span class="line">Physics	80</span><br><span class="line">Maths	90</span><br><span class="line">Biology	87</span><br><span class="line">English	85</span><br><span class="line">History	89</span><br></pre></td></tr></table></figure>
-<h3 id="打印所有行"><a href="#打印所有行" class="headerlink" title="打印所有行"></a>打印所有行</h3><p>默认打印所有行,下面使用了正则匹配,必须含有a才打印<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk '/a/ &#123;print $0&#125;' marks.txt </span><br><span class="line">2)  Rahul   Maths    90</span><br><span class="line">3)  Shyam   Biology  87</span><br><span class="line">4)  Kedar   English  85</span><br><span class="line">5)  Hari    History  89</span><br><span class="line"><span class="meta">#</span> 等价于</span><br><span class="line"><span class="meta">$</span> awk '/a/' marks.txt</span><br></pre></td></tr></table></figure></p>
-<h3 id="计数"><a href="#计数" class="headerlink" title="计数"></a>计数</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk '/a/&#123;++cnt&#125; END &#123;print "Count=",cnt&#125;' marks.txt </span><br><span class="line">Count= 4</span><br></pre></td></tr></table></figure>
-<h3 id="打印行字符数"><a href="#打印行字符数" class="headerlink" title="打印行字符数"></a>打印行字符数</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk '&#123;print length($0)&#125;' marks.txt </span><br><span class="line">23</span><br><span class="line">23</span><br><span class="line">23</span><br><span class="line">23</span><br><span class="line">23</span><br></pre></td></tr></table></figure>
-<h2 id="awk内置变量"><a href="#awk内置变量" class="headerlink" title="awk内置变量"></a>awk内置变量</h2><p>有一些内置变量需要了解,可以加快编程.</p>
-<h3 id="ARGC"><a href="#ARGC" class="headerlink" title="ARGC"></a>ARGC</h3><p>代表参数个数<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;print "Arguments =", ARGC&#125;' One Two Three Four</span><br><span class="line">Arguments = 5</span><br></pre></td></tr></table></figure></p>
-<p>为什么有5个?看下面</p>
-<h3 id="ARGV"><a href="#ARGV" class="headerlink" title="ARGV"></a>ARGV</h3><p>存储每个参数<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;                                              </span><br><span class="line">   for (i = 0; i &lt; ARGC; ++i) &#123; </span><br><span class="line">      printf "ARGV[%d] = %s\n", i, ARGV[i] </span><br><span class="line">   &#125; </span><br><span class="line">&#125;' one two three four</span><br><span class="line">ARGV[0] = awk</span><br><span class="line">ARGV[1] = one</span><br><span class="line">ARGV[2] = two</span><br><span class="line">ARGV[3] = three</span><br><span class="line">ARGV[4] = four</span><br></pre></td></tr></table></figure></p>
-<h3 id="CONVFMT"><a href="#CONVFMT" class="headerlink" title="CONVFMT"></a>CONVFMT</h3><p>代表数字的转换格式,默认是%.6g<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">]$</span> awk 'BEGIN &#123;print "Conversion format = ",CONVFMT&#125;'</span><br><span class="line">Conversion format =  %.6g</span><br></pre></td></tr></table></figure></p>
-<h3 id="ENVIRON"><a href="#ENVIRON" class="headerlink" title="ENVIRON"></a>ENVIRON</h3><p>一个环境变量的关联数组.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;print ENVIRON["user"]&#125;'</span><br><span class="line"><span class="meta">#</span> 什么都没有</span><br></pre></td></tr></table></figure></p>
-<h3 id="FILENAME"><a href="#FILENAME" class="headerlink" title="FILENAME"></a>FILENAME</h3><p>当前文件名<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'END &#123;print FILENAME&#125;' marks.txt </span><br><span class="line">marks.txt</span><br></pre></td></tr></table></figure></p>
-<h3 id="FS"><a href="#FS" class="headerlink" title="FS"></a>FS</h3><p>field separator,输入域的分隔符,默认是空格.可以使用-F修改.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123;print "FS=" FS&#125;' | cat -vte</span><br><span class="line">FS= $</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc shell]$ awk -F "," 'BEGIN &#123;print "FS=" FS&#125;'</span><br><span class="line">FS=,</span><br></pre></td></tr></table></figure></p>
-<h3 id="NF"><a href="#NF" class="headerlink" title="NF"></a>NF</h3><p>number of field,只是某一行的域个数.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> echo -e "One Two\nOne Two Three\nOne Two Three Four" | awk 'NF &gt; 3'</span><br><span class="line">One Two Three Four</span><br></pre></td></tr></table></figure></p>
-<h3 id="NR"><a href="#NR" class="headerlink" title="NR"></a>NR</h3><p>number of record,当前记录的个数.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> echo -e "One Two\nOne Two Three\nOne Two Three Four" | awk 'NR &lt; 3'</span><br><span class="line">One Two</span><br><span class="line">One Two Three</span><br></pre></td></tr></table></figure></p>
-<h3 id="FNR"><a href="#FNR" class="headerlink" title="FNR"></a>FNR</h3><p>它与NR类似，但相对于当前文件。AWK在多个文件上运行时很有用。FNR的值与新文件重置。</p>
-<h3 id="OFMT"><a href="#OFMT" class="headerlink" title="OFMT"></a>OFMT</h3><p>输出数字格式,默认%.6g<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;print "OFMT = " OFMT&#125;'</span><br><span class="line">OFMT = %.6g</span><br></pre></td></tr></table></figure></p>
-<h3 id="OFS"><a href="#OFS" class="headerlink" title="OFS"></a>OFS</h3><p>output field separator,行内输出分隔符,默认也是空格.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;print "OFS = " OFS&#125;' | cat -vte</span><br><span class="line">OFS =  $</span><br></pre></td></tr></table></figure></p>
-<h3 id="ORS"><a href="#ORS" class="headerlink" title="ORS"></a>ORS</h3><p>output record separator,输出记录(行)分隔符,或则行间分隔符,默认是\n<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;print "ORS = " ORS&#125;' | cat -vte</span><br><span class="line">ORS = $</span><br><span class="line"><span class="meta">$</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="RS"><a href="#RS" class="headerlink" title="RS"></a>RS</h3><p>input record separator,输入记录(行)分隔符,或则行间分隔符,默认是\n<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;print "RS = " RS&#125;' | cat -vte</span><br><span class="line">RS = $</span><br><span class="line"><span class="meta">$</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="RLENGTH"><a href="#RLENGTH" class="headerlink" title="RLENGTH"></a>RLENGTH</h3><p>代表match函数匹配的字符串长度.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123; if (match("One Two Three", "re")) &#123; print RLENGTH &#125; &#125;'</span><br><span class="line">2</span><br></pre></td></tr></table></figure></p>
-<h3 id="RSTART"><a href="#RSTART" class="headerlink" title="RSTART"></a>RSTART</h3><p>由match匹配的字符串的第一个位置.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123; if (match("One Two Three", "Thre")) &#123; print RSTART &#125; &#125;'</span><br><span class="line">9</span><br></pre></td></tr></table></figure></p>
-<h3 id="SUBSEP"><a href="#SUBSEP" class="headerlink" title="SUBSEP"></a>SUBSEP</h3><p>数组下标分隔符,默认是\034<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123; print "SUBSEP = " SUBSEP &#125;' | cat -vte</span><br><span class="line">SUBSEP = ^\$</span><br></pre></td></tr></table></figure></p>
-<h3 id="0"><a href="#0" class="headerlink" title="$0"></a>$0</h3><p>代表整个输入记录<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk '&#123;print $0&#125;' marks.txt</span><br><span class="line">1)  Amit    Physics  80</span><br><span class="line">2)  Rahul   Maths    90</span><br><span class="line">3)  Shyam   Biology  87</span><br><span class="line">4)  Kedar   English  85</span><br><span class="line">5)  Hari    History  89</span><br></pre></td></tr></table></figure></p>
-<h3 id="n"><a href="#n" class="headerlink" title="$n"></a>$n</h3><p>代表第n个被FS分割的单元<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk '&#123;print $3 "\t" $4&#125;' marks.txt</span><br><span class="line">Physics	80</span><br><span class="line">Maths	90</span><br><span class="line">Biology	87</span><br><span class="line">English	85</span><br><span class="line">History	89</span><br></pre></td></tr></table></figure></p>
-<h2 id="GNU-AWK的特定变量"><a href="#GNU-AWK的特定变量" class="headerlink" title="GNU AWK的特定变量"></a>GNU AWK的特定变量</h2><h3 id="ERRNO"><a href="#ERRNO" class="headerlink" title="ERRNO"></a>ERRNO</h3><p>一个错误字符串<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123; ret = getline &lt; "junk.txt"; if (ret == -1) print "Error:", ERRNO &#125;'</span><br><span class="line">Error: 没有那个文件或目录</span><br></pre></td></tr></table></figure></p>
-<h3 id="IGNORECASE"><a href="#IGNORECASE" class="headerlink" title="IGNORECASE"></a>IGNORECASE</h3><p>忽略大小写<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN&#123;IGNORECASE = 1&#125; /amit/' marks.txt</span><br><span class="line">1)  Amit    Physics  80</span><br></pre></td></tr></table></figure></p>
-<h3 id="LINT"><a href="#LINT" class="headerlink" title="LINT"></a>LINT</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123;LINT = 1; a&#125;'</span><br><span class="line">awk: 命令行:1: 警告：引用未初始化的变量“a”</span><br><span class="line">awk: 命令行:1: 警告：statement has no effect</span><br></pre></td></tr></table></figure>
-<h3 id="PROCINFO"><a href="#PROCINFO" class="headerlink" title="PROCINFO"></a>PROCINFO</h3><p>打印与该进程相关的信息,如UID, PID等.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123; print PROCINFO["pid"] &#125;'</span><br><span class="line">14206</span><br></pre></td></tr></table></figure></p>
-<h3 id="TEXTDOMAIN"><a href="#TEXTDOMAIN" class="headerlink" title="TEXTDOMAIN"></a>TEXTDOMAIN</h3><p>它代表了AWK程序的文本域,它用于查找程序字符串的本地化翻译。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> awk 'BEGIN &#123; print TEXTDOMAIN &#125;'</span><br><span class="line">messages</span><br></pre></td></tr></table></figure></p>
-<h2 id="awk运算符"><a href="#awk运算符" class="headerlink" title="awk运算符"></a>awk运算符</h2><p>和程序语言一样的运算符.</p>
-<p>算术运算<br>+-*/%<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 50; b = 20; print "(a + b) = ", (a + b) &#125;'</span><br><span class="line">(a + b) =  70</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 50; b = 20; print "(a - b) = ", (a - b) &#125;'</span><br><span class="line">(a - b) =  30</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 50; b = 20; print "(a * b) = ", (a * b) &#125;'</span><br><span class="line">(a * b) =  1000</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 50; b = 20; print "(a / b) = ", (a / b) &#125;'</span><br><span class="line">(a / b) =  2.5</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 50; b = 20; print "(a % b) = ", (a % b) &#125;'</span><br><span class="line">(a % b) =  10</span><br></pre></td></tr></table></figure></p>
-<p>++,–<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 10; b = ++a; printf "a = %d, b = %d\n", a, b &#125;'</span><br><span class="line">a = 11, b = 11</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 10; b = a++; printf "a = %d, b = %d\n", a, b &#125;'</span><br><span class="line">a = 11, b = 10</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 10; b = --a; printf "a = %d, b = %d\n", a, b &#125;'</span><br><span class="line">a = 9, b = 9</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 10; b = a--; printf "a = %d, b = %d\n", a, b &#125;'</span><br><span class="line">a = 9, b = 10</span><br></pre></td></tr></table></figure></p>
-<p>简写:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; cnt = 2; cnt **= 4; print "Counter =", cnt &#125;'</span><br><span class="line">Counter = 16</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; cnt = 2; cnt ^= 4; print "Counter =", cnt &#125;'</span><br><span class="line">Counter = 16</span><br></pre></td></tr></table></figure></p>
-<p>比较运算符:&gt;,&lt;,==,!=,&gt;=,&lt;=</p>
-<p>逻辑运算符:&amp;&amp;,||,!</p>
-<p>三元运算符:condition expression ? statement1 : statement2</p>
-<p>一元运算符:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = -10; a = +a; print "a =", a &#125;'</span><br><span class="line">a = -10</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = -10; a = -a; print "a =", a &#125;'</span><br><span class="line">a = 10</span><br></pre></td></tr></table></figure></p>
-<p>指数运算:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 10; a = a ^ 2; print "a =", a &#125;'</span><br><span class="line">a = 100</span><br><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; a = 10; a = a**2; print "a =", a &#125;'</span><br><span class="line">a = 100</span><br></pre></td></tr></table></figure></p>
-<p>字符串连接符:有点区别,这里是空格<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; str1 = "Hello,"; str2 = "World"; str3 = str1 str2; print str3 &#125;'</span><br><span class="line">Hello,World</span><br></pre></td></tr></table></figure></p>
-<p>in运算符:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ awk 'BEGIN &#123; </span><br><span class="line"><span class="meta">&gt;</span>    arr[0] = 1; arr[1] = 2; arr[2] = 3; for (i in arr) printf "arr[%d] = %d\n", i, arr[i]</span><br><span class="line"><span class="meta">&gt;</span> &#125;'</span><br><span class="line">arr[0] = 1</span><br><span class="line">arr[1] = 2</span><br><span class="line">arr[2] = 3</span><br></pre></td></tr></table></figure></p>
-<p>正则运算符:这里不是指正则运算的,而是匹配和不匹配:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 含有9的行</span><br><span class="line">[jimo@jimo-pc shell]$ awk '$0 ~ 9' marks.txt</span><br><span class="line">2)  Rahul   Maths    90</span><br><span class="line">5)  Hari    History  89</span><br><span class="line"><span class="meta">#</span> 不含9的行</span><br><span class="line">[jimo@jimo-pc shell]$ awk '$0 !~ 9' marks.txt</span><br><span class="line">1)  Amit    Physics  80</span><br><span class="line">3)  Shyam   Biology  87</span><br><span class="line">4)  Kedar   English  85</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h1><p>准确的说,awk是一种编程语言,所以值得拿出来看看.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/28/shell/000-use-awk/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/28/shell/000-use-awk/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjgk5oh3s0029vgka2ep03fwd" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">19</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/005-ssh-and-remote" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/28/linux/005-ssh-and-remote/" class="article-date">
-  <time datetime="2017-12-28T07:51:00.000Z" itemprop="datePublished">2017-12-28</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/28/linux/005-ssh-and-remote/">linux远程连接</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>讲ssh和远程桌面相关.</p>
-<h2 id="1-远程桌面"><a href="#1-远程桌面" class="headerlink" title="1.远程桌面"></a>1.远程桌面</h2><p>可以采用rdesktop命令，连linux，windows都没问题。</p>
-<p>就windows而言，通常可以挂载本地文件夹：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> -r disk:Jimo=/home/jimo/xxx:挂载本地文件夹</span><br><span class="line"><span class="meta">#</span> sound:local 写上比较好</span><br><span class="line"><span class="meta">$</span> rdesktop -u xxx ip:port -p xxxx -r sound:local -r disk:Jimo=/home/jimo/xxx</span><br></pre></td></tr></table></figure></p>
-<p>还需要注意的就是密码，当然可以不指定，等到出现界面时才输，在命令行上输密码需要转义，比如!,需要写成：!,<br>否则会被当成shell命令执行</p>
-<h2 id="2-ssh"><a href="#2-ssh" class="headerlink" title="2.ssh"></a>2.ssh</h2><p>对于远程的云服务器,需要ssh链接.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh username@ip</span><br></pre></td></tr></table></figure></p>
-<p>通过ssh传文件到远程linux服务器:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> scp localfile username@ip:/remote_path</span><br><span class="line"><span class="meta">#</span> 例如</span><br><span class="line"><span class="meta">$</span> scp apache8.0.tar root@119.1.1.1:/root/webapp</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>讲ssh和远程桌面相关.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/28/linux/005-ssh-and-remote/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/28/linux/005-ssh-and-remote/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjgk5oh3k001svgkaka9zstmd" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">19</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">2</span></li></ul>
 
       </footer>
       </div>
@@ -2075,6 +2032,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/04/30/linux/011-linux-terminal-qq/">命令行的QQ</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/30/linux/010-linux-background/">linux后台进程那些事</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/29/blockchain/000-learn-resources/">区块链学习路径与资源</a>
           </li>
         
@@ -2084,14 +2049,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/27/hexo/deploy-hexo-on-github/">部署hexo到github</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/27/python/006-python-warning/">python中的那些警告</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/27/python/008-python-error/">python中的常见错误</a>
           </li>
         
       </ul>
