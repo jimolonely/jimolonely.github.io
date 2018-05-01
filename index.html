@@ -84,6 +84,88 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/011-linux-terminal-qq" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/02/linux/011-linux-terminal-qq/" class="article-date">
+  <time datetime="2018-05-01T20:04:19.362Z" itemprop="datePublished">2018-05-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/02/linux/011-linux-terminal-qq/">命令行的QQ</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>买了服务器,运行一个后台进程,定时给一个好友发消息.</p>
+<h1 id="使用的库"><a href="#使用的库" class="headerlink" title="使用的库"></a>使用的库</h1><p><a href="https://github.com/sjdy521/Mojo-Webqq" target="_blank" rel="noopener">Mojo-WebQQ</a>.<br>安装好了就ok.</p>
+<h1 id="我使用python"><a href="#我使用python" class="headerlink" title="我使用python"></a>我使用python</h1><p>由于我不是perler,就用python访问其链接吧.<br>下面保存为chat.pl<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env perl</span></span><br><span class="line"><span class="keyword">use</span> Mojo::Webqq;</span><br><span class="line"><span class="keyword">my</span> ($host,$port,$post_api);</span><br><span class="line"></span><br><span class="line">$host = <span class="string">"0.0.0.0"</span>; <span class="comment">#发送消息接口监听地址，没有特殊需要请不要修改</span></span><br><span class="line">$port = <span class="number">5000</span>;      <span class="comment">#发送消息接口监听端口，修改为自己希望监听的端口</span></span><br><span class="line"><span class="comment">#$post_api = 'http://xxxx';  #接收到的消息上报接口，如果不需要接收消息上报，可以删除或注释此行</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">my</span> $client = Mojo::Webqq-&gt;new();</span><br><span class="line">$client-&gt;load(<span class="string">"ShowMsg"</span>);</span><br><span class="line">$client-&gt;load(<span class="string">"Openqq"</span>,<span class="string">data=&gt;</span>&#123;<span class="string">listen=&gt;</span>[&#123;<span class="string">host=&gt;</span>$host,<span class="string">port=&gt;</span>$port&#125;], <span class="string">post_api=&gt;</span>$post_api&#125;);</span><br><span class="line">$client-&gt;run();</span><br></pre></td></tr></table></figure></p>
+<p>然后放在后台运行:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup perl chat.pl &gt;&gt;log.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
+<h1 id="如何在linux下扫二维码"><a href="#如何在linux下扫二维码" class="headerlink" title="如何在linux下扫二维码"></a>如何在linux下扫二维码</h1><p>并不显示在终端,而是提供个服务,远程打开:在/tmp<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> python 2</span><br><span class="line">python -m SimpleHTTPServer 80</span><br><span class="line"><span class="meta">#</span> python 3</span><br><span class="line">python -m http.server 80</span><br></pre></td></tr></table></figure></p>
+<h1 id="写程序"><a href="#写程序" class="headerlink" title="写程序"></a>写程序</h1><p>send.py<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding:utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line">PATH = <span class="string">'ids.txt'</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">先读取文件,不要发以前发过的</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_dump_obj</span><span class="params">(path)</span>:</span></span><br><span class="line">    ids = set()</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">with</span> open(path, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            ids = set(json.load(f))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">return</span> ids</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dump_file</span><span class="params">(path, obj)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> open(path, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        json.dump(list(obj), f)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_id</span><span class="params">()</span>:</span></span><br><span class="line">    url = <span class="string">"http://127.0.0.1:5000/openqq/get_friend_info"</span></span><br><span class="line">    friends = requests.get(url, headers=headers)</span><br><span class="line">    <span class="keyword">for</span> f <span class="keyword">in</span> json.loads(friends.text):</span><br><span class="line">        <span class="keyword">if</span> f[<span class="string">'name'</span>] == <span class="string">'孤独的寂寞'</span>: <span class="comment"># 注意比较中文需要转为utf8</span></span><br><span class="line">            <span class="keyword">return</span> f[<span class="string">'id'</span>]</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_content</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    获取一些有意思的话发送</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    ids = load_dump_obj(PATH)</span><br><span class="line">    yu_url = <span class="string">"http://www.59xihuan.cn/jingdianyulu_8_1.html"</span></span><br><span class="line"></span><br><span class="line">    page = requests.get(yu_url, headers=headers)</span><br><span class="line"></span><br><span class="line">    bs = BeautifulSoup(page.text, <span class="string">"html.parser"</span>)</span><br><span class="line">    contents = bs.find_all(name=<span class="string">'div'</span>, attrs=&#123;<span class="string">'class'</span>: <span class="string">'pic_text1'</span>&#125;)</span><br><span class="line">    <span class="comment"># print(contents)</span></span><br><span class="line">    sentences = <span class="string">'又过了一天,很高兴我们还在'</span></span><br><span class="line">    <span class="keyword">for</span> txt <span class="keyword">in</span> contents:</span><br><span class="line">        id = txt[<span class="string">'id'</span>]</span><br><span class="line">        <span class="keyword">if</span> id <span class="keyword">not</span> <span class="keyword">in</span> ids:</span><br><span class="line">            sentences = txt.get_text().strip()</span><br><span class="line">            ids.add(id)</span><br><span class="line">            dump_file(PATH, ids)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="comment"># print(sentences)</span></span><br><span class="line">    <span class="keyword">print</span> sentences</span><br><span class="line">    <span class="keyword">return</span> sentences</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_msg</span><span class="params">(id, content)</span>:</span></span><br><span class="line">    url = <span class="string">'http://127.0.0.1:5000/openqq/send_friend_message'</span></span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">'id'</span>: id,</span><br><span class="line">        <span class="string">'content'</span>: content</span><br><span class="line">    &#125;</span><br><span class="line">    response = requests.post(url, data=data, headers=headers)</span><br><span class="line">    <span class="comment"># print(response.text)</span></span><br><span class="line">    <span class="keyword">print</span> response.text</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">arg_parse</span><span class="params">()</span>:</span></span><br><span class="line">    parser = argparse.ArgumentParser(description=<span class="string">"发送QQ信息"</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'id'</span>, help=<span class="string">"qq friend id"</span>)</span><br><span class="line">    <span class="keyword">return</span> parser.parse_args()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># try:</span></span><br><span class="line">    <span class="comment">#     # arg = arg_parse()</span></span><br><span class="line">    <span class="comment">#     id = get_id()</span></span><br><span class="line">    <span class="comment">#     content = get_content()</span></span><br><span class="line">    <span class="comment">#     send_msg(id, content)</span></span><br><span class="line">    <span class="comment"># except:</span></span><br><span class="line">    <span class="comment">#     print("寂寞的发射了错误.....................")</span></span><br><span class="line">        <span class="comment"># get_content()</span></span><br><span class="line">    id = get_id()</span><br><span class="line">    content = get_content()</span><br><span class="line">    send_msg(id, content)</span><br></pre></td></tr></table></figure></p>
+<p>send2.py是爬取百科的内容:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding:utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line">OLD_IDS_PATH = <span class="string">'old_ids.txt'</span></span><br><span class="line">LEMMA_PATH = <span class="string">'lemmas.txt'</span></span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">先读取文件,不要发以前发过的</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_dump_obj</span><span class="params">(path)</span>:</span></span><br><span class="line">    ids = <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">with</span> open(path, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            ids = json.load(f)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">return</span> ids</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dump_file</span><span class="params">(path, obj)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> open(path, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        json.dump(obj, f)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_id</span><span class="params">()</span>:</span></span><br><span class="line">    url = <span class="string">"http://127.0.0.1:5000/openqq/get_friend_info"</span></span><br><span class="line">    friends = requests.get(url, headers=headers)</span><br><span class="line">    friends.encoding = <span class="string">'utf-8'</span></span><br><span class="line">    <span class="keyword">for</span> f <span class="keyword">in</span> json.loads(friends.text):</span><br><span class="line">        <span class="comment"># if f['name'] == '孤独的寂寞'.decode('utf-8'): # python 2.x</span></span><br><span class="line">        <span class="keyword">if</span> f[<span class="string">'name'</span>] == <span class="string">'孤独的寂寞'</span>:  <span class="comment"># python3</span></span><br><span class="line">            <span class="keyword">return</span> f[<span class="string">'id'</span>]</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_content</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    获取baike</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    lemmas = load_dump_obj(LEMMA_PATH)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> lemmas <span class="keyword">or</span> len(lemmas) == <span class="number">0</span>:</span><br><span class="line">        yu_url = <span class="string">"https://baike.baidu.com/wikitag/api/getlemmas"</span></span><br><span class="line">        data = &#123;</span><br><span class="line">            <span class="string">'limit'</span>: <span class="number">3500</span>,</span><br><span class="line">            <span class="string">'timeout'</span>: <span class="number">3000</span>,</span><br><span class="line">            <span class="string">'tagId'</span>: <span class="number">76613</span>,</span><br><span class="line">            <span class="string">'fromLemma'</span>: <span class="keyword">False</span>,</span><br><span class="line">            <span class="string">'contentLength'</span>: <span class="number">40</span>,</span><br><span class="line">            <span class="string">'page'</span>: <span class="number">0</span></span><br><span class="line">        &#125;</span><br><span class="line">        lemmas = requests.post(yu_url, headers=headers, data=data).json()</span><br><span class="line">        print(lemmas)</span><br><span class="line">        dump_file(LEMMA_PATH, lemmas)</span><br><span class="line">    ids = load_dump_obj(OLD_IDS_PATH)</span><br><span class="line">    <span class="keyword">if</span> ids <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        ids = []</span><br><span class="line">    curr_lemma = <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">for</span> lemma <span class="keyword">in</span> lemmas[<span class="string">'lemmaList'</span>]:</span><br><span class="line">        <span class="keyword">if</span> lemma[<span class="string">'lemmaId'</span>] <span class="keyword">not</span> <span class="keyword">in</span> ids:</span><br><span class="line">            curr_lemma = lemma</span><br><span class="line">            ids.append(lemma[<span class="string">'lemmaId'</span>])</span><br><span class="line">            dump_file(OLD_IDS_PATH, list(ids))</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">    content = <span class="string">"请收下我诚挚的祝福"</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> curr_lemma:  <span class="comment"># 数据已用完</span></span><br><span class="line">        <span class="keyword">return</span> content</span><br><span class="line">    <span class="comment"># 开始爬取页面</span></span><br><span class="line">    url = curr_lemma[<span class="string">'lemmaUrl'</span>]</span><br><span class="line">    page = requests.get(url, headers=headers)</span><br><span class="line">    page.encoding = <span class="string">'utf-8'</span></span><br><span class="line">    <span class="comment"># print(page.text)</span></span><br><span class="line">    bs = BeautifulSoup(page.text, <span class="string">"html.parser"</span>)</span><br><span class="line">    summary = bs.find(name=<span class="string">"div"</span>, attrs=&#123;<span class="string">"class"</span>: <span class="string">"lemma-summary"</span>&#125;)</span><br><span class="line">    <span class="keyword">return</span> curr_lemma[<span class="string">'lemmaTitle'</span>] + <span class="string">'\n'</span> + summary.get_text()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_msg</span><span class="params">(id, content)</span>:</span></span><br><span class="line">    url = <span class="string">'http://127.0.0.1:5000/openqq/send_friend_message'</span></span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">'id'</span>: id,</span><br><span class="line">        <span class="string">'content'</span>: content</span><br><span class="line">    &#125;</span><br><span class="line">    response = requests.post(url, data=data, headers=headers)</span><br><span class="line">    <span class="comment"># print(response.text)</span></span><br><span class="line">    <span class="comment"># print response.text</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">arg_parse</span><span class="params">()</span>:</span></span><br><span class="line">    parser = argparse.ArgumentParser(description=<span class="string">"发送QQ信息"</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'id'</span>, help=<span class="string">"qq friend id"</span>)</span><br><span class="line">    <span class="keyword">return</span> parser.parse_args()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># try:</span></span><br><span class="line">    <span class="comment">#     # arg = arg_parse()</span></span><br><span class="line">    <span class="comment">#     id = get_id()</span></span><br><span class="line">    <span class="comment">#     content = get_content()</span></span><br><span class="line">    <span class="comment">#     send_msg(id, content)</span></span><br><span class="line">    <span class="comment"># except:</span></span><br><span class="line">    <span class="comment">#     print("寂寞的发射了错误.....................")</span></span><br><span class="line">    <span class="comment"># get_content()</span></span><br><span class="line">    id = get_id()</span><br><span class="line">    content = get_content()</span><br><span class="line">    send_msg(id, content)</span><br></pre></td></tr></table></figure></p>
+<h1 id="定时运行"><a href="#定时运行" class="headerlink" title="定时运行"></a>定时运行</h1><p>编辑位于/etc/crontab的文件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">SHELL=/bin/bash</span><br><span class="line">PATH=/sbin:/bin:/usr/sbin:/usr/bin</span><br><span class="line">MAILTO=root</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> For details see man 4 crontabs</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Example of job definition:</span><br><span class="line"><span class="meta">#</span> .---------------- minute (0 - 59)</span><br><span class="line"><span class="meta">#</span> |  .------------- hour (0 - 23)</span><br><span class="line"><span class="meta">#</span> |  |  .---------- day of month (1 - 31)</span><br><span class="line"><span class="meta">#</span> |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...</span><br><span class="line"><span class="meta">#</span> |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat</span><br><span class="line"><span class="meta">#</span> |  |  |  |  |</span><br><span class="line"><span class="meta">#</span> *  *  *  *  * user-name  command to be executed</span><br><span class="line"></span><br><span class="line">30 23 * * * root python ~/qq/send.py </span><br><span class="line">0 12 * * * root python ~/qq/send.py</span><br><span class="line">0 6 * * * root python ~/qq/send.py</span><br></pre></td></tr></table></figure></p>
+<p>重启:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart crond</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>买了服务器,运行一个后台进程,定时给一个好友发消息.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/05/02/linux/011-linux-terminal-qq/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/05/02/linux/011-linux-terminal-qq/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/05/02/linux/011-linux-terminal-qq/" data-id="cjgo41p980026g3kap3gi0nb0" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">21</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-python/008-python-error" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/02/python/008-python-error/" class="article-date">
@@ -152,93 +234,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/02/python/008-python-error/" data-id="cjgo3nl3y002v4zkamym8pabv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/02/python/008-python-error/" data-id="cjgo41p9n002vg3kazdpi5tav" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/011-linux-terminal-qq" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/01/linux/011-linux-terminal-qq/" class="article-date">
-  <time datetime="2018-04-30T23:14:56.636Z" itemprop="datePublished">2018-05-01</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/01/linux/011-linux-terminal-qq/">命令行的QQ</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>买了服务器,运行一个后台进程,定时给一个好友发消息.</p>
-<h1 id="使用的库"><a href="#使用的库" class="headerlink" title="使用的库"></a>使用的库</h1><p><a href="https://github.com/sjdy521/Mojo-Webqq" target="_blank" rel="noopener">Mojo-WebQQ</a>.<br>安装好了就ok.</p>
-<h1 id="我使用python"><a href="#我使用python" class="headerlink" title="我使用python"></a>我使用python</h1><p>由于我不是perler,就用python访问其链接吧.<br>下面保存为chat.pl<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env perl</span></span><br><span class="line"><span class="keyword">use</span> Mojo::Webqq;</span><br><span class="line"><span class="keyword">my</span> ($host,$port,$post_api);</span><br><span class="line"></span><br><span class="line">$host = <span class="string">"0.0.0.0"</span>; <span class="comment">#发送消息接口监听地址，没有特殊需要请不要修改</span></span><br><span class="line">$port = <span class="number">5000</span>;      <span class="comment">#发送消息接口监听端口，修改为自己希望监听的端口</span></span><br><span class="line"><span class="comment">#$post_api = 'http://xxxx';  #接收到的消息上报接口，如果不需要接收消息上报，可以删除或注释此行</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">my</span> $client = Mojo::Webqq-&gt;new();</span><br><span class="line">$client-&gt;load(<span class="string">"ShowMsg"</span>);</span><br><span class="line">$client-&gt;load(<span class="string">"Openqq"</span>,<span class="string">data=&gt;</span>&#123;<span class="string">listen=&gt;</span>[&#123;<span class="string">host=&gt;</span>$host,<span class="string">port=&gt;</span>$port&#125;], <span class="string">post_api=&gt;</span>$post_api&#125;);</span><br><span class="line">$client-&gt;run();</span><br></pre></td></tr></table></figure></p>
-<p>然后放在后台运行:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup perl chat.pl &gt;&gt;log.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
-<h1 id="如何在linux下扫二维码"><a href="#如何在linux下扫二维码" class="headerlink" title="如何在linux下扫二维码"></a>如何在linux下扫二维码</h1><p>并不显示在终端,而是提供个服务,远程打开:在/tmp<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> python 2</span><br><span class="line">python -m SimpleHTTPServer 80</span><br><span class="line"><span class="meta">#</span> python 3</span><br><span class="line">python -m http.server 80</span><br></pre></td></tr></table></figure></p>
-<h1 id="写程序"><a href="#写程序" class="headerlink" title="写程序"></a>写程序</h1><p>send.py<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding:utf-8</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line">PATH = <span class="string">'ids.txt'</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">先读取文件,不要发以前发过的</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_dump_obj</span><span class="params">(path)</span>:</span></span><br><span class="line">    ids = set()</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">with</span> open(path, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">            ids = set(json.load(f))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">return</span> ids</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dump_file</span><span class="params">(path, obj)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> open(path, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        json.dump(list(obj), f)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_id</span><span class="params">()</span>:</span></span><br><span class="line">    url = <span class="string">"http://127.0.0.1:5000/openqq/get_friend_info"</span></span><br><span class="line">    friends = requests.get(url, headers=headers)</span><br><span class="line">    <span class="keyword">for</span> f <span class="keyword">in</span> json.loads(friends.text):</span><br><span class="line">        <span class="keyword">if</span> f[<span class="string">'name'</span>] == <span class="string">'孤独的寂寞'</span>: <span class="comment"># 注意比较中文需要转为utf8</span></span><br><span class="line">            <span class="keyword">return</span> f[<span class="string">'id'</span>]</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_content</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    获取一些有意思的话发送</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    ids = load_dump_obj(PATH)</span><br><span class="line">    yu_url = <span class="string">"http://www.59xihuan.cn/jingdianyulu_8_1.html"</span></span><br><span class="line"></span><br><span class="line">    page = requests.get(yu_url, headers=headers)</span><br><span class="line"></span><br><span class="line">    bs = BeautifulSoup(page.text, <span class="string">"html.parser"</span>)</span><br><span class="line">    contents = bs.find_all(name=<span class="string">'div'</span>, attrs=&#123;<span class="string">'class'</span>: <span class="string">'pic_text1'</span>&#125;)</span><br><span class="line">    <span class="comment"># print(contents)</span></span><br><span class="line">    sentences = <span class="string">'又过了一天,很高兴我们还在'</span></span><br><span class="line">    <span class="keyword">for</span> txt <span class="keyword">in</span> contents:</span><br><span class="line">        id = txt[<span class="string">'id'</span>]</span><br><span class="line">        <span class="keyword">if</span> id <span class="keyword">not</span> <span class="keyword">in</span> ids:</span><br><span class="line">            sentences = txt.get_text().strip()</span><br><span class="line">            ids.add(id)</span><br><span class="line">            dump_file(PATH, ids)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="comment"># print(sentences)</span></span><br><span class="line">    <span class="keyword">print</span> sentences</span><br><span class="line">    <span class="keyword">return</span> sentences</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_msg</span><span class="params">(id, content)</span>:</span></span><br><span class="line">    url = <span class="string">'http://127.0.0.1:5000/openqq/send_friend_message'</span></span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">'id'</span>: id,</span><br><span class="line">        <span class="string">'content'</span>: content</span><br><span class="line">    &#125;</span><br><span class="line">    response = requests.post(url, data=data, headers=headers)</span><br><span class="line">    <span class="comment"># print(response.text)</span></span><br><span class="line">    <span class="keyword">print</span> response.text</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">arg_parse</span><span class="params">()</span>:</span></span><br><span class="line">    parser = argparse.ArgumentParser(description=<span class="string">"发送QQ信息"</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'id'</span>, help=<span class="string">"qq friend id"</span>)</span><br><span class="line">    <span class="keyword">return</span> parser.parse_args()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># try:</span></span><br><span class="line">    <span class="comment">#     # arg = arg_parse()</span></span><br><span class="line">    <span class="comment">#     id = get_id()</span></span><br><span class="line">    <span class="comment">#     content = get_content()</span></span><br><span class="line">    <span class="comment">#     send_msg(id, content)</span></span><br><span class="line">    <span class="comment"># except:</span></span><br><span class="line">    <span class="comment">#     print("寂寞的发射了错误.....................")</span></span><br><span class="line">        <span class="comment"># get_content()</span></span><br><span class="line">    id = get_id()</span><br><span class="line">    content = get_content()</span><br><span class="line">    send_msg(id, content)</span><br></pre></td></tr></table></figure></p>
-<h1 id="定时运行"><a href="#定时运行" class="headerlink" title="定时运行"></a>定时运行</h1><p>编辑位于/etc/crontab的文件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">SHELL=/bin/bash</span><br><span class="line">PATH=/sbin:/bin:/usr/sbin:/usr/bin</span><br><span class="line">MAILTO=root</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> For details see man 4 crontabs</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Example of job definition:</span><br><span class="line"><span class="meta">#</span> .---------------- minute (0 - 59)</span><br><span class="line"><span class="meta">#</span> |  .------------- hour (0 - 23)</span><br><span class="line"><span class="meta">#</span> |  |  .---------- day of month (1 - 31)</span><br><span class="line"><span class="meta">#</span> |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...</span><br><span class="line"><span class="meta">#</span> |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat</span><br><span class="line"><span class="meta">#</span> |  |  |  |  |</span><br><span class="line"><span class="meta">#</span> *  *  *  *  * user-name  command to be executed</span><br><span class="line"></span><br><span class="line">30 23 * * * root python ~/qq/send.py </span><br><span class="line">0 12 * * * root python ~/qq/send.py</span><br><span class="line">0 6 * * * root python ~/qq/send.py</span><br></pre></td></tr></table></figure></p>
-<p>重启:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart crond</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>买了服务器,运行一个后台进程,定时给一个好友发消息.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/05/01/linux/011-linux-terminal-qq/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/05/01/linux/011-linux-terminal-qq/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/01/linux/011-linux-terminal-qq/" data-id="cjgo3nl3k00264zkajif65mzr" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -311,7 +312,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/30/linux/010-linux-background/" data-id="cjgo3nl3i00244zkaqdzc0oh6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/30/linux/010-linux-background/" data-id="cjgo41p960024g3ka4nw7ifac" class="article-share-link">
           Share
         </a>
         
@@ -393,7 +394,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/29/blockchain/000-learn-resources/" data-id="cjgo3nl1x00054zkac4ocivnv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/29/blockchain/000-learn-resources/" data-id="cjgo41p7n0005g3kady7h3z8u" class="article-share-link">
           Share
         </a>
         
@@ -535,7 +536,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjgo3nl3e00214zkaqzm0wc4w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjgo41p92001zg3kac7f6kijn" class="article-share-link">
           Share
         </a>
         
@@ -607,7 +608,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/hexo/deploy-hexo-on-github/" data-id="cjgo3nl2s00144zka8afxt3z6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/hexo/deploy-hexo-on-github/" data-id="cjgo41p8i0014g3kabrpcwtf7" class="article-share-link">
           Share
         </a>
         
@@ -684,7 +685,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/python/006-python-warning/" data-id="cjgo3nl3u002q4zkam5m649w5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/python/006-python-warning/" data-id="cjgo41p9j002qg3kalkqco8qt" class="article-share-link">
           Share
         </a>
         
@@ -770,7 +771,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjgo3nl2f000o4zkawudho4ku" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjgo41p87000og3ka9qt09jx3" class="article-share-link">
           Share
         </a>
         
@@ -855,7 +856,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjgo3nl3w002s4zka0r7bzzma" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjgo41p9l002sg3ka8xiqbqkd" class="article-share-link">
           Share
         </a>
         
@@ -932,7 +933,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjgo3nl2e000l4zkazyyc3vy8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjgo41p85000lg3ka32bij8xk" class="article-share-link">
           Share
         </a>
         
@@ -1010,7 +1011,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjgo3nl2d000j4zkarld23300" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjgo41p84000jg3ka7u1yis4s" class="article-share-link">
           Share
         </a>
         
@@ -1100,7 +1101,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjgo3nl2a000g4zkam0f2nt2f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjgo41p81000gg3kae5ro5vhn" class="article-share-link">
           Share
         </a>
         
@@ -1183,7 +1184,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjgo3nl28000d4zkaz34pi62i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjgo41p7y000dg3kahnkleyam" class="article-share-link">
           Share
         </a>
         
@@ -1279,7 +1280,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjgo3nl3g00224zkacicxzpim" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjgo41p940021g3ka1bo900hr" class="article-share-link">
           Share
         </a>
         
@@ -1364,7 +1365,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjgo3nl2200094zkaob9we2br" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjgo41p7v000bg3kagz3mkdcq" class="article-share-link">
           Share
         </a>
         
@@ -1448,7 +1449,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjgo3nl25000b4zkaot1hz0qf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjgo41p7s0009g3ka51s0haqw" class="article-share-link">
           Share
         </a>
         
@@ -1525,7 +1526,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjgo3nl2b000h4zkac9zzyd86" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjgo41p83000hg3kafzdxwxhk" class="article-share-link">
           Share
         </a>
         
@@ -1638,7 +1639,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjgo3nl4s003z4zka4znothyt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjgo41pah003zg3kacctksf8b" class="article-share-link">
           Share
         </a>
         
@@ -1739,7 +1740,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjgo3nl2100084zkaxo4nfkpe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjgo41p7r0008g3kauw4dhuvz" class="article-share-link">
           Share
         </a>
         
@@ -1825,7 +1826,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjgo3nl3s002n4zkar3s5a1u3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjgo41p9i002ng3kai1jdbcf3" class="article-share-link">
           Share
         </a>
         
@@ -1889,11 +1890,11 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2018/05/02/python/008-python-error/">python中的常见错误</a>
+            <a href="/2018/05/02/linux/011-linux-terminal-qq/">命令行的QQ</a>
           </li>
         
           <li>
-            <a href="/2018/05/01/linux/011-linux-terminal-qq/">命令行的QQ</a>
+            <a href="/2018/05/02/python/008-python-error/">python中的常见错误</a>
           </li>
         
           <li>
