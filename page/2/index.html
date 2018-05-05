@@ -84,6 +84,107 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-cloudcompute/001-virtualbox-network" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/25/cloudcompute/001-virtualbox-network/" class="article-date">
+  <time datetime="2018-03-25T03:10:49.000Z" itemprop="datePublished">2018-03-25</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/25/cloudcompute/001-virtualbox-network/">virtualbox局域网配置</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>有时不仅需要虚拟机能连外网,还需要虚拟机之间能互相通信.</p>
+<h1 id="了解virtualbox的4种联网方式"><a href="#了解virtualbox的4种联网方式" class="headerlink" title="了解virtualbox的4种联网方式"></a>了解virtualbox的4种联网方式</h1><p>可以参考<a href="https://www.cnblogs.com/york-hust/archive/2012/03/29/2422911.html" target="_blank" rel="noopener">文章</a></p>
+<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><ol>
+<li>虚拟机可以访问外网</li>
+<li>虚拟机有静态IP可以互相通信</li>
+</ol>
+<h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><p>2台redhut虚拟机.(其他系统也可以,都可以在界面上配置IP)</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><ol>
+<li>每台虚拟机准备2个网卡,第一个设置为NAT(这里名为enp0s3),第二个设置为host only(名为enp0s8)</li>
+</ol>
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/000.png"> 
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/001.png">
+<ol>
+<li>enp0s3设置为DHCP,enp0s8设置为静态IP,手动配置</li>
+</ol>
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/002.png"> 
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/003.png">
+<ol>
+<li>另一台除了enp0s8的静态IP变了,其余一样.</li>
+</ol>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在ubuntu里会出现2张网卡,但内部通讯的网卡成了默认的,也就是enp0s8:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ip r</span><br><span class="line">default via 192.168.56.1 dev enp0s8  proto static  metric 100 </span><br><span class="line">default via 10.0.2.2 dev enp0s3  proto static  metric 101 </span><br><span class="line">10.0.2.0/24 dev enp0s3  proto kernel  scope link  src 10.0.2.15  metric 100 </span><br><span class="line">169.254.0.0/16 dev enp0s8  scope link  metric 1000 </span><br><span class="line">192.168.56.0/24 dev enp0s8  proto kernel  scope link  src 192.168.56.11  metric 100 </span><br><span class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1 linkdown</span><br></pre></td></tr></table></figure></p>
+<p>这时候会导致虚拟机之间可以通信,但无法访问外网.</p>
+<p>所以我们需要修改网卡顺序,经过查找,ifmetric这个工具可以解决.</p>
+<p>1.先安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install ifmetric</span><br></pre></td></tr></table></figure></p>
+<p>2.修改<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo ifmetric enp0s3</span><br></pre></td></tr></table></figure></p>
+<p>3.查看路由<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ip r</span><br><span class="line">default via 10.0.2.2 dev enp0s3  proto static </span><br><span class="line">default via 192.168.56.1 dev enp0s8  proto static  metric 100 </span><br><span class="line">10.0.2.0/24 dev enp0s3  proto kernel  scope link  src 10.0.2.15 </span><br><span class="line">169.254.0.0/16 dev enp0s8  scope link  metric 1000 </span><br><span class="line">192.168.56.0/24 dev enp0s8  proto kernel  scope link  src 192.168.56.11  metric 100 </span><br><span class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1 linkdown</span><br></pre></td></tr></table></figure></p>
+<p>这时候可以访问外网,虚拟机也可以通讯了.</p>
+<p>有时候重启了又会恢复,可以在开机脚本里搞定.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>有时不仅需要虚拟机能连外网,还需要虚拟机之间能互相通信.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/25/cloudcompute/001-virtualbox-network/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/25/cloudcompute/001-virtualbox-network/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjgsq3svw0008nmkajshrue94" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">4</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-python/005-module-import" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/24/python/005-module-import/" class="article-date">
@@ -156,12 +257,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjgsod501002i13kasjuy9fwq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjgsq3sxb002qnmkakcmst4lr" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -234,7 +335,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjgsod4zc001113kac2bmsqea" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjgsq3swi0015nmkaxs3le9ud" class="article-share-link">
           Share
         </a>
         
@@ -309,7 +410,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjgsod4z6000s13kaza2lix3c" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjgsq3swf000znmkahjoof8wc" class="article-share-link">
           Share
         </a>
         
@@ -403,7 +504,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjgsod4z4000r13kan1wct7fz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjgsq3swe000ynmkaozmuoc7n" class="article-share-link">
           Share
         </a>
         
@@ -487,7 +588,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjgsod4z3000p13kaokhc4x9a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjgsq3swd000vnmka666ubwhx" class="article-share-link">
           Share
         </a>
         
@@ -563,7 +664,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjgsod4ze001613kaajypvb5f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjgsq3swk0017nmkaq6pmpfxo" class="article-share-link">
           Share
         </a>
         
@@ -654,12 +755,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjgsod500002g13ka1yah9f8w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjgsq3sxa002nnmkaqko340or" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -747,7 +848,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjgsod4z2000o13kafju0dq1f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjgsq3swc000tnmkackb0v77e" class="article-share-link">
           Share
         </a>
         
@@ -832,7 +933,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjgsod4z1000m13kamws55hiq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjgsq3swb000rnmka6b02kg7f" class="article-share-link">
           Share
         </a>
         
@@ -928,7 +1029,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjgsod4zg001a13ka7p20u9xb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjgsq3swn001enmkacyqjo7t9" class="article-share-link">
           Share
         </a>
         
@@ -1007,12 +1108,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjgsod4yd000213kac2rkxeb0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjgsq3svs0004nmka1tjqbyqv" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">22</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li></ul>
 
       </footer>
       </div>
@@ -1086,7 +1187,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjgsod4zf001913kanh8tmw3f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjgsq3swm001cnmkaspkt8v61" class="article-share-link">
           Share
         </a>
         
@@ -1170,7 +1271,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjgsod4zd001413kas85p1k4i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjgsq3swl0019nmkaw9xcepuq" class="article-share-link">
           Share
         </a>
         
@@ -1248,12 +1349,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjgsod50q003t13katy56t61y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjgsq3sy3003znmka1s64yjl4" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/magnet/">magnet</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/magnet/">magnet</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -1331,12 +1432,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjgsod50p003r13ka615jup86" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjgsq3sy2003xnmkablz9q168" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">8</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">8</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -1421,12 +1522,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjgsod50n003p13ka61n5tgfu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjgsq3sy0003vnmkazbke4mfq" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -1515,12 +1616,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjgsod4zz002d13kara31gjdm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjgsq3sx9002lnmkams6l81ym" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爬虫/">爬虫</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爬虫/">爬虫</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -1596,12 +1697,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjgsod4yh000413kaf48y9orb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjgsq3svv0006nmkaakzdsnip" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">4</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">4</span></li></ul>
 
       </footer>
       </div>
@@ -1686,91 +1787,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjgsod4zp001r13ka4r1oqdv3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjgsq3swy001znmka9qubrvfw" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ip/">ip</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-react/000-import-js-function" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/21/react/000-import-js-function/" class="article-date">
-  <time datetime="2018-01-21T10:03:38.000Z" itemprop="datePublished">2018-01-21</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/21/react/000-import-js-function/">在React中引入js函数</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文将定义一个js文件,里面增加几个函数,然后在react的js文件里引用.</p>
-<h1 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc src]$ tree</span><br><span class="line">.</span><br><span class="line">├── test</span><br><span class="line">│   └── Test.js</span><br><span class="line">└── utils</span><br><span class="line">    └── net.js</span><br></pre></td></tr></table></figure>
-<p>我们要做的就是在Test.js里引用net.js.</p>
-<h1 id="net-js"><a href="#net-js" class="headerlink" title="net.js"></a>net.js</h1><p>net.js里有封装的访问网络函数:注意export<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span>;</span><br><span class="line"><span class="keyword">import</span> qs <span class="keyword">from</span> <span class="string">'qs'</span>; <span class="comment">//对参数转化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// axios.defaults.baseURL = 'http://192.168.1.146:8082';</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params">url, callback, errorHandler = null</span>) </span>&#123;</span><br><span class="line">    axios.get(<span class="string">'http://192.168.1.146:8082'</span> + url</span><br><span class="line">    ).then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (response.data.ok === <span class="literal">false</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(response.data.msg);</span><br><span class="line">            alert(<span class="string">"msg:"</span> + response.data.msg);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            callback(response);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (errorHandler) &#123;</span><br><span class="line">            errorHandler();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(error);</span><br><span class="line">            alert(error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">post</span>(<span class="params">url, jsonParam, callback, errorHandler = null</span>) </span>&#123;</span><br><span class="line">    axios.post(<span class="string">'http://192.168.1.146:8082'</span> + url,</span><br><span class="line">        qs.stringify(jsonParam)</span><br><span class="line">    ).then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (response.data.ok === <span class="literal">false</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(response.data.msg);</span><br><span class="line">            alert(<span class="string">"msg:"</span> + response.data.msg);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            callback(response);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (errorHandler) &#123;</span><br><span class="line">            errorHandler();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(error);</span><br><span class="line">            alert(error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="Test-js里引用"><a href="#Test-js里引用" class="headerlink" title="Test.js里引用"></a>Test.js里引用</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> net <span class="keyword">from</span> <span class="string">"../utils/net"</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TeaWC</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props);</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">          xx : <span class="string">''</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.myFun = <span class="keyword">this</span>.myFun.bind(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    myFun() &#123;</span><br><span class="line">        <span class="keyword">var</span> t = <span class="keyword">this</span>;</span><br><span class="line">        net.get(url, <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(response)</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                ...</span><br><span class="line">            &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">        )</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>或则另一种引用方式:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;get,post&#125; <span class="keyword">from</span> <span class="string">"../utils/net"</span>;</span><br><span class="line"></span><br><span class="line">get(url, <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response)</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文将定义一个js文件,里面增加几个函数,然后在react的js文件里引用.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/21/react/000-import-js-function/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/21/react/000-import-js-function/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjgsod506002v13ka89juxber" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ip/">ip</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -1829,6 +1851,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/05/05/linux/012-linux-fun-tools/">linux下有趣的工具</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/05/tools/009-local-network-file-transport/">linux局域网文件传输</a>
           </li>
         
@@ -1842,10 +1868,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/30/linux/010-linux-background/">linux后台进程那些事</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/29/blockchain/000-learn-resources/">区块链学习路径与资源</a>
           </li>
         
       </ul>

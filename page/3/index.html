@@ -84,6 +84,85 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-react/000-import-js-function" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/21/react/000-import-js-function/" class="article-date">
+  <time datetime="2018-01-21T10:03:38.000Z" itemprop="datePublished">2018-01-21</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/21/react/000-import-js-function/">在React中引入js函数</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将定义一个js文件,里面增加几个函数,然后在react的js文件里引用.</p>
+<h1 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc src]$ tree</span><br><span class="line">.</span><br><span class="line">├── test</span><br><span class="line">│   └── Test.js</span><br><span class="line">└── utils</span><br><span class="line">    └── net.js</span><br></pre></td></tr></table></figure>
+<p>我们要做的就是在Test.js里引用net.js.</p>
+<h1 id="net-js"><a href="#net-js" class="headerlink" title="net.js"></a>net.js</h1><p>net.js里有封装的访问网络函数:注意export<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span>;</span><br><span class="line"><span class="keyword">import</span> qs <span class="keyword">from</span> <span class="string">'qs'</span>; <span class="comment">//对参数转化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// axios.defaults.baseURL = 'http://192.168.1.146:8082';</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params">url, callback, errorHandler = null</span>) </span>&#123;</span><br><span class="line">    axios.get(<span class="string">'http://192.168.1.146:8082'</span> + url</span><br><span class="line">    ).then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (response.data.ok === <span class="literal">false</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(response.data.msg);</span><br><span class="line">            alert(<span class="string">"msg:"</span> + response.data.msg);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            callback(response);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (errorHandler) &#123;</span><br><span class="line">            errorHandler();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(error);</span><br><span class="line">            alert(error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">post</span>(<span class="params">url, jsonParam, callback, errorHandler = null</span>) </span>&#123;</span><br><span class="line">    axios.post(<span class="string">'http://192.168.1.146:8082'</span> + url,</span><br><span class="line">        qs.stringify(jsonParam)</span><br><span class="line">    ).then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (response.data.ok === <span class="literal">false</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(response.data.msg);</span><br><span class="line">            alert(<span class="string">"msg:"</span> + response.data.msg);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            callback(response);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).catch(<span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (errorHandler) &#123;</span><br><span class="line">            errorHandler();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(error);</span><br><span class="line">            alert(error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Test-js里引用"><a href="#Test-js里引用" class="headerlink" title="Test.js里引用"></a>Test.js里引用</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> net <span class="keyword">from</span> <span class="string">"../utils/net"</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TeaWC</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props);</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">          xx : <span class="string">''</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.myFun = <span class="keyword">this</span>.myFun.bind(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    myFun() &#123;</span><br><span class="line">        <span class="keyword">var</span> t = <span class="keyword">this</span>;</span><br><span class="line">        net.get(url, <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(response)</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                ...</span><br><span class="line">            &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">        )</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>或则另一种引用方式:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;get,post&#125; <span class="keyword">from</span> <span class="string">"../utils/net"</span>;</span><br><span class="line"></span><br><span class="line">get(url, <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response)</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将定义一个js文件,里面增加几个函数,然后在react的js文件里引用.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/21/react/000-import-js-function/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/21/react/000-import-js-function/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjgsq3sxg0030nmkatt7omsvg" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-ai/001-fp_growth" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/18/ai/001-fp_growth/" class="article-date">
@@ -159,12 +238,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjgsod52v007p13kam2775piw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjgsq3svp0002nmka96bhxjg3" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -241,12 +320,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjgsod4zy002b13kam9se5zdb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjgsq3sx8002inmkaci0spal6" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flask/">flask</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wordcloud/">wordcloud</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flask/">flask</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wordcloud/">wordcloud</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -331,12 +410,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjgsod50l003n13kadgsd0iaa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjgsq3sxy003tnmka4r6et5cl" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -564,12 +643,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjgsod50k003l13kagpr3se2k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjgsq3sxv003rnmkajmwutvxr" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/resource/">resource</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/resource/">resource</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -644,12 +723,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjgsod51r007l13kahp3uxw7h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjgsq3svj0001nmkasqnsxbpu" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -730,12 +809,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjgsod50h003j13kac7okhmxy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjgsq3sxu003pnmkay7h9btw2" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -809,12 +888,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjgsod4z9000w13kaqt76u14k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjgsq3swg0012nmkaq0ghqthn" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">22</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li></ul>
 
       </footer>
       </div>
@@ -890,12 +969,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjgsod50g003h13kazb1kigni" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjgsq3sxs003mnmkagrzg1hpi" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asciidoc/">asciidoc</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asciidoc/">asciidoc</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -979,12 +1058,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjgsod4zx002813kap92tr7af" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjgsq3sx7002gnmkasrowwmvp" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/music/">music</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/music/">music</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -1077,12 +1156,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjgsod50e003c13ka87fjy23p" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjgsq3sxp003hnmkaq2euebng" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jupyter/">jupyter</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pyspark/">pyspark</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">4</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jupyter/">jupyter</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pyspark/">pyspark</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">4</span></li></ul>
 
       </footer>
       </div>
@@ -1157,7 +1236,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjgsod4zu002113ka1pkj3yx4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjgsq3swp001hnmkaau2ggqxh" class="article-share-link">
           Share
         </a>
         
@@ -1250,7 +1329,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjgsod50c003913ka6dtyc31r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjgsq3sxo003gnmkagsivdsa1" class="article-share-link">
           Share
         </a>
         
@@ -1333,7 +1412,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjgsod50b003713katqz6ai1r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjgsq3sxn003enmkah8rqcs5d" class="article-share-link">
           Share
         </a>
         
@@ -1420,12 +1499,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjgsod4zw002613kadp0yqs9o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjgsq3sx6002dnmkae3q4rojc" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">13</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -1516,7 +1595,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjgsod509003213ka3a2ddycq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjgsq3sxm003cnmkamcaymnkj" class="article-share-link">
           Share
         </a>
         
@@ -1590,7 +1669,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjgsod507002x13kaer5n9nzb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjgsq3sxi0035nmkah2nuj0y8" class="article-share-link">
           Share
         </a>
         
@@ -1699,12 +1778,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjgsod50f003e13ka2e16awx7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjgsq3sxr003knmkaus9eshnp" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">10</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
 
       </footer>
       </div>
@@ -1819,7 +1898,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjgsod4z7000u13kaitfgni3o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjgsq3swf0011nmkaati54nkg" class="article-share-link">
           Share
         </a>
         
@@ -1893,95 +1972,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjgsod4zo001p13kae2dcvgvx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjgsq3swx001xnmkadsc87byc" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-scala/000-case-class-cs-class" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/29/scala/000-case-class-cs-class/" class="article-date">
-  <time datetime="2017-12-29T13:29:43.000Z" itemprop="datePublished">2017-12-29</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/29/scala/000-case-class-cs-class/">case class和class的区别</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="case-class和class的区别"><a href="#case-class和class的区别" class="headerlink" title="case class和class的区别"></a><a href="https://www.scala-exercises.org/scala_tutorial/classes_vs_case_classes" target="_blank" rel="noopener">case class和class的区别</a></h2><p>以以下两个class为例:</p>
-<p>class<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BankAccount</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> balance = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">deposit</span></span>(amount: <span class="type">Int</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (amount &gt; <span class="number">0</span>) balance = balance + amount</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">withdraw</span></span>(amount: <span class="type">Int</span>): <span class="type">Int</span> =</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> &lt; amount &amp;&amp; amount &lt;= balance) &#123;</span><br><span class="line">      balance = balance - amount</span><br><span class="line">      balance</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">Error</span>(<span class="string">"insufficient funds"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>case class<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Note</span>(<span class="params">name: <span class="type">String</span>, duration: <span class="type">String</span>, octave: <span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="1-创建方式"><a href="#1-创建方式" class="headerlink" title="1.创建方式"></a>1.创建方式</h2><p>一个要new,一个不用<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> aliceAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure></p>
-<h2 id="2-对象比较"><a href="#2-对象比较" class="headerlink" title="2.对象比较"></a>2.对象比较</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> aliceAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"><span class="keyword">val</span> bobAccount = <span class="keyword">new</span> <span class="type">BankAccount</span></span><br><span class="line"></span><br><span class="line">aliceAccount == bobAccount <span class="comment">//false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>) <span class="comment">//不变性</span></span><br><span class="line"><span class="keyword">val</span> cThree = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">c3 == cThree <span class="comment">//true</span></span><br></pre></td></tr></table></figure>
-<h2 id="3-模式匹配"><a href="#3-模式匹配" class="headerlink" title="3.模式匹配"></a>3.模式匹配</h2><p>只有case class支持:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c3 <span class="keyword">match</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="type">Note</span>(name, duration, octave) =&gt; <span class="string">s"The duration of c3 is <span class="subst">$duration</span>"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="4-扩展性"><a href="#4-扩展性" class="headerlink" title="4.扩展性"></a>4.扩展性</h2><p>class可继承,而case class是不变的</p>
-<h2 id="5-为什么需要case-class"><a href="#5-为什么需要case-class" class="headerlink" title="5.为什么需要case class"></a>5.为什么需要case class</h2><p>总的来说,case class就是class的特例,提取出来是因为实践中大量使用case class.</p>
-<p>对于上面那个Note,扩展成class如下:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span>(<span class="params">_name: <span class="type">String</span>, _duration: <span class="type">String</span>, _octave: <span class="type">Int</span></span>) <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor parameters are promoted to members</span></span><br><span class="line">  <span class="keyword">val</span> name = _name</span><br><span class="line">  <span class="keyword">val</span> duration = _duration</span><br><span class="line">  <span class="keyword">val</span> octave = _octave</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Equality redefinition</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">equals</span></span>(other: <span class="type">Any</span>): <span class="type">Boolean</span> = other <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> that: <span class="type">Note</span> =&gt;</span><br><span class="line">      (that canEqual <span class="keyword">this</span>) &amp;&amp;</span><br><span class="line">        name == that.name &amp;&amp;</span><br><span class="line">        duration == that.duration &amp;&amp;</span><br><span class="line">        octave == that.octave</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">canEqual</span></span>(other: <span class="type">Any</span>): <span class="type">Boolean</span> = other.isInstanceOf[<span class="type">Note</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Java hashCode redefinition according to equality</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">hashCode</span></span>(): <span class="type">Int</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> state = <span class="type">Seq</span>(name, duration, octave)</span><br><span class="line">    state.map(_.hashCode()).foldLeft(<span class="number">0</span>)((a, b) =&gt; <span class="number">31</span> * a + b)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// toString redefinition to return the value of an instance instead of its memory addres</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">toString</span> </span>= <span class="string">s"Note(<span class="subst">$name</span>,<span class="subst">$duration</span>,<span class="subst">$octave</span>)"</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create a copy of a case class, with potentially modified field values</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">copy</span></span>(name: <span class="type">String</span> = name, duration: <span class="type">String</span> = duration, octave: <span class="type">Int</span> = octave): <span class="type">Note</span> =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Note</span>(name, duration, octave)</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Note</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor that allows the omission of the `new` keyword</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(name: <span class="type">String</span>, duration: <span class="type">String</span>, octave: <span class="type">Int</span>): <span class="type">Note</span> =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Note</span>(name, duration, octave)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Extractor for pattern matching</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">unapply</span></span>(note: <span class="type">Note</span>): <span class="type">Option</span>[(<span class="type">String</span>, <span class="type">String</span>, <span class="type">Int</span>)] =</span><br><span class="line">    <span class="keyword">if</span> (note eq <span class="literal">null</span>) <span class="type">None</span></span><br><span class="line">    <span class="keyword">else</span> <span class="type">Some</span>((note.name, note.duration, note.octave))</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>例子:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> c3 = <span class="type">Note</span>(<span class="string">"C"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line">c3.toString shouldBe <span class="string">"Note(C,Quarter,3)"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> d = <span class="type">Note</span>(<span class="string">"D"</span>, <span class="string">"Quarter"</span>, <span class="number">3</span>)</span><br><span class="line">c3.equals(d) shouldBe <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> c4 = c3.copy(octave = <span class="number">4</span>)</span><br><span class="line">c4.toString shouldBe <span class="string">"Note(C,Quarter,4)"</span></span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h2 id="case-class和class的区别"><a href="#case-class和class的区别" class="headerlink" title="case class和class的区别"></a><a href="https://www.scala-exercises.org/scala_tutorial/classes_vs_case_classes" target="_blank" rel="noopener">case class和class的区别</a></h2><p>以以下两个class为例:</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/29/scala/000-case-class-cs-class/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/29/scala/000-case-class-cs-class/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjgsod505002s13ka7582a2bi" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -2040,6 +2036,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/05/05/linux/012-linux-fun-tools/">linux下有趣的工具</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/05/tools/009-local-network-file-transport/">linux局域网文件传输</a>
           </li>
         
@@ -2053,10 +2053,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/04/30/linux/010-linux-background/">linux后台进程那些事</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/29/blockchain/000-learn-resources/">区块链学习路径与资源</a>
           </li>
         
       </ul>
