@@ -28,7 +28,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="在我的世界">
 <meta property="og:description" content="pandas那些常用操作,不用不知道. groupby keep columns就是经常需要按一列groupby,但是还想保留其他列.之前:1234567891011groupd  = df.groupby([&apos;student_id&apos;])groupd = groupd.agg(&amp;#123;&apos;pmark&apos;:np.average&amp;#125;)groupd.head()&apos;&apos;&apos;pmark53.827358">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-23T07:29:40.089Z">
+<meta property="og:updated_time" content="2018-05-10T02:17:19.685Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pandas那些常用操作">
 <meta name="twitter:description" content="pandas那些常用操作,不用不知道. groupby keep columns就是经常需要按一列groupby,但是还想保留其他列.之前:1234567891011groupd  = df.groupby([&apos;student_id&apos;])groupd = groupd.agg(&amp;#123;&apos;pmark&apos;:np.average&amp;#125;)groupd.head()&apos;&apos;&apos;pmark53.827358">
@@ -118,7 +118,7 @@ ga('send', 'pageview');
 <h1 id="重点学习groupby-apply"><a href="#重点学习groupby-apply" class="headerlink" title="重点学习groupby.apply()"></a>重点学习groupby.apply()</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.apply.html" target="_blank" rel="noopener">API</a></p>
 <p>例子1:将学生成绩数据按学号分组后把所有课程分数放在一个list里,再转为dict<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list).to_dict()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;'001':[100,90,80],'002':[90,90,90]...&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># or 直接转为list,返回二维数组</span></span><br><span class="line">list(dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list))</span><br></pre></td></tr></table></figure></p>
 <h1 id="迭代DataFrame"><a href="#迭代DataFrame" class="headerlink" title="迭代DataFrame"></a>迭代DataFrame</h1><p>How to iterate over rows in a DataFrame in Pandas?<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">18</span>]: <span class="keyword">for</span> index, row <span class="keyword">in</span> df.iterrows():</span><br><span class="line">   ....:     <span class="keyword">print</span> row[<span class="string">'c1'</span>], row[<span class="string">'c2'</span>]</span><br></pre></td></tr></table></figure></p>
-
+<h1 id="列的字符串匹配"><a href="#列的字符串匹配" class="headerlink" title="列的字符串匹配"></a>列的字符串匹配</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># startswith</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.match(<span class="string">'string'</span>)]</span><br><span class="line"><span class="comment"># contains</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.contains(<span class="string">'string'</span>)]</span><br></pre></td></tr></table></figure>
       
     </div> -->
           <div class="article-entry" itemprop="articleBody">
@@ -139,13 +139,13 @@ ga('send', 'pageview');
 <h1 id="重点学习groupby-apply"><a href="#重点学习groupby-apply" class="headerlink" title="重点学习groupby.apply()"></a>重点学习groupby.apply()</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.apply.html" target="_blank" rel="noopener">API</a></p>
 <p>例子1:将学生成绩数据按学号分组后把所有课程分数放在一个list里,再转为dict<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list).to_dict()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;'001':[100,90,80],'002':[90,90,90]...&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># or 直接转为list,返回二维数组</span></span><br><span class="line">list(dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list))</span><br></pre></td></tr></table></figure></p>
 <h1 id="迭代DataFrame"><a href="#迭代DataFrame" class="headerlink" title="迭代DataFrame"></a>迭代DataFrame</h1><p>How to iterate over rows in a DataFrame in Pandas?<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">18</span>]: <span class="keyword">for</span> index, row <span class="keyword">in</span> df.iterrows():</span><br><span class="line">   ....:     <span class="keyword">print</span> row[<span class="string">'c1'</span>], row[<span class="string">'c2'</span>]</span><br></pre></td></tr></table></figure></p>
-
+<h1 id="列的字符串匹配"><a href="#列的字符串匹配" class="headerlink" title="列的字符串匹配"></a>列的字符串匹配</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># startswith</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.match(<span class="string">'string'</span>)]</span><br><span class="line"><span class="comment"># contains</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.contains(<span class="string">'string'</span>)]</span><br></pre></td></tr></table></figure>
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjgydqi9p002vkukaoalwz1xw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjh0hey4y002x8okas0vbgslz" class="article-share-link">
           Share
         </a>
         
@@ -221,11 +221,11 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2018/05/09/math/000-basic-concept/">概率与统计学基本概念</a>
+            <a href="/2018/05/09/python/004-python-common-use/">python中的常用操作</a>
           </li>
         
           <li>
-            <a href="/2018/05/07/python/004-python-common-use/">python中的常用操作</a>
+            <a href="/2018/05/09/math/000-basic-concept/">概率与统计学基本概念</a>
           </li>
         
           <li>
