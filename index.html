@@ -84,10 +84,99 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/007-use-pandas" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/14/python/007-use-pandas/" class="article-date">
+  <time datetime="2018-05-14T02:31:42.457Z" itemprop="datePublished">2018-05-14</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/14/python/007-use-pandas/">pandas那些常用操作</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>pandas那些常用操作,不用不知道.</p>
+<h1 id="groupby-keep-columns"><a href="#groupby-keep-columns" class="headerlink" title="groupby keep columns"></a>groupby keep columns</h1><p>就是经常需要按一列groupby,但是还想保留其他列.<br>之前:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">groupd  = df.groupby([<span class="string">'student_id'</span>])</span><br><span class="line">groupd = groupd.agg(&#123;<span class="string">'pmark'</span>:np.average&#125;)</span><br><span class="line">groupd.head()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">pmark</span></span><br><span class="line"><span class="string">53.827358</span></span><br><span class="line"><span class="string">84.775641</span></span><br><span class="line"><span class="string">81.977778</span></span><br><span class="line"><span class="string">61.821591</span></span><br><span class="line"><span class="string">55.774000</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<p>之后:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">groupd  = df.groupby([<span class="string">'student_id'</span>],as_index=<span class="keyword">False</span>) <span class="comment"># 保留列</span></span><br><span class="line">groupd = groupd.agg(&#123;<span class="string">'pmark'</span>:np.average&#125;)</span><br><span class="line">groupd.head()</span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">student_id	pmark</span></span><br><span class="line"><span class="string">0	20122169	53.827358</span></span><br><span class="line"><span class="string">1	20122639	84.775641</span></span><br><span class="line"><span class="string">2	20130068	81.977778</span></span><br><span class="line"><span class="string">3	20131649	61.821591</span></span><br><span class="line"><span class="string">4	20131664	55.774000</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="value-counts"><a href="#value-counts" class="headerlink" title="value_counts()"></a>value_counts()</h1><p>计算DataFrame里某一列的值的个数:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">type(marks[<span class="string">'sex'</span>].value_counts())</span><br><span class="line"><span class="comment"># pandas.core.series.Series</span></span><br><span class="line"></span><br><span class="line">sex_cnt = marks[<span class="string">'sex'</span>].value_counts()</span><br><span class="line">dict(sex_cnt)</span><br><span class="line"><span class="comment"># &#123;'女': 176, '男': 517&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="pandas条件选择"><a href="#pandas条件选择" class="headerlink" title="pandas条件选择"></a>pandas条件选择</h1><p>针对选择某些值满足条件的行<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 大于90分为学霸</span></span><br><span class="line">good = marks[marks[<span class="string">'pmark'</span>]&gt;<span class="number">90</span>]</span><br></pre></td></tr></table></figure></p>
+<p>当需要判断某列的值是否在一个列表时可以用isin()<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">code=[<span class="string">'01'</span>,<span class="string">'02'</span>]</span><br><span class="line">dd = df[df[<span class="string">'course_code'</span>].isin(code)]</span><br></pre></td></tr></table></figure></p>
+<h1 id="去重"><a href="#去重" class="headerlink" title="去重"></a>去重</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop_duplicates.html" target="_blank" rel="noopener">官网</a>,<br>可以指定列,否则为全部列.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算学院挂科人数</span></span><br><span class="line">g = df[df[<span class="string">'pmark'</span>]&lt;<span class="number">60</span>].drop_duplicates(subset=[<span class="string">'student_id'</span>]).groupby(<span class="string">'sex'</span>,as_index=<span class="keyword">False</span>).agg(&#123;<span class="string">'pmark'</span>:<span class="string">'count'</span>&#125;)</span><br><span class="line">g.head()</span><br></pre></td></tr></table></figure></p>
+<h1 id="给pandas增加列"><a href="#给pandas增加列" class="headerlink" title="给pandas增加列"></a>给pandas增加列</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pandas.DataFrame.from_csv(<span class="string">'my_data.csv'</span>)  <span class="comment"># fake data</span></span><br><span class="line">df[<span class="string">'diff_A_B'</span>] = df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#or</span></span><br><span class="line">df2 = df.assign(diff_col=df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>])</span><br></pre></td></tr></table></figure>
+<p>更复杂一点,根据已有列且带有条件的生成:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">29</span>]:</span><br><span class="line">df[<span class="string">'points'</span>] = np.where( ( (df[<span class="string">'gender'</span>] == <span class="string">'male'</span>) &amp; (df[<span class="string">'pet1'</span>] == df[<span class="string">'pet2'</span>] ) ) | ( (df[<span class="string">'gender'</span>] == <span class="string">'female'</span>) &amp; (df[<span class="string">'pet1'</span>].isin([<span class="string">'cat'</span>,<span class="string">'dog'</span>] ) ) ), <span class="number">5</span>, <span class="number">0</span>)</span><br><span class="line">df</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">Out[29]:</span></span><br><span class="line"><span class="string">     gender      pet1      pet2  points</span></span><br><span class="line"><span class="string">0      male       dog       dog       5</span></span><br><span class="line"><span class="string">1      male       cat       cat       5</span></span><br><span class="line"><span class="string">2      male       dog       cat       0</span></span><br><span class="line"><span class="string">3    female       cat  squirrel       5</span></span><br><span class="line"><span class="string">4    female       dog       dog       5</span></span><br><span class="line"><span class="string">5    female  squirrel       cat       0</span></span><br><span class="line"><span class="string">6  squirrel       dog       cat       0</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 或则</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> x[<span class="string">'gender'</span>] == <span class="string">'male'</span> <span class="keyword">and</span> x[<span class="string">'pet1'</span>] == x[<span class="string">'pet2'</span>]: <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">elif</span> x[<span class="string">'gender'</span>] == <span class="string">'female'</span> <span class="keyword">and</span> (x[<span class="string">'pet1'</span>] == <span class="string">'cat'</span> <span class="keyword">or</span> x[<span class="string">'pet1'</span>] == <span class="string">'dog'</span>): <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">data[<span class="string">'points'</span>] = data.apply(f, axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="删除pandas的列"><a href="#删除pandas的列" class="headerlink" title="删除pandas的列"></a>删除pandas的列</h1><p>pandas delete column.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = df.drop(<span class="string">'column_name'</span>, <span class="number">1</span>) <span class="comment"># 0代表维度行,1代表维度列</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">df.drop([<span class="string">'column_name'</span>], axis=<span class="number">1</span>, inplace=<span class="keyword">True</span>) <span class="comment"># 就地</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">df.drop(df.columns[[<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>]], axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="重点学习groupby-apply"><a href="#重点学习groupby-apply" class="headerlink" title="重点学习groupby.apply()"></a>重点学习groupby.apply()</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.apply.html" target="_blank" rel="noopener">API</a></p>
+<p>例子1:将学生成绩数据按学号分组后把所有课程分数放在一个list里,再转为dict<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list).to_dict()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;'001':[100,90,80],'002':[90,90,90]...&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># or 直接转为list,返回二维数组</span></span><br><span class="line">list(dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list))</span><br></pre></td></tr></table></figure></p>
+<h1 id="迭代DataFrame"><a href="#迭代DataFrame" class="headerlink" title="迭代DataFrame"></a>迭代DataFrame</h1><p>How to iterate over rows in a DataFrame in Pandas?<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">18</span>]: <span class="keyword">for</span> index, row <span class="keyword">in</span> df.iterrows():</span><br><span class="line">   ....:     <span class="keyword">print</span> row[<span class="string">'c1'</span>], row[<span class="string">'c2'</span>]</span><br></pre></td></tr></table></figure></p>
+<h1 id="列的字符串匹配"><a href="#列的字符串匹配" class="headerlink" title="列的字符串匹配"></a>列的字符串匹配</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># startswith</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.match(<span class="string">'string'</span>)]</span><br><span class="line"><span class="comment"># contains</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.contains(<span class="string">'string'</span>)]</span><br></pre></td></tr></table></figure>
+<h1 id="pandas如何处理数据库中blob保存的图片"><a href="#pandas如何处理数据库中blob保存的图片" class="headerlink" title="pandas如何处理数据库中blob保存的图片"></a>pandas如何处理数据库中blob保存的图片</h1><p>会压缩成base64编码的字符串,解析遵循<a href=""></a>标准.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">stu1[<span class="string">'photo'</span>]</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">0      /9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBw...</span></span><br><span class="line"><span class="string">1      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgFBgcGBQgHBg...</span></span><br><span class="line"><span class="string">2      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ...</span></span><br><span class="line"><span class="string">3      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ...</span></span><br><span class="line"><span class="string">4      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAw...</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<p>使用时:<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"data:jpeg;base64,str"</span>&gt;</span> <span class="comment">&lt;!--其中jpeg可能为png--&gt;</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>pandas那些常用操作,不用不知道.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/05/14/python/007-use-pandas/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/05/14/python/007-use-pandas/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/05/14/python/007-use-pandas/" data-id="cjh5muk54002sq8kajj7nhgqh" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pandas/">pandas</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/010-ffmpeg" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/14/tools/010-ffmpeg/" class="article-date">
-  <time datetime="2018-05-14T01:46:04.787Z" itemprop="datePublished">2018-05-14</time>
+  <time datetime="2018-05-14T02:18:14.589Z" itemprop="datePublished">2018-05-14</time>
 </a>
       
   </div>
@@ -110,7 +199,7 @@ ga('send', 'pageview');
 <h1 id="视频参数说明"><a href="#视频参数说明" class="headerlink" title="视频参数说明"></a>视频参数说明</h1><p>通过ffmpeg查看视频信息,-i指定输入视频<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">]$</span> ffmpeg -i 1.mp4</span><br><span class="line">Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '1.mp4':</span><br><span class="line">  Metadata:</span><br><span class="line">    major_brand     : isom</span><br><span class="line">    minor_version   : 512</span><br><span class="line">    compatible_brands: isomiso2avc1mp41</span><br><span class="line">    encoder         : Lavf57.83.100</span><br><span class="line">  Duration: 00:09:59.03, start: 0.000000, bitrate: 15991 kb/s</span><br><span class="line">    Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuvj420p(pc), 1920x1080, 15923 kb/s, 30 fps, 30 tbr, 15360 tbn, 60 tbc (default)</span><br><span class="line">    Metadata:</span><br><span class="line">      handler_name    : VideoHandler</span><br><span class="line">    Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 32000 Hz, mono, fltp, 69 kb/s (default)</span><br><span class="line">    Metadata:</span><br><span class="line">      handler_name    : SoundHandler</span><br></pre></td></tr></table></figure></p>
 <p>其中Stream 0就是视频流,下面是音频流,h264编码,1920*1080分辨率.<br>这个15923kb/s要特别说明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">码率(比特率): 每秒输入视频的比特数,越高视频越大,质量越高,所以计算视频大小的公式:</span><br><span class="line">视频时长(秒)*码率,例如这个(忽略了音频的大小):</span><br><span class="line">Size(video) = 60s*10 * (15923/8/1024/1024) = 1.13GB</span><br></pre></td></tr></table></figure></p>
 <p>那么视频压缩就是压缩码率,当然帧率也可以压,不过一般不这样干.</p>
-<h1 id="ffmpeg压缩视频"><a href="#ffmpeg压缩视频" class="headerlink" title="ffmpeg压缩视频"></a>ffmpeg压缩视频</h1><p>计算好需要压缩的码率,我打算压缩5倍,设为3200kb/s:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> -b:v 代表视频码率,-b:a 代表音频的 </span><br><span class="line"><span class="meta">$</span> ffmpeg -i 1.mp4 -b:v 3200k 4.mp4</span><br></pre></td></tr></table></figure></p>
+<h1 id="ffmpeg压缩视频"><a href="#ffmpeg压缩视频" class="headerlink" title="ffmpeg压缩视频"></a>ffmpeg压缩视频</h1><p>计算好需要压缩的码率,我打算压缩5倍,设为3200kb/s:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> -b:v 代表视频码率,-b:a 代表音频的 </span><br><span class="line"><span class="meta">$</span> ffmpeg -i 1.mp4 -b:v 3200k 4.mp4</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 直接转换格式并压缩</span><br><span class="line"><span class="meta">$</span> ffmpeg -i MOVI0001.avi -b:v 3200k /home/jimo/视频/11.mp4</span><br></pre></td></tr></table></figure></p>
 <p>这样视频大概200多MB.</p>
 <p>参考:<a href="https://www.cnblogs.com/liusx0303/p/7572050.html" target="_blank" rel="noopener">ffmpeg——关于视频压缩</a></p>
 
@@ -150,7 +239,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/14/tools/010-ffmpeg/" data-id="cjh5lktjt003urvkahhpzys6q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/14/tools/010-ffmpeg/" data-id="cjh5muk5r003yq8kan0rgdlox" class="article-share-link">
           Share
         </a>
         
@@ -250,7 +339,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/09/python/004-python-common-use/" data-id="cjh5lktig002frvka99v32ufp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/09/python/004-python-common-use/" data-id="cjh5muk51002lq8ka20n8qttr" class="article-share-link">
           Share
         </a>
         
@@ -324,7 +413,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/09/math/000-basic-concept/" data-id="cjh5lkti70021rvkahzdtgz2w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/09/math/000-basic-concept/" data-id="cjh5muk4w0028q8kasrlr271z" class="article-share-link">
           Share
         </a>
         
@@ -418,7 +507,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/06/linux/012-linux-fun-tools/" data-id="cjh5lkti5001yrvkazbpz7z4g" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/06/linux/012-linux-fun-tools/" data-id="cjh5muk4u0024q8kazfxm5r8i" class="article-share-link">
           Share
         </a>
         
@@ -496,7 +585,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/05/tools/009-local-network-file-transport/" data-id="cjh5lktjr003trvka83zxr5kq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/05/tools/009-local-network-file-transport/" data-id="cjh5muk5r003xq8kaakdjv1ty" class="article-share-link">
           Share
         </a>
         
@@ -578,7 +667,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/02/linux/011-linux-terminal-qq/" data-id="cjh5lkti3001wrvkacuu6ue4o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/02/linux/011-linux-terminal-qq/" data-id="cjh5muk4t0021q8ka0l5rozmt" class="article-share-link">
           Share
         </a>
         
@@ -660,7 +749,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/02/python/008-python-error/" data-id="cjh5lktin002prvkaq3salj4o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/02/python/008-python-error/" data-id="cjh5muk55002vq8kapudp6ek5" class="article-share-link">
           Share
         </a>
         
@@ -738,7 +827,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/30/linux/010-linux-background/" data-id="cjh5lkti2001trvkasbje0tan" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/30/linux/010-linux-background/" data-id="cjh5muk4s001zq8ka7kf8eagz" class="article-share-link">
           Share
         </a>
         
@@ -820,7 +909,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/29/blockchain/000-learn-resources/" data-id="cjh5lktpg007zrvkahkmqcsc7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/29/blockchain/000-learn-resources/" data-id="cjh5muk3q0005q8katnegb1p7" class="article-share-link">
           Share
         </a>
         
@@ -962,7 +1051,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjh5lkthy001orvkajwgg8euw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjh5muk4q001uq8ka23n34jr8" class="article-share-link">
           Share
         </a>
         
@@ -1034,7 +1123,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/hexo/deploy-hexo-on-github/" data-id="cjh5lktha000urvka1pr0dtz8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/hexo/deploy-hexo-on-github/" data-id="cjh5muk4c000yq8kar3kr4qlw" class="article-share-link">
           Share
         </a>
         
@@ -1111,7 +1200,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/python/006-python-warning/" data-id="cjh5lktik002krvkabtam8f9y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/python/006-python-warning/" data-id="cjh5muk53002qq8kagb331h1m" class="article-share-link">
           Share
         </a>
         
@@ -1197,101 +1286,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjh5lktgs000grvkaqg78omyn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjh5muk45000lq8kasj5blts5" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sql/">sql</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-python/007-use-pandas" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/04/15/python/007-use-pandas/" class="article-date">
-  <time datetime="2018-04-15T03:33:00.000Z" itemprop="datePublished">2018-04-15</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/15/python/007-use-pandas/">pandas那些常用操作</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>pandas那些常用操作,不用不知道.</p>
-<h1 id="groupby-keep-columns"><a href="#groupby-keep-columns" class="headerlink" title="groupby keep columns"></a>groupby keep columns</h1><p>就是经常需要按一列groupby,但是还想保留其他列.<br>之前:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">groupd  = df.groupby([<span class="string">'student_id'</span>])</span><br><span class="line">groupd = groupd.agg(&#123;<span class="string">'pmark'</span>:np.average&#125;)</span><br><span class="line">groupd.head()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">pmark</span></span><br><span class="line"><span class="string">53.827358</span></span><br><span class="line"><span class="string">84.775641</span></span><br><span class="line"><span class="string">81.977778</span></span><br><span class="line"><span class="string">61.821591</span></span><br><span class="line"><span class="string">55.774000</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
-<p>之后:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">groupd  = df.groupby([<span class="string">'student_id'</span>],as_index=<span class="keyword">False</span>) <span class="comment"># 保留列</span></span><br><span class="line">groupd = groupd.agg(&#123;<span class="string">'pmark'</span>:np.average&#125;)</span><br><span class="line">groupd.head()</span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">student_id	pmark</span></span><br><span class="line"><span class="string">0	20122169	53.827358</span></span><br><span class="line"><span class="string">1	20122639	84.775641</span></span><br><span class="line"><span class="string">2	20130068	81.977778</span></span><br><span class="line"><span class="string">3	20131649	61.821591</span></span><br><span class="line"><span class="string">4	20131664	55.774000</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
-<h1 id="value-counts"><a href="#value-counts" class="headerlink" title="value_counts()"></a>value_counts()</h1><p>计算DataFrame里某一列的值的个数:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">type(marks[<span class="string">'sex'</span>].value_counts())</span><br><span class="line"><span class="comment"># pandas.core.series.Series</span></span><br><span class="line"></span><br><span class="line">sex_cnt = marks[<span class="string">'sex'</span>].value_counts()</span><br><span class="line">dict(sex_cnt)</span><br><span class="line"><span class="comment"># &#123;'女': 176, '男': 517&#125;</span></span><br></pre></td></tr></table></figure></p>
-<h1 id="pandas条件选择"><a href="#pandas条件选择" class="headerlink" title="pandas条件选择"></a>pandas条件选择</h1><p>针对选择某些值满足条件的行<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 大于90分为学霸</span></span><br><span class="line">good = marks[marks[<span class="string">'pmark'</span>]&gt;<span class="number">90</span>]</span><br></pre></td></tr></table></figure></p>
-<p>当需要判断某列的值是否在一个列表时可以用isin()<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">code=[<span class="string">'01'</span>,<span class="string">'02'</span>]</span><br><span class="line">dd = df[df[<span class="string">'course_code'</span>].isin(code)]</span><br></pre></td></tr></table></figure></p>
-<h1 id="去重"><a href="#去重" class="headerlink" title="去重"></a>去重</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop_duplicates.html" target="_blank" rel="noopener">官网</a>,<br>可以指定列,否则为全部列.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算学院挂科人数</span></span><br><span class="line">g = df[df[<span class="string">'pmark'</span>]&lt;<span class="number">60</span>].drop_duplicates(subset=[<span class="string">'student_id'</span>]).groupby(<span class="string">'sex'</span>,as_index=<span class="keyword">False</span>).agg(&#123;<span class="string">'pmark'</span>:<span class="string">'count'</span>&#125;)</span><br><span class="line">g.head()</span><br></pre></td></tr></table></figure></p>
-<h1 id="给pandas增加列"><a href="#给pandas增加列" class="headerlink" title="给pandas增加列"></a>给pandas增加列</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pandas.DataFrame.from_csv(<span class="string">'my_data.csv'</span>)  <span class="comment"># fake data</span></span><br><span class="line">df[<span class="string">'diff_A_B'</span>] = df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#or</span></span><br><span class="line">df2 = df.assign(diff_col=df[<span class="string">'A'</span>] - df[<span class="string">'B'</span>])</span><br></pre></td></tr></table></figure>
-<p>更复杂一点,根据已有列且带有条件的生成:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">29</span>]:</span><br><span class="line">df[<span class="string">'points'</span>] = np.where( ( (df[<span class="string">'gender'</span>] == <span class="string">'male'</span>) &amp; (df[<span class="string">'pet1'</span>] == df[<span class="string">'pet2'</span>] ) ) | ( (df[<span class="string">'gender'</span>] == <span class="string">'female'</span>) &amp; (df[<span class="string">'pet1'</span>].isin([<span class="string">'cat'</span>,<span class="string">'dog'</span>] ) ) ), <span class="number">5</span>, <span class="number">0</span>)</span><br><span class="line">df</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">Out[29]:</span></span><br><span class="line"><span class="string">     gender      pet1      pet2  points</span></span><br><span class="line"><span class="string">0      male       dog       dog       5</span></span><br><span class="line"><span class="string">1      male       cat       cat       5</span></span><br><span class="line"><span class="string">2      male       dog       cat       0</span></span><br><span class="line"><span class="string">3    female       cat  squirrel       5</span></span><br><span class="line"><span class="string">4    female       dog       dog       5</span></span><br><span class="line"><span class="string">5    female  squirrel       cat       0</span></span><br><span class="line"><span class="string">6  squirrel       dog       cat       0</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 或则</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> x[<span class="string">'gender'</span>] == <span class="string">'male'</span> <span class="keyword">and</span> x[<span class="string">'pet1'</span>] == x[<span class="string">'pet2'</span>]: <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">elif</span> x[<span class="string">'gender'</span>] == <span class="string">'female'</span> <span class="keyword">and</span> (x[<span class="string">'pet1'</span>] == <span class="string">'cat'</span> <span class="keyword">or</span> x[<span class="string">'pet1'</span>] == <span class="string">'dog'</span>): <span class="keyword">return</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">data[<span class="string">'points'</span>] = data.apply(f, axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
-<h1 id="删除pandas的列"><a href="#删除pandas的列" class="headerlink" title="删除pandas的列"></a>删除pandas的列</h1><p>pandas delete column.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = df.drop(<span class="string">'column_name'</span>, <span class="number">1</span>) <span class="comment"># 0代表维度行,1代表维度列</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">df.drop([<span class="string">'column_name'</span>], axis=<span class="number">1</span>, inplace=<span class="keyword">True</span>) <span class="comment"># 就地</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">df.drop(df.columns[[<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>]], axis=<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
-<h1 id="重点学习groupby-apply"><a href="#重点学习groupby-apply" class="headerlink" title="重点学习groupby.apply()"></a>重点学习groupby.apply()</h1><p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.apply.html" target="_blank" rel="noopener">API</a></p>
-<p>例子1:将学生成绩数据按学号分组后把所有课程分数放在一个list里,再转为dict<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list).to_dict()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;'001':[100,90,80],'002':[90,90,90]...&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># or 直接转为list,返回二维数组</span></span><br><span class="line">list(dd.groupby(<span class="string">'student_id'</span>)[<span class="string">'pmark'</span>].apply(list))</span><br></pre></td></tr></table></figure></p>
-<h1 id="迭代DataFrame"><a href="#迭代DataFrame" class="headerlink" title="迭代DataFrame"></a>迭代DataFrame</h1><p>How to iterate over rows in a DataFrame in Pandas?<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">18</span>]: <span class="keyword">for</span> index, row <span class="keyword">in</span> df.iterrows():</span><br><span class="line">   ....:     <span class="keyword">print</span> row[<span class="string">'c1'</span>], row[<span class="string">'c2'</span>]</span><br></pre></td></tr></table></figure></p>
-<h1 id="列的字符串匹配"><a href="#列的字符串匹配" class="headerlink" title="列的字符串匹配"></a>列的字符串匹配</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># startswith</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.match(<span class="string">'string'</span>)]</span><br><span class="line"><span class="comment"># contains</span></span><br><span class="line">dataFrameOut = dataFrame[dataFrame[<span class="string">'column name'</span>].str.contains(<span class="string">'string'</span>)]</span><br></pre></td></tr></table></figure>
-<h1 id="pandas如何处理数据库中blob保存的图片"><a href="#pandas如何处理数据库中blob保存的图片" class="headerlink" title="pandas如何处理数据库中blob保存的图片"></a>pandas如何处理数据库中blob保存的图片</h1><p>会压缩成base64编码的字符串,解析遵循<a href=""></a>标准.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">stu1[<span class="string">'photo'</span>]</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">0      /9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBw...</span></span><br><span class="line"><span class="string">1      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgFBgcGBQgHBg...</span></span><br><span class="line"><span class="string">2      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ...</span></span><br><span class="line"><span class="string">3      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ...</span></span><br><span class="line"><span class="string">4      /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAw...</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
-<p>使用时:<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"data:jpeg;base64,str"</span>&gt;</span> <span class="comment">&lt;!--其中jpeg可能为png--&gt;</span></span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>pandas那些常用操作,不用不知道.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/04/15/python/007-use-pandas/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/04/15/python/007-use-pandas/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjh5lktil002nrvkaqqmfrvxm" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pandas/">pandas</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -1363,7 +1363,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjh5lktgo000drvkaho4miev2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjh5muk42000hq8kau99sekx5" class="article-share-link">
           Share
         </a>
         
@@ -1441,7 +1441,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjh5lktgk000brvkaw114k7ju" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjh5muk43000jq8ka557hcyyg" class="article-share-link">
           Share
         </a>
         
@@ -1531,7 +1531,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjh5lktgg0008rvka6jihythq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjh5muk3y000dq8ka0rgyh62w" class="article-share-link">
           Share
         </a>
         
@@ -1614,7 +1614,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjh5lktge0006rvkaabfyocay" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjh5muk3v000bq8kar57qc5ke" class="article-share-link">
           Share
         </a>
         
@@ -1710,7 +1710,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjh5lkti0001rrvkas7o480j0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjh5muk4r001wq8ka6gvt8shq" class="article-share-link">
           Share
         </a>
         
@@ -1795,7 +1795,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjh5lktgc0005rvka3603oji4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjh5muk3t0009q8kaz88zow9y" class="article-share-link">
           Share
         </a>
         
@@ -1859,6 +1859,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/05/14/python/007-use-pandas/">pandas那些常用操作</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/14/tools/010-ffmpeg/">ffmpeg常用命令</a>
           </li>
         
@@ -1872,10 +1876,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/05/06/linux/012-linux-fun-tools/">linux下有趣的工具</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/05/tools/009-local-network-file-transport/">linux局域网文件传输</a>
           </li>
         
       </ul>
