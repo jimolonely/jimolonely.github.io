@@ -84,6 +84,90 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-cloudcompute/002-packstack" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/30/cloudcompute/002-packstack/" class="article-date">
+  <time datetime="2018-03-30T04:49:34.000Z" itemprop="datePublished">2018-03-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>安装openstack的一些方法.</p>
+<h1 id="1-从源码安装"><a href="#1-从源码安装" class="headerlink" title="1.从源码安装"></a>1.从源码安装</h1><p>可以参考<a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" title="在ubuntu上安装openstack">在ubuntu上安装openstack</a></p>
+<h1 id="2-按照官方文档"><a href="#2-按照官方文档" class="headerlink" title="2.按照官方文档"></a>2.按照官方文档</h1><p>官方文档是这样开始的 :<a href="https://docs.openstack.org/install-guide/environment.html" target="_blank" rel="noopener">install openstack</a></p>
+<h1 id="3-使用packstack"><a href="#3-使用packstack" class="headerlink" title="3.使用packstack"></a>3.使用packstack</h1><p>packstack安装可以参考<a href="https://www.rdoproject.org/install/packstack/" target="_blank" rel="noopener">官网</a></p>
+<p>它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的.</p>
+<p>在CentOS上:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install -y centos-release-openstack-queens</span><br><span class="line"><span class="meta">$</span> sudo yum update -y</span><br><span class="line"><span class="meta">$</span> sudo yum install -y openstack-packstack</span><br><span class="line"><span class="meta">$</span> sudo packstack --allinone</span><br></pre></td></tr></table></figure></p>
+<p>最后一步需要的时间最长,其中下面是主要花的时间:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pplying 10.0.2.15_controller.pp</span><br><span class="line">10.0.2.15_controller.pp:                             [ DONE ]      </span><br><span class="line">Applying 10.0.2.15_network.pp</span><br><span class="line">10.0.2.15_network.pp:                                [ DONE ]   </span><br><span class="line">Applying 10.0.2.15_compute.pp</span><br><span class="line">10.0.2.15_compute.pp:                                [ DONE ]   </span><br><span class="line">Applying Puppet manifests                            [ DONE ]</span><br><span class="line">Finalizing                                           [ DONE ]</span><br><span class="line"></span><br><span class="line"> **** Installation completed successfully ******</span><br></pre></td></tr></table></figure></p>
+<p>其默认创建了2个用户:admin和demo,其密码在用户目录下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls key*</span><br><span class="line">keystonerc_admin  keystonerc_demo</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# cat keystonerc_demo </span><br><span class="line">unset OS_SERVICE_TOKEN</span><br><span class="line">export OS_USERNAME=demo</span><br><span class="line">export OS_PASSWORD='6c43ac4dbcc141e3'</span><br><span class="line">export PS1='[\u@\h \W(keystone_demo)]\$ '</span><br><span class="line">export OS_AUTH_URL=http://10.0.2.15:5000/v3</span><br><span class="line">    </span><br><span class="line">export OS_PROJECT_NAME=demo</span><br><span class="line">export OS_USER_DOMAIN_NAME=Default</span><br><span class="line">export OS_PROJECT_DOMAIN_NAME=Default</span><br><span class="line">export OS_IDENTITY_API_VERSION=3</span><br></pre></td></tr></table></figure></p>
+<p>启动openstack只需在浏览器输入自己的ip/dashboard:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">To access the OpenStack Dashboard browse to http://10.0.2.15/dashboard</span><br></pre></td></tr></table></figure></p>
+<p>如果重启了系统,只需要再运行上次的answer-file下的配置:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls packstack*</span><br><span class="line">packstack-answers-20180329-220625.txt</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# packstack --answer-file packstack-answers-20180329-220625.txt </span><br><span class="line">Welcome to the Packstack setup utility</span><br><span class="line"></span><br><span class="line">The installation log file is available at: /var/tmp/packstack/20180330-004508-tneRpU/openstack-setup.log</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>使用demo用户登录然后可以创建一个实例试试:<br><img src="/2018/03/30/cloudcompute/002-packstack/000.png"></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>安装openstack的一些方法.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/002-packstack/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/002-packstack/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjh5lktga0004rvkapyebokhj" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos/">centos</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">24</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">4</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-db/000-mysql-error-1698" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/27/db/000-mysql-error-1698/" class="article-date">
@@ -147,12 +231,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjh3fjd2u000p28kaynrbsd0x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjh5lktgi0009rvkam0mhd100" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">24</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -260,12 +344,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjh3fjd4o004a28ka2e1v5k9o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjh5lktjl003rrvkaha636je9" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">24</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
 
       </footer>
       </div>
@@ -361,12 +445,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjh3fjd2m000f28ka53ybdsmg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjh5lktfz0001rvkazqpo3dw3" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">4</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">24</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">4</span></li></ul>
 
       </footer>
       </div>
@@ -447,7 +531,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjh3fjd3z003228kat816mjc5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjh5lktii002irvkapv6ykhds" class="article-share-link">
           Share
         </a>
         
@@ -525,7 +609,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjh3fjd36001h28kal6txhact" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjh5lkthc000wrvkaaoou34nl" class="article-share-link">
           Share
         </a>
         
@@ -600,7 +684,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjh3fjd32001828ka5dxmiazf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjh5lkth5000nrvkak6s1jgvo" class="article-share-link">
           Share
         </a>
         
@@ -694,7 +778,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjh3fjd5d007528kaykuufsak" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjh5lktln007hrvkagwjh6wls" class="article-share-link">
           Share
         </a>
         
@@ -778,7 +862,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjh3fjd31001628ka5s2c5vyi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjh5lkth2000krvkak42v0acg" class="article-share-link">
           Share
         </a>
         
@@ -854,7 +938,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjh3fjd37001i28ka87bmdw7z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjh5lkthd000yrvka59afkmey" class="article-share-link">
           Share
         </a>
         
@@ -947,7 +1031,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjh3fjd30001428ka6imujc12" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjh5lkth1000jrvkajyxceizv" class="article-share-link">
           Share
         </a>
         
@@ -1032,7 +1116,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjh3fjd2z001228kai7ofidj0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjh5lkth4000mrvkarl8n6gkg" class="article-share-link">
           Share
         </a>
         
@@ -1128,7 +1212,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjh3fjd3a001o28kaj1hyfk1s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjh5lkthp0019rvkamw1acbyr" class="article-share-link">
           Share
         </a>
         
@@ -1207,12 +1291,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjh3fjd1p000128ka0nuxzrx4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjh5lktpd007wrvkabqqpaq7r" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">24</span></li></ul>
 
       </footer>
       </div>
@@ -1286,7 +1370,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjh3fjd39001m28kacduqunfk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjh5lkthg0011rvkajh6qi5oc" class="article-share-link">
           Share
         </a>
         
@@ -1370,7 +1454,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjh3fjd38001l28kay8pbbwbo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjh5lkthf0010rvkat8a6i58s" class="article-share-link">
           Share
         </a>
         
@@ -1448,12 +1532,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjh3fjd4l004828kaxe80bl5j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjh5lktjj003prvkag5ftbrfr" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/magnet/">magnet</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/magnet/">magnet</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
 
       </footer>
       </div>
@@ -1531,12 +1615,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjh3fjd4h004528ka2cjg2tfv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjh5lktjg003nrvka9ytul4ka" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">8</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">8</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
 
       </footer>
       </div>
@@ -1621,12 +1705,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjh3fjd4g004328ka6e4y01tn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjh5lktjd003krvkaafatcmb2" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">11</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
 
       </footer>
       </div>
@@ -1715,93 +1799,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjh3fjd3x002x28kalmaijwvq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjh5lktid002arvkal6o5xhtt" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爬虫/">爬虫</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-cloudcompute/000-install-openstack-unbuntu" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" class="article-date">
-  <time datetime="2018-01-26T11:57:01.000Z" itemprop="datePublished">2018-01-26</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/">在ubuntu上安装openstack</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文讲述了在ubuntu16.04上安装openstack的注意事项.<br>如果是redhat或centos,请参考<a href="/2018/03/30/cloudcompute/002-packstack/" title="另一篇文章">另一篇文章</a></p>
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>安装<a href="https://docs.openstack.org/developer/devstack/index.html" target="_blank" rel="noopener">官网</a>的步骤,<br>有可能会成功.经过反复试验,在不翻墙的情况下还是可以安装成功了.</p>
-<p>下面是步骤:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 1.stack用户</span><br><span class="line"><span class="meta">$</span> sudo useradd -s /bin/bash -d /opt/stack -m stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 2.分配权限</span><br><span class="line"><span class="meta">$</span> echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 3.采用stack用户</span><br><span class="line"><span class="meta">$</span> sudo su - stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 4.在stack环境下</span><br><span class="line"><span class="meta">$</span> git clone https://git.openstack.org/openstack-dev/devstack</span><br><span class="line"><span class="meta">$</span> cd devstack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 5.创建local.conf文件,并填入下面的文件</span><br><span class="line">[[local|localrc]]</span><br><span class="line">ADMIN_PASSWORD=secret</span><br><span class="line">DATABASE_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line">RABBIT_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line">SERVICE_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 6.官网说可以直接执行stack.sh了,但经过反复验证,有一个资源下载很慢</span><br><span class="line"><span class="meta">#</span> 就是会去下载此linux镜像:cirros-0.3.5-x86_64-disk.img</span><br><span class="line"><span class="meta">#</span> 可以下载好了,在/opt/stack下建一个files文件夹,放上此文件,不过也不一定</span><br><span class="line"><span class="meta">#</span> 也就12M,慢慢下也能下完</span><br></pre></td></tr></table></figure></p>
-<p>成功的结果:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">=========================</span><br><span class="line">DevStack Component Timing</span><br><span class="line"> (times are in seconds)  </span><br><span class="line">=========================</span><br><span class="line">run_process           89</span><br><span class="line">test_with_retry        4</span><br><span class="line">apt-get-update        17</span><br><span class="line">pip_install          164</span><br><span class="line">osc                  197</span><br><span class="line">wait_for_service      40</span><br><span class="line">dbsync                62</span><br><span class="line">apt-get               16</span><br><span class="line">-------------------------</span><br><span class="line">Unaccounted time     1100</span><br><span class="line">=========================</span><br><span class="line">Total runtime        1689</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">This is your host IP address: 192.168.1.126</span><br><span class="line">This is your host IPv6 address: ::1</span><br><span class="line">Horizon is now available at http://192.168.1.126/dashboard</span><br><span class="line">Keystone is serving at http://192.168.1.126/identity/</span><br><span class="line">The default users are: admin and demo</span><br><span class="line">The password: 1234</span><br><span class="line"></span><br><span class="line">WARNING: </span><br><span class="line">Using lib/neutron-legacy is deprecated, and it will be removed in the future</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Services are running under systemd unit files.</span><br><span class="line">For more information see: </span><br><span class="line">https://docs.openstack.org/devstack/latest/systemd.html</span><br><span class="line"></span><br><span class="line">DevStack Version: queens</span><br><span class="line">Change: 66c893f25c6eb50edef47ec86a6d97fa58d2ea05 Merge "Bump the Cinder LVM backing file size to 24Gb." 2018-01-25 19:26:49 +0000</span><br><span class="line">OS Version: Ubuntu 16.04 xenial</span><br><span class="line"></span><br><span class="line">2018-01-26 10:01:51.399 | stack.sh completed in 1689 seconds.</span><br></pre></td></tr></table></figure></p>
-<p>可以看到接近半小时才整完,而且是反复很多次.</p>
-<p>另外,出错了需要先执行./unstack.sh,再执行stack.sh.</p>
-<p>只要有耐心,一定能装好.</p>
-<p>可以在本地登录:</p>
-<img src="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/000.png">
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文讲述了在ubuntu16.04上安装openstack的注意事项.<br>如果是redhat或centos,请参考<a href="/2018/03/30/cloudcompute/002-packstack/" title="另一篇文章">另一篇文章</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjh3fjd1t000228ka9mbr7qx3" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">4</span></li></ul>
 
       </footer>
       </div>
@@ -1828,7 +1831,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
     </div>
   </div>
 
@@ -1838,7 +1841,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 10px;">math</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 11.25px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
+      <a href="/tags/AI/" style="font-size: 11.25px;">AI</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/design-pattern/" style="font-size: 10px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 15px;">elasticsearch</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 16.25px;">java</a> <a href="/tags/javascript/" style="font-size: 11.25px;">javascript</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/latex/" style="font-size: 12.5px;">latex</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 10px;">math</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 18.75px;">python</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 13.75px;">spark</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 11.25px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 11.25px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 10px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/云计算/" style="font-size: 13.75px;">云计算</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a>
     </div>
   </div>
 
@@ -1860,6 +1863,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2018/05/14/tools/010-ffmpeg/">ffmpeg常用命令</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/09/python/004-python-common-use/">python中的常用操作</a>
           </li>
         
@@ -1873,10 +1880,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/05/05/tools/009-local-network-file-transport/">linux局域网文件传输</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/02/linux/011-linux-terminal-qq/">命令行的QQ</a>
           </li>
         
       </ul>
