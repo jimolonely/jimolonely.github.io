@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111673440-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>redis配置文件 | 在我的世界</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文解释redis的配置文件。 配置文件位置默认安装包下就有,当然也可以自己创建。 12[root@jimo redis-4.0.11]# ls00-RELEASENOTES  BUGS  CONTRIBUTING  COPYING  INSTALL  MANIFESTO  Makefile  README.md  deps  redis.conf  runtest  runtest-cluste">
+<meta name="keywords" content="redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis配置文件">
+<meta property="og:url" content="http://http://jimolonely.github.io/2018/09/04/lang/010-redis-configuration/index.html">
+<meta property="og:site_name" content="在我的世界">
+<meta property="og:description" content="本文解释redis的配置文件。 配置文件位置默认安装包下就有,当然也可以自己创建。 12[root@jimo redis-4.0.11]# ls00-RELEASENOTES  BUGS  CONTRIBUTING  COPYING  INSTALL  MANIFESTO  Makefile  README.md  deps  redis.conf  runtest  runtest-cluste">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-14T03:04:02.322Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis配置文件">
+<meta name="twitter:description" content="本文解释redis的配置文件。 配置文件位置默认安装包下就有,当然也可以自己创建。 12[root@jimo redis-4.0.11]# ls00-RELEASENOTES  BUGS  CONTRIBUTING  COPYING  INSTALL  MANIFESTO  Makefile  README.md  deps  redis.conf  runtest  runtest-cluste">
+  
+    <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/prism-atom-dark.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"><script src="/js/prism.js"></script>
+<script src="/js/prism-line-numbers.min.js"></script></head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我的世界</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">无敌是多么寂寞，此生有你足矣</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">home</a>
+        
+          <a class="main-nav-link" href="/archives">archives</a>
+        
+          <a class="main-nav-link" href="/about">about</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://http://jimolonely.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-lang/010-redis-configuration" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/04/lang/010-redis-configuration/" class="article-date">
+  <time datetime="2018-09-04T00:12:15.000Z" itemprop="datePublished">2018-09-04</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 class="article-title" itemprop="name">
+      redis配置文件
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文解释redis的配置文件。</p>
+<h1 id="配置文件位置"><a href="#配置文件位置" class="headerlink" title="配置文件位置"></a>配置文件位置</h1><p>默认安装包下就有,当然也可以自己创建。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@jimo redis-4.0.11]# ls</span><br><span class="line">00-RELEASENOTES  BUGS  CONTRIBUTING  COPYING  INSTALL  MANIFESTO  Makefile  README.md  deps  redis.conf  runtest  runtest-cluster  runtest-sentinel  sentinel.conf  src  tests  utils</span><br></pre></td></tr></table></figure>
+<p>本文基于<code>redis.conf</code>。</p>
+<h1 id="如何使用redis-conf"><a href="#如何使用redis-conf" class="headerlink" title="如何使用redis.conf"></a>如何使用redis.conf</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-server /path/to/redis.conf</span><br></pre></td></tr></table></figure>
+<h1 id="容量解释"><a href="#容量解释" class="headerlink" title="容量解释"></a>容量解释</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 1k =&gt; 1000 bytes</span><br><span class="line"># 1kb =&gt; 1024 bytes</span><br><span class="line"># 1m =&gt; 1000000 bytes</span><br><span class="line"># 1mb =&gt; 1024*1024 bytes</span><br><span class="line"># 1g =&gt; 1000000000 bytes</span><br><span class="line"># 1gb =&gt; 1024*1024*1024 bytes</span><br></pre></td></tr></table></figure>
+<p>不区分大小写，也就是说：1GB=1gB=1Gb</p>
+<h1 id="包含其他配置文件"><a href="#包含其他配置文件" class="headerlink" title="包含其他配置文件"></a>包含其他配置文件</h1><p>为避免被覆盖，最好放在文件结尾：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># include /path/to/local.conf</span><br><span class="line"># include /path/to/other.conf</span><br></pre></td></tr></table></figure></p>
+<h1 id="加载模块"><a href="#加载模块" class="headerlink" title="加载模块"></a>加载模块</h1><p>在启动时加载模块，如果加载失败则无法启动。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># loadmodule /path/to/my_module.so</span><br><span class="line"># loadmodule /path/to/other_module.so</span><br></pre></td></tr></table></figure></p>
+<h1 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h1><h2 id="bind"><a href="#bind" class="headerlink" title="bind"></a>bind</h2><p>如果没有如下示例的<code>bind</code>，则server监听所有网卡。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># bind 192.168.1.100 10.0.0.1</span><br><span class="line"># bind 127.0.0.1 ::1</span><br></pre></td></tr></table></figure></p>
+<p><strong><em>警告: 如果运行Redis的计算机直接暴露在互联网，绑定到所有接口是危险的，这将暴露对互联网上的每个人都有一个实例。 所以默认情况下我们取消注释遵循bind指令，这将强制Redis只监听IPv4回溯接口地址（这意味着Redis将能够仅接受来自运行到同一台计算机的客户端的连接在跑）</em></strong> 。</p>
+<p>默认情况，绑定到本地：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bind 127.0.0.1</span><br></pre></td></tr></table></figure></p>
+<h2 id="保护模式"><a href="#保护模式" class="headerlink" title="保护模式"></a>保护模式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protected-mode yes</span><br></pre></td></tr></table></figure>
+<p>保护模式默认打开，可以避免暴露到网络上被攻击或访问。</p>
+<p>如果保护模式打开，且满足：</p>
+<ol>
+<li>没有<code>bind</code>指令</li>
+<li>没配置密码</li>
+</ol>
+<p>则redis只接受127.0.0.1 和 ::1的客户端。</p>
+<h2 id="TCP-backlog"><a href="#TCP-backlog" class="headerlink" title="TCP backlog"></a>TCP backlog</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#默认值 511</span><br><span class="line">tcp-backlog：511</span><br></pre></td></tr></table></figure>
+<p>此参数确定了TCP连接中已完成队列(完成三次握手之后)的长度， 当然此值 <strong>必须不大于Linux系统定义的</strong> <code>/proc/sys/net/core/somaxconn</code>值，默认是511，而Linux的默认参数值是128。当系统并发量大并且客户端速度缓慢的时候，可以将这二个参数一起参考设定。</p>
+<p><strong>建议修改为 2048</strong></p>
+<p>修改somaxconn</p>
+<p>该内核参数默认值一般是128，对于负载很大的服务程序来说大大的不够。一般会将它修改为2048或者更大。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cat /proc/sys/net/core/somaxconn</span><br><span class="line">128</span><br></pre></td></tr></table></figure></p>
+<p><code>echo 2048 &gt; /proc/sys/net/core/somaxconn</code> 但是这样系统重启后保存不了</p>
+<p>在<code>/etc/sysctl.conf</code>中添加如下<code>net.core.somaxconn = 2048</code></p>
+<p>然后在终端中执行<code>sysctl -p</code>.</p>
+<h2 id="port"><a href="#port" class="headerlink" title="port"></a>port</h2><p>监听端口，如果为0，则不监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">port 6379</span><br></pre></td></tr></table></figure></p>
+<h2 id="unix-socket"><a href="#unix-socket" class="headerlink" title="unix socket"></a>unix socket</h2><p>监听unix的socket连接，没有设置则不监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># unixsocket /tmp/redis.sock</span><br><span class="line"># unixsocketperm 700</span><br></pre></td></tr></table></figure></p>
+<h2 id="timeout"><a href="#timeout" class="headerlink" title="timeout"></a>timeout</h2><p>在客户端空闲N秒后关闭连接（0表示禁用）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeout 0</span><br></pre></td></tr></table></figure></p>
+<h2 id="TCP-keepalive"><a href="#TCP-keepalive" class="headerlink" title="TCP keepalive"></a>TCP keepalive</h2><p>如果非0，则在没有通信的情况下使用SO_KEEPALIVE向客户端发送TCP ACK。 这有两个原因：</p>
+<ol>
+<li>检测死的客户端。</li>
+<li><p>从中间网络设备的角度看有效连接。</p>
+<p>在Linux上，指定的值（以秒为单位）是用于发送ACK的时间段。 请注意，要关闭连接，需要两倍的时间。 在其他内核上，周期取决于内核配置。</p>
+</li>
+</ol>
+<p>此选项的合理值为300秒，这是从Redis 3.2.1开始的新Redis默认值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcp-keepalive 300</span><br></pre></td></tr></table></figure></p>
+<h1 id="通用配置"><a href="#通用配置" class="headerlink" title="通用配置"></a>通用配置</h1><h2 id="守护程序"><a href="#守护程序" class="headerlink" title="守护程序"></a>守护程序</h2><p>默认redis不开守护程序，如果打开，会写一个pid文件到<code>/var/run/redis.pid</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">daemonize no</span><br></pre></td></tr></table></figure></p>
+<h2 id="supervised"><a href="#supervised" class="headerlink" title="supervised"></a>supervised</h2><p>如果从upstart或systemd运行Redis，Redis可以与您的监督树进行交互:</p>
+<ul>
+<li>supervised no - 不交互</li>
+<li>supervised upsert - 将redis放入SIGSTOP模式与upstart发信号</li>
+<li>supervised systemd - 通过写入READY=1到$NOTIFY_SOCKET与systemd交互</li>
+<li>supervised auto - 通过UPSERT_JOB 或 NOTIFY_SOCKET环境变量检测upstart或systemd方法</li>
+</ul>
+<p>他们只发送“进程准备好”的信号，并不保持持续的ping连接。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervised no</span><br></pre></td></tr></table></figure></p>
+<h2 id="pid-file"><a href="#pid-file" class="headerlink" title="pid file"></a>pid file</h2><p>指定的pid文件会在启动时写入，退出时移除。</p>
+<ul>
+<li>如果守护进程关闭：pid文件不会创建；</li>
+<li>否则一定会使用，默认是：<code>/var/run/redis.pid</code></li>
+</ul>
+<p>最好指定一个pid文件，即使无法创建也不会报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidfile /var/run/redis_6379.pid</span><br></pre></td></tr></table></figure></p>
+<h2 id="loglevel"><a href="#loglevel" class="headerlink" title="loglevel"></a>loglevel</h2><p>有<code>debug,verbose,notice,warning</code>,默认notice(生产环境)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loglevel notice</span><br></pre></td></tr></table></figure></p>
+<h2 id="logfile"><a href="#logfile" class="headerlink" title="logfile"></a>logfile</h2><p>如果为<code>&quot;&quot;</code>,则输出到标准输出，如果同时还开启了守护进程，则转到<code>/dev/null</code>:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logfile &quot;&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="syslog-enabled"><a href="#syslog-enabled" class="headerlink" title="syslog-enabled"></a>syslog-enabled</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># syslog-enabled no</span><br></pre></td></tr></table></figure>
+<h2 id="syslog-ident"><a href="#syslog-ident" class="headerlink" title="syslog-ident"></a>syslog-ident</h2><p>系统日志的主体(identity)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># syslog-ident redis</span><br></pre></td></tr></table></figure></p>
+<h2 id="syslog-facility"><a href="#syslog-facility" class="headerlink" title="syslog-facility"></a>syslog-facility</h2><p>指定syslog工具, 必须是USER或LOCAL0-LOCAL7之间。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># syslog-facility local0</span><br></pre></td></tr></table></figure></p>
+<h2 id="databases"><a href="#databases" class="headerlink" title="databases"></a>databases</h2><p>设置数据库的数量。 默认数据库是DB 0，您可以使用<code>SELECT &lt;dbid&gt;</code>在每个连接上选择不同的数据库，其中dbid是介于0和’databases’-1之间的数字<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">databases 16</span><br></pre></td></tr></table></figure></p>
+<h2 id="always-show-logo"><a href="#always-show-logo" class="headerlink" title="always-show-logo"></a>always-show-logo</h2><p>默认情况下，只有在开始登录标准输出且标准输出为TTY时，Redis才会显示ASCII艺术徽标。 基本上这意味着通常只在交互式会话中显示徽标。</p>
+<p>但是，通过将以下选项设置为yes，可以强制执行4.0之前的行为并始终在启动日志中显示ASCII艺术徽标。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">always-show-logo yes</span><br></pre></td></tr></table></figure></p>
+<h1 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h1><h2 id="save"><a href="#save" class="headerlink" title="save"></a>save</h2><p>将数据库保存在磁盘上：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">    save &lt;秒&gt; &lt;更改数量&gt;</span><br><span class="line"></span><br><span class="line">    如果同时发生了给定的秒数和针对DB的给定写入操作数，则将保存数据库。</span><br><span class="line"></span><br><span class="line">    在下面的示例中，行为将是保存：</span><br><span class="line">    如果至少1个键改变，则在900秒（15分钟）之后</span><br><span class="line">    如果至少改变了10个键，则在300秒（5分钟）后</span><br><span class="line">    如果至少10000键改变，60秒后</span><br><span class="line"></span><br><span class="line">    注意：您可以通过注释掉所有“save”行来完全禁用保存。</span><br><span class="line"></span><br><span class="line">    也可以通过添加带有单个空字符串参数的save指令来删除所有先前配置的保存点，如下例所示：</span><br><span class="line"></span><br><span class="line">    save &quot;&quot;</span><br><span class="line"></span><br><span class="line">save 900 1</span><br><span class="line">save 300 10</span><br><span class="line">save 60 10000</span><br></pre></td></tr></table></figure></p>
+<h2 id="stop-writes-on-bgsave-error"><a href="#stop-writes-on-bgsave-error" class="headerlink" title="stop-writes-on-bgsave-error"></a>stop-writes-on-bgsave-error</h2><p>默认情况下，如果启用了RDB快照（至少一个保存点）并且最新的后台保存失败，Redis将停止接受写入。 这将使用户意识到（以一种困难的方式）数据没有正确地保存在磁盘上，否则很可能没有人会注意到并且会发生一些灾难。</p>
+<p>如果后台保存过程将再次开始工作，Redis将自动再次允许写入。</p>
+<p>但是，如果您已设置对Redis服务器和持久性的正确监视，则可能需要禁用此功能，以便即使磁盘，权限等存在问题，Redis也将继续正常工作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stop-writes-on-bgsave-error yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="rdbcompression"><a href="#rdbcompression" class="headerlink" title="rdbcompression"></a>rdbcompression</h2><p>转储.rdb数据库时使用LZF压缩字符串对象？ 默认设置为“是”，因为它几乎总是一个好处。 如果要在保存子项中节省一些CPU，请将其设置为“否”，但如果您具有可压缩值或键，则数据集可能会更大。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rdbcompression yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="rdbchecksum"><a href="#rdbchecksum" class="headerlink" title="rdbchecksum"></a>rdbchecksum</h2><p>从RDB的第5版开始，CRC64校验和被放置在文件的末尾。 这使得格式更能抵抗损坏，但在保存和加载RDB文件时需要支付性能（大约10％），因此您可以禁用它以获得最佳性能。</p>
+<p>禁用校验和创建的RDB文件的校验和为零，将告诉加载代码跳过检查。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rdbchecksum yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="dbfilename"><a href="#dbfilename" class="headerlink" title="dbfilename"></a>dbfilename</h2><p>转储数据库的文件名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dbfilename dump.rdb</span><br></pre></td></tr></table></figure></p>
+<h2 id="dir"><a href="#dir" class="headerlink" title="dir"></a>dir</h2><p>工作目录。</p>
+<p>数据库将使用’dbfilename’配置的文件名写入此目录。还将在此目录中创建仅可追加文件。</p>
+<p>请注意，您必须在此处指定目录，而不是文件名。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dir ./</span><br></pre></td></tr></table></figure></p>
+<h1 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h1><h2 id="slaveof"><a href="#slaveof" class="headerlink" title="slaveof"></a>slaveof</h2><p>主从复制。 使用slaveof使Redis实例成为另一台Redis服务器的副本。 关于Redis复制的一些事情要尽快理解。</p>
+<ol>
+<li>Redis复制是异步的，但是如果主机看起来与至少给定数量的从站没有连接，则可以配置主机停止接受写入。</li>
+<li>如果复制链路丢失了相对较短的时间，Redis从站能够与主站进行部分重新同步。 您可能希望根据需要配置具有合理值的复制积压大小（请参阅此文件的下一部分）。</li>
+<li>复制是自动的，不需要用户干预。 在网络分区从属设备自动尝试重新连接到主设备并与它们重新同步之后。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># slaveof &lt;masterip&gt; &lt;masterport&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="masterauth"><a href="#masterauth" class="headerlink" title="masterauth"></a>masterauth</h2><p>如果主服务器受密码保护（使用下面的“requirepass”配置指令），则可以在启动复制同步过程之前告知从服务器进行身份验证，否则主服务器将拒绝从服务器请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">masterauth &lt;master-password&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="slave-serve-stale-data"><a href="#slave-serve-stale-data" class="headerlink" title="slave-serve-stale-data"></a>slave-serve-stale-data</h2><p>stale: 陈旧的，过时的</p>
+<p>当从属设备失去与主设备的连接时，或者当复制仍在进行时，从设备可以以两种不同的方式操作：</p>
+<ol>
+<li><p>如果slave-serve-stale-data设置为“yes”（默认值），则slave仍将回复客户端请求，可能是过期数据，或者如果这是第一次同步，则数据集可能只是空。</p>
+</li>
+<li><p>如果slave-serve-stale-data设置为’no’，则slave将回复一个错误“SYNC with master in progress”到所有类型的命令，除了INFO和SLAVEOF。</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slave-serve-stale-data yes</span><br></pre></td></tr></table></figure>
+<h2 id="slave-read-only"><a href="#slave-read-only" class="headerlink" title="slave-read-only"></a>slave-read-only</h2><p>您可以将从属实例配置为是否接受写入。 针对从属实例进行写入可能对存储一些短暂的数据很有用（因为在与主服务器重新同步后，将很容易删除写在从服务器上的数据），但如果客户端由于配置错误而写入数据，也可能会导致问题。</p>
+<p>由于Redis 2.6默认情况下从属设备是只读的。</p>
+<p><strong>注意：只读从站不适合在Internet上暴露给不受信任的客户端。 它只是一个防止滥用实例的保护层。 仍然只读的从属设备默认导出所有管理命令，如CONFIG，DEBUG等。 在某种程度上，您可以使用“rename-command”来隐藏所有管理/危险命令，从而提高只读从站的安全性</strong>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slave-read-only yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-diskless-sync"><a href="#repl-diskless-sync" class="headerlink" title="repl-diskless-sync"></a>repl-diskless-sync</h2><p>复制SYNC策略：磁盘或套接字。</p>
+<hr>
+<p><strong>警告：目前无盘复制是实验性的</strong></p>
+<hr>
+<p>新的从站和重新连接的从站只能接收差异而无法继续复制过程，需要执行所谓的“完全同步”。 RDB文件从主服务器传输到从服务器。传输可以以两种不同的方式发生：</p>
+<ol>
+<li>磁盘：Redis主服务器创建一个将RDB文件写入磁盘的新进程。稍后，父进程将文件以递增方式传输到从属服务器。</li>
+<li>无盘：Redis主站创建一个新进程，直接将RDB文件写入从套接字，而根本不接触磁盘。</li>
+</ol>
+<p>使用磁盘支持的复制，在生成RDB文件时，只要生成RDB文件的当前子代完成其工作，就可以将更多的从服务器排队并与RDB文件一起提供。使用无盘复制，一旦传输开始，到达的新从站将排队，并且当当前终端将终止时将开始新的传输。</p>
+<p>使用无盘复制时，主机在开始传输之前等待一段可配置的时间（以秒为单位），希望多个从站到达并且传输可以并行化。</p>
+<p>对于慢速磁盘和快速（大带宽）网络，无盘复制效果更好。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-diskless-sync no</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-diskless-sync-delay"><a href="#repl-diskless-sync-delay" class="headerlink" title="repl-diskless-sync-delay"></a>repl-diskless-sync-delay</h2><p>启用无盘复制时，可以配置服务器等待的延迟，以便生成通过套接字将RDB传输到从属服务器的子服务器。</p>
+<p>这很重要，因为一旦传输开始，就不可能为新的从站提供服务，这些新的服务器将排队等待下一次RDB传输，因此服务器会等待延迟以便让更多的从服务器到达。</p>
+<p>延迟以秒为单位指定，默认为5秒。 要完全禁用它，只需将其设置为0秒，即可尽快启动传输。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-diskless-sync-delay 5</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-ping-slave-period"><a href="#repl-ping-slave-period" class="headerlink" title="repl-ping-slave-period"></a>repl-ping-slave-period</h2><p>从站以预定义的间隔将PING发送到服务器。 可以使用repl_ping_slave_period选项更改此间隔。 默认值为10秒。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-ping-slave-period 10</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-timeout"><a href="#repl-timeout" class="headerlink" title="repl-timeout"></a>repl-timeout</h2><p>以下选项设置复制超时：</p>
+<ol>
+<li>从从设备的角度来看，在SYNC期间批量传输I / O.</li>
+<li>从站（data，ping）的角度来看主站超时。</li>
+<li>从主设备的角度来看从设备超时（REPLCONF ACK ping）。</li>
+</ol>
+<p><strong>确保此值大于为repl-ping-slave-period指定的值非常重要，否则每次主站和从站之间的流量较低时都会检测到超时。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-timeout 60</span><br></pre></td></tr></table></figure>
+<h2 id="repl-disable-tcp-nodelay"><a href="#repl-disable-tcp-nodelay" class="headerlink" title="repl-disable-tcp-nodelay"></a>repl-disable-tcp-nodelay</h2><p>SYNC后，在从站socket禁用TCP_NODELAY？</p>
+<p>如果选择“是”，Redis将使用较少数量的TCP数据包和较少的带宽将数据发送到从设备。 但这可能会增加数据在从属端出现的延迟，使用默认配置的Linux内核最多可达40毫秒。</p>
+<p>如果选择“否”，将减少从站侧出现数据的延迟，但将使用更多带宽进行复制。</p>
+<p>默认情况下，我们针对低延迟进行了优化，但是在非常高的流量条件下，或者当主设备和从设备远离许多跳时，将其转为“是”可能是个好主意。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-disable-tcp-nodelay no</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-backlog-size"><a href="#repl-backlog-size" class="headerlink" title="repl-backlog-size"></a>repl-backlog-size</h2><p>设置复制积压大小。 积压是一个缓冲区，当从属设备断开连接一段时间后会累积从属数据，这样当一个从属设备想要再次重新连接时，通常不需要完全重新同步，只是部分重新同步就足够了。</p>
+<p>复制积压越大，从站断开连接的时间就可以越长。</p>
+<p>只有在至少连接了一个从站时才会分配积压。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-backlog-size 1mb</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-backlog-ttl"><a href="#repl-backlog-ttl" class="headerlink" title="repl-backlog-ttl"></a>repl-backlog-ttl</h2><p>在主设备不再连接从设备一段时间后，将释放待办事项。 以下选项配置从上次从站断开连接开始需要经过的秒数，以释放待处理日志缓冲区。</p>
+<p>请注意，从站永远不会因为超时释放积压，因为它们可能会在以后升级为主站，并且应该能够与从站正确“部分重新同步”：因此它们应始终积累积压。</p>
+<p>值为0表示永远不会释放积压。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-backlog-ttl 3600</span><br></pre></td></tr></table></figure></p>
+<h2 id="slave-priority"><a href="#slave-priority" class="headerlink" title="slave-priority"></a>slave-priority</h2><p>从属优先级一个整数。 如果主服务器不再正常工作，Redis Sentinel将使用它来选择要升级为主服务器的从服务器。</p>
+<p>具有 <strong>低优先级编号的从站被认为更适合升级</strong> ，因此例如如果有三个优先级为10,100的从站，则Sentinel将选择优先级为10的从站，即最低的。</p>
+<p>但是，<strong>特殊优先级为0表示从站无法执行主站角色</strong>，因此Redis Sentinel永远不会选择优先级为0的从站进行升级。</p>
+<p>默认情况下，优先级为100。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slave-priority 100</span><br></pre></td></tr></table></figure></p>
+<h2 id="min-slaves-to-write"><a href="#min-slaves-to-write" class="headerlink" title="min-slaves-to-write"></a>min-slaves-to-write</h2><p>如果连接的连接少于N个，滞后&lt;= M秒，则主设备可以停止接受写入。</p>
+<p>N个奴隶需要处于“在线”状态。</p>
+<p>以秒为单位的延迟（必须&lt;= 指定值）是根据从从站接收的最后一次ping计算的，通常每秒发送一次。</p>
+<p>此选项不保证N个副本将接受写入，但是如果没有足够的从站可用，则将限制丢失写入的窗口，达到指定的秒数。</p>
+<p>例如，要求至少3个具有滞后&lt;= 10秒的从属使用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">min-slaves-to-write 3</span><br><span class="line">min-slaves-max-lag 10</span><br></pre></td></tr></table></figure></p>
+<p>将一个或另一个设置为0将禁用该功能。</p>
+<p>默认情况下，min-slaves-to-write设置为0（功能禁用），min-slaves-max-lag设置为10。</p>
+<h2 id="slave-announce"><a href="#slave-announce" class="headerlink" title="slave-announce"></a>slave-announce</h2><p>Redis主站能够以不同方式列出所连接从站的地址和端口。例如，“INFO复制”部分提供此信息，Redis Sentinel使用该信息以及其他工具来发现从属实例。<br>此信息可用的另一个位置是主站的“ROLE”命令的输出。</p>
+<p>通常由从站报告的列出的IP和地址通过以下方式获得：</p>
+<ul>
+<li>IP：通过检查从设备用于连接主设备的套接字的对等地址，自动检测地址。</li>
+<li>端口：端口在复制握手期间由从端进行通信，通常是从端用于列出连接的端口。</li>
+</ul>
+<p>但是，当使用端口转发或网络地址转换（NAT）时，从站实际上可以通过不同的IP和端口对访问。从站可以使用以下两个选项，以便向其主站报告一组特定的IP和端口，以便INFO和ROLE都报告这些值。</p>
+<p>如果只需要覆盖端口或IP地址，则无需使用这两个选项。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># slave-announce-ip 5.5.5.5</span><br><span class="line"># slave-announce-port 1234</span><br></pre></td></tr></table></figure></p>
+<h1 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h1><h2 id="requirepass"><a href="#requirepass" class="headerlink" title="requirepass"></a>requirepass</h2><p>访问redis-server的密码，最好很复杂，不然每秒150k的暴力破解很容易猜出来。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">requirepass kdsjfkdsj</span><br></pre></td></tr></table></figure></p>
+<h2 id="rename-command"><a href="#rename-command" class="headerlink" title="rename-command"></a>rename-command</h2><p>对危险命令进行重命名，如果为””,则完全禁用此命令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rename-command CONFIG &quot;&quot;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Clients"><a href="#Clients" class="headerlink" title="Clients"></a>Clients</h1><p>设置客户端最大连接数，默认10000，如果达到限制，报错：<code>&#39;max number of clients reached&#39;</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">maxclients 10000</span><br></pre></td></tr></table></figure></p>
+<h1 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h1><h2 id="maxmemory"><a href="#maxmemory" class="headerlink" title="maxmemory"></a>maxmemory</h2><p>最大内存限制,单位字节。</p>
+<ul>
+<li>当达到限制，redis会根据maxmemory-policy(见下面)移除key</li>
+<li>如果无法移除，则对写命令报错，对读命令正常</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">maxmeory &lt;bytes&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="maxmemory-policy"><a href="#maxmemory-policy" class="headerlink" title="maxmemory-policy"></a>maxmemory-policy</h2><p>当最大内存限制达到，如何清除keys：</p>
+<ul>
+<li>volatile-lru - &gt;移除近似LRU中的过期集。</li>
+<li>allkeys-lru - &gt;移除近似LRU中的任何键。</li>
+<li>volatile-lfu - &gt;移除近似LFU中的过期集。</li>
+<li>allkeys-lfu - &gt;移除近似LFU中的任何键。</li>
+<li>volatile-random - &gt;随机删除过期集合中的key。</li>
+<li>allkeys-random - &gt;随机删除任意key。</li>
+<li>volatile-ttl - &gt; 删除最近的达到TTL的key</li>
+<li><p>noeviction - &gt;不删除任何key，只报错。</p>
+</li>
+<li><p>LRU means Least Recently Used</p>
+</li>
+<li>LFU means Least Frequently Used</li>
+</ul>
+<p>包括的写命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">set setnx setex append</span><br><span class="line">incr decr rpush lpush rpushx lpushx linsert lset rpoplpush sadd</span><br><span class="line">sinter sinterstore sunion sunionstore sdiff sdiffstore zadd zincrby</span><br><span class="line">zunionstore zinterstore hset hsetnx hmset hincrby incrby decrby</span><br><span class="line">getset mset msetnx exec sort</span><br></pre></td></tr></table></figure></p>
+<h1 id="懒删除"><a href="#懒删除" class="headerlink" title="懒删除"></a>懒删除</h1><p>redis删除key有2个命令：DEL和UNLINK，FLUSHALL，FLUSHDB</p>
+<ul>
+<li>DEL是一个同步阻塞操作，如果key关联的值非常大，则会阻塞很长时间</li>
+<li>UNLINK就是非阻塞的删除</li>
+</ul>
+<p>服务器自己删除key的场景：</p>
+<ol>
+<li>内存爆了时</li>
+<li>过期key</li>
+<li>类型RENAME命令，SET，SUNIONSTORE会移除old keys</li>
+<li>从站复制时会先删除再接收</li>
+</ol>
+<p>下面可以配置这些懒删除：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">lazyfree-lazy-eviction no</span><br><span class="line">lazyfree-lazy-expire no</span><br><span class="line">lazyfree-lazy-server-del no</span><br><span class="line">slave-lazy-flush no</span><br></pre></td></tr></table></figure></p>
+<h1 id="只读模式"><a href="#只读模式" class="headerlink" title="只读模式"></a>只读模式</h1><p>默认情况下，针对配置的save point，数据持久化可能会丢失数据。</p>
+<p>AOF是AppendOnly File的缩写，是Redis系统提供了一种记录Redis操作的持久化方案，在AOF生成的文件中，将忠实记录发生在Redis的操作，从而达到在Redis服务器重启或者当机之后，继续恢复之前数据状态的机制。</p>
+<h2 id="appendonly"><a href="#appendonly" class="headerlink" title="appendonly"></a>appendonly</h2><p>AOF和RDB可以同时启动。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendonly no</span><br></pre></td></tr></table></figure></p>
+<h2 id="appendfilename"><a href="#appendfilename" class="headerlink" title="appendfilename"></a>appendfilename</h2><p>追加的文件名，默认<code>appendonly.aof</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendfilename &quot;appendonly.aof&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="appendfsync"><a href="#appendfsync" class="headerlink" title="appendfsync"></a>appendfsync</h2><p>fsync()是告诉操作系统将数据写入磁盘而不是buffer的确切操作。<br>有下面3种模式，如果不确定，使用everysec</p>
+<ul>
+<li>no: 不fsync</li>
+<li>everysec: 默认，每秒一次</li>
+<li>always： 每次写入都同步</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendfsync everysec</span><br></pre></td></tr></table></figure>
+<h2 id="no-appendfsync-on-rewrite"><a href="#no-appendfsync-on-rewrite" class="headerlink" title="no-appendfsync-on-rewrite"></a>no-appendfsync-on-rewrite</h2><p>如果开启AOF并且有很大延迟，则改为yes，但最好是no<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">no-appendfsync-on-rewrite no</span><br></pre></td></tr></table></figure></p>
+<h2 id="auto-aof-rewrite"><a href="#auto-aof-rewrite" class="headerlink" title="auto-aof-rewrite"></a>auto-aof-rewrite</h2><p>当达到配置的存储大小的百分比后，自动重写文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">auto-aof-rewrite-percentage 100</span><br><span class="line">auto-aof-rewrite-min-size 64mb</span><br></pre></td></tr></table></figure></p>
+<h2 id="aof-load-truncates"><a href="#aof-load-truncates" class="headerlink" title="aof-load-truncates"></a>aof-load-truncates</h2><p>当OS发生故障时AOF文件可能会截断，下面的配置：</p>
+<ul>
+<li>如果设为yes，则截断AOF只是发出事件通知给用户</li>
+<li>否则，服务器会报错而终止</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aof-load-truncated yes</span><br></pre></td></tr></table></figure>
+<h2 id="aof-use-rdb-preamble"><a href="#aof-use-rdb-preamble" class="headerlink" title="aof-use-rdb-preamble"></a>aof-use-rdb-preamble</h2><p>如果为yes，则AOF文件会为<code>[RDB file][AOF tail]</code>.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aof-use-rdb-preamble no</span><br></pre></td></tr></table></figure></p>
+<h1 id="LUA-脚本"><a href="#LUA-脚本" class="headerlink" title="LUA 脚本"></a>LUA 脚本</h1><h2 id="lua-time-limit"><a href="#lua-time-limit" class="headerlink" title="lua-time-limit"></a>lua-time-limit</h2><p>lua脚本执行的最长时间。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua-time-limit 5000</span><br></pre></td></tr></table></figure></p>
+<h1 id="redis集群"><a href="#redis集群" class="headerlink" title="redis集群"></a>redis集群</h1><h2 id="cluster-enabled"><a href="#cluster-enabled" class="headerlink" title="cluster-enabled"></a>cluster-enabled</h2><p>这是个实验功能，只有声明为cluster节点的的redis实例才能成为集群的一份子，如下：默认是没启用的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># cluster-enabled yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="cluster-config-file"><a href="#cluster-config-file" class="headerlink" title="cluster-config-file"></a>cluster-config-file</h2><p>每个节点都有一个配置文件，但是不能手动更改，节点会自己更新管理这个文件，<strong>保证同一个机器上的节点的配置文件名不重复。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># cluster-config-file nodes-6379.conf</span><br></pre></td></tr></table></figure></p>
+<h2 id="cluster-node-timeout"><a href="#cluster-node-timeout" class="headerlink" title="cluster-node-timeout"></a>cluster-node-timeout</h2><p>节点超时时间是一个节点无法响应的最大时限：他就被认为挂了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># cluster-node-timeout 15000</span><br></pre></td></tr></table></figure></p>
+<p>//TODO 其他参数</p>
+<h1 id="集群docker-NAT支持"><a href="#集群docker-NAT支持" class="headerlink" title="集群docker/NAT支持"></a>集群docker/NAT支持</h1><p>redis的地址发现在docker等容器环境中会失败，为了支持docker等容器，可以采用以下配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cluster-announce-ip 10.1.1.5</span><br><span class="line">cluster-announce-port 6379</span><br><span class="line">cluster-announce-bus-port 6380</span><br></pre></td></tr></table></figure></p>
+<p>上面的意思就是把这个节点自己的ip和端口通知所有其他节点，让他们发现，这个总线端口就是用来收发消息的，如果不指定，将会采用节点端口偏移10000，比如上面为<code>6379+10000=16379</code>.</p>
+<h1 id="slow-log"><a href="#slow-log" class="headerlink" title="slow log"></a>slow log</h1><p>执行时间：命令的执行时间不包括IO操作和与其他客户端通信的时间。</p>
+<p>一条命令的执行时间达到配置的最大时间后写一条日志：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 10ms</span><br><span class="line">slowing-log-slower-than 10000</span><br></pre></td></tr></table></figure></p>
+<p>配置这个日志队列的最大长度：新的来了老的移除<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slowing-max-len 128</span><br></pre></td></tr></table></figure></p>
+<h1 id="延迟监视器"><a href="#延迟监视器" class="headerlink" title="延迟监视器"></a>延迟监视器</h1><p>为了收集redis实例延迟原因的数据。</p>
+<p><code>LATENCY</code> 命令：打印图片和报告。</p>
+<p>下面的命令为0表示关闭监视，否则代表延迟的最大时间限制，达到了就写入操作日志，单位为毫秒：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">latency-monitor-threshold 0</span><br></pre></td></tr></table></figure></p>
+<p>可以在运行时动态配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG SET latency-monitor-threshold &lt;milliseconds&gt;</span><br></pre></td></tr></table></figure></p>
+<h1 id="事件通知"><a href="#事件通知" class="headerlink" title="事件通知"></a>事件通知</h1><p>redis可以通知Pub/Sub客户端发生的事件，在键空间。例如，一个DEL操作删除了存储子啊database 0的<code>foo</code>key,2条信息会通过Pub/Sub发送：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PUBLISH __keyspace@0__:foo del</span><br><span class="line">PUBLISH __keyevent@0__:del foo</span><br></pre></td></tr></table></figure></p>
+<p>通知分为很多类，每类用一个字符标识：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#  K     Keyspace events, published with __keyspace@&lt;db&gt;__ prefix.</span><br><span class="line">#  E     Keyevent events, published with __keyevent@&lt;db&gt;__ prefix.</span><br><span class="line">#  g     Generic commands (non-type specific) like DEL, EXPIRE, RENAME, ...</span><br><span class="line">#  $     String commands</span><br><span class="line">#  l     List commands</span><br><span class="line">#  s     Set commands</span><br><span class="line">#  h     Hash commands</span><br><span class="line">#  z     Sorted set commands</span><br><span class="line">#  x     Expired events (events generated every time a key expires)</span><br><span class="line">#  e     Evicted events (events generated when a key is evicted for maxmemory)</span><br><span class="line">#  A     Alias for g$lshzxe, so that the &quot;AKE&quot; string means all the events.</span><br></pre></td></tr></table></figure></p>
+<p>例如：只启用list和无类型命令的事件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notify-keyspace-events Elg</span><br></pre></td></tr></table></figure></p>
+<p>默认空字符串，没开启任何事件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notify-keyspace-events &quot;&quot;</span><br></pre></td></tr></table></figure></p>
+<h1 id="高级配置"><a href="#高级配置" class="headerlink" title="高级配置"></a>高级配置</h1><h2 id="hash-max"><a href="#hash-max" class="headerlink" title="hash-max"></a>hash-max</h2><p>hash会被在内存中进行编码来节约空间，下面限制最大的entry项数量阈值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hash-max-ziplist-entries 512</span><br><span class="line">hash-max-ziplist-value 64</span><br></pre></td></tr></table></figure></p>
+<h2 id="list-max"><a href="#list-max" class="headerlink" title="list-max"></a>list-max</h2><p>list也会被编码来节约空间，下面的参数限制了每个内部的list节点可以被指定的最大entry数量或者最大大小。</p>
+<p>对于固定的最大大小，从-5到-1的含义：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># -5: max size: 64 Kb  &lt;-- not recommended for normal workloads</span><br><span class="line"># -4: max size: 32 Kb  &lt;-- not recommended</span><br><span class="line"># -3: max size: 16 Kb  &lt;-- probably not recommended</span><br><span class="line"># -2: max size: 8 Kb   &lt;-- good</span><br><span class="line"># -1: max size: 4 Kb   &lt;-- good</span><br></pre></td></tr></table></figure></p>
+<p>正数代表每个list节点确切的元素个数。通常性能最好的就是-2或-1，但如果你的应用场景不同，也可以调节：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list-max-ziplist-size -2</span><br></pre></td></tr></table></figure></p>
+<h2 id="list-compress"><a href="#list-compress" class="headerlink" title="list-compress"></a>list-compress</h2><p>list也会被压缩，压缩的深度代表：list两端的不压缩节点个数，看下面就明白了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 0: 不压缩</span><br><span class="line"># 1: 只压缩除首尾外的中间节点</span><br><span class="line">#    如：[head]-&gt;node-&gt;node-&gt;...-&gt;node-&gt;[tail]</span><br><span class="line">#    [head], [tail] 不会压缩; 内部节点压缩</span><br><span class="line"># 2: [head]-&gt;[next]-&gt;node-&gt;node-&gt;...-&gt;node-&gt;[prev]-&gt;[tail]</span><br><span class="line">#    2 here means: don&apos;t compress head or head-&gt;next or tail-&gt;prev or tail,</span><br><span class="line">#    but compress all nodes between them.</span><br><span class="line"># 3: [head]-&gt;[next]-&gt;[next]-&gt;node-&gt;node-&gt;...-&gt;node-&gt;[prev]-&gt;[prev]-&gt;[tail]</span><br><span class="line"># 等等</span><br></pre></td></tr></table></figure></p>
+<p>默认是不压缩：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list-compress-depth 0</span><br></pre></td></tr></table></figure></p>
+<h2 id="set-max"><a href="#set-max" class="headerlink" title="set-max"></a>set-max</h2><p>set只会在一种情况被编码：就是这个集合只有字符串组成，且这些字符串恰好都是64位的10进制整数。<br>下面的配置代表：使用这种编码的集合最大元素个数为512.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set-max-intset-entries 512</span><br></pre></td></tr></table></figure></p>
+<h2 id="zset-max"><a href="#zset-max" class="headerlink" title="zset-max"></a>zset-max</h2><p>sorted set 也会编码来解决空间，只在数量低于下面的配置时才有用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zset-max-ziplist-entries 128</span><br><span class="line">zset-max-ziplist-value 64</span><br></pre></td></tr></table></figure></p>
+<h2 id="hll-sparse-max-bytes"><a href="#hll-sparse-max-bytes" class="headerlink" title="hll-sparse-max-bytes"></a>hll-sparse-max-bytes</h2><p>HyperLogLog的稀疏表示限制，当超过下面的配置时就转为密集表示，大于16000是没必要的，因为这时候密集表示的效率已高于稀疏的，推荐用3000，如果CPU很厉害，只考虑空间，那么可以提高到10000。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hll-sparse-max-bytes 3000</span><br></pre></td></tr></table></figure></p>
+<h2 id="activerehashing"><a href="#activerehashing" class="headerlink" title="activerehashing"></a>activerehashing</h2><h2 id="client-output-buffer-limit"><a href="#client-output-buffer-limit" class="headerlink" title="client-output-buffer-limit"></a>client-output-buffer-limit</h2><h2 id="client-query-buffer-limit"><a href="#client-query-buffer-limit" class="headerlink" title="client-query-buffer-limit"></a>client-query-buffer-limit</h2><h2 id="proto-max-bulk-len"><a href="#proto-max-bulk-len" class="headerlink" title="proto-max-bulk-len"></a>proto-max-bulk-len</h2><p>批量请求的单个string的长度限制在512MB，下面可以配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proto-max-bulk-len 512mb</span><br></pre></td></tr></table></figure></p>
+<h2 id="hz"><a href="#hz" class="headerlink" title="hz"></a>hz</h2><p>redis有许多后台任务，比如关闭超时连接，删除过时key等。</p>
+<p>并不是所有任务执行的频率都一样，但redis会根据hz的值来表现。</p>
+<p>默认hz为10，提高hz会使CPU更活跃，响应更快，超时判断更精确。</p>
+<p>hz范围为1-500，一般不会超过100。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hz 10</span><br></pre></td></tr></table></figure></p>
+<h2 id="aof-rewrite-incremental-fsync"><a href="#aof-rewrite-incremental-fsync" class="headerlink" title="aof-rewrite-incremental-fsync"></a>aof-rewrite-incremental-fsync</h2><p>如果为yes，则AOF文件每生成32MB，就同步到磁盘，避免大的延迟飙升。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aof-rewrite-incremental-fsync yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="LFU调优参数"><a href="#LFU调优参数" class="headerlink" title="LFU调优参数"></a>LFU调优参数</h2><p>针对LFU移除算法进行你调优，有2个参数：计数器的对数因子和衰变因子，首先理解他们很重要。</p>
+<h3 id="lfu-log-factor"><a href="#lfu-log-factor" class="headerlink" title="lfu-log-factor"></a>lfu-log-factor</h3><p>LFU计数器对与每个key是一个8位的数，最大值255，redis使用了一个对数行为的概率增量。给定老的计数器的值，这个计数器采用如下方式递增：</p>
+<ol>
+<li>生成一个0-1的随机数R；</li>
+<li>概率P=1/(old_value*lfu_log_factor + 1);</li>
+<li>仅当R&lt;P时才增加计数器。</li>
+</ol>
+<p>默认的lfu-log-factor=10, 下面是一张表，描述了在不同的factor因子下，不同的访问次数对计数器改变频率的影响：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | factor | 100 hits   | 1000 hits  | 100K hits  | 1M hits    | 10M hits   |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 0      | 104        | 255        | 255        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 1      | 18         | 49         | 255        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 10     | 10         | 18         | 142        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 100    | 8          | 11         | 49         | 143        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br></pre></td></tr></table></figure></p>
+<p>可以运行下面的命令得到上述结果(foo初始值为5)：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-benchmark -n <span class="number">1000000</span> incr foo</span><br><span class="line">redis-cli object freq foo</span><br></pre></td></tr></table></figure></p>
+<h3 id="lfu-decay-time"><a href="#lfu-decay-time" class="headerlink" title="lfu-decay-time"></a>lfu-decay-time</h3><p>衰变因子是一个时间，单位为分钟，控制计数器衰变的，到了指定时间，计数器会衰变（除以2，如果小于10则减一）。如果这个值为0，代表每次扫描到这个计数器都会衰减。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lfu-decay-time <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>为啥会有这个，也很简单，lfu-log-factor控制增加，lfu-decay-time控制减少，不然会满了。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                                                
+                                                    
+                                                      
+                                                        <p>本文解释redis的配置文件。</p>
+<h1 id="配置文件位置"><a href="#配置文件位置" class="headerlink" title="配置文件位置"></a>配置文件位置</h1><p>默认安装包下就有,当然也可以自己创建。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@jimo redis-4.0.11]# ls</span><br><span class="line">00-RELEASENOTES  BUGS  CONTRIBUTING  COPYING  INSTALL  MANIFESTO  Makefile  README.md  deps  redis.conf  runtest  runtest-cluster  runtest-sentinel  sentinel.conf  src  tests  utils</span><br></pre></td></tr></table></figure>
+<p>本文基于<code>redis.conf</code>。</p>
+<h1 id="如何使用redis-conf"><a href="#如何使用redis-conf" class="headerlink" title="如何使用redis.conf"></a>如何使用redis.conf</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-server /path/to/redis.conf</span><br></pre></td></tr></table></figure>
+<h1 id="容量解释"><a href="#容量解释" class="headerlink" title="容量解释"></a>容量解释</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 1k =&gt; 1000 bytes</span><br><span class="line"># 1kb =&gt; 1024 bytes</span><br><span class="line"># 1m =&gt; 1000000 bytes</span><br><span class="line"># 1mb =&gt; 1024*1024 bytes</span><br><span class="line"># 1g =&gt; 1000000000 bytes</span><br><span class="line"># 1gb =&gt; 1024*1024*1024 bytes</span><br></pre></td></tr></table></figure>
+<p>不区分大小写，也就是说：1GB=1gB=1Gb</p>
+<h1 id="包含其他配置文件"><a href="#包含其他配置文件" class="headerlink" title="包含其他配置文件"></a>包含其他配置文件</h1><p>为避免被覆盖，最好放在文件结尾：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># include /path/to/local.conf</span><br><span class="line"># include /path/to/other.conf</span><br></pre></td></tr></table></figure></p>
+<h1 id="加载模块"><a href="#加载模块" class="headerlink" title="加载模块"></a>加载模块</h1><p>在启动时加载模块，如果加载失败则无法启动。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># loadmodule /path/to/my_module.so</span><br><span class="line"># loadmodule /path/to/other_module.so</span><br></pre></td></tr></table></figure></p>
+<h1 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h1><h2 id="bind"><a href="#bind" class="headerlink" title="bind"></a>bind</h2><p>如果没有如下示例的<code>bind</code>，则server监听所有网卡。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># bind 192.168.1.100 10.0.0.1</span><br><span class="line"># bind 127.0.0.1 ::1</span><br></pre></td></tr></table></figure></p>
+<p><strong><em>警告: 如果运行Redis的计算机直接暴露在互联网，绑定到所有接口是危险的，这将暴露对互联网上的每个人都有一个实例。 所以默认情况下我们取消注释遵循bind指令，这将强制Redis只监听IPv4回溯接口地址（这意味着Redis将能够仅接受来自运行到同一台计算机的客户端的连接在跑）</em></strong> 。</p>
+<p>默认情况，绑定到本地：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bind 127.0.0.1</span><br></pre></td></tr></table></figure></p>
+<h2 id="保护模式"><a href="#保护模式" class="headerlink" title="保护模式"></a>保护模式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protected-mode yes</span><br></pre></td></tr></table></figure>
+<p>保护模式默认打开，可以避免暴露到网络上被攻击或访问。</p>
+<p>如果保护模式打开，且满足：</p>
+<ol>
+<li>没有<code>bind</code>指令</li>
+<li>没配置密码</li>
+</ol>
+<p>则redis只接受127.0.0.1 和 ::1的客户端。</p>
+<h2 id="TCP-backlog"><a href="#TCP-backlog" class="headerlink" title="TCP backlog"></a>TCP backlog</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#默认值 511</span><br><span class="line">tcp-backlog：511</span><br></pre></td></tr></table></figure>
+<p>此参数确定了TCP连接中已完成队列(完成三次握手之后)的长度， 当然此值 <strong>必须不大于Linux系统定义的</strong> <code>/proc/sys/net/core/somaxconn</code>值，默认是511，而Linux的默认参数值是128。当系统并发量大并且客户端速度缓慢的时候，可以将这二个参数一起参考设定。</p>
+<p><strong>建议修改为 2048</strong></p>
+<p>修改somaxconn</p>
+<p>该内核参数默认值一般是128，对于负载很大的服务程序来说大大的不够。一般会将它修改为2048或者更大。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cat /proc/sys/net/core/somaxconn</span><br><span class="line">128</span><br></pre></td></tr></table></figure></p>
+<p><code>echo 2048 &gt; /proc/sys/net/core/somaxconn</code> 但是这样系统重启后保存不了</p>
+<p>在<code>/etc/sysctl.conf</code>中添加如下<code>net.core.somaxconn = 2048</code></p>
+<p>然后在终端中执行<code>sysctl -p</code>.</p>
+<h2 id="port"><a href="#port" class="headerlink" title="port"></a>port</h2><p>监听端口，如果为0，则不监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">port 6379</span><br></pre></td></tr></table></figure></p>
+<h2 id="unix-socket"><a href="#unix-socket" class="headerlink" title="unix socket"></a>unix socket</h2><p>监听unix的socket连接，没有设置则不监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># unixsocket /tmp/redis.sock</span><br><span class="line"># unixsocketperm 700</span><br></pre></td></tr></table></figure></p>
+<h2 id="timeout"><a href="#timeout" class="headerlink" title="timeout"></a>timeout</h2><p>在客户端空闲N秒后关闭连接（0表示禁用）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeout 0</span><br></pre></td></tr></table></figure></p>
+<h2 id="TCP-keepalive"><a href="#TCP-keepalive" class="headerlink" title="TCP keepalive"></a>TCP keepalive</h2><p>如果非0，则在没有通信的情况下使用SO_KEEPALIVE向客户端发送TCP ACK。 这有两个原因：</p>
+<ol>
+<li>检测死的客户端。</li>
+<li><p>从中间网络设备的角度看有效连接。</p>
+<p>在Linux上，指定的值（以秒为单位）是用于发送ACK的时间段。 请注意，要关闭连接，需要两倍的时间。 在其他内核上，周期取决于内核配置。</p>
+</li>
+</ol>
+<p>此选项的合理值为300秒，这是从Redis 3.2.1开始的新Redis默认值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcp-keepalive 300</span><br></pre></td></tr></table></figure></p>
+<h1 id="通用配置"><a href="#通用配置" class="headerlink" title="通用配置"></a>通用配置</h1><h2 id="守护程序"><a href="#守护程序" class="headerlink" title="守护程序"></a>守护程序</h2><p>默认redis不开守护程序，如果打开，会写一个pid文件到<code>/var/run/redis.pid</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">daemonize no</span><br></pre></td></tr></table></figure></p>
+<h2 id="supervised"><a href="#supervised" class="headerlink" title="supervised"></a>supervised</h2><p>如果从upstart或systemd运行Redis，Redis可以与您的监督树进行交互:</p>
+<ul>
+<li>supervised no - 不交互</li>
+<li>supervised upsert - 将redis放入SIGSTOP模式与upstart发信号</li>
+<li>supervised systemd - 通过写入READY=1到$NOTIFY_SOCKET与systemd交互</li>
+<li>supervised auto - 通过UPSERT_JOB 或 NOTIFY_SOCKET环境变量检测upstart或systemd方法</li>
+</ul>
+<p>他们只发送“进程准备好”的信号，并不保持持续的ping连接。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervised no</span><br></pre></td></tr></table></figure></p>
+<h2 id="pid-file"><a href="#pid-file" class="headerlink" title="pid file"></a>pid file</h2><p>指定的pid文件会在启动时写入，退出时移除。</p>
+<ul>
+<li>如果守护进程关闭：pid文件不会创建；</li>
+<li>否则一定会使用，默认是：<code>/var/run/redis.pid</code></li>
+</ul>
+<p>最好指定一个pid文件，即使无法创建也不会报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidfile /var/run/redis_6379.pid</span><br></pre></td></tr></table></figure></p>
+<h2 id="loglevel"><a href="#loglevel" class="headerlink" title="loglevel"></a>loglevel</h2><p>有<code>debug,verbose,notice,warning</code>,默认notice(生产环境)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loglevel notice</span><br></pre></td></tr></table></figure></p>
+<h2 id="logfile"><a href="#logfile" class="headerlink" title="logfile"></a>logfile</h2><p>如果为<code>&quot;&quot;</code>,则输出到标准输出，如果同时还开启了守护进程，则转到<code>/dev/null</code>:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logfile &quot;&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="syslog-enabled"><a href="#syslog-enabled" class="headerlink" title="syslog-enabled"></a>syslog-enabled</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># syslog-enabled no</span><br></pre></td></tr></table></figure>
+<h2 id="syslog-ident"><a href="#syslog-ident" class="headerlink" title="syslog-ident"></a>syslog-ident</h2><p>系统日志的主体(identity)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># syslog-ident redis</span><br></pre></td></tr></table></figure></p>
+<h2 id="syslog-facility"><a href="#syslog-facility" class="headerlink" title="syslog-facility"></a>syslog-facility</h2><p>指定syslog工具, 必须是USER或LOCAL0-LOCAL7之间。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># syslog-facility local0</span><br></pre></td></tr></table></figure></p>
+<h2 id="databases"><a href="#databases" class="headerlink" title="databases"></a>databases</h2><p>设置数据库的数量。 默认数据库是DB 0，您可以使用<code>SELECT &lt;dbid&gt;</code>在每个连接上选择不同的数据库，其中dbid是介于0和’databases’-1之间的数字<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">databases 16</span><br></pre></td></tr></table></figure></p>
+<h2 id="always-show-logo"><a href="#always-show-logo" class="headerlink" title="always-show-logo"></a>always-show-logo</h2><p>默认情况下，只有在开始登录标准输出且标准输出为TTY时，Redis才会显示ASCII艺术徽标。 基本上这意味着通常只在交互式会话中显示徽标。</p>
+<p>但是，通过将以下选项设置为yes，可以强制执行4.0之前的行为并始终在启动日志中显示ASCII艺术徽标。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">always-show-logo yes</span><br></pre></td></tr></table></figure></p>
+<h1 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h1><h2 id="save"><a href="#save" class="headerlink" title="save"></a>save</h2><p>将数据库保存在磁盘上：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">    save &lt;秒&gt; &lt;更改数量&gt;</span><br><span class="line"></span><br><span class="line">    如果同时发生了给定的秒数和针对DB的给定写入操作数，则将保存数据库。</span><br><span class="line"></span><br><span class="line">    在下面的示例中，行为将是保存：</span><br><span class="line">    如果至少1个键改变，则在900秒（15分钟）之后</span><br><span class="line">    如果至少改变了10个键，则在300秒（5分钟）后</span><br><span class="line">    如果至少10000键改变，60秒后</span><br><span class="line"></span><br><span class="line">    注意：您可以通过注释掉所有“save”行来完全禁用保存。</span><br><span class="line"></span><br><span class="line">    也可以通过添加带有单个空字符串参数的save指令来删除所有先前配置的保存点，如下例所示：</span><br><span class="line"></span><br><span class="line">    save &quot;&quot;</span><br><span class="line"></span><br><span class="line">save 900 1</span><br><span class="line">save 300 10</span><br><span class="line">save 60 10000</span><br></pre></td></tr></table></figure></p>
+<h2 id="stop-writes-on-bgsave-error"><a href="#stop-writes-on-bgsave-error" class="headerlink" title="stop-writes-on-bgsave-error"></a>stop-writes-on-bgsave-error</h2><p>默认情况下，如果启用了RDB快照（至少一个保存点）并且最新的后台保存失败，Redis将停止接受写入。 这将使用户意识到（以一种困难的方式）数据没有正确地保存在磁盘上，否则很可能没有人会注意到并且会发生一些灾难。</p>
+<p>如果后台保存过程将再次开始工作，Redis将自动再次允许写入。</p>
+<p>但是，如果您已设置对Redis服务器和持久性的正确监视，则可能需要禁用此功能，以便即使磁盘，权限等存在问题，Redis也将继续正常工作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stop-writes-on-bgsave-error yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="rdbcompression"><a href="#rdbcompression" class="headerlink" title="rdbcompression"></a>rdbcompression</h2><p>转储.rdb数据库时使用LZF压缩字符串对象？ 默认设置为“是”，因为它几乎总是一个好处。 如果要在保存子项中节省一些CPU，请将其设置为“否”，但如果您具有可压缩值或键，则数据集可能会更大。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rdbcompression yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="rdbchecksum"><a href="#rdbchecksum" class="headerlink" title="rdbchecksum"></a>rdbchecksum</h2><p>从RDB的第5版开始，CRC64校验和被放置在文件的末尾。 这使得格式更能抵抗损坏，但在保存和加载RDB文件时需要支付性能（大约10％），因此您可以禁用它以获得最佳性能。</p>
+<p>禁用校验和创建的RDB文件的校验和为零，将告诉加载代码跳过检查。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rdbchecksum yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="dbfilename"><a href="#dbfilename" class="headerlink" title="dbfilename"></a>dbfilename</h2><p>转储数据库的文件名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dbfilename dump.rdb</span><br></pre></td></tr></table></figure></p>
+<h2 id="dir"><a href="#dir" class="headerlink" title="dir"></a>dir</h2><p>工作目录。</p>
+<p>数据库将使用’dbfilename’配置的文件名写入此目录。还将在此目录中创建仅可追加文件。</p>
+<p>请注意，您必须在此处指定目录，而不是文件名。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dir ./</span><br></pre></td></tr></table></figure></p>
+<h1 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h1><h2 id="slaveof"><a href="#slaveof" class="headerlink" title="slaveof"></a>slaveof</h2><p>主从复制。 使用slaveof使Redis实例成为另一台Redis服务器的副本。 关于Redis复制的一些事情要尽快理解。</p>
+<ol>
+<li>Redis复制是异步的，但是如果主机看起来与至少给定数量的从站没有连接，则可以配置主机停止接受写入。</li>
+<li>如果复制链路丢失了相对较短的时间，Redis从站能够与主站进行部分重新同步。 您可能希望根据需要配置具有合理值的复制积压大小（请参阅此文件的下一部分）。</li>
+<li>复制是自动的，不需要用户干预。 在网络分区从属设备自动尝试重新连接到主设备并与它们重新同步之后。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># slaveof &lt;masterip&gt; &lt;masterport&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="masterauth"><a href="#masterauth" class="headerlink" title="masterauth"></a>masterauth</h2><p>如果主服务器受密码保护（使用下面的“requirepass”配置指令），则可以在启动复制同步过程之前告知从服务器进行身份验证，否则主服务器将拒绝从服务器请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">masterauth &lt;master-password&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="slave-serve-stale-data"><a href="#slave-serve-stale-data" class="headerlink" title="slave-serve-stale-data"></a>slave-serve-stale-data</h2><p>stale: 陈旧的，过时的</p>
+<p>当从属设备失去与主设备的连接时，或者当复制仍在进行时，从设备可以以两种不同的方式操作：</p>
+<ol>
+<li><p>如果slave-serve-stale-data设置为“yes”（默认值），则slave仍将回复客户端请求，可能是过期数据，或者如果这是第一次同步，则数据集可能只是空。</p>
+</li>
+<li><p>如果slave-serve-stale-data设置为’no’，则slave将回复一个错误“SYNC with master in progress”到所有类型的命令，除了INFO和SLAVEOF。</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slave-serve-stale-data yes</span><br></pre></td></tr></table></figure>
+<h2 id="slave-read-only"><a href="#slave-read-only" class="headerlink" title="slave-read-only"></a>slave-read-only</h2><p>您可以将从属实例配置为是否接受写入。 针对从属实例进行写入可能对存储一些短暂的数据很有用（因为在与主服务器重新同步后，将很容易删除写在从服务器上的数据），但如果客户端由于配置错误而写入数据，也可能会导致问题。</p>
+<p>由于Redis 2.6默认情况下从属设备是只读的。</p>
+<p><strong>注意：只读从站不适合在Internet上暴露给不受信任的客户端。 它只是一个防止滥用实例的保护层。 仍然只读的从属设备默认导出所有管理命令，如CONFIG，DEBUG等。 在某种程度上，您可以使用“rename-command”来隐藏所有管理/危险命令，从而提高只读从站的安全性</strong>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slave-read-only yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-diskless-sync"><a href="#repl-diskless-sync" class="headerlink" title="repl-diskless-sync"></a>repl-diskless-sync</h2><p>复制SYNC策略：磁盘或套接字。</p>
+<hr>
+<p><strong>警告：目前无盘复制是实验性的</strong></p>
+<hr>
+<p>新的从站和重新连接的从站只能接收差异而无法继续复制过程，需要执行所谓的“完全同步”。 RDB文件从主服务器传输到从服务器。传输可以以两种不同的方式发生：</p>
+<ol>
+<li>磁盘：Redis主服务器创建一个将RDB文件写入磁盘的新进程。稍后，父进程将文件以递增方式传输到从属服务器。</li>
+<li>无盘：Redis主站创建一个新进程，直接将RDB文件写入从套接字，而根本不接触磁盘。</li>
+</ol>
+<p>使用磁盘支持的复制，在生成RDB文件时，只要生成RDB文件的当前子代完成其工作，就可以将更多的从服务器排队并与RDB文件一起提供。使用无盘复制，一旦传输开始，到达的新从站将排队，并且当当前终端将终止时将开始新的传输。</p>
+<p>使用无盘复制时，主机在开始传输之前等待一段可配置的时间（以秒为单位），希望多个从站到达并且传输可以并行化。</p>
+<p>对于慢速磁盘和快速（大带宽）网络，无盘复制效果更好。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-diskless-sync no</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-diskless-sync-delay"><a href="#repl-diskless-sync-delay" class="headerlink" title="repl-diskless-sync-delay"></a>repl-diskless-sync-delay</h2><p>启用无盘复制时，可以配置服务器等待的延迟，以便生成通过套接字将RDB传输到从属服务器的子服务器。</p>
+<p>这很重要，因为一旦传输开始，就不可能为新的从站提供服务，这些新的服务器将排队等待下一次RDB传输，因此服务器会等待延迟以便让更多的从服务器到达。</p>
+<p>延迟以秒为单位指定，默认为5秒。 要完全禁用它，只需将其设置为0秒，即可尽快启动传输。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-diskless-sync-delay 5</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-ping-slave-period"><a href="#repl-ping-slave-period" class="headerlink" title="repl-ping-slave-period"></a>repl-ping-slave-period</h2><p>从站以预定义的间隔将PING发送到服务器。 可以使用repl_ping_slave_period选项更改此间隔。 默认值为10秒。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-ping-slave-period 10</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-timeout"><a href="#repl-timeout" class="headerlink" title="repl-timeout"></a>repl-timeout</h2><p>以下选项设置复制超时：</p>
+<ol>
+<li>从从设备的角度来看，在SYNC期间批量传输I / O.</li>
+<li>从站（data，ping）的角度来看主站超时。</li>
+<li>从主设备的角度来看从设备超时（REPLCONF ACK ping）。</li>
+</ol>
+<p><strong>确保此值大于为repl-ping-slave-period指定的值非常重要，否则每次主站和从站之间的流量较低时都会检测到超时。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-timeout 60</span><br></pre></td></tr></table></figure>
+<h2 id="repl-disable-tcp-nodelay"><a href="#repl-disable-tcp-nodelay" class="headerlink" title="repl-disable-tcp-nodelay"></a>repl-disable-tcp-nodelay</h2><p>SYNC后，在从站socket禁用TCP_NODELAY？</p>
+<p>如果选择“是”，Redis将使用较少数量的TCP数据包和较少的带宽将数据发送到从设备。 但这可能会增加数据在从属端出现的延迟，使用默认配置的Linux内核最多可达40毫秒。</p>
+<p>如果选择“否”，将减少从站侧出现数据的延迟，但将使用更多带宽进行复制。</p>
+<p>默认情况下，我们针对低延迟进行了优化，但是在非常高的流量条件下，或者当主设备和从设备远离许多跳时，将其转为“是”可能是个好主意。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-disable-tcp-nodelay no</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-backlog-size"><a href="#repl-backlog-size" class="headerlink" title="repl-backlog-size"></a>repl-backlog-size</h2><p>设置复制积压大小。 积压是一个缓冲区，当从属设备断开连接一段时间后会累积从属数据，这样当一个从属设备想要再次重新连接时，通常不需要完全重新同步，只是部分重新同步就足够了。</p>
+<p>复制积压越大，从站断开连接的时间就可以越长。</p>
+<p>只有在至少连接了一个从站时才会分配积压。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-backlog-size 1mb</span><br></pre></td></tr></table></figure></p>
+<h2 id="repl-backlog-ttl"><a href="#repl-backlog-ttl" class="headerlink" title="repl-backlog-ttl"></a>repl-backlog-ttl</h2><p>在主设备不再连接从设备一段时间后，将释放待办事项。 以下选项配置从上次从站断开连接开始需要经过的秒数，以释放待处理日志缓冲区。</p>
+<p>请注意，从站永远不会因为超时释放积压，因为它们可能会在以后升级为主站，并且应该能够与从站正确“部分重新同步”：因此它们应始终积累积压。</p>
+<p>值为0表示永远不会释放积压。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-backlog-ttl 3600</span><br></pre></td></tr></table></figure></p>
+<h2 id="slave-priority"><a href="#slave-priority" class="headerlink" title="slave-priority"></a>slave-priority</h2><p>从属优先级一个整数。 如果主服务器不再正常工作，Redis Sentinel将使用它来选择要升级为主服务器的从服务器。</p>
+<p>具有 <strong>低优先级编号的从站被认为更适合升级</strong> ，因此例如如果有三个优先级为10,100的从站，则Sentinel将选择优先级为10的从站，即最低的。</p>
+<p>但是，<strong>特殊优先级为0表示从站无法执行主站角色</strong>，因此Redis Sentinel永远不会选择优先级为0的从站进行升级。</p>
+<p>默认情况下，优先级为100。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slave-priority 100</span><br></pre></td></tr></table></figure></p>
+<h2 id="min-slaves-to-write"><a href="#min-slaves-to-write" class="headerlink" title="min-slaves-to-write"></a>min-slaves-to-write</h2><p>如果连接的连接少于N个，滞后&lt;= M秒，则主设备可以停止接受写入。</p>
+<p>N个奴隶需要处于“在线”状态。</p>
+<p>以秒为单位的延迟（必须&lt;= 指定值）是根据从从站接收的最后一次ping计算的，通常每秒发送一次。</p>
+<p>此选项不保证N个副本将接受写入，但是如果没有足够的从站可用，则将限制丢失写入的窗口，达到指定的秒数。</p>
+<p>例如，要求至少3个具有滞后&lt;= 10秒的从属使用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">min-slaves-to-write 3</span><br><span class="line">min-slaves-max-lag 10</span><br></pre></td></tr></table></figure></p>
+<p>将一个或另一个设置为0将禁用该功能。</p>
+<p>默认情况下，min-slaves-to-write设置为0（功能禁用），min-slaves-max-lag设置为10。</p>
+<h2 id="slave-announce"><a href="#slave-announce" class="headerlink" title="slave-announce"></a>slave-announce</h2><p>Redis主站能够以不同方式列出所连接从站的地址和端口。例如，“INFO复制”部分提供此信息，Redis Sentinel使用该信息以及其他工具来发现从属实例。<br>此信息可用的另一个位置是主站的“ROLE”命令的输出。</p>
+<p>通常由从站报告的列出的IP和地址通过以下方式获得：</p>
+<ul>
+<li>IP：通过检查从设备用于连接主设备的套接字的对等地址，自动检测地址。</li>
+<li>端口：端口在复制握手期间由从端进行通信，通常是从端用于列出连接的端口。</li>
+</ul>
+<p>但是，当使用端口转发或网络地址转换（NAT）时，从站实际上可以通过不同的IP和端口对访问。从站可以使用以下两个选项，以便向其主站报告一组特定的IP和端口，以便INFO和ROLE都报告这些值。</p>
+<p>如果只需要覆盖端口或IP地址，则无需使用这两个选项。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># slave-announce-ip 5.5.5.5</span><br><span class="line"># slave-announce-port 1234</span><br></pre></td></tr></table></figure></p>
+<h1 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h1><h2 id="requirepass"><a href="#requirepass" class="headerlink" title="requirepass"></a>requirepass</h2><p>访问redis-server的密码，最好很复杂，不然每秒150k的暴力破解很容易猜出来。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">requirepass kdsjfkdsj</span><br></pre></td></tr></table></figure></p>
+<h2 id="rename-command"><a href="#rename-command" class="headerlink" title="rename-command"></a>rename-command</h2><p>对危险命令进行重命名，如果为””,则完全禁用此命令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rename-command CONFIG &quot;&quot;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Clients"><a href="#Clients" class="headerlink" title="Clients"></a>Clients</h1><p>设置客户端最大连接数，默认10000，如果达到限制，报错：<code>&#39;max number of clients reached&#39;</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">maxclients 10000</span><br></pre></td></tr></table></figure></p>
+<h1 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h1><h2 id="maxmemory"><a href="#maxmemory" class="headerlink" title="maxmemory"></a>maxmemory</h2><p>最大内存限制,单位字节。</p>
+<ul>
+<li>当达到限制，redis会根据maxmemory-policy(见下面)移除key</li>
+<li>如果无法移除，则对写命令报错，对读命令正常</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">maxmeory &lt;bytes&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="maxmemory-policy"><a href="#maxmemory-policy" class="headerlink" title="maxmemory-policy"></a>maxmemory-policy</h2><p>当最大内存限制达到，如何清除keys：</p>
+<ul>
+<li>volatile-lru - &gt;移除近似LRU中的过期集。</li>
+<li>allkeys-lru - &gt;移除近似LRU中的任何键。</li>
+<li>volatile-lfu - &gt;移除近似LFU中的过期集。</li>
+<li>allkeys-lfu - &gt;移除近似LFU中的任何键。</li>
+<li>volatile-random - &gt;随机删除过期集合中的key。</li>
+<li>allkeys-random - &gt;随机删除任意key。</li>
+<li>volatile-ttl - &gt; 删除最近的达到TTL的key</li>
+<li><p>noeviction - &gt;不删除任何key，只报错。</p>
+</li>
+<li><p>LRU means Least Recently Used</p>
+</li>
+<li>LFU means Least Frequently Used</li>
+</ul>
+<p>包括的写命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">set setnx setex append</span><br><span class="line">incr decr rpush lpush rpushx lpushx linsert lset rpoplpush sadd</span><br><span class="line">sinter sinterstore sunion sunionstore sdiff sdiffstore zadd zincrby</span><br><span class="line">zunionstore zinterstore hset hsetnx hmset hincrby incrby decrby</span><br><span class="line">getset mset msetnx exec sort</span><br></pre></td></tr></table></figure></p>
+<h1 id="懒删除"><a href="#懒删除" class="headerlink" title="懒删除"></a>懒删除</h1><p>redis删除key有2个命令：DEL和UNLINK，FLUSHALL，FLUSHDB</p>
+<ul>
+<li>DEL是一个同步阻塞操作，如果key关联的值非常大，则会阻塞很长时间</li>
+<li>UNLINK就是非阻塞的删除</li>
+</ul>
+<p>服务器自己删除key的场景：</p>
+<ol>
+<li>内存爆了时</li>
+<li>过期key</li>
+<li>类型RENAME命令，SET，SUNIONSTORE会移除old keys</li>
+<li>从站复制时会先删除再接收</li>
+</ol>
+<p>下面可以配置这些懒删除：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">lazyfree-lazy-eviction no</span><br><span class="line">lazyfree-lazy-expire no</span><br><span class="line">lazyfree-lazy-server-del no</span><br><span class="line">slave-lazy-flush no</span><br></pre></td></tr></table></figure></p>
+<h1 id="只读模式"><a href="#只读模式" class="headerlink" title="只读模式"></a>只读模式</h1><p>默认情况下，针对配置的save point，数据持久化可能会丢失数据。</p>
+<p>AOF是AppendOnly File的缩写，是Redis系统提供了一种记录Redis操作的持久化方案，在AOF生成的文件中，将忠实记录发生在Redis的操作，从而达到在Redis服务器重启或者当机之后，继续恢复之前数据状态的机制。</p>
+<h2 id="appendonly"><a href="#appendonly" class="headerlink" title="appendonly"></a>appendonly</h2><p>AOF和RDB可以同时启动。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendonly no</span><br></pre></td></tr></table></figure></p>
+<h2 id="appendfilename"><a href="#appendfilename" class="headerlink" title="appendfilename"></a>appendfilename</h2><p>追加的文件名，默认<code>appendonly.aof</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendfilename &quot;appendonly.aof&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="appendfsync"><a href="#appendfsync" class="headerlink" title="appendfsync"></a>appendfsync</h2><p>fsync()是告诉操作系统将数据写入磁盘而不是buffer的确切操作。<br>有下面3种模式，如果不确定，使用everysec</p>
+<ul>
+<li>no: 不fsync</li>
+<li>everysec: 默认，每秒一次</li>
+<li>always： 每次写入都同步</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendfsync everysec</span><br></pre></td></tr></table></figure>
+<h2 id="no-appendfsync-on-rewrite"><a href="#no-appendfsync-on-rewrite" class="headerlink" title="no-appendfsync-on-rewrite"></a>no-appendfsync-on-rewrite</h2><p>如果开启AOF并且有很大延迟，则改为yes，但最好是no<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">no-appendfsync-on-rewrite no</span><br></pre></td></tr></table></figure></p>
+<h2 id="auto-aof-rewrite"><a href="#auto-aof-rewrite" class="headerlink" title="auto-aof-rewrite"></a>auto-aof-rewrite</h2><p>当达到配置的存储大小的百分比后，自动重写文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">auto-aof-rewrite-percentage 100</span><br><span class="line">auto-aof-rewrite-min-size 64mb</span><br></pre></td></tr></table></figure></p>
+<h2 id="aof-load-truncates"><a href="#aof-load-truncates" class="headerlink" title="aof-load-truncates"></a>aof-load-truncates</h2><p>当OS发生故障时AOF文件可能会截断，下面的配置：</p>
+<ul>
+<li>如果设为yes，则截断AOF只是发出事件通知给用户</li>
+<li>否则，服务器会报错而终止</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aof-load-truncated yes</span><br></pre></td></tr></table></figure>
+<h2 id="aof-use-rdb-preamble"><a href="#aof-use-rdb-preamble" class="headerlink" title="aof-use-rdb-preamble"></a>aof-use-rdb-preamble</h2><p>如果为yes，则AOF文件会为<code>[RDB file][AOF tail]</code>.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aof-use-rdb-preamble no</span><br></pre></td></tr></table></figure></p>
+<h1 id="LUA-脚本"><a href="#LUA-脚本" class="headerlink" title="LUA 脚本"></a>LUA 脚本</h1><h2 id="lua-time-limit"><a href="#lua-time-limit" class="headerlink" title="lua-time-limit"></a>lua-time-limit</h2><p>lua脚本执行的最长时间。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua-time-limit 5000</span><br></pre></td></tr></table></figure></p>
+<h1 id="redis集群"><a href="#redis集群" class="headerlink" title="redis集群"></a>redis集群</h1><h2 id="cluster-enabled"><a href="#cluster-enabled" class="headerlink" title="cluster-enabled"></a>cluster-enabled</h2><p>这是个实验功能，只有声明为cluster节点的的redis实例才能成为集群的一份子，如下：默认是没启用的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># cluster-enabled yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="cluster-config-file"><a href="#cluster-config-file" class="headerlink" title="cluster-config-file"></a>cluster-config-file</h2><p>每个节点都有一个配置文件，但是不能手动更改，节点会自己更新管理这个文件，<strong>保证同一个机器上的节点的配置文件名不重复。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># cluster-config-file nodes-6379.conf</span><br></pre></td></tr></table></figure></p>
+<h2 id="cluster-node-timeout"><a href="#cluster-node-timeout" class="headerlink" title="cluster-node-timeout"></a>cluster-node-timeout</h2><p>节点超时时间是一个节点无法响应的最大时限：他就被认为挂了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># cluster-node-timeout 15000</span><br></pre></td></tr></table></figure></p>
+<p>//TODO 其他参数</p>
+<h1 id="集群docker-NAT支持"><a href="#集群docker-NAT支持" class="headerlink" title="集群docker/NAT支持"></a>集群docker/NAT支持</h1><p>redis的地址发现在docker等容器环境中会失败，为了支持docker等容器，可以采用以下配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cluster-announce-ip 10.1.1.5</span><br><span class="line">cluster-announce-port 6379</span><br><span class="line">cluster-announce-bus-port 6380</span><br></pre></td></tr></table></figure></p>
+<p>上面的意思就是把这个节点自己的ip和端口通知所有其他节点，让他们发现，这个总线端口就是用来收发消息的，如果不指定，将会采用节点端口偏移10000，比如上面为<code>6379+10000=16379</code>.</p>
+<h1 id="slow-log"><a href="#slow-log" class="headerlink" title="slow log"></a>slow log</h1><p>执行时间：命令的执行时间不包括IO操作和与其他客户端通信的时间。</p>
+<p>一条命令的执行时间达到配置的最大时间后写一条日志：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 10ms</span><br><span class="line">slowing-log-slower-than 10000</span><br></pre></td></tr></table></figure></p>
+<p>配置这个日志队列的最大长度：新的来了老的移除<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slowing-max-len 128</span><br></pre></td></tr></table></figure></p>
+<h1 id="延迟监视器"><a href="#延迟监视器" class="headerlink" title="延迟监视器"></a>延迟监视器</h1><p>为了收集redis实例延迟原因的数据。</p>
+<p><code>LATENCY</code> 命令：打印图片和报告。</p>
+<p>下面的命令为0表示关闭监视，否则代表延迟的最大时间限制，达到了就写入操作日志，单位为毫秒：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">latency-monitor-threshold 0</span><br></pre></td></tr></table></figure></p>
+<p>可以在运行时动态配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG SET latency-monitor-threshold &lt;milliseconds&gt;</span><br></pre></td></tr></table></figure></p>
+<h1 id="事件通知"><a href="#事件通知" class="headerlink" title="事件通知"></a>事件通知</h1><p>redis可以通知Pub/Sub客户端发生的事件，在键空间。例如，一个DEL操作删除了存储子啊database 0的<code>foo</code>key,2条信息会通过Pub/Sub发送：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PUBLISH __keyspace@0__:foo del</span><br><span class="line">PUBLISH __keyevent@0__:del foo</span><br></pre></td></tr></table></figure></p>
+<p>通知分为很多类，每类用一个字符标识：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#  K     Keyspace events, published with __keyspace@&lt;db&gt;__ prefix.</span><br><span class="line">#  E     Keyevent events, published with __keyevent@&lt;db&gt;__ prefix.</span><br><span class="line">#  g     Generic commands (non-type specific) like DEL, EXPIRE, RENAME, ...</span><br><span class="line">#  $     String commands</span><br><span class="line">#  l     List commands</span><br><span class="line">#  s     Set commands</span><br><span class="line">#  h     Hash commands</span><br><span class="line">#  z     Sorted set commands</span><br><span class="line">#  x     Expired events (events generated every time a key expires)</span><br><span class="line">#  e     Evicted events (events generated when a key is evicted for maxmemory)</span><br><span class="line">#  A     Alias for g$lshzxe, so that the &quot;AKE&quot; string means all the events.</span><br></pre></td></tr></table></figure></p>
+<p>例如：只启用list和无类型命令的事件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notify-keyspace-events Elg</span><br></pre></td></tr></table></figure></p>
+<p>默认空字符串，没开启任何事件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notify-keyspace-events &quot;&quot;</span><br></pre></td></tr></table></figure></p>
+<h1 id="高级配置"><a href="#高级配置" class="headerlink" title="高级配置"></a>高级配置</h1><h2 id="hash-max"><a href="#hash-max" class="headerlink" title="hash-max"></a>hash-max</h2><p>hash会被在内存中进行编码来节约空间，下面限制最大的entry项数量阈值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hash-max-ziplist-entries 512</span><br><span class="line">hash-max-ziplist-value 64</span><br></pre></td></tr></table></figure></p>
+<h2 id="list-max"><a href="#list-max" class="headerlink" title="list-max"></a>list-max</h2><p>list也会被编码来节约空间，下面的参数限制了每个内部的list节点可以被指定的最大entry数量或者最大大小。</p>
+<p>对于固定的最大大小，从-5到-1的含义：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># -5: max size: 64 Kb  &lt;-- not recommended for normal workloads</span><br><span class="line"># -4: max size: 32 Kb  &lt;-- not recommended</span><br><span class="line"># -3: max size: 16 Kb  &lt;-- probably not recommended</span><br><span class="line"># -2: max size: 8 Kb   &lt;-- good</span><br><span class="line"># -1: max size: 4 Kb   &lt;-- good</span><br></pre></td></tr></table></figure></p>
+<p>正数代表每个list节点确切的元素个数。通常性能最好的就是-2或-1，但如果你的应用场景不同，也可以调节：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list-max-ziplist-size -2</span><br></pre></td></tr></table></figure></p>
+<h2 id="list-compress"><a href="#list-compress" class="headerlink" title="list-compress"></a>list-compress</h2><p>list也会被压缩，压缩的深度代表：list两端的不压缩节点个数，看下面就明白了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 0: 不压缩</span><br><span class="line"># 1: 只压缩除首尾外的中间节点</span><br><span class="line">#    如：[head]-&gt;node-&gt;node-&gt;...-&gt;node-&gt;[tail]</span><br><span class="line">#    [head], [tail] 不会压缩; 内部节点压缩</span><br><span class="line"># 2: [head]-&gt;[next]-&gt;node-&gt;node-&gt;...-&gt;node-&gt;[prev]-&gt;[tail]</span><br><span class="line">#    2 here means: don&apos;t compress head or head-&gt;next or tail-&gt;prev or tail,</span><br><span class="line">#    but compress all nodes between them.</span><br><span class="line"># 3: [head]-&gt;[next]-&gt;[next]-&gt;node-&gt;node-&gt;...-&gt;node-&gt;[prev]-&gt;[prev]-&gt;[tail]</span><br><span class="line"># 等等</span><br></pre></td></tr></table></figure></p>
+<p>默认是不压缩：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list-compress-depth 0</span><br></pre></td></tr></table></figure></p>
+<h2 id="set-max"><a href="#set-max" class="headerlink" title="set-max"></a>set-max</h2><p>set只会在一种情况被编码：就是这个集合只有字符串组成，且这些字符串恰好都是64位的10进制整数。<br>下面的配置代表：使用这种编码的集合最大元素个数为512.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set-max-intset-entries 512</span><br></pre></td></tr></table></figure></p>
+<h2 id="zset-max"><a href="#zset-max" class="headerlink" title="zset-max"></a>zset-max</h2><p>sorted set 也会编码来解决空间，只在数量低于下面的配置时才有用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zset-max-ziplist-entries 128</span><br><span class="line">zset-max-ziplist-value 64</span><br></pre></td></tr></table></figure></p>
+<h2 id="hll-sparse-max-bytes"><a href="#hll-sparse-max-bytes" class="headerlink" title="hll-sparse-max-bytes"></a>hll-sparse-max-bytes</h2><p>HyperLogLog的稀疏表示限制，当超过下面的配置时就转为密集表示，大于16000是没必要的，因为这时候密集表示的效率已高于稀疏的，推荐用3000，如果CPU很厉害，只考虑空间，那么可以提高到10000。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hll-sparse-max-bytes 3000</span><br></pre></td></tr></table></figure></p>
+<h2 id="activerehashing"><a href="#activerehashing" class="headerlink" title="activerehashing"></a>activerehashing</h2><h2 id="client-output-buffer-limit"><a href="#client-output-buffer-limit" class="headerlink" title="client-output-buffer-limit"></a>client-output-buffer-limit</h2><h2 id="client-query-buffer-limit"><a href="#client-query-buffer-limit" class="headerlink" title="client-query-buffer-limit"></a>client-query-buffer-limit</h2><h2 id="proto-max-bulk-len"><a href="#proto-max-bulk-len" class="headerlink" title="proto-max-bulk-len"></a>proto-max-bulk-len</h2><p>批量请求的单个string的长度限制在512MB，下面可以配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proto-max-bulk-len 512mb</span><br></pre></td></tr></table></figure></p>
+<h2 id="hz"><a href="#hz" class="headerlink" title="hz"></a>hz</h2><p>redis有许多后台任务，比如关闭超时连接，删除过时key等。</p>
+<p>并不是所有任务执行的频率都一样，但redis会根据hz的值来表现。</p>
+<p>默认hz为10，提高hz会使CPU更活跃，响应更快，超时判断更精确。</p>
+<p>hz范围为1-500，一般不会超过100。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hz 10</span><br></pre></td></tr></table></figure></p>
+<h2 id="aof-rewrite-incremental-fsync"><a href="#aof-rewrite-incremental-fsync" class="headerlink" title="aof-rewrite-incremental-fsync"></a>aof-rewrite-incremental-fsync</h2><p>如果为yes，则AOF文件每生成32MB，就同步到磁盘，避免大的延迟飙升。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aof-rewrite-incremental-fsync yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="LFU调优参数"><a href="#LFU调优参数" class="headerlink" title="LFU调优参数"></a>LFU调优参数</h2><p>针对LFU移除算法进行你调优，有2个参数：计数器的对数因子和衰变因子，首先理解他们很重要。</p>
+<h3 id="lfu-log-factor"><a href="#lfu-log-factor" class="headerlink" title="lfu-log-factor"></a>lfu-log-factor</h3><p>LFU计数器对与每个key是一个8位的数，最大值255，redis使用了一个对数行为的概率增量。给定老的计数器的值，这个计数器采用如下方式递增：</p>
+<ol>
+<li>生成一个0-1的随机数R；</li>
+<li>概率P=1/(old_value*lfu_log_factor + 1);</li>
+<li>仅当R&lt;P时才增加计数器。</li>
+</ol>
+<p>默认的lfu-log-factor=10, 下面是一张表，描述了在不同的factor因子下，不同的访问次数对计数器改变频率的影响：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | factor | 100 hits   | 1000 hits  | 100K hits  | 1M hits    | 10M hits   |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 0      | 104        | 255        | 255        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 1      | 18         | 49         | 255        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 10     | 10         | 18         | 142        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 100    | 8          | 11         | 49         | 143        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br></pre></td></tr></table></figure></p>
+<p>可以运行下面的命令得到上述结果(foo初始值为5)：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-benchmark -n <span class="number">1000000</span> incr foo</span><br><span class="line">redis-cli object freq foo</span><br></pre></td></tr></table></figure></p>
+<h3 id="lfu-decay-time"><a href="#lfu-decay-time" class="headerlink" title="lfu-decay-time"></a>lfu-decay-time</h3><p>衰变因子是一个时间，单位为分钟，控制计数器衰变的，到了指定时间，计数器会衰变（除以2，如果小于10则减一）。如果这个值为0，代表每次扫描到这个计数器都会衰减。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lfu-decay-time <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>为啥会有这个，也很简单，lfu-log-factor控制增加，lfu-decay-time控制减少，不然会满了。</p>
+
+          </div>
+          
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/04/lang/010-redis-configuration/" data-id="cjy2i5vf4005rvqchkiwptxih" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+        
+<nav id="article-nav">
+  
+    <a href="/2018/09/05/hadoop/001-hbase-shell-command/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          hbase shell命令
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/09/03/lang/009-redis-partition/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">redis分区：如何在多个Redis实例之间拆分数据</div>
+    </a>
+  
+</nav>
+
+          
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 11.88px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.13px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.38px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.25px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.63px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 11.88px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.25px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 13.13px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.63px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/14/linux/025-ubuntu-use-navidia-card/">ubuntu下使用NVIDIA显卡</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/14/tools/016-vscode-config/">vscode自定义配置</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/10/git/006-git-revert-deleted-files/">git-恢复之前版本误删的文件</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/09/basic/019-cs-basic-concept/">哪些必须知道的CS概念</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/08/life/022-weekly-learn/">2019-28-周报</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Jackpler<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

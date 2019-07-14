@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111673440-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>jdk11新特性 | 在我的世界</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="如果您熟悉英文强烈建议阅读官方文档。 java新增方法当然，下面只是部分： String1234567891011121314@Testpublic void testString() &amp;#123;    String s = &quot; Jimo &quot;;    Assert.assertEquals(&quot;Jimo&quot;, s.strip());    Assert.assertEquals(&quot;Jimo &quot;, s">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jdk11新特性">
+<meta property="og:url" content="http://http://jimolonely.github.io/2018/09/08/java/005-jdk11-new-feature/index.html">
+<meta property="og:site_name" content="在我的世界">
+<meta property="og:description" content="如果您熟悉英文强烈建议阅读官方文档。 java新增方法当然，下面只是部分： String1234567891011121314@Testpublic void testString() &amp;#123;    String s = &quot; Jimo &quot;;    Assert.assertEquals(&quot;Jimo&quot;, s.strip());    Assert.assertEquals(&quot;Jimo &quot;, s">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/000.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/001.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/002.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/003.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/004.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/005.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/006.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/007.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/008.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/009.png">
+<meta property="og:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/010.png">
+<meta property="og:updated_time" content="2019-07-14T03:04:02.306Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="jdk11新特性">
+<meta name="twitter:description" content="如果您熟悉英文强烈建议阅读官方文档。 java新增方法当然，下面只是部分： String1234567891011121314@Testpublic void testString() &amp;#123;    String s = &quot; Jimo &quot;;    Assert.assertEquals(&quot;Jimo&quot;, s.strip());    Assert.assertEquals(&quot;Jimo &quot;, s">
+<meta name="twitter:image" content="http://http/2018/09/08/java/005-jdk11-new-feature/000.png">
+  
+    <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/prism-atom-dark.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"><script src="/js/prism.js"></script>
+<script src="/js/prism-line-numbers.min.js"></script></head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我的世界</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">无敌是多么寂寞，此生有你足矣</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">home</a>
+        
+          <a class="main-nav-link" href="/archives">archives</a>
+        
+          <a class="main-nav-link" href="/about">about</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://http://jimolonely.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/005-jdk11-new-feature" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/08/java/005-jdk11-new-feature/" class="article-date">
+  <time datetime="2018-09-08T07:20:32.000Z" itemprop="datePublished">2018-09-08</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 class="article-title" itemprop="name">
+      jdk11新特性
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果您熟悉英文强烈建议阅读<a href="http://openjdk.java.net/projects/jdk/11/" target="_blank" rel="noopener">官方文档</a>。</p>
+<h1 id="java新增方法"><a href="#java新增方法" class="headerlink" title="java新增方法"></a>java新增方法</h1><p>当然，下面只是部分：</p>
+<h2 id="String"><a href="#String" class="headerlink" title="String"></a>String</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String s = <span class="string">" Jimo "</span>;</span><br><span class="line">    Assert.assertEquals(<span class="string">"Jimo"</span>, s.strip());</span><br><span class="line">    Assert.assertEquals(<span class="string">"Jimo "</span>, s.stripLeading());</span><br><span class="line">    Assert.assertEquals(<span class="string">" Jimo"</span>, s.stripTrailing());</span><br><span class="line">    Assert.assertFalse(s.isBlank());</span><br><span class="line">    Assert.assertEquals(<span class="string">" Jimo  Jimo  Jimo "</span>, s.repeat(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> lines = <span class="string">"I'm a super man\ndo you know me?\n"</span>;</span><br><span class="line">    <span class="keyword">final</span> Stream&lt;String&gt; stringStream = lines.lines();</span><br><span class="line">    System.out.println(stringStream.collect(Collectors.toList()));</span><br><span class="line">    <span class="comment">/*[I'm a super man, do you know me?]*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Path path = Path.of(<span class="string">"test.txt"</span>);</span><br><span class="line">    Files.writeString(path, <span class="string">"Ha jimo"</span>);</span><br><span class="line">    Assert.assertEquals(<span class="string">"Ha jimo"</span>, Files.readString(path));</span><br><span class="line"></span><br><span class="line">    Assert.assertTrue(Files.isSameFile(path, path));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Predicate"><a href="#Predicate" class="headerlink" title="Predicate"></a>Predicate</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPredicate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> count = Stream.of(<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">""</span>)</span><br><span class="line">            .filter(Predicate.not(String::isEmpty))</span><br><span class="line">            .count();</span><br><span class="line">    Assert.assertEquals(<span class="number">2</span>, count);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> Predicate&lt;String&gt; predicate =</span><br><span class="line">            Pattern.compile(<span class="string">"jimo."</span>).asMatchPredicate();</span><br><span class="line">    Assert.assertTrue(predicate.test(<span class="string">"jimo1"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> Thread移除stop和destroy方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/27 8:37</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testThread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Thread t = <span class="keyword">new</span> Thread();</span><br><span class="line">    t.stop();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="TimeUnit"><a href="#TimeUnit" class="headerlink" title="TimeUnit"></a>TimeUnit</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testTimeUnit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> TimeUnit unit = TimeUnit.DAYS;</span><br><span class="line">    Assert.assertEquals(<span class="number">2</span>, unit.convert(Duration.ofHours(<span class="number">49</span>)));</span><br><span class="line">    Assert.assertEquals(<span class="number">1</span>, unit.convert(Duration.ofMinutes(<span class="number">1450</span>)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="lambda-var"><a href="#lambda-var" class="headerlink" title="lambda var"></a>lambda var</h2><p>lambda表达式中支持可变参数var，并且可以注解.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testParam</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> count = Arrays</span><br><span class="line">            .stream(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;)</span><br><span class="line">            .filter((<span class="meta">@Nonnull</span> <span class="keyword">var</span> x) -&gt; x &gt; <span class="number">2</span>)</span><br><span class="line">            .count();</span><br><span class="line">    System.out.println(count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="改进64位架构内部函数"><a href="#改进64位架构内部函数" class="headerlink" title="改进64位架构内部函数"></a>改进64位架构内部函数</h1><p>改进现有的String和array内在函数，并在AArch64处理器上为java.lang.Math sin，cos和log函数实现新的内在函数。</p>
+<p>原因：专用的CPU架构的代码模式可提高用户应用程序和基准测试的性能</p>
+<p>下面分别在JDK8和JDK11上测试对比：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> 测试Math函数的时间, 看JDK11在优化了64位架构后有什么提升</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/25 19:24</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMathOnJDK11</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTime = System.nanoTime();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        Math.sin(i);</span><br><span class="line">        Math.cos(i);</span><br><span class="line">        Math.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> endTime = System.nanoTime();</span><br><span class="line">    System.out.println(TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + <span class="string">"ms"</span>);</span><br><span class="line">    <span class="comment">/*1279ms,1477ms*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMathOnJDK8</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTime = System.nanoTime();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        Math.sin(i);</span><br><span class="line">        Math.cos(i);</span><br><span class="line">        Math.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> endTime = System.nanoTime();</span><br><span class="line">    System.out.println(TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + <span class="string">"ms"</span>);</span><br><span class="line">    <span class="comment">/*8700ms ,8724ms*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="移除Java-EE和CORBA模块"><a href="#移除Java-EE和CORBA模块" class="headerlink" title="移除Java EE和CORBA模块"></a>移除Java EE和CORBA模块</h1><p>JDK6包含完整的Web Service开发栈</p>
+<h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><ol>
+<li><p>JAX-WS（基于XML的Web服务Java API），JAXB（用于XML绑定的Java架构），<br>JAF（JavaBeans Activation Framework）和Common Annotations</p>
+</li>
+<li><p>CORBA（Common Object Request Broker Architecture）通用对象请求代理架构是软件构建的一个标准</p>
+</li>
+</ol>
+<h2 id="为什么移除？"><a href="#为什么移除？" class="headerlink" title="为什么移除？"></a>为什么移除？</h2><ol>
+<li>JavaSE集成JavaEE存在问题：相关性，版本</li>
+<li>Java EE的包可以很方便的从Maven等三方库获取</li>
+<li>并没多少人用JDK中的Java EE</li>
+</ol>
+<h1 id="HTTP-Client标准化"><a href="#HTTP-Client标准化" class="headerlink" title="HTTP Client标准化"></a>HTTP Client标准化</h1><p>HTTP Client：JDK9提出，JDK10更新，JDK11标准化</p>
+<p>从开始的孵化特性走向成熟，形成标准，有意思</p>
+<p>JDK HTTP Client可用于通过网络请求HTTP资源；</p>
+<ol>
+<li>它支持HTTP / 1.1和HTTP / 2</li>
+<li>包括同步和异步编程模型，还支持并发</li>
+<li>将请求和响应主体作为反应流处理</li>
+<li>遵循熟悉的Builder模式。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> HttpClient client = HttpClient.newHttpClient();</span><br><span class="line">    <span class="keyword">final</span> HttpRequest request = HttpRequest.newBuilder()</span><br><span class="line">            .uri(URI.create(<span class="string">"http://openjdk.java.net"</span>))</span><br><span class="line">            .build();</span><br><span class="line">    client.sendAsync(request, HttpResponse.BodyHandlers.ofString())</span><br><span class="line">            .thenApply(HttpResponse::body)</span><br><span class="line">            .thenAccept(System.out::println)</span><br><span class="line">            .join();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="java单文件运行"><a href="#java单文件运行" class="headerlink" title="java单文件运行"></a>java单文件运行</h1><p><a href="http://openjdk.java.net/jeps/330" target="_blank" rel="noopener">http://openjdk.java.net/jeps/330</a></p>
+<h2 id="以前运行java文件"><a href="#以前运行java文件" class="headerlink" title="以前运行java文件"></a>以前运行java文件</h2><img src="/2018/09/08/java/005-jdk11-new-feature/000.png">
+<img src="/2018/09/08/java/005-jdk11-new-feature/001.png">
+<h2 id="现在"><a href="#现在" class="headerlink" title="现在"></a>现在</h2><img src="/2018/09/08/java/005-jdk11-new-feature/002.png">
+<p>但是如果有内部类则找不到：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/003.png">
+<h1 id="Filght-Recorder-JFR"><a href="#Filght-Recorder-JFR" class="headerlink" title="Filght Recorder(JFR)"></a>Filght Recorder(JFR)</h1><p><a href="http://openjdk.java.net/jeps/328" target="_blank" rel="noopener">http://openjdk.java.net/jeps/328</a></p>
+<h2 id="干什么的"><a href="#干什么的" class="headerlink" title="干什么的"></a>干什么的</h2><ol>
+<li>提供用于生成和使用数据作为事件的API</li>
+<li>提供缓冲机制和二进制数据格式</li>
+<li>允许配置和过滤事件</li>
+<li>为OS，HotSpot JVM和JDK库提供事件</li>
+</ol>
+<h2 id="为什么需要"><a href="#为什么需要" class="headerlink" title="为什么需要"></a>为什么需要</h2><p>故障排除，监视和分析是开发生命周期中不可或缺的部分，但是在涉及实际数据的繁重负载下，某些问题仅发生在生产中。</p>
+<p>Flight Recorder记录来自应用程序，JVM和OS的事件。 事件存储在一个文件中，该文件可以附加到错误报告中并由支持工程师进行检查，允许事后分析导致问题时的问题。 工具可以使用API从记录文件中提取信息。</p>
+<p>飞行记录嘛：飞机飞行时的记录，对于程序就是程序运行时的记录，包括状态监控和数据收集等</p>
+<h2 id="如何启动"><a href="#如何启动" class="headerlink" title="如何启动"></a>如何启动</h2><img src="/2018/09/08/java/005-jdk11-new-feature/004.png">
+<img src="/2018/09/08/java/005-jdk11-new-feature/005.png">
+<h2 id="JFR-测试"><a href="#JFR-测试" class="headerlink" title="JFR-测试"></a>JFR-测试</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FlightRecorderTest</span> <span class="keyword">extends</span> <span class="title">Event</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Label</span>(<span class="string">"Hello World"</span>)</span><br><span class="line">    <span class="meta">@Description</span>(<span class="string">"Helps the programmer getting started"</span>)</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span> <span class="keyword">extends</span> <span class="title">Event</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Label</span>(<span class="string">"Message"</span>)</span><br><span class="line">        String message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        HelloWorld event = <span class="keyword">new</span> HelloWorld();</span><br><span class="line">        event.message = <span class="string">"hello, world!"</span>;</span><br><span class="line">        event.commit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行时加上命令行参数：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/006.png">
+<h2 id="读取记录"><a href="#读取记录" class="headerlink" title="读取记录"></a>读取记录</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> 读取jfr文件</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/26 16:52</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readRecordFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Path path = Paths.get(<span class="string">"E:\\ws\\Git\\java-version-compare\\myrecording.jfr"</span>);</span><br><span class="line">    <span class="keyword">final</span> List&lt;RecordedEvent&gt; recordedEvents = RecordingFile.readAllEvents(path);</span><br><span class="line">    <span class="keyword">for</span> (RecordedEvent event : recordedEvents) &#123;</span><br><span class="line">        System.out.println(event.getStartTime() + <span class="string">","</span> + event.getValue(<span class="string">"message"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<img src="/2018/09/08/java/005-jdk11-new-feature/007.png">
+<p><a href="https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/run.htm#JFRRT164" target="_blank" rel="noopener">https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/run.htm#JFRRT164</a></p>
+<h1 id="JDK11-低开销堆内存分析"><a href="#JDK11-低开销堆内存分析" class="headerlink" title="JDK11-低开销堆内存分析"></a>JDK11-低开销堆内存分析</h1><p>提供一种从JVM获取有关Java对象堆分配的信息的方法：</p>
+<ol>
+<li>低开销</li>
+<li>可通过定义明确的程序接口访问，</li>
+<li>可以对所有分配进行采样（即，不限于在一个特定堆区域中的分配或以一种特定方式分配的分配），</li>
+<li>可以以与实现无关的方式定义（即，不依赖于任何特定的GC算法或VM实现）</li>
+<li>以及可以提供有关实时和死Java对象的信息。</li>
+</ol>
+<h2 id="why"><a href="#why" class="headerlink" title="why"></a>why</h2><p>现有的堆内存工具：Java Flight Recorder, jmap, YourKit, and VisualVM</p>
+<p>现在获取Hotspot信息的方式：</p>
+<ol>
+<li><a href="https://github.com/google/allocation-instrumenter" target="_blank" rel="noopener">https://github.com/google/allocation-instrumenter</a></li>
+<li>Java Flight Recorder：只能记录，不能定制采样间隔，不能区分死/活对象</li>
+</ol>
+<h2 id="how"><a href="#how" class="headerlink" title="how"></a>how</h2><p>扩展了JVM TI：增加了分析接口</p>
+<p>JVMTI(JVM Tool Interface)： JDK1.5提出，一般是C，C++实现该接口，在JVM启动时加载</p>
+<p><a href="http://openjdk.java.net/jeps/331" target="_blank" rel="noopener">http://openjdk.java.net/jeps/331</a></p>
+<p>google开源内存分析工具：<a href="https://github.com/google/allocation-instrumenter" target="_blank" rel="noopener">https://github.com/google/allocation-instrumenter</a></p>
+<p>JVMTI介绍：<a href="https://en.wikipedia.org/wiki/Java_Virtual_Machine_Tools_Interface" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Java_Virtual_Machine_Tools_Interface</a></p>
+<p>Jvmti的使用：<a href="https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html</a></p>
+<h1 id="JDK11-无操作-No-Op-GC"><a href="#JDK11-无操作-No-Op-GC" class="headerlink" title="JDK11-无操作(No-Op)GC"></a>JDK11-无操作(No-Op)GC</h1><p>当堆内存枯竭时，JVM直接关闭，什么都不做 ，还有一个碉堡的名字：Epsilon </p>
+<h2 id="why-1"><a href="#why-1" class="headerlink" title="why"></a>why</h2><p>不同的垃圾回收器做不同的事嘛，存在即合理</p>
+<ol>
+<li>性能测试</li>
+<li>内存压力测试</li>
+<li>VM接口测试</li>
+<li>生存期极短Job测试</li>
+<li>延时高敏感程序测试</li>
+<li>吞吐量提高</li>
+</ol>
+<p>启动参数：<code>XX:+UseEpsilonGC</code></p>
+<p><a href="http://openjdk.java.net/jeps/318" target="_blank" rel="noopener">http://openjdk.java.net/jeps/318</a></p>
+<h1 id="JDK11-ZGC-实验性"><a href="#JDK11-ZGC-实验性" class="headerlink" title="JDK11-ZGC(实验性)"></a>JDK11-ZGC(实验性)</h1><p>Z垃圾回收器，也称为ZGC，是一个可扩展的低延迟(scalable low-latency)垃圾回收器.<br>ZGC是一个并发的，单例的，基于区域的，NUMA感知的压缩回收器。 Stop-the-world阶段仅限于根扫描，因此GC暂停时间不会随堆或活动集的大小而增加</p>
+<ol>
+<li>GC暂停时间不应超过10毫秒</li>
+<li>处理堆的大小从相对较小（几百MB）到非常大（TB）不等</li>
+<li>与使用G1相比，应用程序吞吐量减少不超过15％</li>
+<li>为未来的GC功能、优化利用彩色指针和负载屏障奠定基础</li>
+<li>最初支持的平台：Linux / x64</li>
+</ol>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>使用：Linux/x64下编译JDK时：<code>--with-jvm-features=zgc</code></p>
+<p>命令行参数：<code>XX:+UnlockExperimentalVMOptions  -XX:+UseZGC</code></p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>吞吐量：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/008.png">
+<p>暂停时间：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/009.png">
+<p><a href="http://openjdk.java.net/jeps/333" target="_blank" rel="noopener">http://openjdk.java.net/jeps/333</a></p>
+<h1 id="JDK11-TLS1-3"><a href="#JDK11-TLS1-3" class="headerlink" title="JDK11-TLS1.3"></a>JDK11-TLS1.3</h1><p>实现了传输层安全（TLS）协议RFC 8446的1.3版</p>
+<p>TLS 1.3是TLS协议的重大改进，与以前的版本相比，它提供了显著的安全性和性能改进。 其他供应商的几个早期实现已经可用。 我们需要支持TLS 1.3以保持竞争力并与最新标准保持同步。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">useTLS</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    String host = <span class="string">"www.baidu.com"</span>;</span><br><span class="line">    <span class="keyword">int</span> port = <span class="number">443</span>;</span><br><span class="line">    SocketFactory basicSocketFactory = SocketFactory.getDefault();</span><br><span class="line">    Socket s = basicSocketFactory.createSocket(host, port);</span><br><span class="line">    <span class="comment">/*s 是一个 TCP socket*/</span></span><br><span class="line">    SSLSocketFactory tlsSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();</span><br><span class="line">    s = tlsSocketFactory.createSocket(s, host, port, <span class="keyword">true</span>);</span><br><span class="line">    <span class="comment">/*s 现在是一个 基于TCP的TLS socket*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TLS参考：<a href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html</a> </p>
+<p><a href="http://openjdk.java.net/jeps/332" target="_blank" rel="noopener">http://openjdk.java.net/jeps/332</a></p>
+<p>RFC8446: <a href="https://tools.ietf.org/html/rfc8446" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc8446</a></p>
+<p>如何使用TLS：<a href="https://stackoverflow.com/questions/24868820/how-to-make-tls-work-with-java/24872636" target="_blank" rel="noopener">https://stackoverflow.com/questions/24868820/how-to-make-tls-work-with-java/24872636</a><br><a href="http://www.java2s.com/Tutorial/Java/0490__Security/SSLClientSession.htm" target="_blank" rel="noopener">http://www.java2s.com/Tutorial/Java/0490__Security/SSLClientSession.htm</a></p>
+<p>传输层 <a href="https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E5%B1%82" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E5%B1%82</a></p>
+<h1 id="JDK11-Curve25519-and-Curve448"><a href="#JDK11-Curve25519-and-Curve448" class="headerlink" title="JDK11-Curve25519 and Curve448"></a>JDK11-Curve25519 and Curve448</h1><p>RFC 7748定义了一种密钥协商方案，该方案比现有的椭圆曲线Diffie-Hellman（ECDH）方案更有效（原来的是C实现的，现在可以用纯Java实现）和安全。 此JEP的主要目标是API和此标准的实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">keyAgreementTest</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchAlgorithmException,</span></span><br><span class="line"><span class="function">        InvalidAlgorithmParameterException, InvalidKeySpecException, InvalidKeyException </span>&#123;</span><br><span class="line">    KeyPairGenerator kpg = KeyPairGenerator.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    NamedParameterSpec paramSpec = <span class="keyword">new</span> NamedParameterSpec(<span class="string">"X25519"</span>);</span><br><span class="line">    kpg.initialize(paramSpec);</span><br><span class="line">    KeyPair kp = kpg.generateKeyPair();</span><br><span class="line"></span><br><span class="line">    KeyFactory kf = KeyFactory.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    BigInteger u = <span class="keyword">new</span> BigInteger(<span class="string">"1212324324"</span>);</span><br><span class="line">    XECPublicKeySpec pubSpec = <span class="keyword">new</span> XECPublicKeySpec(paramSpec, u);</span><br><span class="line">    PublicKey pubKey = kf.generatePublic(pubSpec);</span><br><span class="line"></span><br><span class="line">    KeyAgreement ka = KeyAgreement.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    ka.init(kp.getPrivate());</span><br><span class="line">    ka.doPhase(pubKey, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">byte</span>[] secret = ka.generateSecret();</span><br><span class="line">    System.out.println(Arrays.toString(secret));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="http://openjdk.java.net/jeps/324" target="_blank" rel="noopener">http://openjdk.java.net/jeps/324</a></p>
+<p>RFC定义的椭圆算法：<a href="https://tools.ietf.org/html/rfc7748" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc7748</a></p>
+<h1 id="JDK11-Deprecate-Nashorn"><a href="#JDK11-Deprecate-Nashorn" class="headerlink" title="JDK11-Deprecate Nashorn"></a>JDK11-Deprecate Nashorn</h1><p>弃用Nashorn JavaScript脚本引擎和API以及jjs工具，在将来的版本中可能会删除它们，如果一群可靠的开发人员表达出对Nashorn前进的明确愿望，那么这个JEP可以取消的</p>
+<p>原因：随着ECMAScript语言构建的快速步伐以及API的调整和修改，JDK发现Nashorn难以维护</p>
+<p><a href="http://openjdk.java.net/jeps/335" target="_blank" rel="noopener">http://openjdk.java.net/jeps/335</a></p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/010.png">
+<h1 id="JDK11-基于Nest的访问控制"><a href="#JDK11-基于Nest的访问控制" class="headerlink" title="JDK11-基于Nest的访问控制"></a>JDK11-基于Nest的访问控制</h1><p>在以前的private public protected的基础上，JVM又提供了一种新的访问控制机制：Nest。</p>
+<p>Java代码都是以类为单位组织的，而且即使是在一个.java文件中的多个类也都会被分别编译为不同的.class类文件。但是对于开发者来说，在一个源文件中的代码在逻辑上应该是可以互相访问的，但是Java并不直接允许这样做。我们虽然可以在一个匿名内部类中访问外层类的成员方法，但是这实际上是通过编译器自动生成的所谓 访问桥(access bridge) 方法进行访问。这个解决方案在解决一部分问题的同时，也带来了如增加了不必要的程序大小和额外性能损耗等问题，而且很容易迷惑一部分Java程序员。</p>
+<p>而JDK 11带来的Nest就是一个更完善的解决方案。编译器现在把一些 看起来 是在一个类中的代码（如上面提到的匿名内部类）组织到Nest 中。而在同一个Nest中的类将会拥有同等的访问权限。这会让应用程序和字节码更加简单、安全，并对开发者透明。</p>
+<p>Java作为一种相对保守的语言，这是少数几个对《Java语言规范》和《Java虚拟机规范》做出较大改动的JEP之一。然而对于普通开发者，在通常的开发中也不会有很大的变动。但是对于反射的重度使用者或接触字节码工程的人来说，这个JEP还是有必要仔细了解一下的。</p>
+<p><a href="http://openjdk.java.net/jeps/181" target="_blank" rel="noopener">http://openjdk.java.net/jeps/181</a></p>
+<p><a href="https://xsun.io/2018/06/29/jdk11-preview/" target="_blank" rel="noopener">https://xsun.io/2018/06/29/jdk11-preview/</a></p>
+<h1 id="JDK11-其他更新"><a href="#JDK11-其他更新" class="headerlink" title="JDK11-其他更新"></a>JDK11-其他更新</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">更新到Unicode 10标准</span><br><span class="line">Java SE 10实现了Unicode 8.0。 Unicode 9.0增加了7,500个字符和6个新脚本，Unicode 10.0.0增加了8,518个字符和4个新脚本。 此升级将包括Unicode 9.0更改，因此添加了总共16,018个字符和10个新脚本。</span><br><span class="line">主要影响的类：</span><br><span class="line">Character and String in the java.lang package,</span><br><span class="line">NumericShaper in the java.awt.font package,</span><br><span class="line">Bidi, BreakIterator, and Normalizer in the java.text package.</span><br><span class="line"></span><br><span class="line">弃用Pack200工具和API</span><br><span class="line">在java.util.jar中弃用pack200和unpack200工具以及Pack200 API。</span><br><span class="line"></span><br><span class="line">实现ChaCha20和Poly1305密码算法</span><br><span class="line">实现RFC 7539中指定的ChaCha20和ChaCha20-Poly1305密码.ChaCha20是一种相对较新的流密码，可以替代旧的，不安全的RC4流密码。</span><br><span class="line"></span><br><span class="line">动态类文件常量</span><br><span class="line">这个JEP扩展了Java类文件格式来支持一种新形式的常量池，CONSTANT_Dynamic。它在初始化的时候，会像invokedynamic指令生成代理方法一样，委托给一个初始化方法进行创建。这是一个JVM内部的特性，对上层软件没有很大的影响，但是为Java语言未来的重大变化铺设了道路。</span><br></pre></td></tr></table></figure>
+<p>Unicode10：<a href="http://openjdk.java.net/jeps/327" target="_blank" rel="noopener">http://openjdk.java.net/jeps/327</a></p>
+<p>Pack200：<a href="http://openjdk.java.net/jeps/336" target="_blank" rel="noopener">http://openjdk.java.net/jeps/336</a></p>
+<p><a href="http://openjdk.java.net/jeps/309" target="_blank" rel="noopener">http://openjdk.java.net/jeps/309</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://dzone.com/articles/features-of-java-11" target="_blank" rel="noopener">https://dzone.com/articles/features-of-java-11
+</a></p>
+<p><a href="http://openjdk.java.net/jeps/320" target="_blank" rel="noopener">http://openjdk.java.net/jeps/320
+</a></p>
+<p><a href="http://openjdk.java.net/jeps/321" target="_blank" rel="noopener">http://openjdk.java.net/jeps/321</a></p>
+<p>HTTP Client的用法：<a href="http://openjdk.java.net/groups/net/httpclient/recipes.html" target="_blank" rel="noopener">http://openjdk.java.net/groups/net/httpclient/recipes.html</a></p>
+<p>Client介绍：<a href="http://openjdk.java.net/groups/net/httpclient/intro.html" target="_blank" rel="noopener">http://openjdk.java.net/groups/net/httpclient/intro.html</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                                                
+                                                    
+                                                      
+                                                        <p>如果您熟悉英文强烈建议阅读<a href="http://openjdk.java.net/projects/jdk/11/" target="_blank" rel="noopener">官方文档</a>。</p>
+<h1 id="java新增方法"><a href="#java新增方法" class="headerlink" title="java新增方法"></a>java新增方法</h1><p>当然，下面只是部分：</p>
+<h2 id="String"><a href="#String" class="headerlink" title="String"></a>String</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String s = <span class="string">" Jimo "</span>;</span><br><span class="line">    Assert.assertEquals(<span class="string">"Jimo"</span>, s.strip());</span><br><span class="line">    Assert.assertEquals(<span class="string">"Jimo "</span>, s.stripLeading());</span><br><span class="line">    Assert.assertEquals(<span class="string">" Jimo"</span>, s.stripTrailing());</span><br><span class="line">    Assert.assertFalse(s.isBlank());</span><br><span class="line">    Assert.assertEquals(<span class="string">" Jimo  Jimo  Jimo "</span>, s.repeat(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> lines = <span class="string">"I'm a super man\ndo you know me?\n"</span>;</span><br><span class="line">    <span class="keyword">final</span> Stream&lt;String&gt; stringStream = lines.lines();</span><br><span class="line">    System.out.println(stringStream.collect(Collectors.toList()));</span><br><span class="line">    <span class="comment">/*[I'm a super man, do you know me?]*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Path path = Path.of(<span class="string">"test.txt"</span>);</span><br><span class="line">    Files.writeString(path, <span class="string">"Ha jimo"</span>);</span><br><span class="line">    Assert.assertEquals(<span class="string">"Ha jimo"</span>, Files.readString(path));</span><br><span class="line"></span><br><span class="line">    Assert.assertTrue(Files.isSameFile(path, path));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Predicate"><a href="#Predicate" class="headerlink" title="Predicate"></a>Predicate</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPredicate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> count = Stream.of(<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">""</span>)</span><br><span class="line">            .filter(Predicate.not(String::isEmpty))</span><br><span class="line">            .count();</span><br><span class="line">    Assert.assertEquals(<span class="number">2</span>, count);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> Predicate&lt;String&gt; predicate =</span><br><span class="line">            Pattern.compile(<span class="string">"jimo."</span>).asMatchPredicate();</span><br><span class="line">    Assert.assertTrue(predicate.test(<span class="string">"jimo1"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> Thread移除stop和destroy方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/27 8:37</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testThread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Thread t = <span class="keyword">new</span> Thread();</span><br><span class="line">    t.stop();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="TimeUnit"><a href="#TimeUnit" class="headerlink" title="TimeUnit"></a>TimeUnit</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testTimeUnit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> TimeUnit unit = TimeUnit.DAYS;</span><br><span class="line">    Assert.assertEquals(<span class="number">2</span>, unit.convert(Duration.ofHours(<span class="number">49</span>)));</span><br><span class="line">    Assert.assertEquals(<span class="number">1</span>, unit.convert(Duration.ofMinutes(<span class="number">1450</span>)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="lambda-var"><a href="#lambda-var" class="headerlink" title="lambda var"></a>lambda var</h2><p>lambda表达式中支持可变参数var，并且可以注解.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testParam</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> count = Arrays</span><br><span class="line">            .stream(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;)</span><br><span class="line">            .filter((<span class="meta">@Nonnull</span> <span class="keyword">var</span> x) -&gt; x &gt; <span class="number">2</span>)</span><br><span class="line">            .count();</span><br><span class="line">    System.out.println(count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="改进64位架构内部函数"><a href="#改进64位架构内部函数" class="headerlink" title="改进64位架构内部函数"></a>改进64位架构内部函数</h1><p>改进现有的String和array内在函数，并在AArch64处理器上为java.lang.Math sin，cos和log函数实现新的内在函数。</p>
+<p>原因：专用的CPU架构的代码模式可提高用户应用程序和基准测试的性能</p>
+<p>下面分别在JDK8和JDK11上测试对比：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> 测试Math函数的时间, 看JDK11在优化了64位架构后有什么提升</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/25 19:24</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMathOnJDK11</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTime = System.nanoTime();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        Math.sin(i);</span><br><span class="line">        Math.cos(i);</span><br><span class="line">        Math.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> endTime = System.nanoTime();</span><br><span class="line">    System.out.println(TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + <span class="string">"ms"</span>);</span><br><span class="line">    <span class="comment">/*1279ms,1477ms*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMathOnJDK8</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTime = System.nanoTime();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        Math.sin(i);</span><br><span class="line">        Math.cos(i);</span><br><span class="line">        Math.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> endTime = System.nanoTime();</span><br><span class="line">    System.out.println(TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + <span class="string">"ms"</span>);</span><br><span class="line">    <span class="comment">/*8700ms ,8724ms*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="移除Java-EE和CORBA模块"><a href="#移除Java-EE和CORBA模块" class="headerlink" title="移除Java EE和CORBA模块"></a>移除Java EE和CORBA模块</h1><p>JDK6包含完整的Web Service开发栈</p>
+<h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><ol>
+<li><p>JAX-WS（基于XML的Web服务Java API），JAXB（用于XML绑定的Java架构），<br>JAF（JavaBeans Activation Framework）和Common Annotations</p>
+</li>
+<li><p>CORBA（Common Object Request Broker Architecture）通用对象请求代理架构是软件构建的一个标准</p>
+</li>
+</ol>
+<h2 id="为什么移除？"><a href="#为什么移除？" class="headerlink" title="为什么移除？"></a>为什么移除？</h2><ol>
+<li>JavaSE集成JavaEE存在问题：相关性，版本</li>
+<li>Java EE的包可以很方便的从Maven等三方库获取</li>
+<li>并没多少人用JDK中的Java EE</li>
+</ol>
+<h1 id="HTTP-Client标准化"><a href="#HTTP-Client标准化" class="headerlink" title="HTTP Client标准化"></a>HTTP Client标准化</h1><p>HTTP Client：JDK9提出，JDK10更新，JDK11标准化</p>
+<p>从开始的孵化特性走向成熟，形成标准，有意思</p>
+<p>JDK HTTP Client可用于通过网络请求HTTP资源；</p>
+<ol>
+<li>它支持HTTP / 1.1和HTTP / 2</li>
+<li>包括同步和异步编程模型，还支持并发</li>
+<li>将请求和响应主体作为反应流处理</li>
+<li>遵循熟悉的Builder模式。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> HttpClient client = HttpClient.newHttpClient();</span><br><span class="line">    <span class="keyword">final</span> HttpRequest request = HttpRequest.newBuilder()</span><br><span class="line">            .uri(URI.create(<span class="string">"http://openjdk.java.net"</span>))</span><br><span class="line">            .build();</span><br><span class="line">    client.sendAsync(request, HttpResponse.BodyHandlers.ofString())</span><br><span class="line">            .thenApply(HttpResponse::body)</span><br><span class="line">            .thenAccept(System.out::println)</span><br><span class="line">            .join();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="java单文件运行"><a href="#java单文件运行" class="headerlink" title="java单文件运行"></a>java单文件运行</h1><p><a href="http://openjdk.java.net/jeps/330" target="_blank" rel="noopener">http://openjdk.java.net/jeps/330</a></p>
+<h2 id="以前运行java文件"><a href="#以前运行java文件" class="headerlink" title="以前运行java文件"></a>以前运行java文件</h2><img src="/2018/09/08/java/005-jdk11-new-feature/000.png">
+<img src="/2018/09/08/java/005-jdk11-new-feature/001.png">
+<h2 id="现在"><a href="#现在" class="headerlink" title="现在"></a>现在</h2><img src="/2018/09/08/java/005-jdk11-new-feature/002.png">
+<p>但是如果有内部类则找不到：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/003.png">
+<h1 id="Filght-Recorder-JFR"><a href="#Filght-Recorder-JFR" class="headerlink" title="Filght Recorder(JFR)"></a>Filght Recorder(JFR)</h1><p><a href="http://openjdk.java.net/jeps/328" target="_blank" rel="noopener">http://openjdk.java.net/jeps/328</a></p>
+<h2 id="干什么的"><a href="#干什么的" class="headerlink" title="干什么的"></a>干什么的</h2><ol>
+<li>提供用于生成和使用数据作为事件的API</li>
+<li>提供缓冲机制和二进制数据格式</li>
+<li>允许配置和过滤事件</li>
+<li>为OS，HotSpot JVM和JDK库提供事件</li>
+</ol>
+<h2 id="为什么需要"><a href="#为什么需要" class="headerlink" title="为什么需要"></a>为什么需要</h2><p>故障排除，监视和分析是开发生命周期中不可或缺的部分，但是在涉及实际数据的繁重负载下，某些问题仅发生在生产中。</p>
+<p>Flight Recorder记录来自应用程序，JVM和OS的事件。 事件存储在一个文件中，该文件可以附加到错误报告中并由支持工程师进行检查，允许事后分析导致问题时的问题。 工具可以使用API从记录文件中提取信息。</p>
+<p>飞行记录嘛：飞机飞行时的记录，对于程序就是程序运行时的记录，包括状态监控和数据收集等</p>
+<h2 id="如何启动"><a href="#如何启动" class="headerlink" title="如何启动"></a>如何启动</h2><img src="/2018/09/08/java/005-jdk11-new-feature/004.png">
+<img src="/2018/09/08/java/005-jdk11-new-feature/005.png">
+<h2 id="JFR-测试"><a href="#JFR-测试" class="headerlink" title="JFR-测试"></a>JFR-测试</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FlightRecorderTest</span> <span class="keyword">extends</span> <span class="title">Event</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Label</span>(<span class="string">"Hello World"</span>)</span><br><span class="line">    <span class="meta">@Description</span>(<span class="string">"Helps the programmer getting started"</span>)</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span> <span class="keyword">extends</span> <span class="title">Event</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Label</span>(<span class="string">"Message"</span>)</span><br><span class="line">        String message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        HelloWorld event = <span class="keyword">new</span> HelloWorld();</span><br><span class="line">        event.message = <span class="string">"hello, world!"</span>;</span><br><span class="line">        event.commit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行时加上命令行参数：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/006.png">
+<h2 id="读取记录"><a href="#读取记录" class="headerlink" title="读取记录"></a>读取记录</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> 读取jfr文件</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/26 16:52</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readRecordFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Path path = Paths.get(<span class="string">"E:\\ws\\Git\\java-version-compare\\myrecording.jfr"</span>);</span><br><span class="line">    <span class="keyword">final</span> List&lt;RecordedEvent&gt; recordedEvents = RecordingFile.readAllEvents(path);</span><br><span class="line">    <span class="keyword">for</span> (RecordedEvent event : recordedEvents) &#123;</span><br><span class="line">        System.out.println(event.getStartTime() + <span class="string">","</span> + event.getValue(<span class="string">"message"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<img src="/2018/09/08/java/005-jdk11-new-feature/007.png">
+<p><a href="https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/run.htm#JFRRT164" target="_blank" rel="noopener">https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/run.htm#JFRRT164</a></p>
+<h1 id="JDK11-低开销堆内存分析"><a href="#JDK11-低开销堆内存分析" class="headerlink" title="JDK11-低开销堆内存分析"></a>JDK11-低开销堆内存分析</h1><p>提供一种从JVM获取有关Java对象堆分配的信息的方法：</p>
+<ol>
+<li>低开销</li>
+<li>可通过定义明确的程序接口访问，</li>
+<li>可以对所有分配进行采样（即，不限于在一个特定堆区域中的分配或以一种特定方式分配的分配），</li>
+<li>可以以与实现无关的方式定义（即，不依赖于任何特定的GC算法或VM实现）</li>
+<li>以及可以提供有关实时和死Java对象的信息。</li>
+</ol>
+<h2 id="why"><a href="#why" class="headerlink" title="why"></a>why</h2><p>现有的堆内存工具：Java Flight Recorder, jmap, YourKit, and VisualVM</p>
+<p>现在获取Hotspot信息的方式：</p>
+<ol>
+<li><a href="https://github.com/google/allocation-instrumenter" target="_blank" rel="noopener">https://github.com/google/allocation-instrumenter</a></li>
+<li>Java Flight Recorder：只能记录，不能定制采样间隔，不能区分死/活对象</li>
+</ol>
+<h2 id="how"><a href="#how" class="headerlink" title="how"></a>how</h2><p>扩展了JVM TI：增加了分析接口</p>
+<p>JVMTI(JVM Tool Interface)： JDK1.5提出，一般是C，C++实现该接口，在JVM启动时加载</p>
+<p><a href="http://openjdk.java.net/jeps/331" target="_blank" rel="noopener">http://openjdk.java.net/jeps/331</a></p>
+<p>google开源内存分析工具：<a href="https://github.com/google/allocation-instrumenter" target="_blank" rel="noopener">https://github.com/google/allocation-instrumenter</a></p>
+<p>JVMTI介绍：<a href="https://en.wikipedia.org/wiki/Java_Virtual_Machine_Tools_Interface" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Java_Virtual_Machine_Tools_Interface</a></p>
+<p>Jvmti的使用：<a href="https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html</a></p>
+<h1 id="JDK11-无操作-No-Op-GC"><a href="#JDK11-无操作-No-Op-GC" class="headerlink" title="JDK11-无操作(No-Op)GC"></a>JDK11-无操作(No-Op)GC</h1><p>当堆内存枯竭时，JVM直接关闭，什么都不做 ，还有一个碉堡的名字：Epsilon </p>
+<h2 id="why-1"><a href="#why-1" class="headerlink" title="why"></a>why</h2><p>不同的垃圾回收器做不同的事嘛，存在即合理</p>
+<ol>
+<li>性能测试</li>
+<li>内存压力测试</li>
+<li>VM接口测试</li>
+<li>生存期极短Job测试</li>
+<li>延时高敏感程序测试</li>
+<li>吞吐量提高</li>
+</ol>
+<p>启动参数：<code>XX:+UseEpsilonGC</code></p>
+<p><a href="http://openjdk.java.net/jeps/318" target="_blank" rel="noopener">http://openjdk.java.net/jeps/318</a></p>
+<h1 id="JDK11-ZGC-实验性"><a href="#JDK11-ZGC-实验性" class="headerlink" title="JDK11-ZGC(实验性)"></a>JDK11-ZGC(实验性)</h1><p>Z垃圾回收器，也称为ZGC，是一个可扩展的低延迟(scalable low-latency)垃圾回收器.<br>ZGC是一个并发的，单例的，基于区域的，NUMA感知的压缩回收器。 Stop-the-world阶段仅限于根扫描，因此GC暂停时间不会随堆或活动集的大小而增加</p>
+<ol>
+<li>GC暂停时间不应超过10毫秒</li>
+<li>处理堆的大小从相对较小（几百MB）到非常大（TB）不等</li>
+<li>与使用G1相比，应用程序吞吐量减少不超过15％</li>
+<li>为未来的GC功能、优化利用彩色指针和负载屏障奠定基础</li>
+<li>最初支持的平台：Linux / x64</li>
+</ol>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>使用：Linux/x64下编译JDK时：<code>--with-jvm-features=zgc</code></p>
+<p>命令行参数：<code>XX:+UnlockExperimentalVMOptions  -XX:+UseZGC</code></p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>吞吐量：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/008.png">
+<p>暂停时间：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/009.png">
+<p><a href="http://openjdk.java.net/jeps/333" target="_blank" rel="noopener">http://openjdk.java.net/jeps/333</a></p>
+<h1 id="JDK11-TLS1-3"><a href="#JDK11-TLS1-3" class="headerlink" title="JDK11-TLS1.3"></a>JDK11-TLS1.3</h1><p>实现了传输层安全（TLS）协议RFC 8446的1.3版</p>
+<p>TLS 1.3是TLS协议的重大改进，与以前的版本相比，它提供了显著的安全性和性能改进。 其他供应商的几个早期实现已经可用。 我们需要支持TLS 1.3以保持竞争力并与最新标准保持同步。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">useTLS</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    String host = <span class="string">"www.baidu.com"</span>;</span><br><span class="line">    <span class="keyword">int</span> port = <span class="number">443</span>;</span><br><span class="line">    SocketFactory basicSocketFactory = SocketFactory.getDefault();</span><br><span class="line">    Socket s = basicSocketFactory.createSocket(host, port);</span><br><span class="line">    <span class="comment">/*s 是一个 TCP socket*/</span></span><br><span class="line">    SSLSocketFactory tlsSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();</span><br><span class="line">    s = tlsSocketFactory.createSocket(s, host, port, <span class="keyword">true</span>);</span><br><span class="line">    <span class="comment">/*s 现在是一个 基于TCP的TLS socket*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TLS参考：<a href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html</a> </p>
+<p><a href="http://openjdk.java.net/jeps/332" target="_blank" rel="noopener">http://openjdk.java.net/jeps/332</a></p>
+<p>RFC8446: <a href="https://tools.ietf.org/html/rfc8446" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc8446</a></p>
+<p>如何使用TLS：<a href="https://stackoverflow.com/questions/24868820/how-to-make-tls-work-with-java/24872636" target="_blank" rel="noopener">https://stackoverflow.com/questions/24868820/how-to-make-tls-work-with-java/24872636</a><br><a href="http://www.java2s.com/Tutorial/Java/0490__Security/SSLClientSession.htm" target="_blank" rel="noopener">http://www.java2s.com/Tutorial/Java/0490__Security/SSLClientSession.htm</a></p>
+<p>传输层 <a href="https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E5%B1%82" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E5%B1%82</a></p>
+<h1 id="JDK11-Curve25519-and-Curve448"><a href="#JDK11-Curve25519-and-Curve448" class="headerlink" title="JDK11-Curve25519 and Curve448"></a>JDK11-Curve25519 and Curve448</h1><p>RFC 7748定义了一种密钥协商方案，该方案比现有的椭圆曲线Diffie-Hellman（ECDH）方案更有效（原来的是C实现的，现在可以用纯Java实现）和安全。 此JEP的主要目标是API和此标准的实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">keyAgreementTest</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchAlgorithmException,</span></span><br><span class="line"><span class="function">        InvalidAlgorithmParameterException, InvalidKeySpecException, InvalidKeyException </span>&#123;</span><br><span class="line">    KeyPairGenerator kpg = KeyPairGenerator.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    NamedParameterSpec paramSpec = <span class="keyword">new</span> NamedParameterSpec(<span class="string">"X25519"</span>);</span><br><span class="line">    kpg.initialize(paramSpec);</span><br><span class="line">    KeyPair kp = kpg.generateKeyPair();</span><br><span class="line"></span><br><span class="line">    KeyFactory kf = KeyFactory.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    BigInteger u = <span class="keyword">new</span> BigInteger(<span class="string">"1212324324"</span>);</span><br><span class="line">    XECPublicKeySpec pubSpec = <span class="keyword">new</span> XECPublicKeySpec(paramSpec, u);</span><br><span class="line">    PublicKey pubKey = kf.generatePublic(pubSpec);</span><br><span class="line"></span><br><span class="line">    KeyAgreement ka = KeyAgreement.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    ka.init(kp.getPrivate());</span><br><span class="line">    ka.doPhase(pubKey, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">byte</span>[] secret = ka.generateSecret();</span><br><span class="line">    System.out.println(Arrays.toString(secret));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="http://openjdk.java.net/jeps/324" target="_blank" rel="noopener">http://openjdk.java.net/jeps/324</a></p>
+<p>RFC定义的椭圆算法：<a href="https://tools.ietf.org/html/rfc7748" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc7748</a></p>
+<h1 id="JDK11-Deprecate-Nashorn"><a href="#JDK11-Deprecate-Nashorn" class="headerlink" title="JDK11-Deprecate Nashorn"></a>JDK11-Deprecate Nashorn</h1><p>弃用Nashorn JavaScript脚本引擎和API以及jjs工具，在将来的版本中可能会删除它们，如果一群可靠的开发人员表达出对Nashorn前进的明确愿望，那么这个JEP可以取消的</p>
+<p>原因：随着ECMAScript语言构建的快速步伐以及API的调整和修改，JDK发现Nashorn难以维护</p>
+<p><a href="http://openjdk.java.net/jeps/335" target="_blank" rel="noopener">http://openjdk.java.net/jeps/335</a></p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/010.png">
+<h1 id="JDK11-基于Nest的访问控制"><a href="#JDK11-基于Nest的访问控制" class="headerlink" title="JDK11-基于Nest的访问控制"></a>JDK11-基于Nest的访问控制</h1><p>在以前的private public protected的基础上，JVM又提供了一种新的访问控制机制：Nest。</p>
+<p>Java代码都是以类为单位组织的，而且即使是在一个.java文件中的多个类也都会被分别编译为不同的.class类文件。但是对于开发者来说，在一个源文件中的代码在逻辑上应该是可以互相访问的，但是Java并不直接允许这样做。我们虽然可以在一个匿名内部类中访问外层类的成员方法，但是这实际上是通过编译器自动生成的所谓 访问桥(access bridge) 方法进行访问。这个解决方案在解决一部分问题的同时，也带来了如增加了不必要的程序大小和额外性能损耗等问题，而且很容易迷惑一部分Java程序员。</p>
+<p>而JDK 11带来的Nest就是一个更完善的解决方案。编译器现在把一些 看起来 是在一个类中的代码（如上面提到的匿名内部类）组织到Nest 中。而在同一个Nest中的类将会拥有同等的访问权限。这会让应用程序和字节码更加简单、安全，并对开发者透明。</p>
+<p>Java作为一种相对保守的语言，这是少数几个对《Java语言规范》和《Java虚拟机规范》做出较大改动的JEP之一。然而对于普通开发者，在通常的开发中也不会有很大的变动。但是对于反射的重度使用者或接触字节码工程的人来说，这个JEP还是有必要仔细了解一下的。</p>
+<p><a href="http://openjdk.java.net/jeps/181" target="_blank" rel="noopener">http://openjdk.java.net/jeps/181</a></p>
+<p><a href="https://xsun.io/2018/06/29/jdk11-preview/" target="_blank" rel="noopener">https://xsun.io/2018/06/29/jdk11-preview/</a></p>
+<h1 id="JDK11-其他更新"><a href="#JDK11-其他更新" class="headerlink" title="JDK11-其他更新"></a>JDK11-其他更新</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">更新到Unicode 10标准</span><br><span class="line">Java SE 10实现了Unicode 8.0。 Unicode 9.0增加了7,500个字符和6个新脚本，Unicode 10.0.0增加了8,518个字符和4个新脚本。 此升级将包括Unicode 9.0更改，因此添加了总共16,018个字符和10个新脚本。</span><br><span class="line">主要影响的类：</span><br><span class="line">Character and String in the java.lang package,</span><br><span class="line">NumericShaper in the java.awt.font package,</span><br><span class="line">Bidi, BreakIterator, and Normalizer in the java.text package.</span><br><span class="line"></span><br><span class="line">弃用Pack200工具和API</span><br><span class="line">在java.util.jar中弃用pack200和unpack200工具以及Pack200 API。</span><br><span class="line"></span><br><span class="line">实现ChaCha20和Poly1305密码算法</span><br><span class="line">实现RFC 7539中指定的ChaCha20和ChaCha20-Poly1305密码.ChaCha20是一种相对较新的流密码，可以替代旧的，不安全的RC4流密码。</span><br><span class="line"></span><br><span class="line">动态类文件常量</span><br><span class="line">这个JEP扩展了Java类文件格式来支持一种新形式的常量池，CONSTANT_Dynamic。它在初始化的时候，会像invokedynamic指令生成代理方法一样，委托给一个初始化方法进行创建。这是一个JVM内部的特性，对上层软件没有很大的影响，但是为Java语言未来的重大变化铺设了道路。</span><br></pre></td></tr></table></figure>
+<p>Unicode10：<a href="http://openjdk.java.net/jeps/327" target="_blank" rel="noopener">http://openjdk.java.net/jeps/327</a></p>
+<p>Pack200：<a href="http://openjdk.java.net/jeps/336" target="_blank" rel="noopener">http://openjdk.java.net/jeps/336</a></p>
+<p><a href="http://openjdk.java.net/jeps/309" target="_blank" rel="noopener">http://openjdk.java.net/jeps/309</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://dzone.com/articles/features-of-java-11" target="_blank" rel="noopener">https://dzone.com/articles/features-of-java-11
+</a></p>
+<p><a href="http://openjdk.java.net/jeps/320" target="_blank" rel="noopener">http://openjdk.java.net/jeps/320
+</a></p>
+<p><a href="http://openjdk.java.net/jeps/321" target="_blank" rel="noopener">http://openjdk.java.net/jeps/321</a></p>
+<p>HTTP Client的用法：<a href="http://openjdk.java.net/groups/net/httpclient/recipes.html" target="_blank" rel="noopener">http://openjdk.java.net/groups/net/httpclient/recipes.html</a></p>
+<p>Client介绍：<a href="http://openjdk.java.net/groups/net/httpclient/intro.html" target="_blank" rel="noopener">http://openjdk.java.net/groups/net/httpclient/intro.html</a></p>
+
+          </div>
+          
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/08/java/005-jdk11-new-feature/" data-id="cjy2i5vg8009nvqchd1zngz18" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
+
+      </footer>
+      </div>
+      
+        
+<nav id="article-nav">
+  
+    <a href="/2018/09/10/server/002-tomcat-config/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          tomcat配置
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/09/08/lang/011-kafka-stream/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">kafka stream</div>
+    </a>
+  
+</nav>
+
+          
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 11.88px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.13px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.38px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.25px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.63px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 11.88px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.25px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 13.13px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.63px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/14/linux/025-ubuntu-use-navidia-card/">ubuntu下使用NVIDIA显卡</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/14/tools/016-vscode-config/">vscode自定义配置</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/10/git/006-git-revert-deleted-files/">git-恢复之前版本误删的文件</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/09/basic/019-cs-basic-concept/">哪些必须知道的CS概念</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/08/life/022-weekly-learn/">2019-28-周报</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Jackpler<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
