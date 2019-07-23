@@ -86,6 +86,603 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-maven/003-maven-reknown" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/22/maven/003-maven-reknown/" class="article-date">
+  <time datetime="2019-03-22T03:02:59.000Z" itemprop="datePublished">2019-03-22</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/22/maven/003-maven-reknown/">maven再学习</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>共同学习把：</p>
+<p><a href="https://www.cnblogs.com/davenkin/p/advanced-maven-multi-module-vs-inheritance.html" target="_blank" rel="noopener">Maven提高篇系列</a></p>
+<p><a href="https://books.sonatype.com/mvnref-book/reference/pom-relationships.html" target="_blank" rel="noopener">maven book</a></p>
+<p>#<br>创建父模块<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> mvn archetype:generate -DgroupId=com.jimo -DartifactId=maven-multi -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=pom-root -DinteractiveMode=false</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> cd maven-multi</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> cat pom.xml </span><br><span class="line">&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</span><br><span class="line">  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span><br><span class="line">  &lt;groupId&gt;com.jimo&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;maven-multi&lt;/artifactId&gt;</span><br><span class="line">  &lt;packaging&gt;pom&lt;/packaging&gt;</span><br><span class="line">  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">  &lt;name&gt;maven-multi Maven Multi Project&lt;/name&gt;</span><br><span class="line">  &lt;url&gt;http://maven.apache.org&lt;/url&gt;</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure></p>
+<p>创建子模块<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">$ mvn archetype:generate -DgroupId=com.jimo -DartifactId=core -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=<span class="keyword">false</span></span><br><span class="line"></span><br><span class="line">$ cd core/</span><br><span class="line"></span><br><span class="line">core$ ls</span><br><span class="line">pom.xml  src</span><br><span class="line"></span><br><span class="line">core$ tree</span><br><span class="line">.</span><br><span class="line">├── pom.xml</span><br><span class="line">└── src</span><br><span class="line">    ├── main</span><br><span class="line">    │   └── java</span><br><span class="line">    │       └── com</span><br><span class="line">    │           └── jimo</span><br><span class="line">    │               └── App.java</span><br><span class="line">    └── test</span><br><span class="line">        └── java</span><br><span class="line">            └── com</span><br><span class="line">                └── jimo</span><br><span class="line">                    └── AppTest.java</span><br><span class="line"></span><br><span class="line"><span class="number">9</span> directories, <span class="number">3</span> files</span><br><span class="line"></span><br><span class="line">core$ cat pom.xml </span><br><span class="line">&lt;?xml version=<span class="string">"1.0"</span>?&gt;</span><br><span class="line">&lt;project xsi:schemaLocation=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span> xmlns=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span><br><span class="line">    xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span><br><span class="line">  &lt;parent&gt;</span><br><span class="line">    &lt;groupId&gt;com.jimo&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;maven-multi&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">  &lt;/parent&gt;</span><br><span class="line">  &lt;groupId&gt;com.jimo&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;core&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">  &lt;name&gt;core&lt;/name&gt;</span><br><span class="line">  &lt;url&gt;http:<span class="comment">//maven.apache.org&lt;/url&gt;</span></span><br><span class="line">  &lt;dependencies&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;junit&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;junit&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;3.8.1&lt;/version&gt;</span><br><span class="line">      &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">  &lt;/dependencies&gt;</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure></p>
+<p>返回父模块，发现pom已经变了：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">core$ cd ..</span><br><span class="line"></span><br><span class="line">maven-multi$ cat pom.xml </span><br><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</span><br><span class="line">&lt;project xmlns=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> xsi:schemaLocation=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span>&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span><br><span class="line">  &lt;groupId&gt;com.jimo&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;maven-multi&lt;/artifactId&gt;</span><br><span class="line">  &lt;packaging&gt;pom&lt;/packaging&gt;</span><br><span class="line">  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">  &lt;name&gt;maven-multi Maven Multi Project&lt;/name&gt;</span><br><span class="line">  &lt;url&gt;http:<span class="comment">//maven.apache.org&lt;/url&gt;</span></span><br><span class="line">  &lt;modules&gt;</span><br><span class="line">    &lt;module&gt;core&lt;/module&gt;</span><br><span class="line">  &lt;/modules&gt;</span><br></pre></td></tr></table></figure></p>
+<p>继续创建另一个模块webapp<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mvn archetype:generate -DgroupId=com.jimo -DartifactId=webapp -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=<span class="keyword">false</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mvn clean install</span><br></pre></td></tr></table></figure>
+<h1 id="学习后的问题总结"><a href="#学习后的问题总结" class="headerlink" title="学习后的问题总结"></a>学习后的问题总结</h1><ol>
+<li><p>maven的多模块和继承有什么区别？</p>
+<ol>
+<li>多模块： 在install时会把所有模块都安装到本地残酷，而继承只会安装父模块</li>
+<li>只有多模块声明时，当然不能共享pom了，每个子模块都得声明一套自己的依赖</li>
+</ol>
+</li>
+<li><p>如何搭建自己的仓库？</p>
+<ol>
+<li>nexus</li>
+<li>Artifactory</li>
+<li>FTP服务器</li>
+</ol>
+</li>
+<li><p>maven的profile作用是啥，怎么使用？</p>
+</li>
+<li><p>常用命令： </p>
+<ol>
+<li>tree命令 :<code>mvn dependency:tree -Dverbose</code></li>
+<li>查看从super-pom继承了哪些属性：<code>mvn help:effective-pom</code></li>
+</ol>
+</li>
+<li><p>如何写一个maven plugin出来？</p>
+</li>
+</ol>
+<pre class="line-numbers language-java"><code class="language-java">
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>共同学习把：</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/22/maven/003-maven-reknown/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/22/maven/003-maven-reknown/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/22/maven/003-maven-reknown/" data-id="cjyf3zlvh00hwuichsh9cs1in" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-java/037-jar-java-cmdline" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/20/java/037-jar-java-cmdline/" class="article-date">
+  <time datetime="2019-03-20T01:29:06.000Z" itemprop="datePublished">2019-03-20</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/20/java/037-jar-java-cmdline/">掌握java命令行编译打包</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>设想遇到这样一种情况： 你被派到一个网络环境封闭、只有shell访问的linux系统去修改代码，你的代码是以jar包形式运行的，<br>你要改的地方很少，就一行代码，你会怎么做？</p>
+<p>现在程序员都使用Eclipse或IDEA等集成开发工具， 几乎已经忘了命令行如何编译、打包，虽然这个不是天天遇到，但遇到了<br>就是体现差距的地方了。</p>
+<p>ok，针对上面的场景，我们创建一个实验环境。</p>
+<h1 id="实践过程"><a href="#实践过程" class="headerlink" title="实践过程"></a>实践过程</h1><p>我们的环境下有一个jar包（关于这个jar包怎么来的，请参加下面# 关于源文件以及打包过程）：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ls</span><br><span class="line">Hello.jar</span><br></pre></td></tr></table></figure></p>
+<p>查看下jar包内容：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ jar -tf Hello.jar </span><br><span class="line">META-INF/</span><br><span class="line">META-INF/MANIFEST.MF</span><br><span class="line">com/</span><br><span class="line">com/jimo/</span><br><span class="line">com/jimo/test/</span><br><span class="line">com/jimo/test/Test.class</span><br><span class="line">com/jimo/Hello.class</span><br></pre></td></tr></table></figure></p>
+<p>要改文件，肯定得解压出来呀：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ jar -xvf Hello.jar </span><br><span class="line">  已创建: META-INF/</span><br><span class="line">  已解压: META-INF/MANIFEST.MF</span><br><span class="line">  已创建: com/</span><br><span class="line">  已创建: com/jimo/</span><br><span class="line">  已创建: com/jimo/test/</span><br><span class="line">  已解压: com/jimo/test/Test.class</span><br><span class="line">  已解压: com/jimo/Hello.class</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ tree</span><br><span class="line">.</span><br><span class="line">├── com</span><br><span class="line">│   └── jimo</span><br><span class="line">│       ├── Hello.class</span><br><span class="line">│       └── test</span><br><span class="line">│           └── Test.class</span><br><span class="line">├── Hello.jar</span><br><span class="line">└── META-INF</span><br><span class="line">    └── MANIFEST.MF</span><br></pre></td></tr></table></figure>
+<p>然后替换新的jar包即可。</p>
+<h1 id="关于源文件以及打包过程"><a href="#关于源文件以及打包过程" class="headerlink" title="关于源文件以及打包过程"></a>关于源文件以及打包过程</h1><p>目录结构：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> tree com/</span><br><span class="line">com/</span><br><span class="line">└── jimo</span><br><span class="line">    ├── Hello.java</span><br><span class="line">    └── test</span><br><span class="line">        └── Test.java</span><br></pre></td></tr></table></figure></p>
+<p>源文件内容：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$ cat com/jimo/Hello.java </span><br><span class="line"><span class="keyword">package</span> com.jimo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.jimo.test.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[]args)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello, Jimo!"</span>);</span><br><span class="line">        Test.print();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//-------------------------------------------</span></span><br><span class="line"></span><br><span class="line">$ cat com/jimo/test/Test.java </span><br><span class="line"><span class="keyword">package</span> com.jimo.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"This is Test!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>编译： <code>-d</code>选项指定编译后文件存放目录<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> mkdir target</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> javac -d target/ com/jimo/*.java</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> ls</span><br><span class="line">com  target</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> tree target/</span><br><span class="line">target/</span><br><span class="line">└── com</span><br><span class="line">    └── jimo</span><br><span class="line">        ├── Hello.class</span><br><span class="line">        └── test</span><br><span class="line">            └── Test.class</span><br></pre></td></tr></table></figure></p>
+<p>打包成jar包：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 首先进入target目录</span><br><span class="line"><span class="meta">$</span> cd target</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 打包</span><br><span class="line"><span class="meta">$</span> jar cvf Hello.jar com</span><br><span class="line">'已添加清单</span><br><span class="line">正在添加: target/com/(输入 = 0) (输出 = 0)(存储了 0%)</span><br><span class="line">正在添加: target/com/jimo/(输入 = 0) (输出 = 0)(存储了 0%)</span><br><span class="line">正在添加: target/com/jimo/test/(输入 = 0) (输出 = 0)(存储了 0%)</span><br><span class="line">正在添加: target/com/jimo/test/Test.class(输入 = 405) (输出 = 286)(压缩了 29%)</span><br><span class="line">正在添加: target/com/jimo/Hello.class(输入 = 474) (输出 = 317)(压缩了 33%)</span><br></pre></td></tr></table></figure></p>
+<p>现在我们运行下jar包：发现报错了<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> java -jar Hello.jar </span><br><span class="line">Hello.jar中没有主清单属性</span><br></pre></td></tr></table></figure></p>
+<p>既然没有主清单文件，我们就创建一个，核心就是指定主类：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">target$</span> cat manifest </span><br><span class="line"></span><br><span class="line">Manifest-Version: 1.0</span><br><span class="line">Created-By: jimo</span><br><span class="line">Main-Class: com.jimo.Hello</span><br></pre></td></tr></table></figure></p>
+<p>然后重新打包运行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jar cvfm Hello.jar manifest com</span><br><span class="line">已添加清单</span><br><span class="line">正在添加: com/(输入 = 0) (输出 = 0)(存储了 0%)</span><br><span class="line">正在添加: com/jimo/(输入 = 0) (输出 = 0)(存储了 0%)</span><br><span class="line">正在添加: com/jimo/test/(输入 = 0) (输出 = 0)(存储了 0%)</span><br><span class="line">正在添加: com/jimo/test/Test.class(输入 = 405) (输出 = 286)(压缩了 29%)</span><br><span class="line">正在添加: com/jimo/Hello.class(输入 = 474) (输出 = 317)(压缩了 33%)</span><br><span class="line"></span><br><span class="line"><span class="meta">target$</span> java -jar Hello.jar </span><br><span class="line">Hello, Jimo!</span><br><span class="line">This is Test!</span><br></pre></td></tr></table></figure></p>
+<p>看下最后的结构：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ tree</span><br><span class="line">.</span><br><span class="line">├── com</span><br><span class="line">│   └── jimo</span><br><span class="line">│       ├── Hello.java</span><br><span class="line">│       └── test</span><br><span class="line">│           └── Test.java</span><br><span class="line">└── target</span><br><span class="line">    ├── com</span><br><span class="line">    │   └── jimo</span><br><span class="line">    │       ├── Hello.class</span><br><span class="line">    │       └── test</span><br><span class="line">    │           └── Test.class</span><br><span class="line">    ├── Hello.jar</span><br><span class="line">    └── manifest</span><br></pre></td></tr></table></figure></p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><ol>
+<li><p><a href="https://docs.oracle.com/javase/tutorial/deployment/jar/manifestindex.html" target="_blank" rel="noopener">Working with Manifest Files</a></p>
+</li>
+<li><p><a href="https://www.cnblogs.com/EasonJim/p/6485677.html" target="_blank" rel="noopener">关于MANIFEST.MF文件的解释</a></p>
+</li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>设想遇到这样一种情况： 你被派到一个网络环境封闭、只有shell访问的linux系统去修改代码，你的代码是以jar包形式运行的，<br>你要改的地方很少，就一行代码，你会怎么做？</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/20/java/037-jar-java-cmdline/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/20/java/037-jar-java-cmdline/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/20/java/037-jar-java-cmdline/" data-id="cjyf3zlu100cvuicho9ko48hr" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-db/007-pgsql-updateset-ambiguous-column" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/19/db/007-pgsql-updateset-ambiguous-column/" class="article-date">
+  <time datetime="2019-03-19T09:27:51.000Z" itemprop="datePublished">2019-03-19</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/19/db/007-pgsql-updateset-ambiguous-column/">pgsql update set ambiguous column</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文从一个问题出发，引申出pgsql的隐藏信息。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>执行下面的sql：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> region (region, cloud_uuid, controllerinfo,createTime, is_select )</span><br><span class="line"><span class="keyword">values</span> (<span class="string">'r'</span>,<span class="string">'c'</span>,<span class="string">'cc'</span>,<span class="keyword">now</span>(),<span class="string">'1'</span>)</span><br><span class="line"><span class="keyword">ON</span> CONFLICT(<span class="string">"cloud_uuid"</span>,<span class="string">"region"</span>) <span class="keyword">DO</span> <span class="keyword">UPDATE</span> <span class="keyword">SET</span></span><br><span class="line">  region=<span class="string">'r'</span>,cloud_uuid=<span class="string">'c'</span>,</span><br><span class="line">  controllerinfo=<span class="string">'cc'</span>,createTime=<span class="keyword">now</span>(),</span><br><span class="line">  is_select=(<span class="keyword">case</span> <span class="keyword">when</span> is_select=<span class="string">'0'</span> <span class="keyword">then</span> <span class="string">'0'</span> <span class="keyword">else</span> <span class="string">'1'</span> <span class="keyword">end</span>);</span><br></pre></td></tr></table></figure></p>
+<p>然后：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[42702] ERROR: column reference &quot;is_select&quot; is ambiguous</span><br></pre></td></tr></table></figure></p>
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>很明显，when后面的is_select被多个表引用，源于这是一个插入更新，会把原来的数据和要插入的数据分开:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ON CONFLICT DO UPDATE中的SET和WHERE子句可以使用表的名称（或别名）访问现有行，</span><br><span class="line">并使用excluded表访问将要插入的行。</span><br></pre></td></tr></table></figure></p>
+<p>所以： 访问要插入数据，使用excluded.columnxxx, 访问原来的数据，使用表或其别名.columnxxx</p>
+<p><a href="https://dba.stackexchange.com/questions/161127/column-reference-is-ambiguous-when-upserting-element-into-table" target="_blank" rel="noopener">column-reference-is-ambiguous-when-upserting-element-into-table</a></p>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>确定自己要引用的表，我这里是原来的表。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> region (region, cloud_uuid, controllerinfo,createTime, is_select )</span><br><span class="line"><span class="keyword">values</span> (<span class="string">'r'</span>,<span class="string">'c'</span>,<span class="string">'cc'</span>,<span class="keyword">now</span>(),<span class="string">'1'</span>)</span><br><span class="line"><span class="keyword">ON</span> CONFLICT(<span class="string">"cloud_uuid"</span>,<span class="string">"region"</span>) <span class="keyword">DO</span> <span class="keyword">UPDATE</span> <span class="keyword">SET</span></span><br><span class="line">  region=<span class="string">'r'</span>,cloud_uuid=<span class="string">'c'</span>,</span><br><span class="line">  controllerinfo=<span class="string">'cc'</span>,createTime=<span class="keyword">now</span>(),</span><br><span class="line">  is_select=(<span class="keyword">case</span> <span class="keyword">when</span> region.is_select=<span class="string">'0'</span> <span class="keyword">then</span> <span class="string">'0'</span> <span class="keyword">else</span> <span class="string">'1'</span> <span class="keyword">end</span>);</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文从一个问题出发，引申出pgsql的隐藏信息。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/19/db/007-pgsql-updateset-ambiguous-column/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/19/db/007-pgsql-updateset-ambiguous-column/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/19/db/007-pgsql-updateset-ambiguous-column/" data-id="cjyf3zlpb0029uichu9apn4tx" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pgsql/">pgsql</a><span class="article-tag-list-count">3</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-java/036-springboot-kafkatemplate" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/19/java/036-springboot-kafkatemplate/" class="article-date">
+  <time datetime="2019-03-19T06:56:41.000Z" itemprop="datePublished">2019-03-19</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/19/java/036-springboot-kafkatemplate/">springboot kafkaTemplate使用</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果能用spring-boot集成的组件当然是最好的。</p>
+<p><a href>项目地址</a></p>
+<h1 id="maven"><a href="#maven" class="headerlink" title="maven"></a>maven</h1><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.3.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">relativePath</span>/&gt;</span> <span class="comment">&lt;!-- lookup parent from repository --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.kafka<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-kafka<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html" target="_blank" rel="noopener">完整配置请点我</a></p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">8088</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  kafka:</span></span><br><span class="line"><span class="attr">    consumer:</span></span><br><span class="line"><span class="attr">      auto-commit-interval:</span> <span class="number">1000</span></span><br><span class="line"><span class="attr">      group-id:</span> <span class="string">logdowngroup1</span></span><br><span class="line"><span class="attr">      bootstrap-servers:</span> <span class="attr">h1:9092,h2:9092,h3:9092</span></span><br><span class="line"><span class="attr">      auto-offset-reset:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">      key-deserializer:</span> <span class="string">org.apache.kafka.common.serialization.StringDeserializer</span></span><br><span class="line"><span class="attr">      value-deserializer:</span> <span class="string">org.apache.kafka.common.serialization.StringDeserializer</span></span><br><span class="line"><span class="attr">      properties:</span></span><br><span class="line"><span class="attr">        rebalance:</span></span><br><span class="line"><span class="attr">          backoff:</span></span><br><span class="line"><span class="attr">            ms:</span> <span class="number">2000</span></span><br><span class="line"><span class="attr">          max:</span></span><br><span class="line"><span class="attr">            retries:</span> <span class="number">10</span></span><br><span class="line"><span class="attr">    producer:</span></span><br><span class="line"><span class="attr">      bootstrap-servers:</span> <span class="attr">h1:9092,h2:9092,h3:9092</span></span><br><span class="line"><span class="attr">      key-serializer:</span> <span class="string">org.apache.kafka.common.serialization.StringSerializer</span></span><br><span class="line"><span class="attr">      value-serializer:</span> <span class="string">org.apache.kafka.common.serialization.StringSerializer</span></span><br><span class="line"><span class="attr">      acks:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">      retries:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">      batch-size:</span> <span class="number">16384</span></span><br><span class="line"><span class="attr">      buffer-memory:</span> <span class="number">33554432</span></span><br><span class="line"><span class="attr">      properties:</span></span><br><span class="line"><span class="attr">        metadata:</span></span><br><span class="line"><span class="attr">          broker:</span></span><br><span class="line"><span class="attr">            list:</span> <span class="attr">h1:9092,h2:9092,h3:9092</span></span><br><span class="line"><span class="attr">        message:</span></span><br><span class="line"><span class="attr">          send:</span></span><br><span class="line"><span class="attr">            max:</span></span><br><span class="line"><span class="attr">              retries:</span> <span class="number">3</span></span><br><span class="line"><span class="attr">        linger:</span></span><br><span class="line"><span class="attr">          ms:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">        ssl:</span></span><br><span class="line"><span class="attr">          client:</span></span><br><span class="line"><span class="attr">            auth:</span> <span class="string">required</span></span><br></pre></td></tr></table></figure>
+<p>注意，里面properties是其他配置，如果对应的kafka没有这些配置，则不起作用，会打印警告日志：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">14</span>:<span class="number">51</span>:<span class="number">55.616</span>  WARN <span class="number">20894</span> --- [nio-<span class="number">8088</span>-exec-<span class="number">3</span>] o.a.k.clients.producer.ProducerConfig    :</span><br><span class="line"> The configuration <span class="string">'message.send.max.retries'</span> was supplied but isn<span class="string">'t a known config.</span></span><br><span class="line"><span class="string">2019-03-19 14:51:55.617  WARN 20894 --- [nio-8088-exec-3] o.a.k.clients.producer.ProducerConfig    : </span></span><br><span class="line"><span class="string">The configuration '</span>ssl.client.auth<span class="string">' was supplied but isn'</span>t a known config.</span><br><span class="line"><span class="number">2019</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">14</span>:<span class="number">51</span>:<span class="number">55.617</span>  WARN <span class="number">20894</span> --- [nio-<span class="number">8088</span>-exec-<span class="number">3</span>] o.a.k.clients.producer.ProducerConfig    :</span><br><span class="line"> The configuration <span class="string">'metadata.broker.list'</span> was supplied but isn<span class="string">'t a known config.</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>生产者：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.kafka.core.KafkaTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Producer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(Producer.class);</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String TOPIC = <span class="string">"users"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> KafkaTemplate&lt;String, String&gt; kafkaTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        logger.info(<span class="string">"&gt;&gt;&gt;&gt;&gt;------producer msg: [&#123;&#125;]"</span>, msg);</span><br><span class="line">        kafkaTemplate.send(TOPIC, msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>消费者：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.kafka.annotation.KafkaListener;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(Consumer.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@KafkaListener</span>(topics = Producer.TOPIC)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">consumes</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        logger.info(<span class="string">"&lt;&lt;&lt;&lt;&lt;------consumer msg:[&#123;&#125;]"</span>, msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>controller:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/kafka"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KafkaController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> Producer producer;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/publish"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sendMsg</span><span class="params">(@RequestParam(<span class="string">"msg"</span>)</span> String msg) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.producer.sendMessage(msg);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"send msg["</span> + msg + <span class="string">"] success!"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>访问：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl http://localhost:8088/kafka/publish?msg=hahah</span><br><span class="line">send msg[hahah] success!</span><br></pre></td></tr></table></figure></p>
+<p>log:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">15</span>:<span class="number">08</span>:<span class="number">05.959</span>  INFO <span class="number">20894</span> --- [nio-<span class="number">8088</span>-exec-<span class="number">7</span>] com.jimo.kafka.Producer                  </span><br><span class="line">: &gt;&gt;&gt;&gt;&gt;------producer msg: [hahah]</span><br><span class="line">2019-03-19 15:08:06.027  INFO 20894 --- [ntainer#0-0-C-1] com.jimo.kafka.Consumer                  </span><br><span class="line">: &lt;&lt;&lt;&lt;&lt;------consumer msg:[hahah]</span><br></pre></td></tr></table></figure></p>
+<h1 id="可配置"><a href="#可配置" class="headerlink" title="可配置"></a>可配置</h1><p>如果我们想让topic字段可配置，就需要做一点小改变：</p>
+<p><a href="https://github.com/spring-projects/spring-kafka/issues/132" target="_blank" rel="noopener">@KafkaListener的topic可以是SpEL表达式</a>,<br><a href="https://github.com/spring-projects/spring-kafka/issues/361" target="_blank" rel="noopener">或这个</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@KafkaListener</span>(topics = <span class="string">"$&#123;kafka.topic&#125;"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">consumes2</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">"&lt;&lt;&lt;&lt;&lt;------consumer2 msg:[&#123;&#125;]"</span>, msg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>producer同步发送：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;kafka.topic&#125;"</span>)</span><br><span class="line"><span class="keyword">private</span> String topic;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">sendMsgSync</span><span class="params">(String key, String msg)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">"&gt;&gt;&gt;&gt;&gt;------producer msg: [&#123;&#125;]"</span>, msg);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span>[] ok = &#123;<span class="keyword">true</span>&#125;;</span><br><span class="line">    ProducerRecord&lt;String, String&gt; record = <span class="keyword">new</span> ProducerRecord&lt;&gt;(topic, key, msg);</span><br><span class="line">    ListenableFuture&lt;SendResult&lt;String, String&gt;&gt; future = kafkaTemplate.send(record);</span><br><span class="line">    future.addCallback(<span class="keyword">new</span> ListenableFutureCallback&lt;SendResult&lt;String, String&gt;&gt;() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(@NonNull Throwable throwable)</span> </span>&#123;</span><br><span class="line">            logger.error(<span class="string">"sent message=[&#123;&#125;] failed!"</span>, msg, throwable);</span><br><span class="line">            ok[<span class="number">0</span>] = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(SendResult&lt;String, String&gt; result)</span> </span>&#123;</span><br><span class="line">            logger.info(<span class="string">"sent message=[&#123;&#125;] with offset=[&#123;&#125;] success!"</span>, msg, result.getRecordMetadata().offset());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 因为是异步发送，所以我们等待，最多10s</span></span><br><span class="line">        future.get(<span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException | ExecutionException | TimeoutException e) &#123;</span><br><span class="line">        logger.error(<span class="string">"waiting for kafka send finish failed!"</span>, e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ok[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>记得配置：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kafka:</span></span><br><span class="line"><span class="attr">  topic:</span> <span class="string">test</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="https://www.programcreek.com/java-api-examples/index.php?api=org.springframework.kafka.support.SendResult" target="_blank" rel="noopener">参考文章</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>如果能用spring-boot集成的组件当然是最好的。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/19/java/036-springboot-kafkatemplate/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/19/java/036-springboot-kafkatemplate/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/19/java/036-springboot-kafkatemplate/" data-id="cjyf3zltz00ctuich5tut0r16" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-linux/020-ubuntu-install-extensions" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/19/linux/020-ubuntu-install-extensions/" class="article-date">
+  <time datetime="2019-03-19T00:19:47.000Z" itemprop="datePublished">2019-03-19</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/19/linux/020-ubuntu-install-extensions/">ubuntu安装扩展/插件</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文翻译自<a href="https://linuxconfig.org/how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux</a></p>
+<p>本文将介绍3种方式安装ubuntu下gnome的extentions。</p>
+<h1 id="1-从ubuntu仓库安装"><a href="#1-从ubuntu仓库安装" class="headerlink" title="1.从ubuntu仓库安装"></a>1.从ubuntu仓库安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install gnome-shell-extensions</span><br></pre></td></tr></table></figure>
+<p>不过需要tweak-tool，18.x没有默认安装，需要手动：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo add-apt-repository universe</span><br><span class="line"><span class="meta">$</span> sudo apt install gnome-tweak-tool</span><br></pre></td></tr></table></figure></p>
+<img src="/2019/03/19/linux/020-ubuntu-install-extensions/000.png">
+<h1 id="2-使用firefox安装"><a href="#2-使用firefox安装" class="headerlink" title="2.使用firefox安装"></a>2.使用firefox安装</h1><ol>
+<li><p><a href="https://addons.mozilla.org/en-US/firefox/addon/gnome-shell-integration/" target="_blank" rel="noopener">安装firefox-gnome-shell扩展</a></p>
+</li>
+<li><p>安装chrome-gnome-shell: <code>$ sudo apt install chrome-gnome-shell</code></p>
+</li>
+<li><p>访问<a href="https://extensions.gnome.org" target="_blank" rel="noopener">gnome.org</a>选择需要的扩展，然后勾选为on即可：</p>
+ <img src="/2019/03/19/linux/020-ubuntu-install-extensions/001.png">
+</li>
+</ol>
+<h1 id="3-从源码安装"><a href="#3-从源码安装" class="headerlink" title="3.从源码安装"></a>3.从源码安装</h1><p>当然，在能获取到源码的前提下。</p>
+<p>// TODO</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文翻译自<a href="https://linuxconfig.org/how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux</a></p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/19/linux/020-ubuntu-install-extensions/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/19/linux/020-ubuntu-install-extensions/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/19/linux/020-ubuntu-install-extensions/" data-id="cjyf3zlv500gvuichib8gzhwa" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/firefox/">firefox</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">8</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-life/009-weekly-learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/18/life/009-weekly-learn/" class="article-date">
+  <time datetime="2019-03-18T00:11:57.000Z" itemprop="datePublished">2019-03-18</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/18/life/009-weekly-learn/">2019-12-周报</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这是2019年第12周周报。</p>
+<ol>
+<li><p>练习leetcode</p>
+</li>
+<li><p>stream流处理的特点：</p>
+<ol>
+<li>无存储：只是数据窗口</li>
+<li>一次性： 消费完了就没了</li>
+<li>惰性： 需要结果才计算</li>
+<li>函数式编程</li>
+</ol>
+</li>
+</ol>
+<ol start="3">
+<li>如何理解流： 只需掌握3个步骤：<ol>
+<li>创建： 集合的.stream() , Stream.of(…)</li>
+<li>中间步骤: filter, map, sort, limit/skip, distinct </li>
+<li>最终操作: forEach(), count(), collect()</li>
+</ol>
+</li>
+</ol>
+<ol start="4">
+<li>@Resource,@Inject,@Autowired的区别： <a href="https://www.baeldung.com/spring-annotations-resource-inject-autowire" target="_blank" rel="noopener">参考</a><ol>
+<li>@Resource:<ol>
+<li>name</li>
+<li>type</li>
+<li>qualifier</li>
+</ol>
+</li>
+<li>@Inject:<ol>
+<li>type</li>
+<li>qualifier</li>
+<li>name</li>
+</ol>
+</li>
+<li>@Autowired: 顺序和@Inject一样，只是是spring自带的注解</li>
+</ol>
+</li>
+</ol>
+<ol start="5">
+<li><p><a href="https://dzone.com/articles/an-interview-question-on-spring-singletons" target="_blank" rel="noopener">你怎么理解spring中的单例模式</a>:</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spring中的单例并不是只有一个实例，而是针对唯一的id只有一个实例对应，也就是引用是单例的。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://stackoverflow.com/questions/6371638/slf4j-how-to-log-formatted-message-object-array-exception" target="_blank" rel="noopener">slf4j logger format 占位符写法</a></p>
+</li>
+</ol>
+<ol start="7">
+<li><p>mysql-datediff(date1,date2): <code>SELECT DATEDIFF(&quot;2017-06-25&quot;, &quot;2017-06-27&quot;); == (-2)</code></p>
+</li>
+<li><p><a href="https://github.com/yuanliangding/books" target="_blank" rel="noopener">发现github上一个电子书库</a></p>
+</li>
+<li><a href="/2019/03/19/linux/020-ubuntu-install-extensions/" title="ubuntu安装扩展/插件">ubuntu安装扩展/插件</a>
+</li>
+<li><a href="/2019/03/19/db/007-pgsql-updateset-ambiguous-column/" title="pgsql update set ambiguous column">pgsql update set ambiguous column</a>
+</li>
+<li><a href="/2019/03/20/java/037-jar-java-cmdline/" title="掌握java命令行编译打包">掌握java命令行编译打包</a>
+</li>
+<li><p>复习了hbase的写法，hbaseTemplate的使用</p>
+</li>
+<li><a href="/2019/03/22/maven/003-maven-reknown/" title="maven再学习">maven再学习</a>
+</li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>这是2019年第12周周报。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/18/life/009-weekly-learn/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/18/life/009-weekly-learn/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/18/life/009-weekly-learn/" data-id="cjyf3zluf00ebuichfbnofzb6" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">17</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/014-chrome-flags" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/03/17/tools/014-chrome-flags/" class="article-date">
@@ -149,7 +746,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/17/tools/014-chrome-flags/" data-id="cjy2i5vi300g4vqchp8457y5p" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/17/tools/014-chrome-flags/" data-id="cjyf3zlwf00l2uich8erchqf1" class="article-share-link">
           Share
         </a>
         
@@ -231,12 +828,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/15/java/035-mybatis-mapkey/" data-id="cjy2i5vgs00bnvqchjxkuvspd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/15/java/035-mybatis-mapkey/" data-id="cjyf3zlty00couichv4kfyj1v" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -324,12 +921,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/14/java/034-jsch-interactive-shell-stream-redirect/" data-id="cjy2i5vgt00bqvqchtruki6w3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/14/java/034-jsch-interactive-shell-stream-redirect/" data-id="cjyf3zlty00cquichrfaoq3vc" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
 
       </footer>
       </div>
@@ -408,12 +1005,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/12/basic/016-java-interview/" data-id="cjy2i5vdp001mvqchj6dlcopv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/12/basic/016-java-interview/" data-id="cjyf3zlp4001muichg60yyuc7" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
 
       </footer>
       </div>
@@ -544,12 +1141,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/11/life/008-weekly-learn/" data-id="cjy2i5vfb006fvqchcz3flswh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/11/life/008-weekly-learn/" data-id="cjyf3zlug00eeuich5f3p7wsz" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">16</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">17</span></li></ul>
 
       </footer>
       </div>
@@ -636,12 +1233,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/033-spring-boot-overview/" data-id="cjy2i5vgr00bivqchu9u621kn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/033-spring-boot-overview/" data-id="cjyf3zltx00cluich288tpgiw" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -720,12 +1317,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/032-springboot-quartz/" data-id="cjy2i5vgr00blvqch1czae5fa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/032-springboot-quartz/" data-id="cjyf3zltv00cguich6ap9ijmi" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/quartz/">quartz</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/quartz/">quartz</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -834,12 +1431,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/031-java-process-memory-usage/" data-id="cjy2i5vgq00bgvqchyp9gty5v" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/031-java-process-memory-usage/" data-id="cjyf3zltu00cbuichwrl9d533" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">51</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
 
       </footer>
       </div>
@@ -921,12 +1518,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/030-spring-boot-build-source/" data-id="cjy2i5vgp00bdvqch8zi890vm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/030-spring-boot-build-source/" data-id="cjyf3zltw00cjuichenm1knhg" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -1034,12 +1631,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/04/life/007-weekly-learn/" data-id="cjy2i5vfa006dvqcho9yjatht" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/04/life/007-weekly-learn/" data-id="cjyf3zluf00e9uichp36h9jbl" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">16</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">23</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">17</span></li></ul>
 
       </footer>
       </div>
@@ -1112,12 +1709,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/01/life/006-chrome-theme/" data-id="cjy2i5vf9006cvqchzf7geeud" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/01/life/006-chrome-theme/" data-id="cjyf3zlue00e6uichmhu5r5y9" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chrome/">chrome</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">22</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chrome/">chrome</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">23</span></li></ul>
 
       </footer>
       </div>
@@ -1194,7 +1791,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/029-eureka-record/" data-id="cjy2i5vgo00bbvqchhuqudbzi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/029-eureka-record/" data-id="cjyf3zltv00ceuich1c3izrbx" class="article-share-link">
           Share
         </a>
         
@@ -1274,12 +1871,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/028-equals-hashcode/" data-id="cjy2i5vgn00b8vqchkbiw6dbb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/028-equals-hashcode/" data-id="cjyf3zlts00c6uichy8nydwpi" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
 
       </footer>
       </div>
@@ -1387,657 +1984,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/basic/015-xml/" data-id="cjy2i5vdp001lvqchkmu20mbu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/basic/015-xml/" data-id="cjyf3zlp4001luichwcbckhdd" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/xml/">xml</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-life/005-weekly-learn" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/02/27/life/005-weekly-learn/" class="article-date">
-  <time datetime="2019-02-27T01:21:37.000Z" itemprop="datePublished">2019-02-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/27/life/005-weekly-learn/">2019-9-周报</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>因为学的东西有点多，又有点杂，所以从这周开始，记录下自己的学习轨迹和内容，方便复习。</p>
-<ol>
-<li><p>spring的学习，深入到源码： <a href="/2019/02/21/java/025-spring-source/" title="spring source">spring source</a>， 关于我自己练习的代码：<a href></a></p>
-</li>
-<li><p>redis底层设计： <a href="/2019/02/21/lang/013-redis-design-principle/" title="redis design">redis design</a></p>
-</li>
-<li><p>把java创建对象复习了下： <a href="/2019/02/22/java/026-java-create-instance/" title="java create instance">java create instance</a></p>
-</li>
-<li><p>CGLib学习： <a href="/2019/02/25/java/027-cglib/" title="cglib">cglib</a></p>
-</li>
-<li><p>skip list,因为redis里用到，而我又是第一次见到： <a href="/2019/02/26/algorithm/002-skip-list/" title="skipList">skipList</a></p>
-</li>
-<li><p>事务和其隔离级别的复习, 理论不复习就会忘： <a href="https://juejin.im/post/5b00c52ef265da0b95276091" target="_blank" rel="noopener">事务</a></p>
-</li>
-<li><p>一个不错的博客作者：<a href="https://juejin.im/user/59fbb2daf265da4319559f3a/posts" target="_blank" rel="noopener">主页</a>, java学习面试地址，感觉作者能力也不是很强，单也有值得学习的地方： <a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">github</a></p>
-<ol>
-<li>先看了<a href="https://github.com/Snailclimb/JavaGuide#java-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6" target="_blank" rel="noopener">集合</a></li>
-</ol>
-</li>
-<li><p>复习了几个设计模式： 观察者、代理、责任链、策略模式</p>
-</li>
-<li><p>再学习XML： <a href="/2019/02/27/basic/015-xml/" title="xml again">xml again</a></p>
-</li>
-<li><p>关于java问题的再认识： <a href="/2019/02/27/java/028-equals-hashcode/" title="equals-hashcode">equals-hashcode</a></p>
-</li>
-<li><a href="/2019/02/27/java/029-eureka-record/" title="[eureka学习]">[eureka学习]</a>
-</li>
-</ol>
-<p>最后在周末复习一下，准备迎接下周的架构师学习。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>因为学的东西有点多，又有点杂，所以从这周开始，记录下自己的学习轨迹和内容，方便复习。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/02/27/life/005-weekly-learn/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/02/27/life/005-weekly-learn/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/life/005-weekly-learn/" data-id="cjy2i5vf9006avqch7scnhmyh" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">16</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-algorithm/002-skip-list" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/02/26/algorithm/002-skip-list/" class="article-date">
-  <time datetime="2019-02-26T05:49:14.000Z" itemprop="datePublished">2019-02-26</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/26/algorithm/002-skip-list/">skip list理解与java实现</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文学习跳跃表及其java代码实现。</p>
-<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p><a href="http://www.cl.cam.ac.uk/teaching/0506/Algorithms/skiplists.pdf" target="_blank" rel="noopener">论文来源</a></p>
-<p>学习其概念，看下面的文章：</p>
-<p><a href="http://blog.jobbole.com/111731/" target="_blank" rel="noopener">漫画算法：什么是跳跃表？</a></p>
-<p><a href="https://en.wikipedia.org/wiki/Skip_list" target="_blank" rel="noopener">wiki</a></p>
-<p><a href="https://redisbook.readthedocs.io/en/latest/internal-datastruct/skiplist.html" target="_blank" rel="noopener">redis里跳跃表的应用</a></p>
-<p>插入的动态图：</p>
-<img src="/2019/02/26/algorithm/002-skip-list/000.gif">
-<h1 id="实现跳跃表"><a href="#实现跳跃表" class="headerlink" title="实现跳跃表"></a>实现跳跃表</h1><p>参考：<a href="https://blog.csdn.net/brillianteagle/article/details/52206261" target="_blank" rel="noopener">算法导论33】跳跃表（Skip list）原理与java实现</a></p>
-<p>SkipListNode<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Objects;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> jimo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 19-2-26 下午4:03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SkipListNode</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> key;</span><br><span class="line">	<span class="keyword">public</span> T value;</span><br><span class="line">	<span class="keyword">public</span> SkipListNode&lt;T&gt; up, down, left, right;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> HEAD_KEY = Integer.MIN_VALUE;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TAIL_KEY = Integer.MAX_VALUE;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SkipListNode</span><span class="params">(<span class="keyword">int</span> key, T value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.key = key;</span><br><span class="line">		<span class="keyword">this</span>.value = value;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span> == o) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (o == <span class="keyword">null</span> || getClass() != o.getClass()) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		SkipListNode&lt;?&gt; that = (SkipListNode&lt;?&gt;) o;</span><br><span class="line">		<span class="keyword">return</span> key == that.key &amp;&amp;</span><br><span class="line">				Objects.equals(value, that.value);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Objects.hash(key, value);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">"["</span> + key + <span class="string">","</span> + value + <span class="string">"]"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>SkipList:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.jimo.structure.skiplist.SkipListNode.HEAD_KEY;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.jimo.structure.skiplist.SkipListNode.TAIL_KEY;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SkipList</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> SkipListNode&lt;T&gt; head, tail;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> nodes;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> level;</span><br><span class="line">	<span class="keyword">private</span> Random random;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> PROBABILITY = <span class="number">0.5</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SkipList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		random = <span class="keyword">new</span> Random();</span><br><span class="line">		head = <span class="keyword">new</span> SkipListNode&lt;&gt;(HEAD_KEY, <span class="keyword">null</span>);</span><br><span class="line">		tail = <span class="keyword">new</span> SkipListNode&lt;&gt;(TAIL_KEY, <span class="keyword">null</span>);</span><br><span class="line">		linkHorizontal(head, tail);</span><br><span class="line">		level = <span class="number">0</span>;</span><br><span class="line">		nodes = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> nodes == <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> nodes;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> SkipListNode&lt;T&gt; <span class="title">findNode</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = <span class="keyword">this</span>.head;</span><br><span class="line">		<span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">			<span class="keyword">while</span> (p.right.key != TAIL_KEY &amp;&amp; p.right.key &lt;= key) &#123;</span><br><span class="line">				p = p.right;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (p.down != <span class="keyword">null</span>) &#123;</span><br><span class="line">				p = p.down;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> p;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> SkipListNode&lt;T&gt; <span class="title">search</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = findNode(key);</span><br><span class="line">		<span class="keyword">if</span> (p.key == key) &#123;</span><br><span class="line">			<span class="keyword">return</span> p;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> k, T v)</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = findNode(k);</span><br><span class="line">		<span class="keyword">if</span> (k == p.key) &#123;</span><br><span class="line">			p.value = v;</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		SkipListNode&lt;T&gt; newNode = <span class="keyword">new</span> SkipListNode&lt;&gt;(k, v);</span><br><span class="line">		linkToRight(p, newNode);</span><br><span class="line">		<span class="keyword">int</span> currentLevel = <span class="number">0</span>;</span><br><span class="line">		<span class="comment">// 抛硬币</span></span><br><span class="line">		<span class="keyword">while</span> (random.nextDouble() &lt; PROBABILITY) &#123;</span><br><span class="line">			<span class="keyword">if</span> (currentLevel &gt;= level) &#123;</span><br><span class="line">				level++;</span><br><span class="line">				SkipListNode&lt;T&gt; p1 = <span class="keyword">new</span> SkipListNode&lt;&gt;(HEAD_KEY, <span class="keyword">null</span>);</span><br><span class="line">				SkipListNode&lt;T&gt; p2 = <span class="keyword">new</span> SkipListNode&lt;&gt;(TAIL_KEY, <span class="keyword">null</span>);</span><br><span class="line">				linkHorizontal(p1, p2);</span><br><span class="line">				linkVertical(p1, head);</span><br><span class="line">				linkVertical(p2, tail);</span><br><span class="line">				head = p1;</span><br><span class="line">				tail = p2;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// p移到上一层</span></span><br><span class="line">			<span class="keyword">while</span> (p.up == <span class="keyword">null</span>) &#123;</span><br><span class="line">				p = p.left;</span><br><span class="line">			&#125;</span><br><span class="line">			p = p.up;</span><br><span class="line"></span><br><span class="line">			SkipListNode&lt;T&gt; e = <span class="keyword">new</span> SkipListNode&lt;&gt;(k, <span class="keyword">null</span>);</span><br><span class="line">			linkToRight(p, e);</span><br><span class="line">			linkVertical(e, newNode);</span><br><span class="line">			newNode = e;</span><br><span class="line">			currentLevel++;</span><br><span class="line">		&#125;</span><br><span class="line">		nodes++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * n2 插在 n1后面</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@author</span> jimo</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@date</span> 19-2-26 下午4:19</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">linkToRight</span><span class="params">(SkipListNode&lt;T&gt; n1, SkipListNode&lt;T&gt; n2)</span> </span>&#123;</span><br><span class="line">		n2.left = n1;</span><br><span class="line">		n2.right = n1.right;</span><br><span class="line">		n1.right.left = n2;</span><br><span class="line">		n1.right = n2;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">linkHorizontal</span><span class="params">(SkipListNode&lt;T&gt; n1, SkipListNode&lt;T&gt; n2)</span> </span>&#123;</span><br><span class="line">		n1.right = n2;</span><br><span class="line">		n2.left = n1;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">linkVertical</span><span class="params">(SkipListNode&lt;T&gt; n1, SkipListNode&lt;T&gt; n2)</span> </span>&#123;</span><br><span class="line">		n1.down = n2;</span><br><span class="line">		n2.up = n1;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printByLevel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = <span class="keyword">this</span>.head;</span><br><span class="line">		<span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">			SkipListNode&lt;T&gt; tmp = p;</span><br><span class="line">			StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">			<span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">				sb.append(p).append(<span class="string">" "</span>);</span><br><span class="line">				p = p.right;</span><br><span class="line">			&#125;</span><br><span class="line">			System.out.println(sb.toString());</span><br><span class="line">			p = tmp.down;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="string">"empty"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">		SkipListNode&lt;T&gt; p = <span class="keyword">this</span>.head;</span><br><span class="line">		<span class="keyword">while</span> (p.down != <span class="keyword">null</span>) &#123;</span><br><span class="line">			p = p.down;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">while</span> (p.left != <span class="keyword">null</span>) &#123;</span><br><span class="line">			p = p.left;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (p.right != <span class="keyword">null</span>) &#123;</span><br><span class="line">			p = p.right;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">while</span> (p.right != <span class="keyword">null</span>) &#123;</span><br><span class="line">			sb.append(p);</span><br><span class="line">			sb.append(<span class="string">"\n"</span>);</span><br><span class="line">			p = p.right;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> sb.toString();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>Test:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		SkipList&lt;String&gt; skipList = <span class="keyword">new</span> SkipList&lt;&gt;();</span><br><span class="line">		skipList.put(<span class="number">2</span>, <span class="string">"like"</span>);</span><br><span class="line">		skipList.put(<span class="number">1</span>, <span class="string">"I"</span>);</span><br><span class="line">		skipList.put(<span class="number">3</span>, <span class="string">"Jimo"</span>);</span><br><span class="line">		skipList.put(<span class="number">5</span>, <span class="string">"much"</span>);</span><br><span class="line">		skipList.put(<span class="number">4</span>, <span class="string">"very"</span>);</span><br><span class="line">		skipList.put(<span class="number">8</span>, <span class="string">"I"</span>);</span><br><span class="line">		skipList.put(<span class="number">6</span>, <span class="string">","</span>);</span><br><span class="line">		skipList.put(<span class="number">9</span>, <span class="string">"do"</span>);</span><br><span class="line">		skipList.put(<span class="number">7</span>, <span class="string">"yes"</span>);</span><br><span class="line">		skipList.put(<span class="number">6</span>, <span class="string">"!"</span>);</span><br><span class="line">		System.out.println(skipList);</span><br><span class="line">		System.out.println(skipList.size());</span><br><span class="line">		skipList.printByLevel();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>可能的结果：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>,I]</span><br><span class="line">[<span class="number">2</span>,like]</span><br><span class="line">[<span class="number">3</span>,Jimo]</span><br><span class="line">[<span class="number">4</span>,very]</span><br><span class="line">[<span class="number">5</span>,much]</span><br><span class="line">[<span class="number">6</span>,!]</span><br><span class="line">[<span class="number">7</span>,yes]</span><br><span class="line">[<span class="number">8</span>,I]</span><br><span class="line">[<span class="number">9</span>,<span class="keyword">do</span>]</span><br><span class="line"></span><br><span class="line"><span class="number">9</span></span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">9</span>,<span class="keyword">null</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>] </span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">8</span>,<span class="keyword">null</span>] [<span class="number">9</span>,<span class="keyword">null</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>] </span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">2</span>,<span class="keyword">null</span>] [<span class="number">4</span>,<span class="keyword">null</span>] [<span class="number">6</span>,<span class="keyword">null</span>] [<span class="number">8</span>,<span class="keyword">null</span>] [<span class="number">9</span>,<span class="keyword">null</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>] </span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">1</span>,I] [<span class="number">2</span>,like] [<span class="number">3</span>,Jimo] [<span class="number">4</span>,very] [<span class="number">5</span>,much] [<span class="number">6</span>,!] [<span class="number">7</span>,yes] [<span class="number">8</span>,I] [<span class="number">9</span>,<span class="keyword">do</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>]</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文学习跳跃表及其java代码实现。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/02/26/algorithm/002-skip-list/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/02/26/algorithm/002-skip-list/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/26/algorithm/002-skip-list/" data-id="cjy2i5vd20006vqchqu9tq21c" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/data-structure/">data structure</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/027-cglib" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/02/25/java/027-cglib/" class="article-date">
-  <time datetime="2019-02-25T02:29:03.000Z" itemprop="datePublished">2019-02-25</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/25/java/027-cglib/">CGLib学习资源</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>学到spring aop原理时，发现一个cglib不太了解，特此记录下。</p>
-<h1 id="官方介绍"><a href="#官方介绍" class="headerlink" title="官方介绍"></a>官方介绍</h1><p>官方只有一个<a href="https://github.com/cglib/cglib/wiki" target="_blank" rel="noopener">github wiki页</a>,介绍很少，重要的就是cglib是干嘛的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cglib是一个功能强大，性能高，质量高的代码生成库，用于扩展JAVA类并在运行时实现接口。</span><br><span class="line"></span><br><span class="line">该库是免费软件，可以出于个人或商业目的自由重复使用。</span><br></pre></td></tr></table></figure>
-<p>有哪些项目用到了呢？ 看这里： <a href="https://github.com/cglib/cglib/wiki#projects" target="_blank" rel="noopener">projects</a></p>
-<p>既然这样，首先知道它的使用方式把。</p>
-<h1 id="使用cglib"><a href="#使用cglib" class="headerlink" title="使用cglib"></a>使用cglib</h1><p>怎么使用很简单，就不重复造轮子了，见 <a href="https://blog.csdn.net/zghwaicsdn/article/details/50957474" target="_blank" rel="noopener">blog</a>,<br><a href="https://dzone.com/articles/cglib-missing-manual" target="_blank" rel="noopener">老外的讲解-很详细</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>学到spring aop原理时，发现一个cglib不太了解，特此记录下。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/02/25/java/027-cglib/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/02/25/java/027-cglib/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/25/java/027-cglib/" data-id="cjy2i5vgm00b4vqchf6iwk23f" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cglib/">cglib</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/026-java-create-instance" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/02/22/java/026-java-create-instance/" class="article-date">
-  <time datetime="2019-02-22T08:49:53.000Z" itemprop="datePublished">2019-02-22</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/22/java/026-java-create-instance/">java创建对象的方式和差别</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文已例子和原理解释4种java创建对象的方式和原理。</p>
-<p>在此之前，我们以User类为例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"user default constructor..."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">		System.out.println(<span class="string">"constructor with name..."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> name;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="1-new"><a href="#1-new" class="headerlink" title="1.new"></a>1.new</h1><p>这种方式没什么好说的，主要从JVM的角度来看类的加载机制。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. new</span></span><br><span class="line">User user1 = <span class="keyword">new</span> User();</span><br></pre></td></tr></table></figure></p>
-<h1 id="2-反射"><a href="#2-反射" class="headerlink" title="2.反射"></a>2.反射</h1><p>下面是2种方式，区别在于第一种（<code>Class.forName().newInstance()</code>）只能调用无参构造方法。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">		<span class="comment">// 2. reflect</span></span><br><span class="line">		Class&lt;?&gt; cls = Class.forName(<span class="string">"com.jimo.ioc.User"</span>);</span><br><span class="line">		User user2 = (User) cls.newInstance();</span><br><span class="line"><span class="comment">///		User user3 = User.class.newInstance();</span></span><br><span class="line"></span><br><span class="line">		Constructor&lt;?&gt; c1 = cls.getDeclaredConstructor(String.class);</span><br><span class="line">		c1.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">		User user4 = (User) c1.newInstance(<span class="string">"jimo"</span>);</span><br></pre></td></tr></table></figure></p>
-<h1 id="3-clone"><a href="#3-clone" class="headerlink" title="3.clone()"></a>3.clone()</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h1 id="4-反序列化"><a href="#4-反序列化" class="headerlink" title="4.反序列化"></a>4.反序列化</h1><p>注意，我们采用的实现Serializable接口的方式：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 4. 序列化/反序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// write</span></span><br><span class="line">ObjectOutputStream out = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> FileOutputStream(<span class="string">"User.file"</span>));</span><br><span class="line">out.writeObject(user4);</span><br><span class="line">out.close();</span><br><span class="line"></span><br><span class="line"><span class="comment">// read</span></span><br><span class="line">ObjectInputStream in = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"User.file"</span>));</span><br><span class="line">User user5 = (User) in.readObject();</span><br><span class="line">System.out.println(user5.getName());</span><br></pre></td></tr></table></figure></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
-<li><a href="http://www.importnew.com/17964.html" target="_blank" rel="noopener">Java对象的序列化与反序列化</a></li>
-<li><a href="https://www.jianshu.com/p/4cc036dbef8d" target="_blank" rel="noopener">Java中创建对象的方式</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文已例子和原理解释4种java创建对象的方式和原理。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/02/22/java/026-java-create-instance/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/02/22/java/026-java-create-instance/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/22/java/026-java-create-instance/" data-id="cjy2i5vgl00azvqch039ts1is" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-lang/013-redis-design-principle" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/02/21/lang/013-redis-design-principle/" class="article-date">
-  <time datetime="2019-02-21T06:01:29.000Z" itemprop="datePublished">2019-02-21</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/21/lang/013-redis-design-principle/">redis设计和原理</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文是《redis设计与实现–黄健宏》一书的读后感和笔记。</p>
-<h1 id="SDS（simple-dynamic-string）"><a href="#SDS（simple-dynamic-string）" class="headerlink" title="SDS（simple dynamic string）"></a>SDS（simple dynamic string）</h1><p>简单动态字符串： redis自定义的字符串结构：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span> &#123;</span></span><br><span class="line">  <span class="comment">// 已经使用的长度</span></span><br><span class="line">  <span class="keyword">int</span> len;</span><br><span class="line">  <span class="comment">// 未使用的长度</span></span><br><span class="line">  <span class="keyword">int</span> <span class="built_in">free</span>;</span><br><span class="line">  <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>为什么不使用C语言的字符串字面量的原因：</p>
-<ol>
-<li>获取字符串长度复杂度为O(1), 而不是O(N)</li>
-<li>杜绝缓冲区溢出： 增加字符串内容而忘记分配合适的长度造成覆盖等</li>
-<li>减少修改字符串的内存重分配： 主要采用了2种策略<ol>
-<li>空间预分配： 低于1MB长度时，扩展会翻倍，超过1MB时每次多分配1MB</li>
-<li>惰性空间释放： 缩短字符串时并不内存分配，只是修改free的长度</li>
-</ol>
-</li>
-<li>二进制安全： 可以保存除文本外，图像、视频、音频等2进制信息，因为不以<code>\0</code>来判断结尾，而是len</li>
-<li>兼容部分C语言库函数： sds依然保留<code>\0</code>结尾，所以可以重复使用部分字符串函数。</li>
-</ol>
-<h1 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h1><p>list的数据结构</p>
-<p>单个节点: 是一个双向链表<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span></span><br><span class="line"></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> *value;</span><br><span class="line">&#125; listNode;</span><br></pre></td></tr></table></figure></p>
-<p>list结构：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">list</span> &#123;</span></span><br><span class="line">  listNode *head;</span><br><span class="line"></span><br><span class="line">  listNode *tail;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> len;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 几个函数 </span></span><br><span class="line">  <span class="keyword">void</span> (*dup)(<span class="keyword">void</span> *ptr);</span><br><span class="line">  <span class="keyword">void</span> (*<span class="built_in">free</span>)(<span class="keyword">void</span> *ptr);</span><br><span class="line">  <span class="keyword">void</span> (*match)(<span class="keyword">void</span> *ptr,<span class="keyword">void</span> *key);</span><br><span class="line">&#125; <span class="built_in">list</span>;</span><br></pre></td></tr></table></figure></p>
-<h1 id="dict"><a href="#dict" class="headerlink" title="dict"></a>dict</h1><p>保存键值对</p>
-<h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">  <span class="comment">// hash entry array</span></span><br><span class="line">  dictEntry **table;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// hash table size</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> size;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 用于计算索引值，总是等于size-1</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> sizemask;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// used size</span></span><br><span class="line">  <span class="keyword">unsigned</span> ling used;</span><br><span class="line">&#125; dictht;</span><br></pre></td></tr></table></figure>
-<p>下面是dictEntry: 每个entry后面可以跟一串entry， 用于到hash出的索引冲突时。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> &#123;</span></span><br><span class="line">  <span class="keyword">void</span> *key;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// value</span></span><br><span class="line">  <span class="keyword">union</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> *val;</span><br><span class="line">    <span class="keyword">uint64_t</span> u64;</span><br><span class="line">    <span class="keyword">int64_t</span> s64;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 链表</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; dictEntry;</span><br></pre></td></tr></table></figure></p>
-<p>下面才是字典的最后封装：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">  <span class="comment">// 类型特定函数</span></span><br><span class="line">  dictType *type;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 私有数据保存传给特定函数的可选参数</span></span><br><span class="line">  <span class="keyword">void</span> *privdata;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// hash table</span></span><br><span class="line">  dictht ht[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// rehash index: 当rehash没有进行时值为-1</span></span><br><span class="line">  <span class="keyword">int</span> rehashidx;</span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure></p>
-<ol>
-<li>hash table为什么需要2个？<br>因为ht[1]是在rehash时使用的，后面会说</li>
-<li>rehashidx的作用是啥？<br>是一个计数器，标记rehash的进度和是否完成。</li>
-<li>绘制出dict的数据结构图</li>
-</ol>
-<img src="/2019/02/21/lang/013-redis-design-principle/000.png">
-<h2 id="hash算法"><a href="#hash算法" class="headerlink" title="hash算法"></a>hash算法</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hash = dict-&gt;type-&gt;hashFunction(key);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 看到这里的sizemask的作用了把</span></span><br><span class="line">index = hash &amp; dict-&gt;ht[x].sizemask;</span><br></pre></td></tr></table></figure>
-<p>这个索引值就是dictEntry数组里的下标。</p>
-<p>hash算法： MurmurHash</p>
-<h2 id="冲突解决"><a href="#冲突解决" class="headerlink" title="冲突解决"></a>冲突解决</h2><p>采用链地址法： 采用前插法，在dictEntry形成链表。</p>
-<h2 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h2><ol>
-<li>为什么需要？<br>因为一段时间后hash表会变得要么很大，要么很少，为了维持一个负载均衡因子，会有2种可能：扩展和收缩。</li>
-<li>rehash的步骤？<ol>
-<li>分配空间给ht[1]<ol>
-<li>扩展： newSize &gt;= used*2</li>
-<li>收缩： newSize &gt;= used</li>
-</ol>
-</li>
-<li>转移，这是一个渐近的过程，并不是一下就过去了，后面会说</li>
-<li>释放ht[0], 交换ht[1]为ht[0]</li>
-</ol>
-</li>
-<li>什么时候hash表会扩展？<ol>
-<li>负载因子： load_factor = ht[0].used / ht[0].size</li>
-<li>当没有BGSAVE或BGREWRITEAOF在执行且负载因子&gt;=1, 不知什么时候会大于1？</li>
-<li>当上述命令在执行，且负载因子&gt;=5，执行时负载因子会变大，因为copy on write技术需要节约内存</li>
-</ol>
-</li>
-<li>什么时候收缩？<br>当负载因子 &lt; 0.1</li>
-</ol>
-<h2 id="渐近式rehash"><a href="#渐近式rehash" class="headerlink" title="渐近式rehash"></a>渐近式rehash</h2><ol>
-<li>why？<br>因为当键值对很大时，一次性转移会暂停服务，需要慢慢来</li>
-<li>步骤<ol>
-<li>这个过程会同时用到ht[0],ht[1]</li>
-<li>初始rehashidx设为0</li>
-<li>每移动一个key-value，rehashidx++</li>
-<li>直到完成，rehashidx重置为-1</li>
-</ol>
-</li>
-<li>在rehash阶段，CRUD怎么办？<br>修改会只在ht[1]上进行， 查询会从ht[0]到ht[1]</li>
-</ol>
-<h1 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h1><ol>
-<li>什么是跳跃表？解释其原理。<br>见： <a href="/2019/02/26/algorithm/002-skip-list/" title="skip list理解与java实现">skip list理解与java实现</a></li>
-<li>在redis中哪里用到了跳跃表？<br>2个地方：1.有序集合集（sorted set） 2.集群节点中用作内部数据结构</li>
-</ol>
-<h1 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h1><p>实际上，redis的键值都是对象。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">redisObject</span> &#123;</span></span><br><span class="line">  <span class="keyword">unsigned</span> type:<span class="number">4</span>;</span><br><span class="line">  <span class="keyword">unsigned</span> encoding:<span class="number">4</span>;</span><br><span class="line">  <span class="comment">// 指向底层数据结构的指针</span></span><br><span class="line">  <span class="keyword">void</span> *ptr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="type"><a href="#type" class="headerlink" title="type"></a>type</h2><p>有： <code>string, list, hash, set, zset</code>, 通过下面的命令可以查看：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span> SET msg "hello world"</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line"><span class="meta">redis&gt;</span> TYPE msg</span><br><span class="line">string</span><br></pre></td></tr></table></figure></p>
-<h2 id="encoding"><a href="#encoding" class="headerlink" title="encoding"></a>encoding</h2><p>表示使用哪种数据结构，有：<code>int,embstr,raw,hashtable,linkedlist,ziplist,intset,skiplist</code>,<br>可以使用<code>OBJECT ENCODING xxx</code>查看：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span> SET msg "hello string"</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line"><span class="meta">redis&gt;</span> OBJECT ENCODING msg</span><br><span class="line">"embstr"</span><br></pre></td></tr></table></figure></p>
-<p>一个数据结构可以有多种编码：</p>
-<ol>
-<li>string: int/raw/embstr</li>
-<li>list: ziplist/linkedlist</li>
-<li>hash: ziplist/hashtable</li>
-<li>set: intset/hashtable</li>
-<li>zset: ziplist/skiplist</li>
-</ol>
-<p>问： </p>
-<ol>
-<li>在什么条件由一种结构换到另一种？</li>
-<li>有什么是embstr呢？ 见下面。</li>
-</ol>
-<h2 id="string对象"><a href="#string对象" class="headerlink" title="string对象"></a>string对象</h2><p>字符串对象的编码可以是： int, raw, embstr</p>
-<ol>
-<li>long能存下的数字肯定是int编码</li>
-<li>小于等于39字节的恩字符串是 embstr</li>
-<li>大于39字节的是 raw，用sds存</li>
-</ol>
-<p>embstr与raw的区别？<br>embstr只分配一次内存就将redisObject和sds存好，也只需要释放一次，而raw是2次。</p>
-<p>long double类型的浮点数也是存的字符串对象， 在需要运算时才转换。</p>
-<h2 id="编码的转换"><a href="#编码的转换" class="headerlink" title="编码的转换"></a>编码的转换</h2><p>编码在一定条件是会转换的，比如：</p>
-<ol>
-<li>int会转为embstr或raw， 在整数中加入字符串时。</li>
-<li>embstr没有修改函数，要修改时也会转成raw。</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文是《redis设计与实现–黄健宏》一书的读后感和笔记。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/02/21/lang/013-redis-design-principle/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/02/21/lang/013-redis-design-principle/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/lang/013-redis-design-principle/" data-id="cjy2i5vf5005wvqcham1g0dc7" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/025-spring-source" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/02/21/java/025-spring-source/" class="article-date">
-  <time datetime="2019-02-21T03:27:42.000Z" itemprop="datePublished">2019-02-21</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/21/java/025-spring-source/">spring源码学习（一）</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>终于到了这一步，曾经无数次想过，没想到来得如此平缓。只要还在学习，就还在路上，就永远不晚。</p>
-<h1 id="IOC理解"><a href="#IOC理解" class="headerlink" title="IOC理解"></a>IOC理解</h1><h2 id="1-理解概念"><a href="#1-理解概念" class="headerlink" title="1.理解概念"></a>1.理解概念</h2><p><a href="https://jinnianshilongnian.iteye.com/blog/1413846" target="_blank" rel="noopener">Ioc和DI概念的理解</a>.</p>
-<p>然后问自己那几个问题：</p>
-<ol>
-<li>Ioc是什么，控制了什么，谁控制谁，反转了什么，谁反转谁</li>
-<li>DI是什么，谁依赖谁，依赖了什么，为什么依赖，谁注入了什么，给谁注入</li>
-<li>Ioc和DI的关系</li>
-</ol>
-<h2 id="2-学习源码"><a href="#2-学习源码" class="headerlink" title="2.学习源码"></a>2.学习源码</h2><p><a href="https://blog.csdn.net/lisongjia123/article/details/52129340" target="_blank" rel="noopener">Spring源码剖析——核心IOC容器原理</a></p>
-<h2 id="3-自己实现"><a href="#3-自己实现" class="headerlink" title="3.自己实现"></a>3.自己实现</h2><p>可以参考博客：<a href="https://segmentfault.com/a/1190000013130650" target="_blank" rel="noopener">blog1</a>, <a href="https://www.jianshu.com/p/72aeb5d94360" target="_blank" rel="noopener">blog2</a></p>
-<p>在此之前，需要熟悉java通过反射创建对象的方式： <a href="/2019/02/22/java/026-java-create-instance/" title="java创建对象的方式和差别">java创建对象的方式和差别</a></p>
-<p>// TODO</p>
-<h1 id="springmvc"><a href="#springmvc" class="headerlink" title="springmvc"></a>springmvc</h1><p>从理解到实现。</p>
-<p>传统的基于servlet的spring和spring5+里面的基于reactive stream的东西，都需要熟悉。</p>
-<h2 id="1-流程理解"><a href="#1-流程理解" class="headerlink" title="1.流程理解"></a>1.流程理解</h2><p>盗一下下面博客的图：</p>
-<img src="/2019/02/21/java/025-spring-source/000.png">
-<img src="/2019/02/21/java/025-spring-source/001.png">
-<h2 id="2-实现一个"><a href="#2-实现一个" class="headerlink" title="2.实现一个"></a>2.实现一个</h2><p><a href="https://my.oschina.net/liughDevelop/blog/1622646" target="_blank" rel="noopener">自己手写一个SpringMVC框架(简化)</a></p>
-<h1 id="AOP"><a href="#AOP" class="headerlink" title="AOP"></a>AOP</h1><p>aop是什么： 可以看作对OOP的一种扩展，目标是在扩展或增加新功能时解藕和，提高代码的可用性和灵活性。</p>
-<p>aop可以做什么： 日志、性能、安全、事务、异常等。</p>
-<p><a href="https://www.cnblogs.com/liuning8023/p/4343957.html" target="_blank" rel="noopener">Java 面向切面编程（Aspect Oriented Programming，AOP）—推荐，写的不错</a></p>
-<h2 id="1-原理理解"><a href="#1-原理理解" class="headerlink" title="1.原理理解"></a>1.原理理解</h2><p><a href="https://blog.csdn.net/dreamrealised/article/details/12885739" target="_blank" rel="noopener">AOP的底层实现-CGLIB动态代理和JDK动态代理</a></p>
-<a href="/2019/02/25/java/027-cglib/" title="关于CGLib的原理">关于CGLib的原理</a>
-<p>学习了原理之后问自己以下问题，直到能快速回答出来为止：</p>
-<ol>
-<li>AOP是一种模式，与OOP的区别是什么</li>
-<li>AOP要解决什么问题，常见的有哪些</li>
-<li>AOP中间有哪些概念，解释切面、切点、连接点、通知等概念以及他们的关系</li>
-<li>spring的AOP是怎么实现的，2种实现的区别和优缺点？</li>
-</ol>
-<h2 id="2-spring-AOP如何使用"><a href="#2-spring-AOP如何使用" class="headerlink" title="2.spring AOP如何使用"></a>2.spring AOP如何使用</h2><p>关于使用，推荐几篇博客，写的很仔细：</p>
-<ol>
-<li><a href="https://segmentfault.com/a/1190000007469982" target="_blank" rel="noopener">Spring AOP 实战</a></li>
-<li><a href="https://www.cnblogs.com/davidwang456/p/4013631.html" target="_blank" rel="noopener">基于注解的Spring AOP的配置和使用–转载</a></li>
-</ol>
-<p>学习完使用后问自己以下问题：</p>
-<ol>
-<li>实现AOP涉及的注解： <code>@Aspect, @PointCut</code>如何使用？</li>
-<li>切点的书写规则, 可以是某个包、类、方法、带有某个注解等</li>
-<li>通知的5种类型的含义和执行顺序：<code>@Before, @Around, @After, @AfterReturning, @AfterThrowing</code></li>
-</ol>
-<h2 id="2-实现AOP"><a href="#2-实现AOP" class="headerlink" title="2.实现AOP"></a>2.实现AOP</h2><p><a href="https://juejin.im/post/5c1c402b6fb9a049a570df27" target="_blank" rel="noopener">Spring系列之AOP的原理及手动实现</a>, 这篇文章介绍了aop涉及的设计模式。</p>
-<p><a href="https://github.com/lliyu/myspring/tree/master/src/main/java/aop" target="_blank" rel="noopener">他的源码实现</a></p>
-<p>跟着做一遍。</p>
-<h1 id="spring事务机制"><a href="#spring事务机制" class="headerlink" title="spring事务机制"></a>spring事务机制</h1><h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>参考文章：<a href="https://www.ibm.com/developerworks/cn/java/j-master-spring-transactional-use/index.html" target="_blank" rel="noopener">透彻的掌握 Spring 中@transactional 的使用</a></p>
-<p>然后问自己：</p>
-<ol>
-<li><code>@Transactional</code> 注解有哪些属性，分别代表什么意思？</li>
-<li><code>propagation</code>属性的3个级别什么意思？</li>
-<li><code>rollbackFor</code>在什么情况下不会回滚？</li>
-<li>只有public方法才有效吗？</li>
-<li>spring AOP的自调用问题： 非事务方法调用事务方法不会回滚</li>
-</ol>
-<h2 id="再深入一点"><a href="#再深入一点" class="headerlink" title="再深入一点"></a>再深入一点</h2><p>参考文章： <a href="https://juejin.im/post/5b00c52ef265da0b95276091" target="_blank" rel="noopener">可能是最漂亮的Spring事务管理详解</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>终于到了这一步，曾经无数次想过，没想到来得如此平缓。只要还在学习，就还在路上，就永远不晚。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/02/21/java/025-spring-source/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/02/21/java/025-spring-source/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/java/025-spring-source/" data-id="cjy2i5vgn00b6vqchupf8jiwm" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a><span class="article-tag-list-count">4</span></li></ul>
 
       </footer>
       </div>
@@ -2074,7 +2026,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 11.88px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.13px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.38px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.25px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.63px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 11.88px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.25px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 13.13px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.63px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 12.94px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.59px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2096,23 +2048,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/07/14/linux/025-ubuntu-use-navidia-card/">ubuntu下使用NVIDIA显卡</a>
+            <a href="/2019/07/23/linux/028-ubuntu-application-launcher/">ubuntu制作启动图标</a>
           </li>
         
           <li>
-            <a href="/2019/07/14/tools/016-vscode-config/">vscode自定义配置</a>
+            <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
           </li>
         
           <li>
-            <a href="/2019/07/10/git/006-git-revert-deleted-files/">git-恢复之前版本误删的文件</a>
+            <a href="/2019/07/17/java/049-spring-autowire-in-dependency/">spring无法注入依赖库中的bean</a>
           </li>
         
           <li>
-            <a href="/2019/07/09/basic/019-cs-basic-concept/">哪些必须知道的CS概念</a>
+            <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
           </li>
         
           <li>
-            <a href="/2019/07/08/life/022-weekly-learn/">2019-28-周报</a>
+            <a href="/2019/07/15/linux/026-centos-firewalld/">重新认识centos防火墙</a>
           </li>
         
       </ul>

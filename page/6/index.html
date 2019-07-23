@@ -86,6 +86,592 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-ansible/002-reusable-playbook" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/04/ansible/002-reusable-playbook/" class="article-date">
+  <time datetime="2019-01-04T09:54:32.000Z" itemprop="datePublished">2019-01-04</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/04/ansible/002-reusable-playbook/">创建可重用playbook</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>消除重复代码一直是程序员的目标，playbook也不例外。</p>
+<p>当一个playbook内容变得很大时，你就会想拆分了。</p>
+<p>拆分后，肯定要引入主剧本，这就有2种方式：<code>include/import</code>.</p>
+<h1 id="静态和动态引入"><a href="#静态和动态引入" class="headerlink" title="静态和动态引入"></a>静态和动态引入</h1><ol>
+<li>静态：使用<code>import</code>引入的；</li>
+<li>动态：使用<code>include</code>引入的。</li>
+</ol>
+<p>区别：</p>
+<ol>
+<li>静态引入的文件会在解析时被预处理，类似编译过程；</li>
+<li>动态引入的会在运行时才被处理</li>
+</ol>
+<p>当遇到如<code>tags</code>,<code>when</code>等选项：</p>
+<ol>
+<li>静态引入会将他们copy到所有子任务</li>
+<li>而动态只会应用到当前任务</li>
+</ol>
+<h1 id="使用权衡"><a href="#使用权衡" class="headerlink" title="使用权衡"></a>使用权衡</h1><p>使用<code>include * vs. import *</code>有一些优点，用户在选择时应考虑一些权衡：</p>
+<p>使用<code>include *</code>语句的主要优点是循环。当循环与include一起使用时，包含的任务或角色将对循环中的每个项执行一次。</p>
+<p>与<code>import *</code>语句相比，使用<code>include *</code>确实有一些限制：</p>
+<ol>
+<li>仅存在于动态包含内的标记不会显示在–list-tags输出中。</li>
+<li>仅存在于动态包含内的任务不会显示在–list-tasks输出中。</li>
+<li>不能使用<code>notify</code>来触发来自动态包含内的处理程序名称（请参阅下面的注释）。</li>
+<li>不能使用<code>--start-at-task</code>在动态包含内的任务中开启执行。</li>
+</ol>
+<p>与动态包含相比，使用<code>import *</code>也有一些限制：</p>
+<ol>
+<li>如上所述，循环根本不能与<code>import</code>一起使用。</li>
+<li>将变量用于目标文件或角色名称时，不能使用inventory中的变量（host/group变量等）。</li>
+</ol>
+<h1 id="import-playbook使用"><a href="#import-playbook使用" class="headerlink" title="import_playbook使用"></a>import_playbook使用</h1><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- import_playbook:</span> <span class="string">webservers.yml</span></span><br><span class="line"><span class="attr">- import_playbook:</span> <span class="string">databases.yml</span></span><br></pre></td></tr></table></figure>
+<h1 id="include-import-tasks使用"><a href="#include-import-tasks使用" class="headerlink" title="include/import_tasks使用"></a>include/import_tasks使用</h1><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># common_tasks.yml</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">placeholder</span> <span class="string">foo</span></span><br><span class="line"><span class="attr">  command:</span> <span class="string">/bin/foo</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">placeholder</span> <span class="string">bar</span></span><br><span class="line"><span class="attr">  command:</span> <span class="string">/bin/bar</span></span><br></pre></td></tr></table></figure>
+<p>然后引入：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">common_tasks.yml</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">- include_tasks:</span> <span class="string">common_tasks.yml</span></span><br></pre></td></tr></table></figure></p>
+<p>同时可以传递变量：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">jimo</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">jack</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">lily</span></span><br></pre></td></tr></table></figure></p>
+<p>用到handler中，我们先定义一个handler.yml:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># more_handlers.yml</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">  service:</span> <span class="string">name=apache</span> <span class="string">state=restarted</span></span><br></pre></td></tr></table></figure>
+<p>引入例子：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">- include_tasks:</span> <span class="string">more_handlers.yml</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">more_handlers.yml</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li><a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse.html</a></li>
+<li><a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_includes.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_includes.html</a></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>消除重复代码一直是程序员的目标，playbook也不例外。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/04/ansible/002-reusable-playbook/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/04/ansible/002-reusable-playbook/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/04/ansible/002-reusable-playbook/" data-id="cjyf3zloq000guich32w6n860" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-ansible/001-playbook" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/03/ansible/001-playbook/" class="article-date">
+  <time datetime="2019-01-03T04:34:58.000Z" itemprop="datePublished">2019-01-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/03/ansible/001-playbook/">ansible-playbook</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>在入门了之后就开始进阶把。</p>
+<p>本文来自<a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html" target="_blank" rel="noopener">playbooks简介</a></p>
+<p>先理解3个东西：</p>
+<ol>
+<li>playbook（剧本）</li>
+<li>tasks（任务）</li>
+<li>handler（处理）</li>
+</ol>
+<p>理解他们都是什么，关系是什么，怎么用。</p>
+<h1 id="playbook"><a href="#playbook" class="headerlink" title="playbook"></a>playbook</h1><p>只有一个剧本：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    http_port:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">    max_clients:</span> <span class="number">200</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">write</span> <span class="string">the</span> <span class="string">apache</span> <span class="string">config</span> <span class="string">file</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">/srv/httpd.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd.conf</span></span><br><span class="line"><span class="attr">    notify:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">running</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br><span class="line"><span class="attr">  handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure></p>
+<p>有多个剧本：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">write</span> <span class="string">the</span> <span class="string">apache</span> <span class="string">config</span> <span class="string">file</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">/srv/httpd.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd.conf</span></span><br><span class="line"></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">databases</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">postgresql</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">postgresql</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">that</span> <span class="string">postgresql</span> <span class="string">is</span> <span class="string">started</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">postgresql</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br></pre></td></tr></table></figure></p>
+<p>一眼就能看懂对把，还是学下基础知识。</p>
+<h1 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h1><h2 id="Host和User"><a href="#Host和User" class="headerlink" title="Host和User"></a>Host和User</h2><p>hosts: 遵循pattern模式<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br></pre></td></tr></table></figure></p>
+<p>remote_user可以为每个任务独有：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">test</span> <span class="string">connection</span></span><br><span class="line"><span class="attr">      ping:</span></span><br><span class="line"><span class="attr">      remote_user:</span> <span class="string">yourname</span></span><br></pre></td></tr></table></figure>
+<p>激活权限提升</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br></pre></td></tr></table></figure>
+<p>或者单独指定：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">started</span></span><br><span class="line"><span class="attr">      become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">      become_method:</span> <span class="string">sudo</span></span><br></pre></td></tr></table></figure></p>
+<p>切换用户：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  become_user:</span> <span class="string">postgres</span></span><br></pre></td></tr></table></figure>
+<p>提升：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  become_method:</span> <span class="string">su</span></span><br></pre></td></tr></table></figure></p>
+<p>如果需要指定密码，使用<code>--ask-become-pass</code>.</p>
+<p>对主机排序，改变运行顺序：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  order:</span> <span class="string">sorted</span></span><br><span class="line"><span class="attr">  gather_facts:</span> <span class="literal">False</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - debug:</span></span><br><span class="line"><span class="attr">        var:</span> <span class="string">inventory_hostname</span></span><br></pre></td></tr></table></figure>
+<h2 id="Task列表"><a href="#Task列表" class="headerlink" title="Task列表"></a>Task列表</h2><ol>
+<li>顺序执行</li>
+<li>冥等性： 执行一次和多次结果一样</li>
+<li>name属性：可读性输出</li>
+</ol>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">make</span> <span class="string">sure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">running</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br></pre></td></tr></table></figure>
+<p>直接写命令，参数这些很自由：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">enable</span> <span class="string">selinux</span></span><br><span class="line"><span class="attr">    command:</span> <span class="string">/sbin/setenforce</span> <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>shell和command关心返回值，也就是短路运算：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">and</span> <span class="string">ignore</span> <span class="string">the</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">/usr/bin/somecommand</span> <span class="string">||</span> <span class="string">/bin/true</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">and</span> <span class="string">ignore</span> <span class="string">the</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">/usr/bin/somecommand</span></span><br><span class="line"><span class="attr">    ignore_errors:</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure></p>
+<p>太长的命令可以缩进换行：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">Copy</span> <span class="string">ansible</span> <span class="string">inventory</span> <span class="string">file</span> <span class="string">to</span> <span class="string">client</span></span><br><span class="line"><span class="attr">    copy:</span> <span class="string">src=/etc/ansible/hosts</span> <span class="string">dest=/etc/ansible/hosts</span></span><br><span class="line">            <span class="string">owner=root</span> <span class="string">group=root</span> <span class="string">mode=0644</span></span><br></pre></td></tr></table></figure></p>
+<p>使用变量：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">create</span> <span class="string">a</span> <span class="string">virtual</span> <span class="string">host</span> <span class="string">file</span> <span class="string">for</span> <span class="string">&#123;&#123;</span> <span class="string">vhost</span> <span class="string">&#125;&#125;</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">somefile.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd/conf.d/&#123;&#123;</span> <span class="string">vhost</span> <span class="string">&#125;&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Hnadler"><a href="#Hnadler" class="headerlink" title="Hnadler"></a>Hnadler</h2><p>状态改变时执行的操作。</p>
+<p>例如：文件内容改变时，重启2个服务<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- name:</span> <span class="string">template</span> <span class="string">configuration</span> <span class="string">file</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    src:</span> <span class="string">template.j2</span></span><br><span class="line"><span class="attr">    dest:</span> <span class="string">/etc/foo.conf</span></span><br><span class="line"><span class="attr">  notify:</span></span><br><span class="line"><span class="bullet">     -</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="bullet">     -</span> <span class="string">restart</span> <span class="string">apache</span></span><br></pre></td></tr></table></figure></p>
+<p>相应的2个handler定义如下：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure></p>
+<p>在2.2版本后，可以使用listen，这样只需要notify一次： 通过监听主题<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br><span class="line"><span class="attr">      listen:</span> <span class="string">"restart web services"</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">        state:</span><span class="string">restarted</span></span><br><span class="line"><span class="attr">      listen:</span> <span class="string">"restart web services"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">everything</span></span><br><span class="line"><span class="attr">      command:</span> <span class="string">echo</span> <span class="string">"this task will restart the web services"</span></span><br><span class="line"><span class="attr">      notify:</span> <span class="string">"restart web services"</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="执行playbook"><a href="#执行playbook" class="headerlink" title="执行playbook"></a>执行playbook</h2><p>并行度10，fork 10：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible-playbook playbook.yml -f 10</span><br></pre></td></tr></table></figure></p>
+<p>再看一个复合例子：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">$</span> <span class="string">cat</span> <span class="string">playbook.yml</span> </span><br><span class="line"><span class="attr">- name:</span> <span class="string">top</span> <span class="string">playbook</span></span><br><span class="line"><span class="attr">  hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ping</span> <span class="string">ping</span></span><br><span class="line"><span class="attr">    ping:</span> </span><br><span class="line"><span class="attr">  - include:</span> <span class="string">tasks/echo1.yml</span> <span class="string">the_user=root</span></span><br><span class="line"><span class="attr">  - include:</span> <span class="string">tasks/echo2.yml</span></span><br><span class="line"><span class="attr">  handlers:</span></span><br><span class="line"><span class="attr">      - include:</span> <span class="string">handlers/handlers.yml</span></span><br></pre></td></tr></table></figure></p>
+<p>输出结果的方式</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>在入门了之后就开始进阶把。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/03/ansible/001-playbook/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/03/ansible/001-playbook/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/03/ansible/001-playbook/" data-id="cjyf3zloo000duichqtodq7hk" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-ansible/000-ansible-fresh" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/02/ansible/000-ansible-fresh/" class="article-date">
+  <time datetime="2019-01-02T08:38:38.000Z" itemprop="datePublished">2019-01-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/02/ansible/000-ansible-fresh/">ansible1-入门金殿</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>入门总是简单的，看看你有多快。</p>
+<p>关于ssh连接请查找相关知识。</p>
+<h1 id="一条命令格式"><a href="#一条命令格式" class="headerlink" title="一条命令格式"></a>一条命令格式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ansible PATTERNS -m MODULE -a PARAMS</span><br></pre></td></tr></table></figure>
+<p>只需要明白模式、模块、参数就可以实现命令行级别的使用了。</p>
+<h2 id="PATTERNS"><a href="#PATTERNS" class="headerlink" title="PATTERNS"></a>PATTERNS</h2><p><a href="https://docs.ansible.com/ansible/latest/user_guide/intro_patterns.html" target="_blank" rel="noopener">patterns</a></p>
+<p>可以分为3个部分：</p>
+<ol>
+<li>all/*， webservers[0-25]</li>
+<li>逻辑运算： &amp;/！</li>
+<li>正则表达式：~正则， <code>~(web|db).*\.example\.com</code></li>
+</ol>
+<h2 id="MODULE"><a href="#MODULE" class="headerlink" title="MODULE"></a>MODULE</h2><p>模块太多了，可以了解一下简单的：<br><a href="https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html" target="_blank" rel="noopener">ad-hoc</a></p>
+<p>大概有：</p>
+<ol>
+<li>ping</li>
+<li>shell</li>
+<li>copy</li>
+<li>file</li>
+<li>yum/apt/…</li>
+<li>user</li>
+<li>git</li>
+<li>service</li>
+<li>setup</li>
+</ol>
+<p>参数和模块对应。</p>
+<h1 id="连接方式"><a href="#连接方式" class="headerlink" title="连接方式"></a>连接方式</h1><p>当然是ssh，只是连接方式有区别。</p>
+<h2 id="SSH的key"><a href="#SSH的key" class="headerlink" title="SSH的key"></a>SSH的key</h2><p>不用说了。</p>
+<h2 id="密码登陆"><a href="#密码登陆" class="headerlink" title="密码登陆"></a>密码登陆</h2><p>加上<code>-k</code>选项。</p>
+<h1 id="Ansible配置文件"><a href="#Ansible配置文件" class="headerlink" title="Ansible配置文件"></a>Ansible配置文件</h1><ol>
+<li>配置文件优先顺序</li>
+<li>有哪些配置属性</li>
+</ol>
+<p><a href="https://ansible-tran.readthedocs.io/en/latest/docs/intro_configuration.html" target="_blank" rel="noopener">ansible config</a></p>
+<h1 id="hosts"><a href="#hosts" class="headerlink" title="hosts"></a>hosts</h1><p>对哪些机器执行，ansible里叫inventory（清单文件），这个hosts文件默认在<code>/etc/ansible/hosts</code>,不过我们可以在任何目录配置它。</p>
+<ol>
+<li>在工作目录新建ansible.cfg.</li>
+<li>加入配置： <code>inventory = hosts</code>, 注意，必须是在<code>[defaults]</code>模块下才行</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = hosts</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>入门总是简单的，看看你有多快。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/02/ansible/000-ansible-fresh/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/02/ansible/000-ansible-fresh/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/02/ansible/000-ansible-fresh/" data-id="cjyf3zloj0009uichtlvtzrun" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-tools/013-ssh" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/02/tools/013-ssh/" class="article-date">
+  <time datetime="2019-01-02T06:55:48.000Z" itemprop="datePublished">2019-01-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/02/tools/013-ssh/">SSH那些事</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>ssh已经无处不在，尤其是ansible完全依赖于ssh实现了无agent管理机器。</p>
+<h1 id="发布自己的public-key"><a href="#发布自己的public-key" class="headerlink" title="发布自己的public key"></a>发布自己的public key</h1><p>自己电脑 —访问—》 远程电脑</p>
+<p>自己电脑的public key —放到—&gt; 远程电脑的<code>.ssh/authorized_keys</code> .</p>
+<p>自己的public key：<br>自己生成：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh-keygen -t rsa</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/home/jack/.ssh/id_rsa): </span><br><span class="line">Enter passphrase (empty for no passphrase): </span><br><span class="line">Enter same passphrase again: </span><br><span class="line">Your identification has been saved in /home/jack/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved in /home/jack/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:XNTbM9mTiyFhjgsMG0R/5+Ou6LrBprvlRcxzIfY7dWE jack@jack</span><br><span class="line">The key's randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|    oo    ..     |</span><br><span class="line">|     o.  . o.    |</span><br><span class="line">|      =+ o=..E o.|</span><br><span class="line">|     .+++o+oo.*o.|</span><br><span class="line">|       =So.+..ooo|</span><br><span class="line">|    . . o.+ o. . |</span><br><span class="line">|     = . o .     |</span><br><span class="line">|    = o . o      |</span><br><span class="line">|   +o++o ...     |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> cat ~/.ssh/id_rsa.pub </span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDsP6P3B6JNmkI2xFMXfNUe8LSQC+fWgB7ifNU7uS2iv55dPiU5uWo0LMLW9SQhVHQeFl9V5ur8t19rCY1IoMvQNoSfEnWjN2PTO2rhbugqBBwVQzZLkyqfLtiMGdSIzQ1CFvoHQbX3fb2A70GXpoX8pa2P5TP4WJufsLKEamcnIXhdW8GVQif9Gf24VCYyUn+Omi3RdWHOdn1gQsLB7qfapO/t4vSURHYvdgy0AJ2bmJRBqCKseIEBXsdNy3VbL1DxSTU8kww20nSV4wa9OPxPMApdzPIiXxx+ow70KvgwrfBnc8gQ6yxzdBnyGHizU0TLWv3FLO5ZtDz+6v77zeZX jack@jack</span><br></pre></td></tr></table></figure></p>
+<p>然后复制到远程主机的<code>.ssh/authorized_keys</code>文件里。</p>
+<p>当然，也可以一句命令搞定：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub | ssh USER@HOST "mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys"</span><br></pre></td></tr></table></figure></p>
+<p>当然，还有个软件叫<a href="http://linux.die.net/man/1/ssh-copy-id" target="_blank" rel="noopener">ssh-copy-id</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>ssh已经无处不在，尤其是ansible完全依赖于ssh实现了无agent管理机器。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/02/tools/013-ssh/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/02/tools/013-ssh/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/02/tools/013-ssh/" data-id="cjyf3zlwg00l7uichsevsavd4" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-git/002-git-commit-wrong-person" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/01/git/002-git-commit-wrong-person/" class="article-date">
+  <time datetime="2019-01-01T01:45:34.000Z" itemprop="datePublished">2019-01-01</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/01/git/002-git-commit-wrong-person/">为什么git提交关联了错误的用户</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>前几天检查github提交历史，发现明明提交了，为什么绿格子没有点亮。然后引发了让我惊奇的事情。<br>因为我在2台电脑上提交过，都使用的SSH的方式，然后就出现了2个陌生的用户：</p>
+<img src="/2019/01/01/git/002-git-commit-wrong-person/000.png">
+<p>而且这2个账户还有自己单独的主页，虽然一看就知道才创建的。</p>
+<p>经过查找，发现了<a href="https://github.community/t5/Support-Protips/Why-is-my-commit-associated-with-the-wrong-person/ba-p/6728" target="_blank" rel="noopener">github社区的回答</a>.</p>
+<p>大概内容如下：</p>
+<ol>
+<li>github每次提交关联了3类用户：作者（修改文件的人）、提交者、推送者；</li>
+<li>提交者是通过邮件地址来确定的，不管是私有还是公有地址；</li>
+<li>查看一下提交者。</li>
+</ol>
+<p>通过命令行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ git log</span><br><span class="line">commit 5bca74ff5bcff3ffe9d21d96b4dfb3ba01309638</span><br><span class="line">Author: jimo &lt;11@11.com&gt;</span><br><span class="line">Date:   Mon Dec 31 23:18:58 2018 +0800</span><br><span class="line"></span><br><span class="line">    modify</span><br></pre></td></tr></table></figure></p>
+<p>或通过github网站（所有人都能看到）：在<a href="https://github.com/用户名/仓库/commit/id.patch" target="_blank" rel="noopener">https://github.com/用户名/仓库/commit/id.patch</a><br><img src="/2019/01/01/git/002-git-commit-wrong-person/001.png"></p>
+<p>可以看出果然不是我，而是一个jimo的人，但也和上面的用户对不上，所以是根据邮箱随便产生的把（我猜测）。</p>
+<p>那解决办法呢？</p>
+<p>将邮件改正确(就是github账户里验证过的邮箱)试试：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git config user.email &quot;yours&quot;</span><br></pre></td></tr></table></figure></p>
+<p>然后再修改提交就ok了：</p>
+<img src="/2019/01/01/git/002-git-commit-wrong-person/002.png">
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>前几天检查github提交历史，发现明明提交了，为什么绿格子没有点亮。然后引发了让我惊奇的事情。<br>因为我在2台电脑上提交过，都使用的SSH的方式，然后就出现了2个陌生的用户：</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/01/git/002-git-commit-wrong-person/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/01/git/002-git-commit-wrong-person/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/01/git/002-git-commit-wrong-person/" data-id="cjyf3zlpz0044uich7rsoylqz" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a><span class="article-tag-list-count">7</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-algorithm/001-week-algo" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/22/algorithm/001-week-algo/" class="article-date">
+  <time datetime="2018-12-22T14:46:02.000Z" itemprop="datePublished">2018-12-22</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/22/algorithm/001-week-algo/">week1-算法</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>还不知道写什么。</p>
+<p>也许这就是个不能延续的坑。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>还不知道写什么。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/12/22/algorithm/001-week-algo/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/12/22/algorithm/001-week-algo/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/12/22/algorithm/001-week-algo/" data-id="cjyf3zlod0004uicht100b6h1" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/algorithm/">algorithm</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-basic/013-consumer-driven-contracts" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/19/basic/013-consumer-driven-contracts/" class="article-date">
@@ -168,7 +754,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/19/basic/013-consumer-driven-contracts/" data-id="cjy2i5vdn001gvqchpucdanip" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/19/basic/013-consumer-driven-contracts/" data-id="cjyf3zlp3001guich29z01pzt" class="article-share-link">
           Share
         </a>
         
@@ -265,7 +851,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/17/basic/012-circuit-breaker/" data-id="cjy2i5vdn001evqchs0pwuscp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/17/basic/012-circuit-breaker/" data-id="cjyf3zlp2001euichq1i85g77" class="article-share-link">
           Share
         </a>
         
@@ -357,7 +943,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/14/tools/012-idea-question/" data-id="cjy2i5vi200g2vqch53d859jy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/14/tools/012-idea-question/" data-id="cjyf3zlwg00l5uich0jcw8924" class="article-share-link">
           Share
         </a>
         
@@ -502,12 +1088,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/14/algorithm/000-week-algo/" data-id="cjy2i5vd10005vqchtz1ydmds" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/14/algorithm/000-week-algo/" data-id="cjyf3zlof0006uicheuwdsepj" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/algorithm/">algorithm</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/algorithm/">algorithm</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
 
       </footer>
       </div>
@@ -577,12 +1163,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/12/hadoop/003-hdfs-cmd/" data-id="cjy2i5veo004cvqchfn4r8kd5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/12/hadoop/003-hdfs-cmd/" data-id="cjyf3zlrg008ruichdj8kzp7p" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -715,7 +1301,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/11/basic/011-microservice-trade-offs/" data-id="cjy2i5vdm001dvqchyn6rt9qa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/11/basic/011-microservice-trade-offs/" data-id="cjyf3zlp2001duichwosvdi3t" class="article-share-link">
           Share
         </a>
         
@@ -808,7 +1394,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/010-devops-culture/" data-id="cjy2i5vdl0019vqchzn69b8fb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/010-devops-culture/" data-id="cjyf3zlp1001buicho4hjdmdp" class="article-share-link">
           Share
         </a>
         
@@ -885,7 +1471,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/shell/002-join-list/" data-id="cjy2i5vhm00eovqch34l8g9g9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/10/shell/002-join-list/" data-id="cjyf3zlvv00j7uichafk5mjf0" class="article-share-link">
           Share
         </a>
         
@@ -971,7 +1557,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/009-observed-required/" data-id="cjy2i5vdk0015vqch1eoqt08g" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/009-observed-required/" data-id="cjyf3zloz0015uichw763c030" class="article-share-link">
           Share
         </a>
         
@@ -1069,7 +1655,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/09/basic/008-continuous-delivery/" data-id="cjy2i5vdk0016vqchceri6mps" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/09/basic/008-continuous-delivery/" data-id="cjyf3zlp00016uichq8srkap6" class="article-share-link">
           Share
         </a>
         
@@ -1254,7 +1840,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/06/basic/007-continuous-integration/" data-id="cjy2i5vdm001bvqchrinpanf6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/06/basic/007-continuous-integration/" data-id="cjyf3zlp10019uichvlvzz0qv" class="article-share-link">
           Share
         </a>
         
@@ -1342,7 +1928,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/04/basic/006-microservice-prerequisites/" data-id="cjy2i5vdi000zvqchydu8ip8z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/04/basic/006-microservice-prerequisites/" data-id="cjyf3zloz0013uichmbg51b2y" class="article-share-link">
           Share
         </a>
         
@@ -1483,7 +2069,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/30/basic/005-how-to-break-monolith-into-microservices/" data-id="cjy2i5vdj0014vqchw2zxj87d" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/11/30/basic/005-how-to-break-monolith-into-microservices/" data-id="cjyf3zloy0011uich6dlens4e" class="article-share-link">
           Share
         </a>
         
@@ -1558,633 +2144,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/29/java/022-jvm-monitor/" data-id="cjy2i5vgi00amvqch2mp9arpm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/11/29/java/022-jvm-monitor/" data-id="cjyf3zltm00biuichspmv1yxx" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/017-ubuntu-wallpaper-slide" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/" class="article-date">
-  <time datetime="2018-11-26T23:48:55.000Z" itemprop="datePublished">2018-11-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/">ubuntu设置桌面背景幻灯片</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>定时切换ubuntu18.04 桌面幻灯片。</p>
-<p>使用自带工具Shotwell即可。</p>
-<p>选中所有图片—》文件—》set as desktop slideshow.</p>
-<p><a href="http://ubuntuhandbook.org/index.php/2018/07/4-wallpaper-changer-ubuntu-18-04/" target="_blank" rel="noopener">4种方法设置</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>定时切换ubuntu18.04 桌面幻灯片。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/27/linux/017-ubuntu-wallpaper-slide/" data-id="cjy2i5vg0008pvqchi5d2iift" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">51</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">6</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-life/003-work-ready" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/26/life/003-work-ready/" class="article-date">
-  <time datetime="2018-11-26T12:11:26.000Z" itemprop="datePublished">2018-11-26</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/26/life/003-work-ready/">begin to work</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>how to quickly begin to work?</p>
-<h1 id="openvpn"><a href="#openvpn" class="headerlink" title="openvpn"></a>openvpn</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apt install openvpn</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 把config目录拷过来</span><br><span class="line"></span><br><span class="line">sudo openvpn --config client-lenovo.ovpn</span><br></pre></td></tr></table></figure>
-<h1 id="navicat"><a href="#navicat" class="headerlink" title="navicat"></a>navicat</h1><ol>
-<li><p>下载解压</p>
-</li>
-<li><p>解决中文乱码问题:<a href="https://blog.csdn.net/qq_41376740/article/details/80499545" target="_blank" rel="noopener">blog</a></p>
-</li>
-</ol>
-<h1 id="配置gitlab-ssh"><a href="#配置gitlab-ssh" class="headerlink" title="配置gitlab ssh"></a>配置gitlab ssh</h1><h1 id="下载项目并导入"><a href="#下载项目并导入" class="headerlink" title="下载项目并导入"></a>下载项目并导入</h1><p>记得切换分支i后再pull一下，保持最新代码。</p>
-<h1 id="IDEA-配置"><a href="#IDEA-配置" class="headerlink" title="IDEA 配置"></a>IDEA 配置</h1><ol>
-<li>给IDEA安装阿里的插件。</li>
-<li>注释模板</li>
-<li>修改快捷键（alt+w）</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>how to quickly begin to work?</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/26/life/003-work-ready/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/26/life/003-work-ready/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/26/life/003-work-ready/" data-id="cjy2i5vf80069vqch65b1y6n1" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">22</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/work/">work</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-life/002-just-forward" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/22/life/002-just-forward/" class="article-date">
-  <time datetime="2018-11-22T00:54:48.000Z" itemprop="datePublished">2018-11-22</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/22/life/002-just-forward/">只是向前</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>在一个早上，我突然自己内心狂躁。</p>
-<p>我的眼里只有前方，已经懒得回头看一看身后，我曾经学过的，曾经放下的，曾经想要的，曾经得不到的。</p>
-<p>然而，在紧张的生活进程里，如果回过头，会发现以前学过的忘了，曾经放下的还可以拿起，曾经想要的得到了，曾经得不到的也不想要了。</p>
-<p>回头看，这是个反思的过程，这是个总结的过程，我已经失去了过目不忘的本领，过了一日千里的学习能力，我剩下的只是经验的沉淀，加上自己的判断原则，我依然保持着对世间万物的批判，却已经没有改变他们的勇气。</p>
-<p>好多事情都在走回头路，发展的速度跟不上满足人们好奇心的速度，所以将以前的东西包装一下，人们也会愚蠢地被吸引，偶尔有人犹豫了一下，但也懒得思考了。在这个碎片化地信息时代，人们懒得思考了。</p>
-<p>一直向前不可避免，但不能阻止我的倒退。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>在一个早上，我突然自己内心狂躁。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/22/life/002-just-forward/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/22/life/002-just-forward/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/22/life/002-just-forward/" data-id="cjy2i5vf70064vqchx57zhkun" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">22</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-basic/004-microservices-martin-flower" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/15/basic/004-microservices-martin-flower/" class="article-date">
-  <time datetime="2018-11-15T00:56:46.000Z" itemprop="datePublished">2018-11-15</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/15/basic/004-microservices-martin-flower/">微服务-martin fowler</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文翻译自<a href="https://martinfowler.com/articles/microservices.html" target="_blank" rel="noopener">Martin Fowler的微服务</a></p>
-<p>“微服务” - 在拥挤的软件架构街道上又一个新名词。 虽然我们的自然倾向是通过轻蔑的眼神传递这些东西，但这一点术语描述了我们发现越来越有吸引力的软件系统风格。 我们已经看到许多项目在过去几年中使用了这种风格，到目前为止的结果是积极的，以至于对于我们的许多同事而言，这已经成为构建企业应用程序的默认样式。 然而，遗憾的是，没有太多信息可以概述微服务的风格以及如何实现。</p>
-<p>简而言之，微服务架构风格[1]是一种将单个应用程序开发为一套小型服务的方法，每个小型服务都在自己的进程中运行，并用轻量级机制（通常是HTTP资源API）进行通信。 这些服务围绕业务功能构建，可通过全自动部署机制独立部署。 这些服务至少可以集中管理，可以用不同的编程语言编写，并使用不同的数据存储技术。</p>
-<p>为了开始解释微服务架构，将它与整体应用架构进行比较是有用的：作为单个整体构建的单片应用程序。 企业应用程序通常由三个主要部分构成：客户端用户界面（由用户机器上的浏览器中运行的HTML页面和javascript组成）数据库（由插入到公共数据库管理中的许多表组成，通常是关系数据库管理系统）和服务器端应用程序。 服务器端应用程序将处理HTTP请求，执行逻辑，从数据库检索和更新数据，以及选择和填充要发送到浏览器的HTML视图。 这个服务器端应用程序是一个整体 - 一个逻辑可执行文件[2]。 对系统的任何更改都涉及构建和部署新版本的服务器端应用程序。</p>
-<p>这种单个服务器是构建这种系统的自然方式。 处理请求的所有逻辑都在一个进程中运行，允许您使用语言的基本功能将应用程序划分为类，函数和命名空间。 需要注意的是，您可以在开发人员的笔记本电脑上运行和测试应用程序，并使用部署管道确保对更改进行适当测试并将其部署到生产环境中。 您可以通过在负载均衡器后面运行许多实例来水平扩展整体。</p>
-<p>单个应用程序可以取得成功，但越来越多的人对它们感到沮丧 - 特别是在将更多应用程序部署到云中时。 变更周期联系在一起 - 对应用程序的一小部分进行了更改，需要重建和部署整个整体。 随着时间的推移，通常很难保持良好的模块化结构，使得更难以保持应该只影响该模块中的一个模块的更改。 扩展需要扩展整个应用程序，而不是需要更多资源的部分。</p>
-<img src="/2018/11/15/basic/004-microservices-martin-flower/000.png">
-<p>这些挫折导致产生了微服务架构风格：将应用程序构建为服务套件。 除了服务可独立部署和扩展的事实之外，每个服务还提供了一个牢固的模块边界，甚至允许以不同的编程语言编写不同的服务。 他们也可以由不同的团队管理。</p>
-<p>我们并不认为微服务风格是新颖的或创新的，其根源至少可以归结为Unix的设计原则。 但我们认为没有足够的人考虑微服务架构，如果使用它们，许多软件开发会更好。</p>
-<h1 id="微服务架构的特征"><a href="#微服务架构的特征" class="headerlink" title="微服务架构的特征"></a>微服务架构的特征</h1><p>我们不能说微服务架构风格有正式的定义，但我们可以尝试描述我们认为适合架构的共同特征。 与概述共同特征的任何定义一样，并非所有微服务架构都具有所有特征，但我们确实期望大多数微服务架构都具有大多数特征。 虽然我们的作者一直是这个相当宽松的社区的积极成员，但我们的目的是尝试描述我们在自己的工作中所看到的以及我们所知道的团队的类似努力。 特别是我们没有规定一些符合的定义。</p>
-<h2 id="通过服务进行组件化"><a href="#通过服务进行组件化" class="headerlink" title="通过服务进行组件化"></a>通过服务进行组件化</h2><p>只要我们参与软件行业，就一直希望通过将组件集成在一起来构建系统，就像我们在物理世界中看到事物的方式一样。 在过去的几十年中，我们已经看到了大多数语言平台的大型公共库的大量进展。</p>
-<p>在谈论组件时，我们遇到了定义组件的困难。 我们的定义是组件是可<strong>独立更换</strong>和<strong>升级</strong>的软件单元。</p>
-<p>微服务架构会使用依赖库，但他们将自己的软件组件化的主要方式是分解为服务。 我们将库定义为链接到程序中并调用内存中函数的组件，而服务是与Web服务请求或RPC等机制进行通信的<strong>进程外组件</strong>。 （这与许多面向对象程序中的服务对象的概念不同[3]。）</p>
-<p>将服务用作组件（而不是库）的一个主要原因是服务可以独立部署。 如果您在单个进程中有一个由多个库组成的应用程序[4]，则对任何单个组件的更改都会导致必须重新部署整个应用程序。 但是，如果将该应用程序分解为多个服务，您可以预期许多单个服务更改只需要重新部署该服务。 这不是绝对的，一些变化将改变服务接口，从而产生一些协调，但良好的微服务架构的目标是通过服务合同中的紧密服务边界和演化机制来最小化这些。</p>
-<p>将服务用作组件的另一个结果是更明确的组件接口。 大多数语言没有用于定义<a href="https://martinfowler.com/bliki/PublishedInterface.html" target="_blank" rel="noopener">显式发布接口</a>的良好机制。 通常，它只是文档和规程阻止客户端破坏组件的封装，导致组件之间过于紧密的耦合。 通过使用显式远程调用机制，服务可以更轻松地避免这种情况。</p>
-<p>使用这样的服务确实有缺点。 远程调用比进程内调用更昂贵，因此远程API需要更粗糙，这通常更难以使用。 如果您需要更改组件之间的职责分配，那么当您跨越流程边界时，这种行为的变化就更难。</p>
-<p>在第一次近似中，我们可以观察到服务映射到运行时进程，但这只是第一次近似。 服务可能包含多个始终一起开发和部署的进程，例如应用程序进程和仅由该服务使用的数据库。</p>
-<h2 id="围绕业务功能进行组织"><a href="#围绕业务功能进行组织" class="headerlink" title="围绕业务功能进行组织"></a>围绕业务功能进行组织</h2><p>在将大型应用程序拆分为多个部分时，通常管理侧重于技术层，从而导致UI团队，服务器端逻辑团队和数据库团队。 当团队按照这些方式分开时，即使是简单的更改也可能导致跨团队项目需要时间和预算批准。 一个聪明的团队将围绕这个进行优化，并为两个恶魔中的较小者提供丰富的优势 - 只需将逻辑强制应用到他们可以访问的任何应用程序中。 换句话说，逻辑无处不在。 这是康威定律[5]的一个例子。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">设计系统（广泛定义）的任何组织都将产生一种设计，其结构是组织通信结构的副本。</span><br><span class="line"></span><br><span class="line">- Melvyn Conway，1967年</span><br></pre></td></tr></table></figure>
-<img src="/2018/11/15/basic/004-microservices-martin-flower/001.png">
-<p>微服务通过围绕业务功能组织来划分服务的方法是不同的。 此类服务为该业务领域采用广泛的软件实现，包括用户界面，持久存储和任何外部协作。 因此，团队是跨职能的，包括开发所需的全部技能：用户体验，数据库和项目管理。</p>
-<img src="/2018/11/15/basic/004-microservices-martin-flower/002.png">
-<p>以这种方式组建的一家公司是 <a href="www.comparethemarket.com">www.comparethemarket.com</a>。 跨职能团队负责构建和运营每个产品，每个产品分为多个通过消息总线进行通信的单独服务。</p>
-<p>大型单片应用程序也可以围绕业务功能进行模块化，尽管这不是常见的情况。 当然，我们会敦促一个庞大的团队构建一个单一的应用程序，以便沿着业务线划分自己。 我们在这里看到的主要问题是，它们往往围绕太多的背景进行组织。 如果整体跨越许多这些模块化边界，团队的个别成员可能难以将它们装入短期记忆中。 此外，我们看到模块化生产线需要大量的纪律来执行。 服务组件所需的更明确的分离使得更容易保持团队边界清晰。</p>
-<h2 id="产品不是项目"><a href="#产品不是项目" class="headerlink" title="产品不是项目"></a>产品不是项目</h2><p>我们看到的大多数应用程序开发工作都使用项目模型：其目的是提供一些软件然后被认为是完成的。 完成后，软件将移交给维护组织，构建它的项目团队将被解散。</p>
-<p>微服务支持者倾向于避免使用这种模式，而更倾向于认为团队应该在其整个生命周期内拥有产品。 对此的一个共同启示是亚马逊的<a href="https://queue.acm.org/detail.cfm?id=1142065" target="_blank" rel="noopener">“你构建，运行它”</a>的概念，开发团队对生产中的软件负全部责任。 这使开发人员能够日常接触他们的软件在生产中的行为，并增加与用户的联系，因为他们必须承担至少一些支持负担。</p>
-<p>产品心态，与业务能力的联系紧密相连。 不是将软件视为一组要完成的功能，而是存在一种持续的关系，其中的问题是软件如何帮助其用户增强业务能力。</p>
-<p>没有理由为什么这种方法不能与单一应用程序一起使用，但较小的服务粒度可以使创建服务开发人员与其用户之间的个人关系变得更加容易。</p>
-<h2 id="智能endpoints和dump-pipes"><a href="#智能endpoints和dump-pipes" class="headerlink" title="智能endpoints和dump pipes"></a>智能endpoints和dump pipes</h2><p>在不同进程之间建立沟通结构时，我们已经看到许多产品和方法都强调将重要的智慧放入沟通机制本身。 一个很好的例子是企业服务总线（ESB），其中ESB产品通常包括用于消息路由，编排，转换和应用业务规则的复杂工具。</p>
-<p>微服务社区倾向于采用另一种方法：智能endpoints和dump pipes。 从微服务构建的应用程序旨在尽可能地分离和内聚 - 它们拥有自己的域逻辑，并且更像是传统Unix意义上的过滤器 - 接收请求，适当地应用逻辑并产生响应。 这些是使用简单的RESTish协议而不是复杂的协议（如WS-Choreography或BPEL或中央工具的编排）编排的。</p>
-<p>最常用的两种协议是带有资源API的HTTP请求-响应 和 轻量级消息传递[8]。 第一个最好的表达方式是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">成为网络，而不是在网络后面</span><br><span class="line"></span><br><span class="line">- 伊恩罗宾逊</span><br></pre></td></tr></table></figure></p>
-<p>微服务团队使用万维网（在很大程度上，Unix）构建的原则和协议。 经常使用的资源可以通过开发人员或操作人员的非常小的努力来缓存。</p>
-<p>常用的第二种方法是通过轻量级消息总线进行消息传递。 所选择的基础设施通常是愚蠢的（如同仅作为消息路由器那样愚蠢） - 诸如RabbitMQ或ZeroMQ之类的简单实现除了提供可靠的异步结构之外没有多大作用 - 智能仍然存在于生产和 消费信息; 在服务中。</p>
-<p>在整体应用中，组件在进程中执行，它们之间的通信是通过方法调用或函数调用。 将整体变为微服务的最大问题在于改变通信模式。 从内存中方法调用到RPC的简单转换会导致繁琐的通信无法正常执行。 相反，您需要用粗粒度的方法替换细粒度的通信。</p>
-<h2 id="去中心化治理"><a href="#去中心化治理" class="headerlink" title="去中心化治理"></a>去中心化治理</h2><p>集中治理的后果之一是在单一技术平台上实现标准化的趋势。 经验表明，这种方法是有限的 - 并非每个问题都是钉子而不是每个解决方案都是锤子。 我们更喜欢使用正确的工具来完成工作，而单片应用程序可以在一定程度上利用不同的语言，但这并不常见。</p>
-<p>将整体应用的组件拆分为服务，我们可以在构建每个组件时做出选择。 您想使用Node.js站立一个简单的报告页面吗？ 去吧。 C++是否适用于特别近乎实时的组件？ 精细。 您想要交换不同风格的数据库，以更好地适应一个组件的读取行为？ 我们有重建他的技术。</p>
-<p>当然，仅仅因为你可以做某事，并不意味着你应该 - 但以这种方式对系统进行划分意味着你可以选择。</p>
-<p>构建微服务的团队也更喜欢采用不同的标准方法。 他们不是使用在纸上某处写下的一组定义标准，而是更愿意生成有用的工具，其他开发人员可以使用它来解决与他们面临的类似问题。 这些工具通常从实现中收集并与更广泛的组共享，有时不仅仅是使用内部开源模型。 现在git和github已成为事实上的版本控制系统，开源实践在内部变得越来越普遍。</p>
-<p>Netflix是遵循这一理念的一个很好的例子。 共享有用的，尤其是经过实战考验的代码，因为库鼓励其他开发人员以类似的方式解决类似的问题，但如果需要，可以选择不同的方法。 共享库往往侧重于数据存储，进程间通信的常见问题，我们将在下面进一步讨论基础架构自动化。</p>
-<p>对于微服务社区来说，管理费用特别缺乏吸引力。这并不是说社区不重视服务合同。恰恰相反，因为往往会有更多。只是他们正在寻找管理这些合同的不同方式。<a href="https://martinfowler.com/bliki/TolerantReader.html" target="_blank" rel="noopener">容忍阅读器</a>和<a href="https://martinfowler.com/articles/consumerDrivenContracts.html" target="_blank" rel="noopener">消费者驱动合同</a>等模式通常应用于微服务。这些援助服务合同独立发展。在构建过程中执行消费者驱动的合同可以增强信心并快速反馈您的服务是否正常运行。事实上，我们知道澳大利亚的一个团队通过消费者驱动的合同推动新服务的建设。他们使用简单的工具，允许他们定义服务的合同。在编写新服务的代码之前，这将成为自动构建的一部分。然后，该服务仅在满足合同的情况下构建 - 这是在构建新软件时避免’YAGNI’(“YAGNI”或“You Aren’t Going To Need It 你不会需要它”是一个XP原则和劝告，直到你知道你需要它们才能添加功能) 困境的优雅方法。这些技术和围绕它们成长的工具通过减少服务之间的时间耦合来限制中央合同管理的需要。</p>
-<p>也许分散治理的最高点是由亚马逊推广的精神建立/运行它。 团队负责他们构建的软件的所有方面，包括全天候运行软件。 放弃这种责任水平绝对不是常态，但我们确实看到越来越多的公司将责任推向开发团队。 Netflix是另一个采用这种精神的组织[11]。 每天晚上凌晨3点被您的手机唤醒肯定是在编写代码时注重质量的强大动力。 这些想法与传统的集中治理模式相差甚远。</p>
-<h2 id="去中心化数据管理"><a href="#去中心化数据管理" class="headerlink" title="去中心化数据管理"></a>去中心化数据管理</h2><p>数据管理的分散化以多种不同的方式呈现。 在最抽象的层面上，它意味着世界的概念模型在不同系统之间会有所不同。 这是在大型企业中集成时的常见问题，客户的销售视图将与支持视图不同。 销售视图中称为客户的某些内容可能根本不会出现在支持视图中。 那些做的可能具有不同的属性和（更糟糕的）具有微妙不同语义的共同属性。</p>
-<p>此问题在应用程序之间很常见，但也可能在应用程序中发生，特别是当该应用程序分为单独的组件时。 一种有用的思考方式是<a href="https://martinfowler.com/bliki/BoundedContext.html" target="_blank" rel="noopener">有界上下文</a> 的领域驱动设计概念。 DDD将复杂域划分为多个有界上下文，并映射出它们之间的关系。 此过程对单片和微服务体系结构都很有用，但服务和上下文边界之间存在自然关联，这有助于澄清，正如我们在业务功能部分中所述，强化了分离。</p>
-<p>除了关于概念模型的分散决策之外，微服务还分散了数据存储决策。 虽然单一应用程序更喜欢单个逻辑数据库来存储持久性数据，但企业通常更喜欢跨越一系列应用程序的单个数据库 - 其中许多决策是通过供应商围绕许可的商业模型来实现的。 微服务更喜欢让每个服务管理自己的数据库，可以是相同数据库技术的不同实例，也可以是完全不同的数据库系统 - 这种方法称为<a href="https://martinfowler.com/bliki/PolyglotPersistence.html" target="_blank" rel="noopener">多语言持久性(Polyglot Persistence)</a>。 您可以在整体应用中使用多语言持久性，但它在微服务中更常出现。</p>
-<img src="/2018/11/15/basic/004-microservices-martin-flower/003.png">
-<p>跨微服务的分散数据对数据更新有影响。 处理更新的常用方法是在更新多个资源时使用事务来保证一致性。 这种方法通常用于整体结构中。</p>
-<p>使用这样的事务有助于保持一致性，但会产生显着的时间耦合，这在多个服务中是有问题的。 众所周知，分布式事务很难实现，因此微服务架构<a href="http://www.eaipatterns.com/ramblings/18_starbucks.html" target="_blank" rel="noopener">强调服务之间的无事务协调</a>，明确认识到一致性可能只是最终的一致性，而问题是通过补偿操作来处理的。</p>
-<p>选择以这种方式管理数据不一致 是许多开发团队面临的新挑战，但它通常与业务实践相匹配。 企业通常会处理一定程度的不一致，以便快速响应需求，同时采取某种逆转流程来应对错误。 只要修复错误的成本低于在更大的一致性下丢失业务的成本，那么权衡是值得的。</p>
-<h2 id="基础设施自动化"><a href="#基础设施自动化" class="headerlink" title="基础设施自动化"></a>基础设施自动化</h2><p>基础设施自动化技术在过去几年中发生了巨大变化 - 特别是云和AWS的发展降低了构建、部署和运行微服务的操作复杂性。</p>
-<p>许多使用微服务构建的产品或系统都是由具有丰富的<a href="https://martinfowler.com/bliki/ContinuousDelivery.html" target="_blank" rel="noopener">持续交付</a>和其前身<a href="https://martinfowler.com/articles/continuousIntegration.html" target="_blank" rel="noopener">持续集成</a>经验的团队构建的。 以这种方式构建软件的团队广泛使用基础设施自动化技术。 这在下面显示的构建管道中说明。</p>
-<img src="/2018/11/15/basic/004-microservices-martin-flower/004.png">
-<p>由于这不是关于持续交付的文章，我们将在这里注意几个关键功能。 我们希望尽可能多的信心，我们的软件正在运行，因此我们运行了大量的<strong>自动化测试</strong>。 软件“向上”的管道意味着我们自动部署到每个新环境。</p>
-<p>通过这些环境，整个应用程序将非常开心地构建、测试并推动。 事实证明，一旦你投资自动化的生产之路，那么部署更多应用程序似乎不再那么可怕了。 请记住，CD的目标之一就是使部署无聊，所以无论是一个还是三个应用程序，只要它仍然无聊就无所谓[12]。</p>
-<p>我们看到团队使用广泛的基础设施自动化的另一个领域是管理生产中的微服务。 与我们上面的断言相反，只要部署很无聊，整体和微服务之间没有太大的区别，每个部署的运营环境可能会截然不同。</p>
-<img src="/2018/11/15/basic/004-microservices-martin-flower/005.png">
-<h2 id="设计失败处理"><a href="#设计失败处理" class="headerlink" title="设计失败处理"></a>设计失败处理</h2><p>使用服务作为组件的结果是，需要设计程序让它们能够容忍服务的失败。 由于供应者不可用，任何服务调用都可能失败，客户必须尽可能优雅地对此做出响应。 与单片设计相比，这是一个缺点，因为它引入了额外的复杂性来处理它。 结果是微服务团队不断反思服务失败如何影响用户体验。 Netflix的Simian Army在工作日引发服务甚至数据中心的故障，以测试应用程序的弹性和监控。</p>
-<p>生产中的这种自动化测试足以让大多数操作组在休息一周之前就会出现这种情绪。 这并不是说整体式建筑风格不具备复杂的监控设置 - 在我们的经验中它不常见。</p>
-<p>由于服务可能随时发生故障，因此能够快速检测故障并在可能的情况下自动恢复服务非常重要。 微服务应用程序非常重视应用程序的实时监控，检查架构元素（数据库每秒获得多少请求）和业务相关度量（例如每分钟收到多少订单）。 语义监控可以提供出现问题的早期预警系统，从而触发开发团队跟进和调查。</p>
-<p>这对于微服务架构尤为重要，因为微服务对编排和<a href="https://martinfowler.com/eaaDev/EventCollaboration.html" target="_blank" rel="noopener">事件协作</a> 的偏好会导致紧急行为。 虽然许多权威人士赞扬偶然出现的价值，但事实是，新兴行为有时可能是一件坏事。 监控对于快速发现不良紧急行为至关重要，因此可以修复。</p>
-<p>整体结构可以像微服务一样透明 - 事实上，它们应该是。 不同之处在于您绝对需要知道在不同进程中运行的服务何时断开连接。 对于同一过程中的库，这种透明性不太可能有用。</p>
-<p>微服务团队希望看到针对每个服务的复杂监控和日志记录设置，例如显示上/下状态的仪表板以及各种运营和业务相关指标。 有关断路器状态，当前吞吐量和延迟的详细信息是我们经常遇到的其他示例。</p>
-<h2 id="进化设计"><a href="#进化设计" class="headerlink" title="进化设计"></a>进化设计</h2><p>微服务从业者通常来自进化设计背景，并将服务分解视为进一步的工具，使应用程序开发人员能够控制应用程序中的更改， 而不会降低变更速度。 变更控制并不一定意味着改变 - 通过正确的态度和工具，您可以对软件进行频繁，快速和良好控制的更改。</p>
-<p>每当您尝试将软件系统分解为组件时，您就面临着如何分割各个部分的决定 - 我们决定切割应用程序的原则是什么？ 组件的关键属性是独立替换和可升级性的概念[13]  - 这意味着我们寻找可以想象在不影响其协作者的情况下重写组件的点。 实际上，许多微服务组通过明确地期望许多服务被废弃而不是长期演变来进一步考虑这一点。</p>
-<p>Guardian网站是一个设计和构建为整体的应用程序的一个很好的例子，但是在微服务方向上不断发展。 monolith仍然是网站的核心，但他们更喜欢通过构建使用monolith API的微服务来添加新功能。 这种方法对于本质上是临时的功能尤其方便，例如处理体育赛事的专用页面。 网站的这一部分可以使用快速开发语言快速组合在一起，并在事件结束后删除。 我们在金融机构看到过类似的方法，为市场机会增加新服务，并在几个月甚至几周后丢弃。</p>
-<p>这种对可替换性的强调是模块化设计的更一般原则的一个特例， 即通过变化模式驱动模块化[14]。 您希望在同一模块中保持同时更改的内容。 很少变化的系统部分应该与目前正在经历大量流失的系统处于不同的服务中。 如果您发现自己反复更改两项服务，那就表明它们应该合并。</p>
-<p>将组件放入服务中可以为更细粒度的发布计划添加机会。 对于整体，任何更改都需要完整构建和部署整个应用程序。 但是，使用微服务，您只需要重新部署您修改的服务。 这可以简化并加快发布过程。 缺点是您必须担心一项服务的变化会打破其消费者。 传统的集成方法是尝试使用版本控制来解决这个问题，但微服务世界中的偏好仅仅是<a href="https://martinfowler.com/articles/enterpriseREST.html#versioning" target="_blank" rel="noopener">使用版本控制作为最后的手段</a>。 我们可以通过设计服务尽可能容忍提供者的变化来避免大量的版本控制。</p>
-<h1 id="微服务是未来吗？"><a href="#微服务是未来吗？" class="headerlink" title="微服务是未来吗？"></a>微服务是未来吗？</h1><p>我们写这篇文章的主要目的是解释微服务的主要思想和原则。 通过花时间来做到这一点，我们清楚地认为微服务架构风格是一个重要的想法 - 值得认真考虑企业应用程序。 我们最近使用这种方式构建了几个系统，并了解了其他使用和支持这种方法的人。</p>
-<p>我们知道谁在某种程度上开创了这种架构风格，包括亚马逊，Netflix，卫报，英国政府数字服务，realestate.com.au，Forward和comparethemarket.com。 2013年的会议周充满了一些公司的例子，这些公司正在转向可以归类为微服务的公司 - 包括Travis CI。 此外，有很多组织长期以来一直在做我们称之为微服务的东西，但没有使用过这个名字。 （通常这被标记为SOA  - 尽管如我们所说，SOA有许多相互矛盾的形式。[15]）</p>
-<p>然而，尽管有这些积极的经验，但我们并不认为我们确信微服务是软件架构的未来发展方向。 虽然到目前为止我们的经验与整体应用相比是积极的，但我们意识到没有足够的时间让我们做出充分的判断。</p>
-<p>通常，您的架构决策的真正后果只有在您制作它们几年后才会明显。 我们已经看到一个项目，其中一个强大的团队，对模块化的强烈渴望，已经构建了一个多年来已经腐朽的单片架构。 许多人认为，微服务不太可能出现这种衰退，因为服务边界是明确的，很难修补。 然而，在我们看到足够的系统具有足够的年龄之前，我们无法真正评估微服务架构是如何成熟的。</p>
-<p>人们可能会期望微服务成熟得很好。 在组件化的任何努力中，成功取决于软件在组件中的适用程度。 很难弄清楚组件边界的确切位置。 进化设计认识到正确边界的困难，因此很容易重构它们的重要性。 但是，当您的组件是具有远程通信的服务时，则重构比使用进程内库更难。 跨服务边界移动代码是困难的，任何接口更改都需要在参与者之间进行协调，需要添加向后兼容性层，并且测试变得更加复杂。</p>
-<p>另一个问题是如果组件没有干净地组成，那么您所做的就是将复杂性从组件内部转移到组件之间的连接。 这不仅仅是移动复杂性，而是将其移动到一个不那么明确且难以控制的地方。 当你看到一个小而简单的组件内部时，很容易认为事情会更好，同时缺少服务之间的混乱连接。</p>
-<p>最后，还有团队技能的因素。 新技术往往被更熟练的团队所采用。 但对于技能更高的团队来说，一种更有效的技术并不一定适用于技能较低的团队。 我们已经看到很多不太熟练的团队构建凌乱的单片架构，但是当微服务发生这种混乱时，需要花时间看看会发生什么。 一个糟糕的团队总是会创建一个糟糕的系统 - 很难说微服务是否可以减少这种情况下的混乱或使情况变得更糟。</p>
-<p>我们听到的一个合理的论点是，您不应该从微服务架构开始。 而是<a href="https://martinfowler.com/bliki/MonolithFirst.html" target="_blank" rel="noopener">从整体开始</a>，保持模块化，并在整体成为问题时将其拆分为微服务。 （虽然<a href="https://martinfowler.com/articles/dont-start-monolith.html" target="_blank" rel="noopener">这个建议并不理想</a>，但是好的进程内接口通常不是一个好的服务接口。）</p>
-<p>所以我们谨慎乐观地写下这个。 到目前为止，我们已经看到了足够的微服务风格，觉得它可能是<a href="https://martinfowler.com/microservices/" target="_blank" rel="noopener">一条值得走的路</a>。 我们无法确定最终会在哪里结束，但软件开发的挑战之一是您只能根据您当前必须提供的不完善信息做出决策。</p>
-<h1 id="旁注"><a href="#旁注" class="headerlink" title="旁注"></a>旁注</h1><h2 id="微服务有多大？"><a href="#微服务有多大？" class="headerlink" title="微服务有多大？"></a>微服务有多大？</h2><p>虽然“微服务”已经成为这种建筑风格的流行名称，但它的名字确实导致了对服务规模的不幸关注以及关于什么构成“微”的争论。 在我们与微服务从业者的对话中，我们看到了各种规模的服务。 报道的最大尺寸遵循亚马逊关于Two Pizza Team的概念（即整个团队可以由两个比萨饼喂养），意味着不超过十几个人。 在规模较小的规模上，我们已经看到了一个由六人组成的团队支持六项服务的设置。</p>
-<p>这导致了这样的问题：在这个尺寸范围内是否存在足够大的差异，即每个人的服务和每人服务的尺寸不应该集中在一个微服务标签下。 目前我们认为将它们组合在一起会更好，但当我们进一步探索这种风格时，我们肯定会改变主意。</p>
-<h2 id="微服务和SOA"><a href="#微服务和SOA" class="headerlink" title="微服务和SOA"></a>微服务和SOA</h2><p>当我们谈到微服务时，一个常见的问题是这是否只是我们十年前看到的面向服务架构（SOA）。这一点有其优点，因为微服务风格与一些SOA倡导者非常相似。然而，问题是SOA意味着<a href="https://martinfowler.com/bliki/ServiceOrientedAmbiguity.html" target="_blank" rel="noopener">太多不同的东西</a>，而且大多数时候我们遇到称为“SOA”的东西，它与我们在这里描述的样式有很大的不同，通常是因为我们专注于ESBs整合单片应用程序。</p>
-<p>特别是我们已经看到了许多拙劣的服务导向实现 - 从隐藏ESB [6]中的复杂性的趋势，到耗资数百万并且没有价值的失败的多年计划，到积极抑制变化的集中治理模型，有时很难看到过去的这些问题。</p>
-<p>当然，微服务社区中使用的许多技术都是从开发人员在大型组织中集成服务的经验中发展而来的。<a href="https://martinfowler.com/bliki/TolerantReader.html" target="_blank" rel="noopener">容忍读者模式</a>就是一个例子。使用网络的努力做出了贡献，使用简单的协议是从这些经验中获得的另一种方法 - 远离中心标准的反应，这种标准已达到复杂性，<a href="http://wiki.apache.org/ws/WebServiceSpecifications" target="_blank" rel="noopener">坦率地说，令人惊叹</a>。 （只要你需要一个本体来管理你的本体，你就知道你遇到了很大的麻烦。）</p>
-<p>SOA的这种常见表现导致一些微服务提倡者完全拒绝SOA标签，尽管其他人认为微服务是SOA的一种形式[7]，也许服务导向正确。无论哪种方式，SOA代表这些不同的事物 意味着有一个更清晰地定义这种建筑风格的术语是有价值的。</p>
-<h2 id="许多语言，很多选择"><a href="#许多语言，很多选择" class="headerlink" title="许多语言，很多选择"></a>许多语言，很多选择</h2><p>JVM作为一个平台的发展只是在一个通用平台中混合语言的最新例子。 通常的做法是采用更高级别的语言来利用几十年来更高级别的抽象。 正如下降到裸机并将性能敏感代码写入较低级别的代码。 然而，许多整体应用不需要这种级别的性能优化，也不需要DSL和更高级别的抽象（令我们沮丧）。 相反，单一应用通常是单一语言，其趋势是限制使用的技术数量[10]。</p>
-<h2 id="经过实战检验的标准和强制执行的标准"><a href="#经过实战检验的标准和强制执行的标准" class="headerlink" title="经过实战检验的标准和强制执行的标准"></a>经过实战检验的标准和强制执行的标准</h2><p>微服务团队倾向于避开企业架构小组制定的严格执行标准，但很乐意使用甚至传播HTTP，ATOM和其他微格式等开放标准的使用，这有点二分法。</p>
-<p>关键的区别在于如何制定标准以及如何实施标准。 由IETF等团体管理的标准只有在更广泛的世界中有多个实时实施并且通常来自成功的开源项目时才成为标准。</p>
-<p>这些标准与企业界的许多标准不同，它们通常由最近没有编程经验或受供应商过度影响的团体开发。</p>
-<h2 id="做正确的事情很容易"><a href="#做正确的事情很容易" class="headerlink" title="做正确的事情很容易"></a>做正确的事情很容易</h2><p>我们发现由于持续交付和部署而增加自动化的一个副作用是创建有用的工具来帮助开发人员和操作人员。 用于创建人工制品，管理代码库，提供简单服务或添加标准监视和日志记录的工具现在非常普遍。 网上最好的例子可能是<a href="http://netflix.github.io/" target="_blank" rel="noopener">Netflix的开源工具集</a>，但还有其他一些，包括我们广泛使用的<a href="http://dropwizard.codahale.com/" target="_blank" rel="noopener">Dropwizard</a>。</p>
-<h2 id="断路器和生产就绪代码"><a href="#断路器和生产就绪代码" class="headerlink" title="断路器和生产就绪代码"></a>断路器和生产就绪代码</h2><p><a href="https://martinfowler.com/bliki/CircuitBreaker.html" target="_blank" rel="noopener">断路器</a>出现在 <a href="https://www.amazon.com/gp/product/B00A32NXZO?ie=UTF8&amp;tag=martinfowlerc-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=B00A32NXZO" target="_blank" rel="noopener">Release It</a> 中，以及其他模式，如Bulkhead和Timeout。 这些模式一起实施，在构建通信应用程序时至关重要。 这篇<a href="http://techblog.netflix.com/2012/02/fault-tolerance-in-high-volume.html" target="_blank" rel="noopener">Netflix博客文章</a>很好地解释了它们的应用。</p>
-<h2 id="同步调用被认为是有害的"><a href="#同步调用被认为是有害的" class="headerlink" title="同步调用被认为是有害的"></a>同步调用被认为是有害的</h2><p>每当您在服务之间进行多次同步调用时，您将遇到停机的乘法效应。 简而言之，这就是系统停机时间成为各个组件停机时间的产物。 您面临一个选择，使您的呼叫异步或管理停机时间。 在<a href="http://www.guardian.co.uk，他们在新平台上实施了一个简单的规则" target="_blank" rel="noopener">www.guardian.co.uk，他们在新平台上实施了一个简单的规则</a> - 每个用户请求一个同步调用，而在Netflix，他们的平台API重新设计已经在API结构中构建了异步性。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文翻译自<a href="https://martinfowler.com/articles/microservices.html" target="_blank" rel="noopener">Martin Fowler的微服务</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/15/basic/004-microservices-martin-flower/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/15/basic/004-microservices-martin-flower/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/15/basic/004-microservices-martin-flower/" data-id="cjy2i5vdj0011vqchlwtxdxkd" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/microservice/">microservice</a><span class="article-tag-list-count">9</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/021-mock-test" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/13/java/021-mock-test/" class="article-date">
-  <time datetime="2018-11-13T00:00:01.000Z" itemprop="datePublished">2018-11-13</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/13/java/021-mock-test/">Mock对象用于测试</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Mock入门"><a href="#Mock入门" class="headerlink" title="Mock入门"></a>Mock入门</h1><p><a href="https://site.mockito.org/" target="_blank" rel="noopener">java的mock框架</a>，<a href="https://static.javadoc.io/org.mockito/mockito-core/2.23.0/org/mockito/Mockito.html" target="_blank" rel="noopener">其文档</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/21444517" target="_blank" rel="noopener">参考</a></p>
-<h2 id="依赖的2种情况"><a href="#依赖的2种情况" class="headerlink" title="依赖的2种情况"></a>依赖的2种情况</h2><ol>
-<li>一个类的方法依赖另一个类的方法</li>
-</ol>
-<img src="/2018/11/13/java/021-mock-test/000.png">
-<ol start="2">
-<li>同一个类的方法间依赖</li>
-</ol>
-<img src="/2018/11/13/java/021-mock-test/001.png">
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> B b;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">a</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> b.b();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">a1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> a2();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">a2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">"a2"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">B</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">b</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">"this is b"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Mock使用"><a href="#Mock使用" class="headerlink" title="Mock使用"></a>Mock使用</h2><h3 id="引入依赖"><a href="#引入依赖" class="headerlink" title="引入依赖"></a>引入依赖</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- https://mvnrepository.com/artifact/org.mockito/mockito-core --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.mockito&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;mockito-core&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.23.0&lt;/version&gt;</span><br><span class="line">    &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;junit&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;junit&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;4.12&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<p>需要注意的就是：springboot的<code>spring-boot-starter-test</code>以及包含junit和mockito依赖。</p>
-<h3 id="如何模拟一个对象"><a href="#如何模拟一个对象" class="headerlink" title="如何模拟一个对象"></a>如何模拟一个对象</h3><h4 id="原生方法"><a href="#原生方法" class="headerlink" title="原生方法"></a>原生方法</h4><p>以List为例，使用mock方法即可：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> org.mockito.Mockito.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">//mock creation</span></span><br><span class="line">List mockedList = mock(List.class);</span><br><span class="line"></span><br><span class="line"><span class="comment">//using mock object</span></span><br><span class="line">mockedList.add(<span class="string">"one"</span>);</span><br><span class="line">mockedList.clear();</span><br><span class="line"></span><br><span class="line"><span class="comment">//verification</span></span><br><span class="line">verify(mockedList).add(<span class="string">"one"</span>);</span><br><span class="line">verify(mockedList).clear();</span><br></pre></td></tr></table></figure></p>
-<h4 id="依赖情况1"><a href="#依赖情况1" class="headerlink" title="依赖情况1"></a>依赖情况1</h4><p>或者使用注解：</p>
-<p><a href="https://static.javadoc.io/org.mockito/mockito-core/2.23.0/org/mockito/InjectMocks.html" target="_blank" rel="noopener">文档</a> ,<br><code>@InjectMocks只会注入使用@Spy或@Mock注释创建的mock/spy对象</code></p>
-<ol>
-<li>构造函数注入</li>
-<li>setter注入</li>
-<li>字段注入</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ATest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 被测对象</span></span><br><span class="line">	<span class="meta">@InjectMocks</span></span><br><span class="line">	<span class="keyword">private</span> A a;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 被引用的对象，需要模拟的</span></span><br><span class="line">	<span class="meta">@Mock</span></span><br><span class="line">	<span class="keyword">private</span> B b;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Before</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		<span class="comment">// 使注解生效，可以继承</span></span><br><span class="line">		MockitoAnnotations.initMocks(<span class="keyword">this</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">a</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		when(b.b()).thenReturn(<span class="string">"bb"</span>);</span><br><span class="line">		<span class="keyword">final</span> String s = <span class="keyword">this</span>.a.a();</span><br><span class="line"></span><br><span class="line">		assertEquals(<span class="string">"bb"</span>, s);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="依赖情况2"><a href="#依赖情况2" class="headerlink" title="依赖情况2"></a>依赖情况2</h4><p>这时候创建被测类的spy对象，才可以模拟其方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">a1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 模拟A类的a2方法, 创建a的spy对象，只部分化a对象</span></span><br><span class="line">		a = spy(a);</span><br><span class="line">		when(a.a2()).thenReturn(<span class="string">"aa"</span>);</span><br><span class="line"><span class="comment">//		或者：doReturn("aaa").when(a).a2();</span></span><br><span class="line">		assertEquals(<span class="string">"aaa"</span>, a.a1());</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="JUnit-Mockito"><a href="#JUnit-Mockito" class="headerlink" title="JUnit+Mockito"></a>JUnit+Mockito</h4><p>当然，在junit测试框架下，我们可以完全使用注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(MockitoJUnitRunner.class)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ATest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 被测对象</span></span><br><span class="line">	<span class="meta">@InjectMocks</span></span><br><span class="line">	<span class="keyword">private</span> A a;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 被引用的对象</span></span><br><span class="line">	<span class="meta">@Mock</span></span><br><span class="line">	<span class="keyword">private</span> B b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="模拟方法返回值"><a href="#模拟方法返回值" class="headerlink" title="模拟方法返回值"></a>模拟方法返回值</h3><p>这是我们最常用的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span>(expected = RuntimeException.class)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stub</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 创建模拟的LinkedList</span></span><br><span class="line">	LinkedList mockedList = mock(LinkedList.class);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 模拟返回值（stub）</span></span><br><span class="line">	when(mockedList.get(<span class="number">0</span>)).thenReturn(<span class="string">"first"</span>);</span><br><span class="line">	<span class="comment">// 模拟抛异常</span></span><br><span class="line">	when(mockedList.get(<span class="number">1</span>)).thenThrow(<span class="keyword">new</span> RuntimeException());</span><br><span class="line"></span><br><span class="line">	assertEquals(<span class="string">"first"</span>, mockedList.get(<span class="number">0</span>));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 第99个元素没有被模拟，所以返回null</span></span><br><span class="line">	assertNull(mockedList.get(<span class="number">99</span>));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 抛异常</span></span><br><span class="line">	mockedList.get(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="模拟方法参数"><a href="#模拟方法参数" class="headerlink" title="模拟方法参数"></a>模拟方法参数</h3><p>有时我们不关心参数的值，只需要随便给一个，mock可以随机一些：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">arguments</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 创建模拟的LinkedList</span></span><br><span class="line">	LinkedList mockedList = mock(LinkedList.class);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 不管参数是什么（必须是int），都返回element</span></span><br><span class="line">	when(mockedList.get(anyInt())).thenReturn(<span class="string">"element"</span>);</span><br><span class="line"></span><br><span class="line">	assertEquals(<span class="string">"element"</span>, mockedList.get(<span class="number">3</span>));</span><br><span class="line">	assertEquals(<span class="string">"element"</span>, mockedList.get(<span class="number">999</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>当然，除了anyInt(),还有其他类型：Stirng,Short,Char,List,Set,Map,Iterable,参考源码：<code>org.mockito.ArgumentMatchers</code>.</p>
-<p>或者我们自定义参数条件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">arg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">class</span> <span class="title">ListOfTwoElements</span> <span class="keyword">implements</span> <span class="title">ArgumentMatcher</span>&lt;<span class="title">List</span>&gt; </span>&#123;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(List list)</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> list.size() == <span class="number">2</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="comment">//printed in verification errors</span></span><br><span class="line">			<span class="keyword">return</span> <span class="string">"[list of 2 elements]"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	List mock = mock(List.class);</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 也可以用lambda表达式 list -&gt; list.size()&gt;2</span></span><br><span class="line">	when(mock.addAll(argThat(<span class="keyword">new</span> ListOfTwoElements()))).thenReturn(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">	assertTrue(mock.addAll(Arrays.asList(<span class="string">"one"</span>, <span class="string">"two"</span>)));</span><br><span class="line">	assertFalse(mock.addAll(Arrays.asList(<span class="string">"one"</span>, <span class="string">"two"</span>, <span class="string">"three"</span>)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="验证方法的调用次数"><a href="#验证方法的调用次数" class="headerlink" title="验证方法的调用次数"></a>验证方法的调用次数</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">timesTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 创建模拟的LinkedList</span></span><br><span class="line">	LinkedList mockedList = mock(LinkedList.class);</span><br><span class="line"></span><br><span class="line">	mockedList.add(<span class="string">"once"</span>);</span><br><span class="line"></span><br><span class="line">	mockedList.add(<span class="string">"twice"</span>);</span><br><span class="line">	mockedList.add(<span class="string">"twice"</span>);</span><br><span class="line"></span><br><span class="line">	mockedList.add(<span class="string">"three times"</span>);</span><br><span class="line">	mockedList.add(<span class="string">"three times"</span>);</span><br><span class="line">	mockedList.add(<span class="string">"three times"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 默认是一次</span></span><br><span class="line">	verify(mockedList).add(<span class="string">"once"</span>);</span><br><span class="line">	verify(mockedList, times(<span class="number">1</span>)).add(<span class="string">"once"</span>);</span><br><span class="line"></span><br><span class="line">	verify(mockedList, times(<span class="number">2</span>)).add(<span class="string">"twice"</span>);</span><br><span class="line">	verify(mockedList, times(<span class="number">3</span>)).add(<span class="string">"three times"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// never(). never() == times(0)</span></span><br><span class="line">	verify(mockedList, never()).add(<span class="string">"never happened"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 还有至少和至多多少次：atLeast()/atMost()</span></span><br><span class="line">	verify(mockedList, atLeastOnce()).add(<span class="string">"three times"</span>);</span><br><span class="line">	verify(mockedList, atLeast(<span class="number">2</span>)).add(<span class="string">"three times"</span>);</span><br><span class="line">	verify(mockedList, atMost(<span class="number">5</span>)).add(<span class="string">"three times"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>好理解，但是为什么需要？</p>
-<p>假如我们的被测方法存在一个循环，循环里有条件判断，可以判断某个方法因为条件的不同执行的次数。</p>
-<h3 id="doXxxx方法"><a href="#doXxxx方法" class="headerlink" title="doXxxx方法"></a>doXxxx方法</h3><p><a href="https://static.javadoc.io/org.mockito/mockito-core/2.23.0/org/mockito/Mockito.html#do_family_methods_stubs" target="_blank" rel="noopener">文档</a></p>
-<p>一般来说，<code>when().thenReturn()</code>基本能满足需求，所以什么时候需要使用do系列方法？</p>
-<ol>
-<li>模拟void的方法</li>
-<li>模拟spy对象，上面</li>
-<li>在一个测试中多次修改一个方法的行为</li>
-</ol>
-<p>说一下多次修改一个方法的返回值：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getInstanceInfoActive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		when(openstackService.execute(anyString(), anyString(), anyString(), anyString(),</span><br><span class="line">				anyString(), anyString(), argThat(s -&gt; !s.contains(<span class="string">"&amp;marker="</span>)))).thenReturn(getOneServerJson(<span class="number">2</span>));</span><br><span class="line"><span class="comment">//		doReturn(getOneServerJson(2)).when(openstackService).execute(anyString(), anyString(), anyString(), anyString(),</span></span><br><span class="line"><span class="comment">//				anyString(), anyString(), argThat(s -&gt; !s.contains("&amp;marker=")));</span></span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">int</span> count = service.getInstanceInfoActive(<span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>);</span><br><span class="line">		assertEquals(<span class="number">2</span>, count);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 模拟返回超过1000条数据</span></span><br><span class="line">		doReturn(getOneServerJson(<span class="number">1000</span>)).when(openstackService).execute(anyString(), anyString(), anyString(), anyString(),</span><br><span class="line">				anyString(), anyString(), argThat(s -&gt; !s.contains(<span class="string">"&amp;marker="</span>)));</span><br><span class="line">		doReturn(getOneServerJson(<span class="number">999</span>)).when(openstackService).execute(anyString(), anyString(), anyString(), anyString(),</span><br><span class="line">				anyString(), anyString(), argThat(s -&gt; s.contains(<span class="string">"&amp;marker="</span>)));</span><br><span class="line"><span class="comment">//		when(openstackService.execute(anyString(), anyString(), anyString(), anyString(),</span></span><br><span class="line"><span class="comment">//				anyString(), anyString(), argThat(s -&gt; s.contains("&amp;marker=")))).thenReturn(getOneServerJson(999));</span></span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">int</span> count2 = service.getInstanceInfoActive(<span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>);</span><br><span class="line">		assertEquals(<span class="number">1999</span>, count2);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="方法没有返回值"><a href="#方法没有返回值" class="headerlink" title="方法没有返回值"></a>方法没有返回值</h3><p>理论上应该抛出异常，否则就是方法本身不可测了。</p>
-<h3 id="方法是私有的"><a href="#方法是私有的" class="headerlink" title="方法是私有的"></a>方法是私有的</h3><p>mockito框架不支持测试私有方法，<a href="https://github.com/mockito/mockito/wiki/Mockito-And-Private-Methods" target="_blank" rel="noopener">原因</a></p>
-<p>但有另一个强大的框架：<a href="https://github.com/powermock/powermock" target="_blank" rel="noopener">powermock</a>,可以<a href="https://github.com/powermock/powermock/wiki/MockPrivate" target="_blank" rel="noopener">测试私有方法</a>。</p>
-<p>修改权限：改为包权限。</p>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>参考文档：<br><a href="https://static.javadoc.io/org.mockito/mockito-core/2.23.0/org/mockito/Mockito.html" target="_blank" rel="noopener">https://static.javadoc.io/org.mockito/mockito-core/2.23.0/org/mockito/Mockito.html</a></p>
-<h1 id="为什么使用Mock"><a href="#为什么使用Mock" class="headerlink" title="为什么使用Mock"></a>为什么使用Mock</h1><ol>
-<li><p>Mockito是一个非常好的模拟框架。它允许您使用简洁的API编写漂亮的测试。 Mockito不会让你糊涂，因为测试非常易读并且会产生干净的验证错误。</p>
-</li>
-<li><p>StackOverflow社区将Mockito评为最佳的java模拟框架。尽管StackOverflow避开可能引发情绪争论的问题，但事实上Mockito获得的选票最多。</p>
-</li>
-<li><p>所有库中的前10个Java库，不仅仅是测试工具。 2013年底，对30,000个GitHub项目进行了分析。尽管Mockito在主报告中排名第9，但mockito-core和mockito-all都是相同的工具，因此Mockito的实际位置是4号，超过了Guava或Spring等著名工具。将这项研究视为Mockito每天用Java编写的单元测试所产生巨大影响的指标。</p>
-</li>
-<li><p>行为驱动开发的创始人Dan North在2008年写道：<br>“我们在主会议期间决定使用JUnit 4和Mockito，因为我们认为它们是TDD和Java中Mock的未来”</p>
-</li>
-</ol>
-<h1 id="Spring中的Mock"><a href="#Spring中的Mock" class="headerlink" title="Spring中的Mock"></a>Spring中的Mock</h1><p><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html" target="_blank" rel="noopener">spring-boot官方测试文档</a></p>
-<p>spring-boot包含的测试依赖</p>
-<p>mock在spring中的分类和使用</p>
-<h1 id="ScalaTest-Mock"><a href="#ScalaTest-Mock" class="headerlink" title="ScalaTest+Mock"></a>ScalaTest+Mock</h1><p>官方文档：<a href="http://www.scalatest.org/user_guide/testing_with_mock_objects" target="_blank" rel="noopener">http://www.scalatest.org/user_guide/testing_with_mock_objects</a></p>
-<p>scala的mock有4种常用框架：</p>
-<p>scala-mock是scala原生支持的：<a href="http://scalamock.org/quick-start/" target="_blank" rel="noopener">http://scalamock.org/quick-start/</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="Mock入门"><a href="#Mock入门" class="headerlink" title="Mock入门"></a>Mock入门</h1><p><a href="https://site.mockito.org/" target="_blank" rel="noopener">java的mock框架</a>，<a href="https://static.javadoc.io/org.mockito/mockito-core/2.23.0/org/mockito/Mockito.html" target="_blank" rel="noopener">其文档</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/13/java/021-mock-test/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/13/java/021-mock-test/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/13/java/021-mock-test/" data-id="cjy2i5vgj00arvqchy3lyc4ve" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/020-spring-boot-unit-test-with-h2db-in-memory" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/31/java/020-spring-boot-unit-test-with-h2db-in-memory/" class="article-date">
-  <time datetime="2018-10-31T07:05:35.000Z" itemprop="datePublished">2018-10-31</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/10/31/java/020-spring-boot-unit-test-with-h2db-in-memory/">spring-boot集成h2内存数据库进行单元测试</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>我们使用<a href="http://www.h2database.com/html/features.html" target="_blank" rel="noopener">h2内存数据库</a>.然后集成在框架里。<br>以下是测试环境搭建过程：</p>
-<h1 id="加入h2依赖"><a href="#加入h2依赖" class="headerlink" title="加入h2依赖"></a>加入h2依赖</h1><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.h2database&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;h2&lt;/artifactId&gt;</span><br><span class="line">    &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<h1 id="新增测试环境配置文件"><a href="#新增测试环境配置文件" class="headerlink" title="新增测试环境配置文件"></a>新增测试环境配置文件</h1><p>复制一份<code>application-dev.yml</code>,重命名为：<code>application-test.yml</code>.内容只有数据库配置改变：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: app</span><br><span class="line">  #数据库连接</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-<span class="number">1</span>;MODE=PostgreSQL</span><br><span class="line">#    url: jdbc:h2:mem:test;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS public;SCHEMA=public</span><br><span class="line">    username:</span><br><span class="line">    password:</span><br><span class="line">    driverClassName: org.h2.Driver</span><br><span class="line">    schema: classpath:sql/init-table.sql</span><br><span class="line">    data: classpath:sql/data.sql</span><br><span class="line"></span><br><span class="line"># mybatis xml配置</span><br><span class="line">mybatis:</span><br><span class="line">  config-location: classpath:mybatis-config.xml</span><br><span class="line">  mapper-locations: classpath:mappers<span class="comment">/**/*.xml</span></span><br></pre></td></tr></table></figure></p>
-<h1 id="准备测试数据"><a href="#准备测试数据" class="headerlink" title="准备测试数据"></a>准备测试数据</h1><p>看上面的配置文件，有一个初始数据表的sql：init-table.sql<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> <span class="keyword">if</span> <span class="keyword">exists</span> asset;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> asset (</span><br><span class="line">  <span class="keyword">id</span> <span class="built_in">serial</span> ,</span><br><span class="line">  <span class="keyword">name</span> <span class="built_in">varchar</span>(<span class="number">100</span>),</span><br><span class="line">  ip <span class="built_in">varchar</span>(<span class="number">100</span>),</span><br><span class="line">  hostname <span class="built_in">varchar</span>(<span class="number">100</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
-<p>还有初始化数据的：data.sql:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> asset(<span class="keyword">name</span>,ip,hostname) <span class="keyword">values</span>(<span class="string">'openstack'</span>,<span class="string">'172.1.1.2'</span>,<span class="string">'controller'</span>);</span><br></pre></td></tr></table></figure>
-<h1 id="待测mapper"><a href="#待测mapper" class="headerlink" title="待测mapper"></a>待测mapper</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MapperScan</span>(basePackages = &#123;<span class="string">"com.jimo.mapper"</span>&#125;)</span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestDaoApplication</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		SpringApplication.run(TestDaoApplication.class, args);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">AssetMapper</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">insert</span><span class="params">(Asset a)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(<span class="keyword">int</span> id)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function">List&lt;Asset&gt; <span class="title">selectAll</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Asset</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String ip;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String hostname;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//getter/setter</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>对应的语句：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" &gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">"com.jimo.mapper.AssetMapper"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">delete</span> <span class="attr">id</span>=<span class="string">"delete"</span>&gt;</span></span><br><span class="line">        delete from asset where id=#&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">delete</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"insert"</span>&gt;</span></span><br><span class="line">        insert into asset(name,hostname,ip) set name=#&#123;a.name&#125;,hostname=#&#123;a.hostname&#125;,ip=#&#123;a.ip&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectAll"</span> <span class="attr">resultType</span>=<span class="string">"com.jimo.model.Asset"</span>&gt;</span></span><br><span class="line">      SELECT  * from asset</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h1 id="编写测试类"><a href="#编写测试类" class="headerlink" title="编写测试类"></a>编写测试类</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringRunner.class)</span><br><span class="line"><span class="comment">// 使用测试环境配置</span></span><br><span class="line"><span class="meta">@ActiveProfiles</span>(<span class="string">"test"</span>)</span><br><span class="line"><span class="comment">// 不加载web环境，更快</span></span><br><span class="line"><span class="meta">@SpringBootTest</span>(webEnvironment = SpringBootTest.WebEnvironment.NONE)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AssetMapperTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Autowired</span></span><br><span class="line">	<span class="keyword">private</span> AssetMapper mapper;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">selectAll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> List&lt;Asset&gt; assets = mapper.selectAll();</span><br><span class="line">        assertEquals(<span class="number">1</span>, assets.size());</span><br><span class="line"></span><br><span class="line">        mapper.delete(<span class="number">1</span>);</span><br><span class="line">        assertEquals(<span class="number">0</span>, mapper.selectAll().size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>h2内存数据库可以模拟多种数据库，但不是所有语法都满足，所以需要折中处理。</p>
-<p>如果可以，还是使用一个测试的数据库环境最好。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>我们使用<a href="http://www.h2database.com/html/features.html" target="_blank" rel="noopener">h2内存数据库</a>.然后集成在框架里。<br>以下是测试环境搭建过程：</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/10/31/java/020-spring-boot-unit-test-with-h2db-in-memory/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/10/31/java/020-spring-boot-unit-test-with-h2db-in-memory/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/31/java/020-spring-boot-unit-test-with-h2db-in-memory/" data-id="cjy2i5vgi00apvqchkgqly79y" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">69</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/test/">test</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
 
       </footer>
       </div>
@@ -2221,7 +2186,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 11.88px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.13px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.38px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.25px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.63px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 11.88px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.25px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 13.13px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.63px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 12.94px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.59px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2243,23 +2208,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/07/14/linux/025-ubuntu-use-navidia-card/">ubuntu下使用NVIDIA显卡</a>
+            <a href="/2019/07/23/linux/028-ubuntu-application-launcher/">ubuntu制作启动图标</a>
           </li>
         
           <li>
-            <a href="/2019/07/14/tools/016-vscode-config/">vscode自定义配置</a>
+            <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
           </li>
         
           <li>
-            <a href="/2019/07/10/git/006-git-revert-deleted-files/">git-恢复之前版本误删的文件</a>
+            <a href="/2019/07/17/java/049-spring-autowire-in-dependency/">spring无法注入依赖库中的bean</a>
           </li>
         
           <li>
-            <a href="/2019/07/09/basic/019-cs-basic-concept/">哪些必须知道的CS概念</a>
+            <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
           </li>
         
           <li>
-            <a href="/2019/07/08/life/022-weekly-learn/">2019-28-周报</a>
+            <a href="/2019/07/15/linux/026-centos-firewalld/">重新认识centos防火墙</a>
           </li>
         
       </ul>

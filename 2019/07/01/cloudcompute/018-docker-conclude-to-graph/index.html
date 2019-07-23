@@ -39,7 +39,9 @@ ga('send', 'pageview');
 <meta property="og:image" content="http://http/2019/07/01/cloudcompute/018-docker-conclude-to-graph/008.png">
 <meta property="og:image" content="http://http/2019/07/01/cloudcompute/018-docker-conclude-to-graph/009.png">
 <meta property="og:image" content="http://http/2019/07/01/cloudcompute/018-docker-conclude-to-graph/010.png">
-<meta property="og:updated_time" content="2019-07-14T03:04:02.290Z">
+<meta property="og:image" content="http://http/2019/07/01/cloudcompute/018-docker-conclude-to-graph/011.png">
+<meta property="og:image" content="http://http/2019/07/01/cloudcompute/018-docker-conclude-to-graph/012.png">
+<meta property="og:updated_time" content="2019-07-23T00:44:38.959Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="docker知识总结成图">
 <meta name="twitter:description" content="本文将大部分docker知识按图总结，便于理解。 存储本章我们学习以下内容：  docker 为容器提供了两种存储资源：数据层和 Data Volume。 数据层包括镜像层和容器层，由 storage driver 管理。 Data Volume 有两种类型：bind mount 和 docker managed volume。 bind mount 可实现容器与 host 之间，容器与容器之间共">
@@ -154,6 +156,7 @@ ga('send', 'pageview');
 </ol>
 <h2 id="存储的生命周期"><a href="#存储的生命周期" class="headerlink" title="存储的生命周期"></a>存储的生命周期</h2><p>创建、共享、使用、备份、迁移、恢复备份、销毁。</p>
 <p>现在说出这些阶段如何实现。</p>
+<h2 id="Rex-Ray分布式存储方案"><a href="#Rex-Ray分布式存储方案" class="headerlink" title="Rex-Ray分布式存储方案"></a>Rex-Ray分布式存储方案</h2><p>学习如何使用<a href="https://rexray.io/" target="_blank" rel="noopener">https://rexray.io/</a></p>
 <h1 id="docker-machine"><a href="#docker-machine" class="headerlink" title="docker machine"></a>docker machine</h1><p><a href="https://docs.docker.com/machine/install-machine/" target="_blank" rel="noopener">https://docs.docker.com/machine/install-machine/</a></p>
 <p>学习docker machine是干嘛的</p>
 <p>怎么使用</p>
@@ -248,6 +251,61 @@ ga('send', 'pageview');
 </ol>
 <p>盗个图： </p>
 <img src="/2019/07/01/cloudcompute/018-docker-conclude-to-graph/010.png">
+<p>// TODO<br>使用host-gw作为backend</p>
+<h3 id="weave网络"><a href="#weave网络" class="headerlink" title="weave网络"></a>weave网络</h3><ol>
+<li>安装： <a href="https://www.weave.works/docs/net/latest/install/installing-weave/" target="_blank" rel="noopener">https://www.weave.works/docs/net/latest/install/installing-weave/</a></li>
+<li><p>运行<code>weave launch</code>拉取docker镜像并运行weave, 完了之后如果有个防火墙警告，需要重新配防火墙：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">WARNING: existing iptables rule</span><br><span class="line"></span><br><span class="line">&apos;-A FORWARD -j REJECT --reject-with icmp-host-prohibited&apos;</span><br><span class="line"></span><br><span class="line">will block name resolution via weaveDNS - please reconfigure your firewall.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看网络配置，多了weave： <code>docker network ls</code>, <code>docker network inspect weave</code></p>
+ <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># docker network inspect weave</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"Name"</span>: <span class="string">"weave"</span>,</span><br><span class="line">    <span class="attr">"Id"</span>: <span class="string">"a96fe9925c0e970ddb7c0e8334f8a625c9eef1307b994183b7bfa331616be050"</span>,</span><br><span class="line">    <span class="attr">"Created"</span>: <span class="string">"2019-07-15T09:19:51.673661228+09:00"</span>,</span><br><span class="line">    <span class="attr">"Scope"</span>: <span class="string">"local"</span>,</span><br><span class="line">    <span class="attr">"Driver"</span>: <span class="string">"weavemesh"</span>,</span><br><span class="line">    <span class="attr">"EnableIPv6"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"IPAM"</span>: &#123;</span><br><span class="line">        <span class="attr">"Driver"</span>: <span class="string">"weavemesh"</span>,</span><br><span class="line">        <span class="attr">"Options"</span>: <span class="literal">null</span>,</span><br><span class="line">        <span class="attr">"Config"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"Subnet"</span>: <span class="string">"10.32.0.0/12"</span></span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置网络： (恢复之前的环境，执行<code>eval $(weave env --restore)</code>)</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># weave env</span><br><span class="line">export DOCKER_HOST=unix:///var/run/weave/weave.sock ORIG_DOCKER_HOST=</span><br><span class="line"># eval $(weave env)</span><br><span class="line"></span><br><span class="line"># docker run --name bbox1 -itd busybox</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看网络结构：</p>
+<ol>
+<li><code>docker exec bbox1 ip a</code>, 找到ethwe@ifxxx</li>
+<li><code>ip link</code>, 找到上述网卡</li>
+<li><code>brctl show</code>，看weave网络链接的网卡不止一个</li>
+<li><code>ip -d link</code>: 深入探究</li>
+<li>得出网络连接拓扑：<img src="/2019/07/01/cloudcompute/018-docker-conclude-to-graph/011.png">
+</li>
+</ol>
+</li>
+<li><p>再运行一个bbox2，会发现可以通过hostname访问，说明有DNS服务，网络结构：</p>
+ <img src="/2019/07/01/cloudcompute/018-docker-conclude-to-graph/012.png">
+</li>
+<li><p>weave 主机间连通性</p>
+</li>
+<li><p>weave与外网连通</p>
+</li>
+</ol>
+<h3 id="calico网络"><a href="#calico网络" class="headerlink" title="calico网络"></a>calico网络</h3><ol>
+<li><p>3层网络，driver为calico，</p>
+</li>
+<li><p>同一个网络可通信，不同网络不行</p>
+</li>
+<li><p>calico的network policy可自定义ACL，实现不同calico网络的通信</p>
+</li>
+<li><p>policy的修改：配置文件<code>calicoctl apply -f policy.yml</code></p>
+</li>
+<li><p>calico可创建子网，先创建IP Pool</p>
+</li>
+</ol>
+<h2 id="网络选择因素"><a href="#网络选择因素" class="headerlink" title="网络选择因素"></a>网络选择因素</h2><p>没有最好，只有适合，下面是一些选择的总结。</p>
+<ol>
+<li><p>网络拓扑：基于什么网络实现，vxlan、macvlan、overlay、underlay还是纯3层网络</p>
+</li>
+<li><p>是否需要分布式存储网络信息，比如etcd、consule</p>
+</li>
+<li><p>是否需要划分子网</p>
+</li>
+<li><p>连通与隔离性考虑</p>
+</li>
+<li><p>性能：underlay优于overlay，因为更底层</p>
+</li>
+</ol>
 
       
     </div> -->
@@ -291,6 +349,7 @@ ga('send', 'pageview');
 </ol>
 <h2 id="存储的生命周期"><a href="#存储的生命周期" class="headerlink" title="存储的生命周期"></a>存储的生命周期</h2><p>创建、共享、使用、备份、迁移、恢复备份、销毁。</p>
 <p>现在说出这些阶段如何实现。</p>
+<h2 id="Rex-Ray分布式存储方案"><a href="#Rex-Ray分布式存储方案" class="headerlink" title="Rex-Ray分布式存储方案"></a>Rex-Ray分布式存储方案</h2><p>学习如何使用<a href="https://rexray.io/" target="_blank" rel="noopener">https://rexray.io/</a></p>
 <h1 id="docker-machine"><a href="#docker-machine" class="headerlink" title="docker machine"></a>docker machine</h1><p><a href="https://docs.docker.com/machine/install-machine/" target="_blank" rel="noopener">https://docs.docker.com/machine/install-machine/</a></p>
 <p>学习docker machine是干嘛的</p>
 <p>怎么使用</p>
@@ -385,13 +444,68 @@ ga('send', 'pageview');
 </ol>
 <p>盗个图： </p>
 <img src="/2019/07/01/cloudcompute/018-docker-conclude-to-graph/010.png">
+<p>// TODO<br>使用host-gw作为backend</p>
+<h3 id="weave网络"><a href="#weave网络" class="headerlink" title="weave网络"></a>weave网络</h3><ol>
+<li>安装： <a href="https://www.weave.works/docs/net/latest/install/installing-weave/" target="_blank" rel="noopener">https://www.weave.works/docs/net/latest/install/installing-weave/</a></li>
+<li><p>运行<code>weave launch</code>拉取docker镜像并运行weave, 完了之后如果有个防火墙警告，需要重新配防火墙：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">WARNING: existing iptables rule</span><br><span class="line"></span><br><span class="line">&apos;-A FORWARD -j REJECT --reject-with icmp-host-prohibited&apos;</span><br><span class="line"></span><br><span class="line">will block name resolution via weaveDNS - please reconfigure your firewall.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看网络配置，多了weave： <code>docker network ls</code>, <code>docker network inspect weave</code></p>
+ <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># docker network inspect weave</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"Name"</span>: <span class="string">"weave"</span>,</span><br><span class="line">    <span class="attr">"Id"</span>: <span class="string">"a96fe9925c0e970ddb7c0e8334f8a625c9eef1307b994183b7bfa331616be050"</span>,</span><br><span class="line">    <span class="attr">"Created"</span>: <span class="string">"2019-07-15T09:19:51.673661228+09:00"</span>,</span><br><span class="line">    <span class="attr">"Scope"</span>: <span class="string">"local"</span>,</span><br><span class="line">    <span class="attr">"Driver"</span>: <span class="string">"weavemesh"</span>,</span><br><span class="line">    <span class="attr">"EnableIPv6"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"IPAM"</span>: &#123;</span><br><span class="line">        <span class="attr">"Driver"</span>: <span class="string">"weavemesh"</span>,</span><br><span class="line">        <span class="attr">"Options"</span>: <span class="literal">null</span>,</span><br><span class="line">        <span class="attr">"Config"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"Subnet"</span>: <span class="string">"10.32.0.0/12"</span></span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置网络： (恢复之前的环境，执行<code>eval $(weave env --restore)</code>)</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># weave env</span><br><span class="line">export DOCKER_HOST=unix:///var/run/weave/weave.sock ORIG_DOCKER_HOST=</span><br><span class="line"># eval $(weave env)</span><br><span class="line"></span><br><span class="line"># docker run --name bbox1 -itd busybox</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看网络结构：</p>
+<ol>
+<li><code>docker exec bbox1 ip a</code>, 找到ethwe@ifxxx</li>
+<li><code>ip link</code>, 找到上述网卡</li>
+<li><code>brctl show</code>，看weave网络链接的网卡不止一个</li>
+<li><code>ip -d link</code>: 深入探究</li>
+<li>得出网络连接拓扑：<img src="/2019/07/01/cloudcompute/018-docker-conclude-to-graph/011.png">
+</li>
+</ol>
+</li>
+<li><p>再运行一个bbox2，会发现可以通过hostname访问，说明有DNS服务，网络结构：</p>
+ <img src="/2019/07/01/cloudcompute/018-docker-conclude-to-graph/012.png">
+</li>
+<li><p>weave 主机间连通性</p>
+</li>
+<li><p>weave与外网连通</p>
+</li>
+</ol>
+<h3 id="calico网络"><a href="#calico网络" class="headerlink" title="calico网络"></a>calico网络</h3><ol>
+<li><p>3层网络，driver为calico，</p>
+</li>
+<li><p>同一个网络可通信，不同网络不行</p>
+</li>
+<li><p>calico的network policy可自定义ACL，实现不同calico网络的通信</p>
+</li>
+<li><p>policy的修改：配置文件<code>calicoctl apply -f policy.yml</code></p>
+</li>
+<li><p>calico可创建子网，先创建IP Pool</p>
+</li>
+</ol>
+<h2 id="网络选择因素"><a href="#网络选择因素" class="headerlink" title="网络选择因素"></a>网络选择因素</h2><p>没有最好，只有适合，下面是一些选择的总结。</p>
+<ol>
+<li><p>网络拓扑：基于什么网络实现，vxlan、macvlan、overlay、underlay还是纯3层网络</p>
+</li>
+<li><p>是否需要分布式存储网络信息，比如etcd、consule</p>
+</li>
+<li><p>是否需要划分子网</p>
+</li>
+<li><p>连通与隔离性考虑</p>
+</li>
+<li><p>性能：underlay优于overlay，因为更底层</p>
+</li>
+</ol>
 
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/01/cloudcompute/018-docker-conclude-to-graph/" data-id="cjy2i5ve5002tvqch6aa9de7h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/01/cloudcompute/018-docker-conclude-to-graph/" data-id="cjyf3zlpn0039uich3puqiw7i" class="article-share-link">
           Share
         </a>
         
@@ -445,7 +559,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 11.88px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.13px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.38px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.25px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.63px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 11.88px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.25px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 13.13px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.63px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 12.94px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.59px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -467,23 +581,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/07/14/linux/025-ubuntu-use-navidia-card/">ubuntu下使用NVIDIA显卡</a>
+            <a href="/2019/07/23/linux/028-ubuntu-application-launcher/">ubuntu制作启动图标</a>
           </li>
         
           <li>
-            <a href="/2019/07/14/tools/016-vscode-config/">vscode自定义配置</a>
+            <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
           </li>
         
           <li>
-            <a href="/2019/07/10/git/006-git-revert-deleted-files/">git-恢复之前版本误删的文件</a>
+            <a href="/2019/07/17/java/049-spring-autowire-in-dependency/">spring无法注入依赖库中的bean</a>
           </li>
         
           <li>
-            <a href="/2019/07/09/basic/019-cs-basic-concept/">哪些必须知道的CS概念</a>
+            <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
           </li>
         
           <li>
-            <a href="/2019/07/08/life/022-weekly-learn/">2019-28-周报</a>
+            <a href="/2019/07/15/linux/026-centos-firewalld/">重新认识centos防火墙</a>
           </li>
         
       </ul>
