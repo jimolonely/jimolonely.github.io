@@ -86,6 +86,92 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/010-concurrent-lock" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/02/java/010-concurrent-lock/" class="article-date">
+  <time datetime="2018-10-02T11:15:53.000Z" itemprop="datePublished">2018-10-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/10/02/java/010-concurrent-lock/">java并发-Lock</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/package-summary.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/package-summary.html</a><br>java.util.concurrent.locks.Lock接口用作类似于synchronized块的线程同步机制。 新的锁定机制比同步块更灵活，提供更多选项。 Lock和synchronized块之间的主要区别如下 ：</p>
+<ol>
+<li><p>保证顺序 - 同步块不提供任何顺序保证，等待线程将被授予访问权限。 锁接口处理它。</p>
+</li>
+<li><p>无超时 - 如果未授予锁定，则同步块没有超时选项。 Lock接口提供了这样的选项。</p>
+</li>
+<li><p>单个方法 - 同步块必须完全包含在单个方法中，而锁定接口的方法lock（）和unlock（）可以在不同的方法中调用。</p>
+</li>
+</ol>
+<h1 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sinrail.lock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ThreadLocalRandom;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.Lock;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * ReentrantLock 可重入锁，锁和同步比起来有以下不同：</span></span><br><span class="line"><span class="comment"> * 1.保证序列：同步不能保证序列执行，除非锁整个方法</span></span><br><span class="line"><span class="comment"> * 2.超时机制：同步也没有</span></span><br><span class="line"><span class="comment"> * 3.单一方法：同步只能用于一个方法，而lock可以在不同的方法中lock和unlock</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * 下面使用打印机的例子，一个打印任务必须执行完才能进行下一个，我们使用锁来保证顺序</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> jimo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/9/29 14:26</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LockDemo</span> </span>&#123;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 打印机</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@author</span> jimo</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@date</span> 2018/9/29 14:33</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Printer</span> </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">final</span> Lock lock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			lock.lock();</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				<span class="keyword">final</span> <span class="keyword">int</span> duration = ThreadLocalRandom.current().nextInt(<span class="number">1000</span>);</span><br><span class="line">				System.out.println(Thread.currentThread().getName() + <span class="string">": 打印花费时间："</span> + duration + <span class="string">" ms"</span>);</span><br><span class="line">				Thread.sleep(duration);</span><br><span class="line">			&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">			&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">				System.out.println(Thread.currentThread().getName() + <span class="string">": 打印成功！"</span>);</span><br><span class="line">				lock.unlock();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Task</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> Printer printer;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Task</span><span class="params">(String name, Printer printer)</span> </span>&#123;</span><br><span class="line">			<span class="keyword">super</span>(name);</span><br><span class="line">			<span class="keyword">this</span>.printer = printer;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			System.out.println(Thread.currentThread().getName() + <span class="string">": 开始打印..."</span>);</span><br><span class="line">			printer.print();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">final</span> Printer printer = <span class="keyword">new</span> Printer();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">new</span> Task(<span class="string">"task 1"</span>, printer).start();</span><br><span class="line">		<span class="keyword">new</span> Task(<span class="string">"task 2"</span>, printer).start();</span><br><span class="line">		<span class="keyword">new</span> Task(<span class="string">"task 3"</span>, printer).start();</span><br><span class="line">		<span class="keyword">new</span> Task(<span class="string">"task 4"</span>, printer).start();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">task <span class="number">2</span>: 开始打印...</span><br><span class="line">task <span class="number">1</span>: 开始打印...</span><br><span class="line">task <span class="number">3</span>: 开始打印...</span><br><span class="line">task <span class="number">4</span>: 开始打印...</span><br><span class="line">task <span class="number">2</span>: 打印花费时间：<span class="number">641</span> ms</span><br><span class="line">task <span class="number">2</span>: 打印成功！</span><br><span class="line">task <span class="number">1</span>: 打印花费时间：<span class="number">662</span> ms</span><br><span class="line">task <span class="number">1</span>: 打印成功！</span><br><span class="line">task <span class="number">3</span>: 打印花费时间：<span class="number">590</span> ms</span><br><span class="line">task <span class="number">3</span>: 打印成功！</span><br><span class="line">task <span class="number">4</span>: 打印花费时间：<span class="number">481</span> ms</span><br><span class="line">task <span class="number">4</span>: 打印成功！</span><br></pre></td></tr></table></figure></p>
+<p>假如没有锁，代码这样写：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 没有锁时</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">int</span> duration = ThreadLocalRandom.current().nextInt(<span class="number">1000</span>);</span><br><span class="line">		System.out.println(Thread.currentThread().getName() + <span class="string">": 打印花费时间："</span> + duration + <span class="string">" ms"</span>);</span><br><span class="line">		Thread.sleep(duration);</span><br><span class="line">		System.out.println(Thread.currentThread().getName() + <span class="string">": 打印成功！"</span>);</span><br><span class="line">	&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>则得到的结果将不是顺序的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">task <span class="number">2</span>: 开始打印...</span><br><span class="line">task <span class="number">1</span>: 开始打印...</span><br><span class="line">task <span class="number">3</span>: 开始打印...</span><br><span class="line">task <span class="number">4</span>: 开始打印...</span><br><span class="line">task <span class="number">2</span>: 打印花费时间：<span class="number">58</span> ms</span><br><span class="line">task <span class="number">1</span>: 打印花费时间：<span class="number">38</span> ms</span><br><span class="line">task <span class="number">4</span>: 打印花费时间：<span class="number">532</span> ms</span><br><span class="line">task <span class="number">3</span>: 打印花费时间：<span class="number">849</span> ms</span><br><span class="line">task <span class="number">1</span>: 打印成功！</span><br><span class="line">task <span class="number">2</span>: 打印成功！</span><br><span class="line">task <span class="number">4</span>: 打印成功！</span><br><span class="line">task <span class="number">3</span>: 打印成功！</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/package-summary.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/package-summary.html</a><br>java.util.concurrent.locks.Lock接口用作类似于synchronized块的线程同步机制。 新的锁定机制比同步块更灵活，提供更多选项。 Lock和synchronized块之间的主要区别如下 ：</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/10/02/java/010-concurrent-lock/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/10/02/java/010-concurrent-lock/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/10/02/java/010-concurrent-lock/" data-id="cjyfq8rax005w9cchxwzn0pqc" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/009-concurent-tool-class" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/10/01/java/009-concurent-tool-class/" class="article-date">
@@ -149,12 +235,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/01/java/009-concurent-tool-class/" data-id="cjyf3zlth00ayuichd02f3bec" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/01/java/009-concurent-tool-class/" data-id="cjyfq8raw005t9cchs7m02nzq" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -228,12 +314,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/30/java/008-java-concurrent-deadlock/" data-id="cjyf3zltf00avuich6nc3d9wm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/30/java/008-java-concurrent-deadlock/" data-id="cjyfq8raw005r9cch2x719tuh" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -302,7 +388,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/28/basic/002-http/" data-id="cjyf3zlox000xuichi24gstp7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/28/basic/002-http/" data-id="cjyfq8r97000q9cch96upfedf" class="article-share-link">
           Share
         </a>
         
@@ -427,12 +513,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/28/java/007-checkstyle-idea-git-pre-commit/" data-id="cjyf3zltf00atuichmwx90ooe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/28/java/007-checkstyle-idea-git-pre-commit/" data-id="cjyfq8rav005o9cchh84pp43o" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/checkstyle/">checkstyle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/checkstyle/">checkstyle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -502,12 +588,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/27/java/006-ali-java-stadard-graph/" data-id="cjyf3zlte00aquichgumnxya1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/27/java/006-ali-java-stadard-graph/" data-id="cjyfq8rau005k9cchjowc4blf" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -577,12 +663,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/003-front-end-session-check/" data-id="cjyf3zlsz0097uich0g0r6f8y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/003-front-end-session-check/" data-id="cjyfq8rao004x9cch7nxl1tv3" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/html/">html</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/html/">html</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a><span class="article-tag-list-count">7</span></li></ul>
 
       </footer>
       </div>
@@ -668,12 +754,12 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/002-condition-juge/" data-id="cjyf3zlst0096uich92rcyozn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/002-condition-juge/" data-id="cjyfq8ran004t9cch57ysxdtw" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a><span class="article-tag-list-count">7</span></li></ul>
 
       </footer>
       </div>
@@ -763,7 +849,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/23/server/005-how-nginx-handle-a-request/" data-id="cjyf3zlw100jruich3i3ir7do" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/23/server/005-how-nginx-handle-a-request/" data-id="cjyfq8ri300nu9cchonl0203g" class="article-share-link">
           Share
         </a>
         
@@ -895,7 +981,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/19/server/004-nginx-directives/" data-id="cjyf3zlvz00jmuich3jar67q0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/19/server/004-nginx-directives/" data-id="cjyfq8ri200nr9cch84lsrrir" class="article-share-link">
           Share
         </a>
         
@@ -952,7 +1038,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/18/server/003-nginx-serve-static/" data-id="cjyf3zlvy00jhuichtefvs0u0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/18/server/003-nginx-serve-static/" data-id="cjyfq8ri200np9cchqlc8ewxo" class="article-share-link">
           Share
         </a>
         
@@ -1028,7 +1114,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/16/scala/003-scala-cheat-sheet/" data-id="cjyf3zlvs00ixuichrtiod9yk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/16/scala/003-scala-cheat-sheet/" data-id="cjyfq8rhx00na9cchg61trn0m" class="article-share-link">
           Share
         </a>
         
@@ -1108,7 +1194,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/15/scala/002-sbt-shoud-know/" data-id="cjyf3zlvs00iuuich15zph1s8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/15/scala/002-sbt-shoud-know/" data-id="cjyfq8rhy00nd9cch1whn1v1x" class="article-share-link">
           Share
         </a>
         
@@ -1207,7 +1293,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/14/basic/000-ssh-config/" data-id="cjyf3zlov000ruichi1fnogjw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/14/basic/000-ssh-config/" data-id="cjyfq8r95000p9cchddl6qoij" class="article-share-link">
           Share
         </a>
         
@@ -1289,7 +1375,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/13/db/005-connection-pool/" data-id="cjyf3zlpa0024uich75u7p1fs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/13/db/005-connection-pool/" data-id="cjyfq8ra6003b9cch3wpe7a8b" class="article-share-link">
           Share
         </a>
         
@@ -1369,7 +1455,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/11/db/004-pgsql-function/" data-id="cjyf3zlpa0023uichu5j3iu5t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/11/db/004-pgsql-function/" data-id="cjyfq8ra400369cchew9sieye" class="article-share-link">
           Share
         </a>
         
@@ -1468,7 +1554,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/10/lang/012-redis-distributed-lock/" data-id="cjyf3zlt900a5uiche06u7auf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/10/lang/012-redis-distributed-lock/" data-id="cjyfq8rbv009e9cchas5mrcgj" class="article-share-link">
           Share
         </a>
         
@@ -1569,7 +1655,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/10/server/002-tomcat-config/" data-id="cjyf3zlvx00jeuichdwiehvge" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/10/server/002-tomcat-config/" data-id="cjyfq8ri100nm9cch1x7fvtlk" class="article-share-link">
           Share
         </a>
         
@@ -1779,12 +1865,12 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/08/java/005-jdk11-new-feature/" data-id="cjyf3zlte00aouichpx20797v" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/08/java/005-jdk11-new-feature/" data-id="cjyfq8rav005m9cchp4mux36d" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -1876,101 +1962,12 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/08/lang/011-kafka-stream/" data-id="cjyf3zlt900a7uich2ybzb1yr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/08/lang/011-kafka-stream/" data-id="cjyfq8rbx009h9cchyt8ncmky" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kafka/">kafka</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-maven/001-maven-tutorial" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/06/maven/001-maven-tutorial/" class="article-date">
-  <time datetime="2018-09-06T07:54:57.000Z" itemprop="datePublished">2018-09-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/06/maven/001-maven-tutorial/">maven回眸</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>使用了这么多年的maven，maven的单词什么意思？</p>
-<p>原来是 <strong>行家</strong>.</p>
-<h1 id="maven方法"><a href="#maven方法" class="headerlink" title="maven方法"></a>maven方法</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Builds</span><br><span class="line">Documentation</span><br><span class="line">Reporting</span><br><span class="line">Dependencies</span><br><span class="line">SCMs</span><br><span class="line">Releases</span><br><span class="line">Distribution</span><br><span class="line">Mailing list</span><br></pre></td></tr></table></figure>
-<h1 id="POM-xml"><a href="#POM-xml" class="headerlink" title="POM.xml"></a>POM.xml</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">project dependencies</span><br><span class="line">plugins</span><br><span class="line">goals</span><br><span class="line">build profiles</span><br><span class="line">project version</span><br><span class="line">developers</span><br><span class="line">mailing list</span><br></pre></td></tr></table></figure>
-<h2 id="Super-POM"><a href="#Super-POM" class="headerlink" title="Super POM"></a>Super POM</h2><p>Super POM是Maven的默认POM。 所有POM都继承自父级或默认（尽管明确定义与否）。 此基本POM称为Super POM，包含默认继承的值。</p>
-<p>查看超级POM的默认配置的简单方法是运行以下命令：<code>mvn help:effective-pom</code></p>
-<p>在任何目录中创建一个pom.xml：<br><figure class="highlight m"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;project xmlns <span class="built_in">=</span> <span class="string">"http://maven.apache.org/POM/4.0.0"</span></span><br><span class="line">   xmlns:xsi <span class="built_in">=</span> <span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">   xsi:schemaLocation <span class="built_in">=</span> <span class="string">"http://maven.apache.org/POM/4.0.0</span></span><br><span class="line"><span class="string">   http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span><br><span class="line">   &lt;modelVersion&gt;<span class="number">4.0</span>.<span class="number">0</span>&lt;/modelVersion&gt;</span><br><span class="line"></span><br><span class="line">   &lt;groupId&gt;com.companyname.project-group&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;project&lt;/artifactId&gt;</span><br><span class="line">   &lt;version&gt;<span class="number">1.0</span>&lt;/version&gt;</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure></p>
-<p>然后在命令行执行命令即可：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br></pre></td><td class="code"><pre><span class="line">PS E:\ws\test&gt; mvn help:effective-pom</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">[INFO]</span><br><span class="line">Effective POMs, after inheritance, interpolation, and profiles are applied:</span><br><span class="line"></span><br><span class="line">&lt;?xml version="1.0" encoding="GBK"?&gt;</span><br><span class="line">&lt;!-- ====================================================================== --&gt;</span><br><span class="line">&lt;!--                                                                        --&gt;</span><br><span class="line">&lt;!-- Generated by Maven Help Plugin on 2018-09-06T16:15:38+08:00            --&gt;</span><br><span class="line">&lt;!-- See: http://maven.apache.org/plugins/maven-help-plugin/                --&gt;</span><br><span class="line">&lt;!--                                                                        --&gt;</span><br><span class="line">&lt;!-- ====================================================================== --&gt;</span><br><span class="line">&lt;!-- ====================================================================== --&gt;</span><br><span class="line">&lt;!--                                                                        --&gt;</span><br><span class="line">&lt;!-- Effective POM for project                                              --&gt;</span><br><span class="line">&lt;!-- 'com.companyname.project-group:project:jar:1.0'                        --&gt;</span><br><span class="line">&lt;!--                                                                        --&gt;</span><br><span class="line">&lt;!-- ====================================================================== --&gt;</span><br><span class="line">&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</span><br><span class="line">  &lt;groupId&gt;com.companyname.project-group&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;project&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.0&lt;/version&gt;</span><br><span class="line">  &lt;repositories&gt;</span><br><span class="line">    &lt;repository&gt;</span><br><span class="line">      &lt;snapshots&gt;</span><br><span class="line">        &lt;enabled&gt;false&lt;/enabled&gt;</span><br><span class="line">      &lt;/snapshots&gt;</span><br><span class="line">      &lt;id&gt;central&lt;/id&gt;</span><br><span class="line">      &lt;name&gt;Central Repository&lt;/name&gt;</span><br><span class="line">      &lt;url&gt;https://repo.maven.apache.org/maven2&lt;/url&gt;</span><br><span class="line">    &lt;/repository&gt;</span><br><span class="line">  &lt;/repositories&gt;</span><br><span class="line">  &lt;pluginRepositories&gt;</span><br><span class="line">    &lt;pluginRepository&gt;</span><br><span class="line">      &lt;releases&gt;</span><br><span class="line">        &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;</span><br><span class="line">      &lt;/releases&gt;</span><br><span class="line">      &lt;snapshots&gt;</span><br><span class="line">        &lt;enabled&gt;false&lt;/enabled&gt;</span><br><span class="line">      &lt;/snapshots&gt;</span><br><span class="line">      &lt;id&gt;central&lt;/id&gt;</span><br><span class="line">      &lt;name&gt;Central Repository&lt;/name&gt;</span><br><span class="line">      &lt;url&gt;https://repo.maven.apache.org/maven2&lt;/url&gt;</span><br><span class="line">    &lt;/pluginRepository&gt;</span><br><span class="line">  &lt;/pluginRepositories&gt;</span><br><span class="line">  &lt;build&gt;</span><br><span class="line">    &lt;sourceDirectory&gt;E:\ws\test\src\main\java&lt;/sourceDirectory&gt;</span><br><span class="line">    &lt;scriptSourceDirectory&gt;E:\ws\test\src\main\scripts&lt;/scriptSourceDirectory&gt;</span><br><span class="line">    &lt;testSourceDirectory&gt;E:\ws\test\src\test\java&lt;/testSourceDirectory&gt;</span><br><span class="line">    &lt;outputDirectory&gt;E:\ws\test\target\classes&lt;/outputDirectory&gt;</span><br><span class="line">    &lt;testOutputDirectory&gt;E:\ws\test\target\test-classes&lt;/testOutputDirectory&gt;</span><br><span class="line">    &lt;resources&gt;</span><br><span class="line">      &lt;resource&gt;</span><br><span class="line">        &lt;directory&gt;E:\ws\test\src\main\resources&lt;/directory&gt;</span><br><span class="line">      &lt;/resource&gt;</span><br><span class="line">    &lt;/resources&gt;</span><br><span class="line">    &lt;testResources&gt;</span><br><span class="line">      &lt;testResource&gt;</span><br><span class="line">        &lt;directory&gt;E:\ws\test\src\test\resources&lt;/directory&gt;</span><br><span class="line">      &lt;/testResource&gt;</span><br><span class="line">    &lt;/testResources&gt;</span><br><span class="line">    &lt;directory&gt;E:\ws\test\target&lt;/directory&gt;</span><br><span class="line">    &lt;finalName&gt;project-1.0&lt;/finalName&gt;</span><br><span class="line">    &lt;pluginManagement&gt;</span><br><span class="line">      &lt;plugins&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">          &lt;artifactId&gt;maven-antrun-plugin&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;1.3&lt;/version&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">          &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;2.2-beta-5&lt;/version&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">          &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;2.8&lt;/version&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">          &lt;artifactId&gt;maven-release-plugin&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;2.3.2&lt;/version&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">      &lt;/plugins&gt;</span><br><span class="line">    &lt;/pluginManagement&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-clean-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.5&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-clean&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;clean&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;clean&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-resources-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.6&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-testResources&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;process-test-resources&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;testResources&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-resources&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;process-resources&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;resources&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.4&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-jar&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;package&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;jar&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;3.1&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-compile&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;compile&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;compile&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-testCompile&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;test-compile&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;testCompile&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.12.4&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-test&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;test&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;test&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-install-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.4&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-install&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;install&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;install&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-deploy-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.7&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-deploy&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;deploy&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;deploy&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-site-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;3.3&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-site&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;site&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;site&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">            &lt;configuration&gt;</span><br><span class="line">              &lt;outputDirectory&gt;E:\ws\test\target\site&lt;/outputDirectory&gt;</span><br><span class="line">              &lt;reportPlugins&gt;</span><br><span class="line">                &lt;reportPlugin&gt;</span><br><span class="line">                  &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">                  &lt;artifactId&gt;maven-project-info-reports-plugin&lt;/artifactId&gt;</span><br><span class="line">                &lt;/reportPlugin&gt;</span><br><span class="line">              &lt;/reportPlugins&gt;</span><br><span class="line">            &lt;/configuration&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;default-deploy&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;site-deploy&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;deploy&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">            &lt;configuration&gt;</span><br><span class="line">              &lt;outputDirectory&gt;E:\ws\test\target\site&lt;/outputDirectory&gt;</span><br><span class="line">              &lt;reportPlugins&gt;</span><br><span class="line">                &lt;reportPlugin&gt;</span><br><span class="line">                  &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">                  &lt;artifactId&gt;maven-project-info-reports-plugin&lt;/artifactId&gt;</span><br><span class="line">                &lt;/reportPlugin&gt;</span><br><span class="line">              &lt;/reportPlugins&gt;</span><br><span class="line">            &lt;/configuration&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">        &lt;configuration&gt;</span><br><span class="line">          &lt;outputDirectory&gt;E:\ws\test\target\site&lt;/outputDirectory&gt;</span><br><span class="line">          &lt;reportPlugins&gt;</span><br><span class="line">            &lt;reportPlugin&gt;</span><br><span class="line">              &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">              &lt;artifactId&gt;maven-project-info-reports-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;/reportPlugin&gt;</span><br><span class="line">          &lt;/reportPlugins&gt;</span><br><span class="line">        &lt;/configuration&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br><span class="line">  &lt;reporting&gt;</span><br><span class="line">    &lt;outputDirectory&gt;E:\ws\test\target\site&lt;/outputDirectory&gt;</span><br><span class="line">  &lt;/reporting&gt;</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure></p>
-<p>在上面的pom.xml中，您可以看到默认的项目源文件夹结构，输出目录，所需的插件，存储库，报告目录，Maven将在执行所需目标时使用。</p>
-<p>Maven pom.xml也不需要手动编写。 Maven提供了许多原型插件来创建项目，按顺序创建项目结构和pom.xml.</p>
-<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><h1 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h1><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html" target="_blank" rel="noopener">官网-5分钟入门</a></p>
-<p><a href="https://maven.apache.org/guides/getting-started/index.html" target="_blank" rel="noopener">官网-入门指导</a></p>
-<p><a href="https://maven.apache.org/pom.html" target="_blank" rel="noopener">官网-POM文件</a></p>
-<p><a href="https://maven.apache.org/settings.html" target="_blank" rel="noopener">官网-setting</a></p>
-<p><a href="http://tutorials.jenkov.com/maven/maven-tutorial.html" target="_blank" rel="noopener">maven入门博客</a></p>
-<p><a href="https://www.tutorialspoint.com/maven/maven_overview.htm" target="_blank" rel="noopener">maven入门教程</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>使用了这么多年的maven，maven的单词什么意思？</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/09/06/maven/001-maven-tutorial/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/09/06/maven/001-maven-tutorial/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/06/maven/001-maven-tutorial/" data-id="cjyf3zlvg00htuich262fr8o2" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -2007,7 +2004,7 @@ null==undefined
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 12.94px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.59px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2029,6 +2026,10 @@ null==undefined
       <ul>
         
           <li>
+            <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/23/linux/028-ubuntu-application-launcher/">ubuntu制作启动图标</a>
           </li>
         
@@ -2042,10 +2043,6 @@ null==undefined
         
           <li>
             <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/15/linux/026-centos-firewalld/">重新认识centos防火墙</a>
           </li>
         
       </ul>

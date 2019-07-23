@@ -86,6 +86,96 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-cloudcompute/009-docker-dockerfile" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/02/cloudcompute/009-docker-dockerfile/" class="article-date">
+  <time datetime="2018-08-02T05:51:55.000Z" itemprop="datePublished">2018-08-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/02/cloudcompute/009-docker-dockerfile/">3.dockerfile命令</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>dockerfile命令.</p>
+<h1 id="总图导航"><a href="#总图导航" class="headerlink" title="总图导航"></a>总图导航</h1><img src="/2018/08/02/cloudcompute/009-docker-dockerfile/000.png">
+<h1 id="执行例子"><a href="#执行例子" class="headerlink" title="执行例子"></a>执行例子</h1><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> busybox</span><br><span class="line"><span class="keyword">MAINTAINER</span> jimo</span><br><span class="line"><span class="keyword">WORKDIR</span> /testdir</span><br><span class="line"><span class="keyword">RUN</span> touch tmpfile1</span><br><span class="line"><span class="keyword">COPY</span> ["tmpfile2","."]</span><br><span class="line"><span class="keyword">ADD</span> ["test.tar.gz","."]</span><br><span class="line"><span class="keyword">ENV</span> WELCOME <span class="string">"welcome,hello jimo!"</span></span><br></pre></td></tr></table></figure>
+<p>步骤:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# ls</span><br><span class="line">Dockerfile  test.tar.gz  tmpfile2</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker build -t my-image .</span><br><span class="line">Sending build context to Docker daemon  3.584kB</span><br><span class="line">Step 1/7 : FROM busybox</span><br><span class="line"><span class="meta"> ---&gt;</span> 8ac48589692a</span><br><span class="line">Step 2/7 : MAINTAINER jimo</span><br><span class="line"><span class="meta"> ---&gt;</span> Running in cddd7ca74cac</span><br><span class="line">Removing intermediate container cddd7ca74cac</span><br><span class="line"><span class="meta"> ---&gt;</span> 4c677feaf9b1</span><br><span class="line">Step 3/7 : WORKDIR /testdir</span><br><span class="line">Removing intermediate container 74aa3f9fe05c</span><br><span class="line"><span class="meta"> ---&gt;</span> dee8626e9257</span><br><span class="line">Step 4/7 : RUN touch tmpfile1</span><br><span class="line"><span class="meta"> ---&gt;</span> Running in 8778416873e1</span><br><span class="line">Removing intermediate container 8778416873e1</span><br><span class="line"><span class="meta"> ---&gt;</span> 454f8faf14d7</span><br><span class="line">Step 5/7 : COPY ["tmpfile2","."]</span><br><span class="line"><span class="meta"> ---&gt;</span> acc5e5121870</span><br><span class="line">Step 6/7 : ADD ["test.tar.gz","."]</span><br><span class="line"><span class="meta"> ---&gt;</span> 64e240a80739</span><br><span class="line">Step 7/7 : ENV WELCOME "welcome,hello jimo!"</span><br><span class="line"><span class="meta"> ---&gt;</span> Running in f1b75e490e80</span><br><span class="line">Removing intermediate container f1b75e490e80</span><br><span class="line"><span class="meta"> ---&gt;</span> 135177378c5b</span><br><span class="line">Successfully built 135177378c5b</span><br><span class="line">Successfully tagged my-image:latest</span><br></pre></td></tr></table></figure></p>
+<p>验证:进入容器<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker run -it my-image</span><br><span class="line">/testdir # ls</span><br><span class="line">Dockerfile  tmpfile1    tmpfile2</span><br><span class="line">/testdir # echo $WELCOME</span><br><span class="line">welcome,hello jimo!</span><br><span class="line">/testdir #</span><br></pre></td></tr></table></figure></p>
+<h1 id="CMD"><a href="#CMD" class="headerlink" title="CMD"></a>CMD</h1><p>下面看看 CMD 是如何工作的。Dockerfile 片段如下：<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CMD</span> echo "Hello world"</span><br></pre></td></tr></table></figure></p>
+<p>运行容器 docker run -it [image] 将输出：<br>Hello world</p>
+<p>但当后面加上一个命令，比如 docker run -it [image] /bin/bash，CMD 会被忽略掉，命令 bash 将被执行：<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@<span class="number">10</span>a32dc7d3d3:/<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="ENTRYPOINT"><a href="#ENTRYPOINT" class="headerlink" title="ENTRYPOINT"></a>ENTRYPOINT</h1><ol>
+<li>ENTRYPOINT 的 Exec 格式用于设置要执行的命令及其参数，同时可通过 CMD 提供额外的参数。</li>
+<li>ENTRYPOINT 中的参数始终会被使用，而 CMD 的额外参数可以在容器启动时动态替换掉。</li>
+</ol>
+<p>比如下面的 Dockerfile 片段：<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ENTRYPOINT</span> ["/bin/echo", "Hello"]  </span><br><span class="line"><span class="keyword">CMD</span> ["world"]</span><br></pre></td></tr></table></figure></p>
+<p>当容器通过 docker run -it [image] 启动时，输出为：<br>Hello world</p>
+<p>而如果通过 docker run -it [image] jimo 启动，则输出为：<br>Hello jimo</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文来自<a href="http://www.cnblogs.com/CloudMan6/p/6875834.html" target="_blank" rel="noopener">blog</a></p>
+<p>最佳学习方式: 去 <a href="https://hub.docker.com/" target="_blank" rel="noopener">Docker Hub</a> 上参考那些官方镜像的 Dockerfile.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>dockerfile命令.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/08/02/cloudcompute/009-docker-dockerfile/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/08/02/cloudcompute/009-docker-dockerfile/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjyfq8r9w002d9cchr5q6hcr9" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a><span class="article-tag-list-count">13</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/004-big-data-fresh" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/02/java/004-big-data-fresh/" class="article-date">
@@ -195,12 +285,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjyf3zltd00aluich9cvi7vh0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjyfq8rat005g9cch10rjqb3s" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -312,7 +402,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjyf3zlpk002wuich4hp3xik6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjyfq8r9w002e9cchwykl8jdg" class="article-share-link">
           Share
         </a>
         
@@ -421,7 +511,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjyf3zlpi002tuich5t6g2z2t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjyfq8r9v00299cch9gl6hz0t" class="article-share-link">
           Share
         </a>
         
@@ -501,7 +591,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjyf3zluc00dxuich54htroay" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjyfq8rbx009j9cchbqhgqdzu" class="article-share-link">
           Share
         </a>
         
@@ -577,7 +667,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjyf3zlv200gluichrb5u2rh5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjyfq8rha00lk9cched7ix6nc" class="article-share-link">
           Share
         </a>
         
@@ -686,12 +776,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/23/java/003-design-pattern-type/" data-id="cjyf3zltc00ajuichw7y26yf9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/23/java/003-design-pattern-type/" data-id="cjyfq8rat005e9cchh0idvluq" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -779,7 +869,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/22/js/001-npms/" data-id="cjyf3zlse0091uich8upkqqjj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/22/js/001-npms/" data-id="cjyfq8ral004n9cchflmajuru" class="article-share-link">
           Share
         </a>
         
@@ -981,12 +1071,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/21/elasticsearch/005-all-know/" data-id="cjyf3zlpv003tuichnm0nsmlb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/21/elasticsearch/005-all-know/" data-id="cjyfq8rae00409cch10g8yrul" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -1073,7 +1163,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/11/cloudcompute/006-nova01/" data-id="cjyf3zlpi002suichc9vwyvcr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/11/cloudcompute/006-nova01/" data-id="cjyfq8r9u00269cchqhsseya7" class="article-share-link">
           Share
         </a>
         
@@ -1161,12 +1251,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/01/java/002-jconsole/" data-id="cjyf3zltc00aguichpeo0bop9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/01/java/002-jconsole/" data-id="cjyfq8ras005b9cchby02vcc0" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">71</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
 
       </footer>
       </div>
@@ -1255,7 +1345,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/30/cloudcompute/015-virtualbox-install-openstack/" data-id="cjyf3zlpo003buichpmcbhgob" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/06/30/cloudcompute/015-virtualbox-install-openstack/" data-id="cjyfq8ra1002t9cch5pwif8pw" class="article-share-link">
           Share
         </a>
         
@@ -1329,7 +1419,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/26/life/000-open-new-life/" data-id="cjyf3zlub00duuich2cw9h131" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/06/26/life/000-open-new-life/" data-id="cjyfq8rc500a59cch1laid8yh" class="article-share-link">
           Share
         </a>
         
@@ -1438,7 +1528,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/21/linux/013-linux-backup/" data-id="cjyf3zlv100giuichyjq6qmd7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/06/21/linux/013-linux-backup/" data-id="cjyfq8rg500ld9cchjrrif5se" class="article-share-link">
           Share
         </a>
         
@@ -1520,7 +1610,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/11/blockchain/000-learn-resources/" data-id="cjyf3zlou000ouichdqdaqv5f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/06/11/blockchain/000-learn-resources/" data-id="cjyfq8r92000o9cchsl9uxh41" class="article-share-link">
           Share
         </a>
         
@@ -1598,7 +1688,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/01/tools/009-local-network-file-transport/" data-id="cjyf3zlwd00kvuich19skgxkf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/06/01/tools/009-local-network-file-transport/" data-id="cjyfq8ril00p79cch20l5mqxa" class="article-share-link">
           Share
         </a>
         
@@ -1674,7 +1764,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/31/basic/001-RESTful/" data-id="cjyf3zlow000tuichvkc1t5q6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/31/basic/001-RESTful/" data-id="cjyfq8r9a000t9cchxcxppk4m" class="article-share-link">
           Share
         </a>
         
@@ -1753,7 +1843,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/30/git/001-git-command-collect/" data-id="cjyf3zlpx0042uichmu1cesjy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/30/git/001-git-command-collect/" data-id="cjyfq8rae00429cchi0ffk87p" class="article-share-link">
           Share
         </a>
         
@@ -1841,7 +1931,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/15/math/001-fourier-wavelet-transform/" data-id="cjyf3zlve00hmuichnuimvrnp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/15/math/001-fourier-wavelet-transform/" data-id="cjyfq8rci00b59cchy59eqn1k" class="article-share-link">
           Share
         </a>
         
@@ -1915,92 +2005,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/10/math/000-basic-concept/" data-id="cjyf3zlvb00heuichh6dzcp80" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/10/math/000-basic-concept/" data-id="cjyfq8rcf00ax9cchqx4hva3e" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/math/">math</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/probability/">probability</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/statistics/">statistics</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/010-ffmpeg" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/01/tools/010-ffmpeg/" class="article-date">
-  <time datetime="2018-05-01T05:51:55.000Z" itemprop="datePublished">2018-05-01</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/01/tools/010-ffmpeg/">ffmpeg常用命令</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本问主要说明视频的一些参数和linux下ffmpeg的视频转换和压缩功能.</p>
-<h1 id="视频参数说明"><a href="#视频参数说明" class="headerlink" title="视频参数说明"></a>视频参数说明</h1><p>通过ffmpeg查看视频信息,-i指定输入视频<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">]$</span> ffmpeg -i 1.mp4</span><br><span class="line">Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '1.mp4':</span><br><span class="line">  Metadata:</span><br><span class="line">    major_brand     : isom</span><br><span class="line">    minor_version   : 512</span><br><span class="line">    compatible_brands: isomiso2avc1mp41</span><br><span class="line">    encoder         : Lavf57.83.100</span><br><span class="line">  Duration: 00:09:59.03, start: 0.000000, bitrate: 15991 kb/s</span><br><span class="line">    Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuvj420p(pc), 1920x1080, 15923 kb/s, 30 fps, 30 tbr, 15360 tbn, 60 tbc (default)</span><br><span class="line">    Metadata:</span><br><span class="line">      handler_name    : VideoHandler</span><br><span class="line">    Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 32000 Hz, mono, fltp, 69 kb/s (default)</span><br><span class="line">    Metadata:</span><br><span class="line">      handler_name    : SoundHandler</span><br></pre></td></tr></table></figure></p>
-<p>其中Stream 0就是视频流,下面是音频流,h264编码,1920*1080分辨率.<br>这个15923kb/s要特别说明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">码率(比特率): 每秒输入视频的比特数,越高视频越大,质量越高,所以计算视频大小的公式:</span><br><span class="line">视频时长(秒)*码率,例如这个(忽略了音频的大小):</span><br><span class="line">Size(video) = 60s*10 * (15923/8/1024/1024) = 1.13GB</span><br></pre></td></tr></table></figure></p>
-<p>那么视频压缩就是压缩码率,当然帧率也可以压,不过一般不这样干.</p>
-<h1 id="ffmpeg压缩视频"><a href="#ffmpeg压缩视频" class="headerlink" title="ffmpeg压缩视频"></a>ffmpeg压缩视频</h1><p>计算好需要压缩的码率,我打算压缩5倍,设为3200kb/s:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> -b:v 代表视频码率,-b:a 代表音频的 </span><br><span class="line"><span class="meta">$</span> ffmpeg -i 1.mp4 -b:v 3200k 4.mp4</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 直接转换格式并压缩</span><br><span class="line"><span class="meta">$</span> ffmpeg -i MOVI0001.avi -b:v 3200k /home/jimo/视频/11.mp4</span><br></pre></td></tr></table></figure></p>
-<p>这样视频大概200多MB.</p>
-<p>参考:<a href="https://www.cnblogs.com/liusx0303/p/7572050.html" target="_blank" rel="noopener">ffmpeg——关于视频压缩</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本问主要说明视频的一些参数和linux下ffmpeg的视频转换和压缩功能.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/05/01/tools/010-ffmpeg/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/05/01/tools/010-ffmpeg/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/01/tools/010-ffmpeg/" data-id="cjyf3zlwe00l0uichlc50p2xt" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/video/">video</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -2037,7 +2047,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 12.94px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 10.59px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2059,6 +2069,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/23/linux/028-ubuntu-application-launcher/">ubuntu制作启动图标</a>
           </li>
         
@@ -2072,10 +2086,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/15/linux/026-centos-firewalld/">重新认识centos防火墙</a>
           </li>
         
       </ul>
