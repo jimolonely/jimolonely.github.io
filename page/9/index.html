@@ -86,6 +86,313 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/005-jdk11-new-feature" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/08/java/005-jdk11-new-feature/" class="article-date">
+  <time datetime="2018-09-08T07:20:32.000Z" itemprop="datePublished">2018-09-08</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/08/java/005-jdk11-new-feature/">jdk11新特性</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果您熟悉英文强烈建议阅读<a href="http://openjdk.java.net/projects/jdk/11/" target="_blank" rel="noopener">官方文档</a>。</p>
+<h1 id="java新增方法"><a href="#java新增方法" class="headerlink" title="java新增方法"></a>java新增方法</h1><p>当然，下面只是部分：</p>
+<h2 id="String"><a href="#String" class="headerlink" title="String"></a>String</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String s = <span class="string">" Jimo "</span>;</span><br><span class="line">    Assert.assertEquals(<span class="string">"Jimo"</span>, s.strip());</span><br><span class="line">    Assert.assertEquals(<span class="string">"Jimo "</span>, s.stripLeading());</span><br><span class="line">    Assert.assertEquals(<span class="string">" Jimo"</span>, s.stripTrailing());</span><br><span class="line">    Assert.assertFalse(s.isBlank());</span><br><span class="line">    Assert.assertEquals(<span class="string">" Jimo  Jimo  Jimo "</span>, s.repeat(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> lines = <span class="string">"I'm a super man\ndo you know me?\n"</span>;</span><br><span class="line">    <span class="keyword">final</span> Stream&lt;String&gt; stringStream = lines.lines();</span><br><span class="line">    System.out.println(stringStream.collect(Collectors.toList()));</span><br><span class="line">    <span class="comment">/*[I'm a super man, do you know me?]*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Path path = Path.of(<span class="string">"test.txt"</span>);</span><br><span class="line">    Files.writeString(path, <span class="string">"Ha jimo"</span>);</span><br><span class="line">    Assert.assertEquals(<span class="string">"Ha jimo"</span>, Files.readString(path));</span><br><span class="line"></span><br><span class="line">    Assert.assertTrue(Files.isSameFile(path, path));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Predicate"><a href="#Predicate" class="headerlink" title="Predicate"></a>Predicate</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPredicate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> count = Stream.of(<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">""</span>)</span><br><span class="line">            .filter(Predicate.not(String::isEmpty))</span><br><span class="line">            .count();</span><br><span class="line">    Assert.assertEquals(<span class="number">2</span>, count);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> Predicate&lt;String&gt; predicate =</span><br><span class="line">            Pattern.compile(<span class="string">"jimo."</span>).asMatchPredicate();</span><br><span class="line">    Assert.assertTrue(predicate.test(<span class="string">"jimo1"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> Thread移除stop和destroy方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/27 8:37</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testThread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Thread t = <span class="keyword">new</span> Thread();</span><br><span class="line">    t.stop();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="TimeUnit"><a href="#TimeUnit" class="headerlink" title="TimeUnit"></a>TimeUnit</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testTimeUnit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> TimeUnit unit = TimeUnit.DAYS;</span><br><span class="line">    Assert.assertEquals(<span class="number">2</span>, unit.convert(Duration.ofHours(<span class="number">49</span>)));</span><br><span class="line">    Assert.assertEquals(<span class="number">1</span>, unit.convert(Duration.ofMinutes(<span class="number">1450</span>)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="lambda-var"><a href="#lambda-var" class="headerlink" title="lambda var"></a>lambda var</h2><p>lambda表达式中支持可变参数var，并且可以注解.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testParam</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> count = Arrays</span><br><span class="line">            .stream(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;)</span><br><span class="line">            .filter((<span class="meta">@Nonnull</span> <span class="keyword">var</span> x) -&gt; x &gt; <span class="number">2</span>)</span><br><span class="line">            .count();</span><br><span class="line">    System.out.println(count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="改进64位架构内部函数"><a href="#改进64位架构内部函数" class="headerlink" title="改进64位架构内部函数"></a>改进64位架构内部函数</h1><p>改进现有的String和array内在函数，并在AArch64处理器上为java.lang.Math sin，cos和log函数实现新的内在函数。</p>
+<p>原因：专用的CPU架构的代码模式可提高用户应用程序和基准测试的性能</p>
+<p>下面分别在JDK8和JDK11上测试对比：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> 测试Math函数的时间, 看JDK11在优化了64位架构后有什么提升</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/25 19:24</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMathOnJDK11</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTime = System.nanoTime();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        Math.sin(i);</span><br><span class="line">        Math.cos(i);</span><br><span class="line">        Math.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> endTime = System.nanoTime();</span><br><span class="line">    System.out.println(TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + <span class="string">"ms"</span>);</span><br><span class="line">    <span class="comment">/*1279ms,1477ms*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMathOnJDK8</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTime = System.nanoTime();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        Math.sin(i);</span><br><span class="line">        Math.cos(i);</span><br><span class="line">        Math.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> endTime = System.nanoTime();</span><br><span class="line">    System.out.println(TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + <span class="string">"ms"</span>);</span><br><span class="line">    <span class="comment">/*8700ms ,8724ms*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="移除Java-EE和CORBA模块"><a href="#移除Java-EE和CORBA模块" class="headerlink" title="移除Java EE和CORBA模块"></a>移除Java EE和CORBA模块</h1><p>JDK6包含完整的Web Service开发栈</p>
+<h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><ol>
+<li><p>JAX-WS（基于XML的Web服务Java API），JAXB（用于XML绑定的Java架构），<br>JAF（JavaBeans Activation Framework）和Common Annotations</p>
+</li>
+<li><p>CORBA（Common Object Request Broker Architecture）通用对象请求代理架构是软件构建的一个标准</p>
+</li>
+</ol>
+<h2 id="为什么移除？"><a href="#为什么移除？" class="headerlink" title="为什么移除？"></a>为什么移除？</h2><ol>
+<li>JavaSE集成JavaEE存在问题：相关性，版本</li>
+<li>Java EE的包可以很方便的从Maven等三方库获取</li>
+<li>并没多少人用JDK中的Java EE</li>
+</ol>
+<h1 id="HTTP-Client标准化"><a href="#HTTP-Client标准化" class="headerlink" title="HTTP Client标准化"></a>HTTP Client标准化</h1><p>HTTP Client：JDK9提出，JDK10更新，JDK11标准化</p>
+<p>从开始的孵化特性走向成熟，形成标准，有意思</p>
+<p>JDK HTTP Client可用于通过网络请求HTTP资源；</p>
+<ol>
+<li>它支持HTTP / 1.1和HTTP / 2</li>
+<li>包括同步和异步编程模型，还支持并发</li>
+<li>将请求和响应主体作为反应流处理</li>
+<li>遵循熟悉的Builder模式。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> HttpClient client = HttpClient.newHttpClient();</span><br><span class="line">    <span class="keyword">final</span> HttpRequest request = HttpRequest.newBuilder()</span><br><span class="line">            .uri(URI.create(<span class="string">"http://openjdk.java.net"</span>))</span><br><span class="line">            .build();</span><br><span class="line">    client.sendAsync(request, HttpResponse.BodyHandlers.ofString())</span><br><span class="line">            .thenApply(HttpResponse::body)</span><br><span class="line">            .thenAccept(System.out::println)</span><br><span class="line">            .join();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="java单文件运行"><a href="#java单文件运行" class="headerlink" title="java单文件运行"></a>java单文件运行</h1><p><a href="http://openjdk.java.net/jeps/330" target="_blank" rel="noopener">http://openjdk.java.net/jeps/330</a></p>
+<h2 id="以前运行java文件"><a href="#以前运行java文件" class="headerlink" title="以前运行java文件"></a>以前运行java文件</h2><img src="/2018/09/08/java/005-jdk11-new-feature/000.png">
+<img src="/2018/09/08/java/005-jdk11-new-feature/001.png">
+<h2 id="现在"><a href="#现在" class="headerlink" title="现在"></a>现在</h2><img src="/2018/09/08/java/005-jdk11-new-feature/002.png">
+<p>但是如果有内部类则找不到：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/003.png">
+<h1 id="Filght-Recorder-JFR"><a href="#Filght-Recorder-JFR" class="headerlink" title="Filght Recorder(JFR)"></a>Filght Recorder(JFR)</h1><p><a href="http://openjdk.java.net/jeps/328" target="_blank" rel="noopener">http://openjdk.java.net/jeps/328</a></p>
+<h2 id="干什么的"><a href="#干什么的" class="headerlink" title="干什么的"></a>干什么的</h2><ol>
+<li>提供用于生成和使用数据作为事件的API</li>
+<li>提供缓冲机制和二进制数据格式</li>
+<li>允许配置和过滤事件</li>
+<li>为OS，HotSpot JVM和JDK库提供事件</li>
+</ol>
+<h2 id="为什么需要"><a href="#为什么需要" class="headerlink" title="为什么需要"></a>为什么需要</h2><p>故障排除，监视和分析是开发生命周期中不可或缺的部分，但是在涉及实际数据的繁重负载下，某些问题仅发生在生产中。</p>
+<p>Flight Recorder记录来自应用程序，JVM和OS的事件。 事件存储在一个文件中，该文件可以附加到错误报告中并由支持工程师进行检查，允许事后分析导致问题时的问题。 工具可以使用API从记录文件中提取信息。</p>
+<p>飞行记录嘛：飞机飞行时的记录，对于程序就是程序运行时的记录，包括状态监控和数据收集等</p>
+<h2 id="如何启动"><a href="#如何启动" class="headerlink" title="如何启动"></a>如何启动</h2><img src="/2018/09/08/java/005-jdk11-new-feature/004.png">
+<img src="/2018/09/08/java/005-jdk11-new-feature/005.png">
+<h2 id="JFR-测试"><a href="#JFR-测试" class="headerlink" title="JFR-测试"></a>JFR-测试</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FlightRecorderTest</span> <span class="keyword">extends</span> <span class="title">Event</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Label</span>(<span class="string">"Hello World"</span>)</span><br><span class="line">    <span class="meta">@Description</span>(<span class="string">"Helps the programmer getting started"</span>)</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span> <span class="keyword">extends</span> <span class="title">Event</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Label</span>(<span class="string">"Message"</span>)</span><br><span class="line">        String message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        HelloWorld event = <span class="keyword">new</span> HelloWorld();</span><br><span class="line">        event.message = <span class="string">"hello, world!"</span>;</span><br><span class="line">        event.commit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行时加上命令行参数：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/006.png">
+<h2 id="读取记录"><a href="#读取记录" class="headerlink" title="读取记录"></a>读取记录</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@func</span> 读取jfr文件</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> wangpeng</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/8/26 16:52</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readRecordFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Path path = Paths.get(<span class="string">"E:\\ws\\Git\\java-version-compare\\myrecording.jfr"</span>);</span><br><span class="line">    <span class="keyword">final</span> List&lt;RecordedEvent&gt; recordedEvents = RecordingFile.readAllEvents(path);</span><br><span class="line">    <span class="keyword">for</span> (RecordedEvent event : recordedEvents) &#123;</span><br><span class="line">        System.out.println(event.getStartTime() + <span class="string">","</span> + event.getValue(<span class="string">"message"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<img src="/2018/09/08/java/005-jdk11-new-feature/007.png">
+<p><a href="https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/run.htm#JFRRT164" target="_blank" rel="noopener">https://docs.oracle.com/javacomponents/jmc-5-5/jfr-runtime-guide/run.htm#JFRRT164</a></p>
+<h1 id="JDK11-低开销堆内存分析"><a href="#JDK11-低开销堆内存分析" class="headerlink" title="JDK11-低开销堆内存分析"></a>JDK11-低开销堆内存分析</h1><p>提供一种从JVM获取有关Java对象堆分配的信息的方法：</p>
+<ol>
+<li>低开销</li>
+<li>可通过定义明确的程序接口访问，</li>
+<li>可以对所有分配进行采样（即，不限于在一个特定堆区域中的分配或以一种特定方式分配的分配），</li>
+<li>可以以与实现无关的方式定义（即，不依赖于任何特定的GC算法或VM实现）</li>
+<li>以及可以提供有关实时和死Java对象的信息。</li>
+</ol>
+<h2 id="why"><a href="#why" class="headerlink" title="why"></a>why</h2><p>现有的堆内存工具：Java Flight Recorder, jmap, YourKit, and VisualVM</p>
+<p>现在获取Hotspot信息的方式：</p>
+<ol>
+<li><a href="https://github.com/google/allocation-instrumenter" target="_blank" rel="noopener">https://github.com/google/allocation-instrumenter</a></li>
+<li>Java Flight Recorder：只能记录，不能定制采样间隔，不能区分死/活对象</li>
+</ol>
+<h2 id="how"><a href="#how" class="headerlink" title="how"></a>how</h2><p>扩展了JVM TI：增加了分析接口</p>
+<p>JVMTI(JVM Tool Interface)： JDK1.5提出，一般是C，C++实现该接口，在JVM启动时加载</p>
+<p><a href="http://openjdk.java.net/jeps/331" target="_blank" rel="noopener">http://openjdk.java.net/jeps/331</a></p>
+<p>google开源内存分析工具：<a href="https://github.com/google/allocation-instrumenter" target="_blank" rel="noopener">https://github.com/google/allocation-instrumenter</a></p>
+<p>JVMTI介绍：<a href="https://en.wikipedia.org/wiki/Java_Virtual_Machine_Tools_Interface" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Java_Virtual_Machine_Tools_Interface</a></p>
+<p>Jvmti的使用：<a href="https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html</a></p>
+<h1 id="JDK11-无操作-No-Op-GC"><a href="#JDK11-无操作-No-Op-GC" class="headerlink" title="JDK11-无操作(No-Op)GC"></a>JDK11-无操作(No-Op)GC</h1><p>当堆内存枯竭时，JVM直接关闭，什么都不做 ，还有一个碉堡的名字：Epsilon </p>
+<h2 id="why-1"><a href="#why-1" class="headerlink" title="why"></a>why</h2><p>不同的垃圾回收器做不同的事嘛，存在即合理</p>
+<ol>
+<li>性能测试</li>
+<li>内存压力测试</li>
+<li>VM接口测试</li>
+<li>生存期极短Job测试</li>
+<li>延时高敏感程序测试</li>
+<li>吞吐量提高</li>
+</ol>
+<p>启动参数：<code>XX:+UseEpsilonGC</code></p>
+<p><a href="http://openjdk.java.net/jeps/318" target="_blank" rel="noopener">http://openjdk.java.net/jeps/318</a></p>
+<h1 id="JDK11-ZGC-实验性"><a href="#JDK11-ZGC-实验性" class="headerlink" title="JDK11-ZGC(实验性)"></a>JDK11-ZGC(实验性)</h1><p>Z垃圾回收器，也称为ZGC，是一个可扩展的低延迟(scalable low-latency)垃圾回收器.<br>ZGC是一个并发的，单例的，基于区域的，NUMA感知的压缩回收器。 Stop-the-world阶段仅限于根扫描，因此GC暂停时间不会随堆或活动集的大小而增加</p>
+<ol>
+<li>GC暂停时间不应超过10毫秒</li>
+<li>处理堆的大小从相对较小（几百MB）到非常大（TB）不等</li>
+<li>与使用G1相比，应用程序吞吐量减少不超过15％</li>
+<li>为未来的GC功能、优化利用彩色指针和负载屏障奠定基础</li>
+<li>最初支持的平台：Linux / x64</li>
+</ol>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>使用：Linux/x64下编译JDK时：<code>--with-jvm-features=zgc</code></p>
+<p>命令行参数：<code>XX:+UnlockExperimentalVMOptions  -XX:+UseZGC</code></p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>吞吐量：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/008.png">
+<p>暂停时间：</p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/009.png">
+<p><a href="http://openjdk.java.net/jeps/333" target="_blank" rel="noopener">http://openjdk.java.net/jeps/333</a></p>
+<h1 id="JDK11-TLS1-3"><a href="#JDK11-TLS1-3" class="headerlink" title="JDK11-TLS1.3"></a>JDK11-TLS1.3</h1><p>实现了传输层安全（TLS）协议RFC 8446的1.3版</p>
+<p>TLS 1.3是TLS协议的重大改进，与以前的版本相比，它提供了显著的安全性和性能改进。 其他供应商的几个早期实现已经可用。 我们需要支持TLS 1.3以保持竞争力并与最新标准保持同步。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">useTLS</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    String host = <span class="string">"www.baidu.com"</span>;</span><br><span class="line">    <span class="keyword">int</span> port = <span class="number">443</span>;</span><br><span class="line">    SocketFactory basicSocketFactory = SocketFactory.getDefault();</span><br><span class="line">    Socket s = basicSocketFactory.createSocket(host, port);</span><br><span class="line">    <span class="comment">/*s 是一个 TCP socket*/</span></span><br><span class="line">    SSLSocketFactory tlsSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();</span><br><span class="line">    s = tlsSocketFactory.createSocket(s, host, port, <span class="keyword">true</span>);</span><br><span class="line">    <span class="comment">/*s 现在是一个 基于TCP的TLS socket*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TLS参考：<a href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html</a> </p>
+<p><a href="http://openjdk.java.net/jeps/332" target="_blank" rel="noopener">http://openjdk.java.net/jeps/332</a></p>
+<p>RFC8446: <a href="https://tools.ietf.org/html/rfc8446" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc8446</a></p>
+<p>如何使用TLS：<a href="https://stackoverflow.com/questions/24868820/how-to-make-tls-work-with-java/24872636" target="_blank" rel="noopener">https://stackoverflow.com/questions/24868820/how-to-make-tls-work-with-java/24872636</a><br><a href="http://www.java2s.com/Tutorial/Java/0490__Security/SSLClientSession.htm" target="_blank" rel="noopener">http://www.java2s.com/Tutorial/Java/0490__Security/SSLClientSession.htm</a></p>
+<p>传输层 <a href="https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E5%B1%82" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E5%B1%82</a></p>
+<h1 id="JDK11-Curve25519-and-Curve448"><a href="#JDK11-Curve25519-and-Curve448" class="headerlink" title="JDK11-Curve25519 and Curve448"></a>JDK11-Curve25519 and Curve448</h1><p>RFC 7748定义了一种密钥协商方案，该方案比现有的椭圆曲线Diffie-Hellman（ECDH）方案更有效（原来的是C实现的，现在可以用纯Java实现）和安全。 此JEP的主要目标是API和此标准的实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">keyAgreementTest</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchAlgorithmException,</span></span><br><span class="line"><span class="function">        InvalidAlgorithmParameterException, InvalidKeySpecException, InvalidKeyException </span>&#123;</span><br><span class="line">    KeyPairGenerator kpg = KeyPairGenerator.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    NamedParameterSpec paramSpec = <span class="keyword">new</span> NamedParameterSpec(<span class="string">"X25519"</span>);</span><br><span class="line">    kpg.initialize(paramSpec);</span><br><span class="line">    KeyPair kp = kpg.generateKeyPair();</span><br><span class="line"></span><br><span class="line">    KeyFactory kf = KeyFactory.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    BigInteger u = <span class="keyword">new</span> BigInteger(<span class="string">"1212324324"</span>);</span><br><span class="line">    XECPublicKeySpec pubSpec = <span class="keyword">new</span> XECPublicKeySpec(paramSpec, u);</span><br><span class="line">    PublicKey pubKey = kf.generatePublic(pubSpec);</span><br><span class="line"></span><br><span class="line">    KeyAgreement ka = KeyAgreement.getInstance(<span class="string">"XDH"</span>);</span><br><span class="line">    ka.init(kp.getPrivate());</span><br><span class="line">    ka.doPhase(pubKey, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">byte</span>[] secret = ka.generateSecret();</span><br><span class="line">    System.out.println(Arrays.toString(secret));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="http://openjdk.java.net/jeps/324" target="_blank" rel="noopener">http://openjdk.java.net/jeps/324</a></p>
+<p>RFC定义的椭圆算法：<a href="https://tools.ietf.org/html/rfc7748" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc7748</a></p>
+<h1 id="JDK11-Deprecate-Nashorn"><a href="#JDK11-Deprecate-Nashorn" class="headerlink" title="JDK11-Deprecate Nashorn"></a>JDK11-Deprecate Nashorn</h1><p>弃用Nashorn JavaScript脚本引擎和API以及jjs工具，在将来的版本中可能会删除它们，如果一群可靠的开发人员表达出对Nashorn前进的明确愿望，那么这个JEP可以取消的</p>
+<p>原因：随着ECMAScript语言构建的快速步伐以及API的调整和修改，JDK发现Nashorn难以维护</p>
+<p><a href="http://openjdk.java.net/jeps/335" target="_blank" rel="noopener">http://openjdk.java.net/jeps/335</a></p>
+<img src="/2018/09/08/java/005-jdk11-new-feature/010.png">
+<h1 id="JDK11-基于Nest的访问控制"><a href="#JDK11-基于Nest的访问控制" class="headerlink" title="JDK11-基于Nest的访问控制"></a>JDK11-基于Nest的访问控制</h1><p>在以前的private public protected的基础上，JVM又提供了一种新的访问控制机制：Nest。</p>
+<p>Java代码都是以类为单位组织的，而且即使是在一个.java文件中的多个类也都会被分别编译为不同的.class类文件。但是对于开发者来说，在一个源文件中的代码在逻辑上应该是可以互相访问的，但是Java并不直接允许这样做。我们虽然可以在一个匿名内部类中访问外层类的成员方法，但是这实际上是通过编译器自动生成的所谓 访问桥(access bridge) 方法进行访问。这个解决方案在解决一部分问题的同时，也带来了如增加了不必要的程序大小和额外性能损耗等问题，而且很容易迷惑一部分Java程序员。</p>
+<p>而JDK 11带来的Nest就是一个更完善的解决方案。编译器现在把一些 看起来 是在一个类中的代码（如上面提到的匿名内部类）组织到Nest 中。而在同一个Nest中的类将会拥有同等的访问权限。这会让应用程序和字节码更加简单、安全，并对开发者透明。</p>
+<p>Java作为一种相对保守的语言，这是少数几个对《Java语言规范》和《Java虚拟机规范》做出较大改动的JEP之一。然而对于普通开发者，在通常的开发中也不会有很大的变动。但是对于反射的重度使用者或接触字节码工程的人来说，这个JEP还是有必要仔细了解一下的。</p>
+<p><a href="http://openjdk.java.net/jeps/181" target="_blank" rel="noopener">http://openjdk.java.net/jeps/181</a></p>
+<p><a href="https://xsun.io/2018/06/29/jdk11-preview/" target="_blank" rel="noopener">https://xsun.io/2018/06/29/jdk11-preview/</a></p>
+<h1 id="JDK11-其他更新"><a href="#JDK11-其他更新" class="headerlink" title="JDK11-其他更新"></a>JDK11-其他更新</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">更新到Unicode 10标准</span><br><span class="line">Java SE 10实现了Unicode 8.0。 Unicode 9.0增加了7,500个字符和6个新脚本，Unicode 10.0.0增加了8,518个字符和4个新脚本。 此升级将包括Unicode 9.0更改，因此添加了总共16,018个字符和10个新脚本。</span><br><span class="line">主要影响的类：</span><br><span class="line">Character and String in the java.lang package,</span><br><span class="line">NumericShaper in the java.awt.font package,</span><br><span class="line">Bidi, BreakIterator, and Normalizer in the java.text package.</span><br><span class="line"></span><br><span class="line">弃用Pack200工具和API</span><br><span class="line">在java.util.jar中弃用pack200和unpack200工具以及Pack200 API。</span><br><span class="line"></span><br><span class="line">实现ChaCha20和Poly1305密码算法</span><br><span class="line">实现RFC 7539中指定的ChaCha20和ChaCha20-Poly1305密码.ChaCha20是一种相对较新的流密码，可以替代旧的，不安全的RC4流密码。</span><br><span class="line"></span><br><span class="line">动态类文件常量</span><br><span class="line">这个JEP扩展了Java类文件格式来支持一种新形式的常量池，CONSTANT_Dynamic。它在初始化的时候，会像invokedynamic指令生成代理方法一样，委托给一个初始化方法进行创建。这是一个JVM内部的特性，对上层软件没有很大的影响，但是为Java语言未来的重大变化铺设了道路。</span><br></pre></td></tr></table></figure>
+<p>Unicode10：<a href="http://openjdk.java.net/jeps/327" target="_blank" rel="noopener">http://openjdk.java.net/jeps/327</a></p>
+<p>Pack200：<a href="http://openjdk.java.net/jeps/336" target="_blank" rel="noopener">http://openjdk.java.net/jeps/336</a></p>
+<p><a href="http://openjdk.java.net/jeps/309" target="_blank" rel="noopener">http://openjdk.java.net/jeps/309</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://dzone.com/articles/features-of-java-11" target="_blank" rel="noopener">https://dzone.com/articles/features-of-java-11
+</a></p>
+<p><a href="http://openjdk.java.net/jeps/320" target="_blank" rel="noopener">http://openjdk.java.net/jeps/320
+</a></p>
+<p><a href="http://openjdk.java.net/jeps/321" target="_blank" rel="noopener">http://openjdk.java.net/jeps/321</a></p>
+<p>HTTP Client的用法：<a href="http://openjdk.java.net/groups/net/httpclient/recipes.html" target="_blank" rel="noopener">http://openjdk.java.net/groups/net/httpclient/recipes.html</a></p>
+<p>Client介绍：<a href="http://openjdk.java.net/groups/net/httpclient/intro.html" target="_blank" rel="noopener">http://openjdk.java.net/groups/net/httpclient/intro.html</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>如果您熟悉英文强烈建议阅读<a href="http://openjdk.java.net/projects/jdk/11/" target="_blank" rel="noopener">官方文档</a>。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/08/java/005-jdk11-new-feature/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/08/java/005-jdk11-new-feature/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/08/java/005-jdk11-new-feature/" data-id="cjyhx0ke10075ghchv022styx" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-lang/011-kafka-stream" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/08/lang/011-kafka-stream/" class="article-date">
+  <time datetime="2018-09-08T06:27:25.000Z" itemprop="datePublished">2018-09-08</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/08/lang/011-kafka-stream/">kafka stream</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文介绍kafka2.0的stream操作，并用java实现调用,实现了官网的3个例子。</p>
+<h1 id="最简Pipe"><a href="#最简Pipe" class="headerlink" title="最简Pipe"></a>最简Pipe</h1><p>pipe相当于管道，连接2个topic的流通道，这里注意的就是消费者的客户端怎么写。</p>
+<h2 id="pipe"><a href="#pipe" class="headerlink" title="pipe"></a>pipe</h2><p>管道什么都不做：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.kafka.common.serialization.Serdes;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.streams.KafkaStreams;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.streams.StreamsBuilder;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.streams.StreamsConfig;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.streams.Topology;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.CountDownLatch;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Pipe</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line">        props.put(StreamsConfig.APPLICATION_ID_CONFIG, <span class="string">"stream-pipe"</span>);</span><br><span class="line">        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG,</span><br><span class="line">                <span class="string">"hadoop4:9092,hadoop5:9092,hadoop6:9092,hadoop7:9092,hadoop8:9092,hadoop9:9092"</span>);</span><br><span class="line">        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());</span><br><span class="line">        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> StreamsBuilder builder = <span class="keyword">new</span> StreamsBuilder();</span><br><span class="line"></span><br><span class="line">        builder.stream(<span class="string">"jimo"</span>).to(<span class="string">"hehe"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> Topology topology = builder.build();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> KafkaStreams streams = <span class="keyword">new</span> KafkaStreams(topology, props);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> CountDownLatch latch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// attach shutdown handler to catch control-c</span></span><br><span class="line">        Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(<span class="string">"streams-shutdown-hook"</span>) &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                streams.close();</span><br><span class="line">                latch.countDown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            streams.start();</span><br><span class="line">            latch.await();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            System.exit(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        System.exit(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="生产者"><a href="#生产者" class="headerlink" title="生产者"></a>生产者</h2><p>生产者依然不变：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span> KafkaProducer&lt;String, String&gt; producer;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String TOPIC = <span class="string">"jimo"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Before</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Properties properties = <span class="keyword">new</span> Properties();</span><br><span class="line">        properties.setProperty(<span class="string">"metadata.broker.list"</span>, <span class="string">"hadoop4:9092,hadoop5:9092,hadoop6:9092,hadoop7:9092,hadoop8:9092,hadoop9:9092"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"bootstrap.servers"</span>, <span class="string">"hadoop4:9092,hadoop5:9092,hadoop6:9092,hadoop7:9092,hadoop8:9092,hadoop9:9092"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"acks"</span>, <span class="string">"all"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"retries"</span>, <span class="string">"0"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"batch.size"</span>, <span class="string">"16384"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"request.timeout.ms"</span>, <span class="string">"10000"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"message.send.max.retries"</span>, <span class="string">"3"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"linger.ms"</span>, <span class="string">"1"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"buffer.memory"</span>, <span class="string">"33554432"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"ssl.client.auth"</span>, <span class="string">"required"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"key.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringSerializer"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"value.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringSerializer"</span>);</span><br><span class="line">        producer = <span class="keyword">new</span> KafkaProducer&lt;&gt;(properties);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">            ProducerRecord&lt;String, String&gt; record = <span class="keyword">new</span> ProducerRecord&lt;&gt;(TOPIC, <span class="string">"key"</span> + i, <span class="string">"hehe"</span> + i);</span><br><span class="line">            producer.send(record, (recordMetadata, e) -&gt; &#123;</span><br><span class="line">                System.out.println(recordMetadata.offset());</span><br><span class="line">                <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@After</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        producer.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="消费者"><a href="#消费者" class="headerlink" title="消费者"></a>消费者</h2><p>现在到了jimo 的主题里，开启消费者去消费。</p>
+<p>java客户端需要改为流的形式：</p>
+<p>pom.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;kafka_2.10&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;0.9.0.1&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;0.9.0.1&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StreamConsumer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Properties properties = <span class="keyword">new</span> Properties();</span><br><span class="line">        properties.setProperty(<span class="string">"bootstrap.servers"</span>, <span class="string">"hadoop4:9092,hadoop5:9092,hadoop6:9092,hadoop7:9092,hadoop8:9092,hadoop9:9092"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"zookeeper.connect"</span>, <span class="string">"hadoop4:2181,hadoop5:2181,hadoop6:2181"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"group.id"</span>, <span class="string">"stream-pipe"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"zookeeper.session.timeout.ms"</span>, <span class="string">"5000"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"zookeeper.connection.timeout"</span>, <span class="string">"10000"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"zookeeper.sync.time.ms"</span>, <span class="string">"200"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"auto.commit.interval.ms"</span>, <span class="string">"1000"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"rebalance.max.retries"</span>, <span class="string">"10"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"rebalance.backoff.ms"</span>, <span class="string">"2000"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"auto.offset.reset"</span>, <span class="string">"largest"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"key.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line">        properties.setProperty(<span class="string">"value.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line">        <span class="keyword">final</span> ConsumerConnector connector = Consumer.createJavaConsumerConnector(<span class="keyword">new</span> ConsumerConfig(properties));</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">final</span> String topic = <span class="string">"hehe"</span>;</span><br><span class="line">        map.put(topic, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">final</span> Map&lt;String, List&lt;KafkaStream&lt;<span class="keyword">byte</span>[], <span class="keyword">byte</span>[]&gt;&gt;&gt; streamMap = connector.createMessageStreams(map);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> KafkaStream&lt;<span class="keyword">byte</span>[], <span class="keyword">byte</span>[]&gt; stream = streamMap.get(topic).get(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (MessageAndMetadata&lt;<span class="keyword">byte</span>[], <span class="keyword">byte</span>[]&gt; metadata : stream) &#123;</span><br><span class="line">            System.out.println(<span class="string">"------------------offset偏移量:"</span> + metadata.offset());</span><br><span class="line">            System.out.println(<span class="string">"-----------------------message:"</span> + Arrays.toString(metadata.message()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="LineSplit"><a href="#LineSplit" class="headerlink" title="LineSplit"></a>LineSplit</h1><p>出现了个时间戳的问题，<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">org.apache.kafka.streams.errors.StreamsException: <span class="function">Input record <span class="title">ConsumerRecord</span><span class="params">(topic = telegraf, partition = <span class="number">1</span>, offset = <span class="number">0</span>, CreateTime = <span class="number">-1</span>, serialized key size = <span class="number">-1</span>, serialized value size = <span class="number">283</span>, headers = RecordHeaders(headers = [], isReadOnly = <span class="keyword">false</span>)</span></span></span><br><span class="line"><span class="function"> has <span class="title">invalid</span> <span class="params">(negative)</span> timestamp。 Use a different TimestampExtractor to process <span class="keyword">this</span> data.</span></span><br></pre></td></tr></table></figure></p>
+<p>于是重写了生成时间戳的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecord;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.streams.processor.TimestampExtractor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyEventTimeExtractor</span> <span class="keyword">implements</span> <span class="title">TimestampExtractor</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">extract</span><span class="params">(ConsumerRecord&lt;Object, Object&gt; record, <span class="keyword">long</span> previousTimestamp)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> System.currentTimeMillis();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">properties.put(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, MyEventTimeExtractor.class.getName());</span><br><span class="line">producer = <span class="keyword">new</span> KafkaProducer&lt;&gt;(properties);</span><br></pre></td></tr></table></figure></p>
+<p>这样写出的offset就是随机的了，不是原来的递增？</p>
+<h2 id="生产者-1"><a href="#生产者-1" class="headerlink" title="生产者"></a>生产者</h2><p>生产者稍微改下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ProducerRecord&lt;String, String&gt; record = <span class="keyword">new</span> ProducerRecord&lt;&gt;(TOPIC, <span class="string">"key"</span> + i, <span class="string">"hehe helo aska cdd"</span> + i);</span><br></pre></td></tr></table></figure></p>
+<h2 id="LineSplit-1"><a href="#LineSplit-1" class="headerlink" title="LineSplit"></a>LineSplit</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LineSplit</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line">        props.put(StreamsConfig.APPLICATION_ID_CONFIG, <span class="string">"streams-line-split"</span>);</span><br><span class="line">        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="string">"hadoop4:9092,hadoop5:9092,hadoop6:9092,hadoop7:9092,hadoop8:9092,hadoop9:9092"</span>);</span><br><span class="line">        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());</span><br><span class="line">        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> StreamsBuilder builder = <span class="keyword">new</span> StreamsBuilder();</span><br><span class="line"></span><br><span class="line">        KStream&lt;String, String&gt; source = builder.stream(<span class="string">"test"</span>);</span><br><span class="line">        source.flatMapValues(value -&gt; Arrays.asList(value.split(<span class="string">"\\W+"</span>)))</span><br><span class="line">                .to(<span class="string">"jimo"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> Topology topology = builder.build();</span><br><span class="line">        <span class="keyword">final</span> KafkaStreams streams = <span class="keyword">new</span> KafkaStreams(topology, props);</span><br><span class="line">        <span class="keyword">final</span> CountDownLatch latch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// attach shutdown handler to catch control-c</span></span><br><span class="line">        Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(<span class="string">"streams-shutdown-hook"</span>) &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                streams.close();</span><br><span class="line">                latch.countDown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            streams.start();</span><br><span class="line">            latch.await();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            System.exit(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        System.exit(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="消费者-1"><a href="#消费者-1" class="headerlink" title="消费者"></a>消费者</h2><p>消费者只需修改group.id<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">properties.setProperty(<span class="string">"group.id"</span>, <span class="string">"streams-line-split"</span>);</span><br></pre></td></tr></table></figure></p>
+<img src="/2018/09/08/lang/011-kafka-stream/000.png">
+<h1 id="Word-Count"><a href="#Word-Count" class="headerlink" title="Word Count"></a>Word Count</h1><p>没什么问题，注意解析结果时要转成数字。</p>
+<h2 id="生产者-2"><a href="#生产者-2" class="headerlink" title="生产者"></a>生产者</h2><p>生产者改了下数据：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Random r = <span class="keyword">new</span> Random();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">    ProducerRecord&lt;String, String&gt; record = <span class="keyword">new</span> ProducerRecord&lt;&gt;(TOPIC,</span><br><span class="line">            <span class="string">"key"</span> + i,</span><br><span class="line">            <span class="string">"hehe"</span> + r.nextInt(<span class="number">20</span>) + <span class="string">" helo"</span> + r.nextInt(<span class="number">20</span>)</span><br><span class="line">                    + <span class="string">" aska"</span> + r.nextInt(<span class="number">20</span>) + <span class="string">" cdd"</span> + r.nextInt(<span class="number">20</span>));</span><br><span class="line">    producer.send(record, (recordMetadata, e) -&gt; &#123;</span><br><span class="line">        System.out.println(recordMetadata.offset());</span><br><span class="line">        <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="WordCount"><a href="#WordCount" class="headerlink" title="WordCount"></a>WordCount</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> StreamsBuilder builder = <span class="keyword">new</span> StreamsBuilder();</span><br><span class="line"><span class="keyword">final</span> KStream&lt;String, String&gt; stream = builder.stream(<span class="string">"test"</span>);</span><br><span class="line">stream.flatMapValues(value -&gt; Arrays.asList(value.toLowerCase(Locale.getDefault()).split(<span class="string">"\\W+"</span>)))</span><br><span class="line">        .groupBy((key, value) -&gt; value)</span><br><span class="line">        .count(Materialized.as(<span class="string">"count"</span>))</span><br><span class="line">        .toStream()</span><br><span class="line">        .to(<span class="string">"jimo"</span>, Produced.with(Serdes.String(), Serdes.Long()));</span><br></pre></td></tr></table></figure>
+<h2 id="消费者-2"><a href="#消费者-2" class="headerlink" title="消费者"></a>消费者</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">properties.setProperty(<span class="string">"group.id"</span>, <span class="string">"streams-wordcount"</span>);</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"><span class="keyword">final</span> KafkaStream&lt;<span class="keyword">byte</span>[], <span class="keyword">byte</span>[]&gt; stream = streamMap.get(topic).get(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*注意：这个例子返回的key-value是 String-Long型的*/</span></span><br><span class="line"><span class="keyword">for</span> (MessageAndMetadata&lt;<span class="keyword">byte</span>[], <span class="keyword">byte</span>[]&gt; metadata : stream) &#123;</span><br><span class="line">    System.out.format(<span class="string">"-------------offset偏移量:%s,Key:%s,value:%d %n"</span>,</span><br><span class="line">            metadata.offset(), <span class="keyword">new</span> String(metadata.key(), StandardCharsets.UTF_8),</span><br><span class="line">            <span class="keyword">new</span> BigInteger(metadata.message()).intValue()</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<img src="/2018/09/08/lang/011-kafka-stream/001.png">
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://kafka.apache.org/20/documentation/streams/quickstart" target="_blank" rel="noopener">https://kafka.apache.org/20/documentation/streams/quickstart</a></p>
+<p><a href="https://kafka.apache.org/20/documentation/streams/tutorial" target="_blank" rel="noopener">https://kafka.apache.org/20/documentation/streams/tutorial</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文介绍kafka2.0的stream操作，并用java实现调用,实现了官网的3个例子。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/08/lang/011-kafka-stream/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/08/lang/011-kafka-stream/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/08/lang/011-kafka-stream/" data-id="cjyhx0kf600bbghch0x9xp7k2" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kafka/">kafka</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-maven/001-maven-tutorial" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/06/maven/001-maven-tutorial/" class="article-date">
@@ -161,12 +468,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/06/maven/001-maven-tutorial/" data-id="cjyfq8rcl00bd9cch2c9be6mp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/06/maven/001-maven-tutorial/" data-id="cjyhx0kgd00fkghche3kitmz7" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -265,12 +572,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/002-hbase-java/" data-id="cjyfq8raj004k9cchx95x86c4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/002-hbase-java/" data-id="cjyhx0kdq0069ghchewk8czqa" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
 
       </footer>
       </div>
@@ -367,7 +674,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/001-hbase-shell-command/" data-id="cjyfq8rai004g9cch5j8nagoz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/001-hbase-shell-command/" data-id="cjyhx0kdq0066ghchqp72d5pe" class="article-share-link">
           Share
         </a>
         
@@ -688,7 +995,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/04/lang/010-redis-configuration/" data-id="cjyfq8rby009o9cchtpy2130e" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/04/lang/010-redis-configuration/" data-id="cjyhx0kfa00btghchtjlg5b2q" class="article-share-link">
           Share
         </a>
         
@@ -824,7 +1131,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/009-redis-partition/" data-id="cjyfq8rbv009b9cch2gh7sxt8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/009-redis-partition/" data-id="cjyhx0kf400b4ghch6dzq1c99" class="article-share-link">
           Share
         </a>
         
@@ -974,7 +1281,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/008-redis-lru-cache/" data-id="cjyfq8rbu00969cchuc8wea96" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/008-redis-lru-cache/" data-id="cjyhx0kf300azghchvd4ewc3j" class="article-share-link">
           Share
         </a>
         
@@ -1079,7 +1386,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjyfq8rbt00919cchqdq7j3p4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjyhx0kf200awghchm1kh7u68" class="article-share-link">
           Share
         </a>
         
@@ -1206,7 +1513,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjyfq8rbt00949cchli4l6f1n" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjyhx0kf000apghchmpqhnvwo" class="article-share-link">
           Share
         </a>
         
@@ -1281,7 +1588,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjyfq8rhb00ln9cchdzfi1cjq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjyhx0kfw00dvghch7j6x3csx" class="article-share-link">
           Share
         </a>
         
@@ -1391,7 +1698,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjyfq8rbs008z9cchpssfxkgp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjyhx0kf300b1ghchisxmvmwa" class="article-share-link">
           Share
         </a>
         
@@ -1518,7 +1825,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjyfq8rbr008x9ccha1a5wnxg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjyhx0kez00anghch1akjhhrp" class="article-share-link">
           Share
         </a>
         
@@ -1815,7 +2122,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjyfq8rbu00999cchxhyao9ry" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjyhx0kf100aughchro8dt2ky" class="article-share-link">
           Share
         </a>
         
@@ -1977,7 +2284,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjyfq8ri000ni9cch39hq6bgb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjyhx0kgo00goghchh52qs5rs" class="article-share-link">
           Share
         </a>
         
@@ -2116,7 +2423,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjyfq8ri000nk9cchi83zcdxv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjyhx0kgl00ggghch6cgz14gb" class="article-share-link">
           Share
         </a>
         
@@ -2201,7 +2508,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjyfq8r9z002o9cch66n5d4zo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjyhx0kd50041ghch71g3wd58" class="article-share-link">
           Share
         </a>
         
@@ -2311,7 +2618,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjyfq8r9x002i9cchj2gnprgi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjyhx0kd4003wghch55yaeu0d" class="article-share-link">
           Share
         </a>
         
@@ -2395,7 +2702,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjyfq8r9z002m9cch35bc3ctt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjyhx0kd5003zghchboxg8efr" class="article-share-link">
           Share
         </a>
         
@@ -2499,193 +2806,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjyfq8r9y002l9cchnwjg8v4s" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a><span class="article-tag-list-count">13</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/011-win10-linux-subsystem" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/04/tools/011-win10-linux-subsystem/" class="article-date">
-  <time datetime="2018-08-04T00:17:46.000Z" itemprop="datePublished">2018-08-04</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/04/tools/011-win10-linux-subsystem/">win10-linux-subsystem</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>在win10上安装linux子系统。</p>
-<ol>
-<li>在控制面板–&gt;程序里启用。</li>
-</ol>
-<img src="/2018/08/04/tools/011-win10-linux-subsystem/001.png">
-<ol start="2">
-<li><p>在商店安装想要的系统.</p>
-</li>
-<li><p>使用，主要是如何访问windows的东西，下图明了。</p>
-</li>
-</ol>
-<img src="/2018/08/04/tools/011-win10-linux-subsystem/000.png">
-<p><strong>注意：不要用windows修改在linux中创建的文件。</strong></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>在win10上安装linux子系统。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/08/04/tools/011-win10-linux-subsystem/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/08/04/tools/011-win10-linux-subsystem/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjyfq8rio00pc9cchvl134v2b" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-cloudcompute/010-docker-registry" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/03/cloudcompute/010-docker-registry/" class="article-date">
-  <time datetime="2018-08-03T05:51:55.000Z" itemprop="datePublished">2018-08-03</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/03/cloudcompute/010-docker-registry/">4.docker Registry</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="总图导航"><a href="#总图导航" class="headerlink" title="总图导航"></a>总图导航</h1><img src="/2018/08/03/cloudcompute/010-docker-registry/000.png">
-<h1 id="镜像命名"><a href="#镜像命名" class="headerlink" title="镜像命名"></a>镜像命名</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> docker images</span><br><span class="line">REPOSITORY                    TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">my-image                      latest              135177378c5b        About an hour ago   1.15MB</span><br></pre></td></tr></table></figure>
-<p>镜像名称组成: REPOSITORY:TAG,默认TAG是latest,并无强制要求.</p>
-<h1 id="TAG最佳实践"><a href="#TAG最佳实践" class="headerlink" title="TAG最佳实践"></a>TAG最佳实践</h1><ol>
-<li>采用docker社区普遍采用的3级格式.</li>
-<li>一个版本可以有多个TAG.</li>
-</ol>
-<p>命令如下<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 最初为1.9.1</span><br><span class="line">docker tag myimage-v1.9.1 myimage:1</span><br><span class="line">docker tag myimage-v1.9.1 myimage:1.9</span><br><span class="line">docker tag myimage-v1.9.1 myimage:1.9.1</span><br><span class="line">docker tag myimage-v1.9.1 myimage:latest</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>升级到1.9.2</span><br><span class="line">docker tag myimage-v1.9.2 myimage:1</span><br><span class="line">docker tag myimage-v1.9.2 myimage:1.9</span><br><span class="line">docker tag myimage-v1.9.2 myimage:1.9.2</span><br><span class="line">docker tag myimage-v1.9.2 myimage:latest</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 2.0.0发布</span><br><span class="line">docker tag myimage-v2.0.0 myimage:2</span><br><span class="line">docker tag myimage-v2.0.0 myimage:2.0</span><br><span class="line">docker tag myimage-v2.0.0 myimage:2.0.0</span><br><span class="line">docker tag myimage-v2.0.0 myimage:latest</span><br></pre></td></tr></table></figure></p>
-<p>如下图:</p>
-<img src="/2018/08/03/cloudcompute/010-docker-registry/001.png">
-<p>这种TAG的解释和好处:</p>
-<ol>
-<li>myimage:1 始终指向 1 这个分支中最新的镜像。</li>
-<li>myimage:1.9 始终指向 1.9.x 中最新的镜像。</li>
-<li>myimage:latest 始终指向所有版本中最新的镜像。</li>
-<li>如果想使用特定版本，可以选择 myimage:1.9.1、myimage:1.9.2 或 myimage:2.0.0。</li>
-</ol>
-<h1 id="上传到Registry"><a href="#上传到Registry" class="headerlink" title="上传到Registry"></a>上传到Registry</h1><p>注意个人需要带上 : 用户名/image:tag<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker login -u jackpler</span><br><span class="line">Password: </span><br><span class="line">Login Succeeded</span><br><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker tag my-image jackpler/my-image:v1</span><br><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker images</span><br><span class="line">REPOSITORY                    TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">jackpler/my-image             v1                  135177378c5b        About an hour ago   1.15MB</span><br><span class="line">my-image                      latest              135177378c5b        About an hour ago   1.15MB</span><br><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker push jackpler/my-image:v1</span><br><span class="line">The push refers to repository [docker.io/jackpler/my-image]</span><br><span class="line">f89ed34343be: Pushed </span><br><span class="line">d2fc55a59506: Pushed </span><br><span class="line">7046cf07d08a: Pushed </span><br><span class="line">bdad0d9725ad: Pushed </span><br><span class="line">0314be9edf00: Mounted from library/busybox </span><br><span class="line">v1: digest: sha256:a07e725b2cf9fdfbbb80ee71efa890070cab2bea9fb1006fb31078e8eaeb7898 size: 1355</span><br></pre></td></tr></table></figure></p>
-<p>在网站可看到:</p>
-<img src="/2018/08/03/cloudcompute/010-docker-registry/002.png">
-<p>在网站上可以删除.</p>
-<h1 id="搭建本地Registry"><a href="#搭建本地Registry" class="headerlink" title="搭建本地Registry"></a>搭建本地Registry</h1><p>原因很多: 网速,费用,安全.</p>
-<p>使用<a href="https://hub.docker.com/r/library/registry/" target="_blank" rel="noopener">官方的registry</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker run -d -p 5001:5000 -v /home/jimo/myregistry:/var/lib/registry registry:latest</span><br><span class="line">Unable to find image 'registry:latest' locally</span><br><span class="line">latest: Pulling from library/registry</span><br><span class="line">81033e7c1d6a: Pull complete </span><br><span class="line">b235084c2315: Pull complete </span><br><span class="line">c692f3a6894b: Pull complete </span><br><span class="line">ba2177f3a70e: Pull complete </span><br><span class="line">a8d793620947: Pull complete </span><br><span class="line">Digest: sha256:feb40d14cd33e646b9985e2d6754ed66616fedb840226c4d917ef53d616dcd6c</span><br><span class="line">Status: Downloaded newer image for registry:latest</span><br><span class="line">80f81f33ed15616f5334d6e49642da0eff1cd4777aae075f816f48f6de52269a</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~/workplace/dockerfile# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES</span><br><span class="line">80f81f33ed15        registry:latest     "/entrypoint.sh /etc…"   11 seconds ago      Up 10 seconds       0.0.0.0:5001-&gt;5000/tcp   agitated_clarke</span><br></pre></td></tr></table></figure></p>
-<p>-p : 绑定在5001端口<br>-v : 把镜像存储映射到本地<br>-d : 后台运行</p>
-<p>上传到本地registry<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker tag jackpler/my-image:v1 localhost:5001/jackpler/my-image:v1.1</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker images</span><br><span class="line">REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">jackpler/my-image                  v1                  135177378c5b        2 hours ago         1.15MB</span><br><span class="line">my-image                           latest              135177378c5b        2 hours ago         1.15MB</span><br><span class="line">localhost:5001/jackpler/my-image   v1.1                135177378c5b        2 hours ago         1.15MB</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker push localhost:5001/jackpler/my-image:v1.1</span><br><span class="line">The push refers to repository [localhost:5001/jackpler/my-image]</span><br><span class="line">f89ed34343be: Pushed </span><br><span class="line">d2fc55a59506: Pushed </span><br><span class="line">7046cf07d08a: Pushed </span><br><span class="line">bdad0d9725ad: Pushed </span><br><span class="line">0314be9edf00: Pushed </span><br><span class="line">v1.1: digest: sha256:a07e725b2cf9fdfbbb80ee71efa890070cab2bea9fb1006fb31078e8eaeb7898 size: 1355</span><br></pre></td></tr></table></figure></p>
-<p><strong>注意:</strong><br>REPOSITORY的格式: [registry-host]:[port]/[username]/xxx<br>只有docker hub上的镜像可以省略 [registry-host]:[port] </p>
-<p>本文来自<a href="http://www.cnblogs.com/CloudMan6/p/6902325.html" target="_blank" rel="noopener">blog</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="总图导航"><a href="#总图导航" class="headerlink" title="总图导航"></a>总图导航</h1><img src="/2018/08/03/cloudcompute/010-docker-registry/000.png">
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/08/03/cloudcompute/010-docker-registry/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/08/03/cloudcompute/010-docker-registry/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjyfq8r9x002g9cchk9rchurs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjyhx0kd4003ughchvxaw0hly" class="article-share-link">
           Share
         </a>
         
@@ -2727,7 +2848,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2749,6 +2870,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/24/java/051-spring-http-status-code/">spring如何返回http状态码</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
           </li>
         
@@ -2758,14 +2887,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/17/java/049-spring-autowire-in-dependency/">spring无法注入依赖库中的bean</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
           </li>
         
       </ul>

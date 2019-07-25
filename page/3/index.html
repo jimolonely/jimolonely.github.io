@@ -86,6 +86,180 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-js/007-axios-vue" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/04/30/js/007-axios-vue/" class="article-date">
+  <time datetime="2019-04-30T05:31:46.000Z" itemprop="datePublished">2019-04-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/04/30/js/007-axios-vue/">axios的使用记录</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>axios很强大，但有一些踩过的坑。</p>
+<h1 id="在vue里构造实例"><a href="#在vue里构造实例" class="headerlink" title="在vue里构造实例"></a>在vue里构造实例</h1><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Full config:  https://github.com/axios/axios#request-config</span></span><br><span class="line"><span class="comment">// axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';</span></span><br><span class="line"><span class="comment">// axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;</span></span><br><span class="line"><span class="comment">// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> config = &#123;</span><br><span class="line">    <span class="comment">// baseURL: process.env.baseURL || process.env.apiUrl || "",</span></span><br><span class="line">    withCredentials: <span class="literal">true</span>, <span class="comment">// Check cross-site Access-Control</span></span><br><span class="line">    <span class="comment">// timeout: 60 * 1000, // Timeout</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> _axios = axios.create(config);</span><br></pre></td></tr></table></figure>
+<h1 id="设置拦截器"><a href="#设置拦截器" class="headerlink" title="设置拦截器"></a>设置拦截器</h1><p>推荐使用：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">_axios.interceptors.request.use(</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">config</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// Do something before request is sent</span></span><br><span class="line">        <span class="keyword">return</span> config;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// Do something with request error</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">    &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a response interceptor</span></span><br><span class="line">_axios.interceptors.response.use(</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// Do something with response data</span></span><br><span class="line">        <span class="keyword">return</span> response;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// Do something with response error</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">    &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<h1 id="application-x-www-form-urlencoded"><a href="#application-x-www-form-urlencoded" class="headerlink" title="application/x-www-form-urlencoded"></a>application/x-www-form-urlencoded</h1><p>axios的content-type默认是application/json的，需要修改header才能发送application/x-www-form-urlencoded请求。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">_axios.post(constructUrl(apiType, url), data || &#123;&#125;, &#123;</span><br><span class="line">    headers: &#123;</span><br><span class="line">        <span class="string">'Content-Type'</span>: <span class="string">'application/x-www-form-urlencoded; charset=UTF-8'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;).then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">    handleResult(res.data, callback);</span><br><span class="line">&#125;).catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    handleError(err, errorHandle);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>但是还没完，axios会把我们传入的data（json对象）序列化为json字符串，这样后台收不到参数。</p>
+<p>修改： 使用qs模块序列化， 在request前置拦截器里判断，然后调用<code>qs.stringify</code>方法，<br>把json对象序列化为&amp;连接的键值对参数。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> qs <span class="keyword">from</span> <span class="string">'qs'</span>;</span><br><span class="line"></span><br><span class="line">_axios.interceptors.request.use(</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">config</span>) </span>&#123;</span><br><span class="line">        config.headers.Authentication = storage.get(<span class="string">"TOKEN"</span>);</span><br><span class="line">        <span class="keyword">if</span> (config.data</span><br><span class="line">            &amp;&amp; config.headers[<span class="string">'Content-Type'</span>] === <span class="string">'application/x-www-form-urlencoded; charset=UTF-8'</span>) &#123;</span><br><span class="line">            config.data = qs.stringify(config.data);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> config;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// Do something with request error</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error);</span><br><span class="line">    &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>axios很强大，但有一些踩过的坑。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/04/30/js/007-axios-vue/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/04/30/js/007-axios-vue/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/04/30/js/007-axios-vue/" data-id="cjyhx0ke3007fghchwmv8xit9" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a><span class="article-tag-list-count">3</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-js/006-webpack-first-view" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/04/26/js/006-webpack-first-view/" class="article-date">
+  <time datetime="2019-04-26T01:24:51.000Z" itemprop="datePublished">2019-04-26</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/04/26/js/006-webpack-first-view/">初次遇见webpack</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文是作者对webpack的一些初见。</p>
+<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p><a href="https://www.webpackjs.com/concepts/" target="_blank" rel="noopener">官方文档</a> 写得很详细，当读完之后，写下自己的见解。</p>
+<ol>
+<li><p>是什么？<br> 就一个js打包工具，包括js文件，css，html和其他资源。</p>
+</li>
+<li><p>有哪些基本概念需要了解？<br> 无非：</p>
+<ol>
+<li>入口： 指定js文件入口</li>
+<li>出口： 打包存放位置</li>
+<li>loader： 对非js文件的转换工具</li>
+<li>plugin： 强大的插件，在整个生命周期（打包、压缩、环境变量）都可用</li>
+</ol>
+</li>
+<li><p>支持多模式： 开发、生产、测试等</p>
+</li>
+</ol>
+<h1 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h1><p>建立一个依赖图。</p>
+<h1 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h1><p><a href="https://webpack.js.org/guides/getting-started" target="_blank" rel="noopener">参考官方文档</a></p>
+<p>跟着做很简单，注意1点，先安装npx： <code>npm install -g npx</code>.</p>
+<p>结果：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">jack@jack:~<span class="regexp">/workspace/</span>temp/webpack-demo$ ll</span><br><span class="line">总用量 <span class="number">36</span></span><br><span class="line">drwxr-xr-x   <span class="number">5</span> jack jack  <span class="number">4096</span> <span class="number">4</span>月  <span class="number">26</span> <span class="number">10</span>:<span class="number">02</span> ./</span><br><span class="line">drwxr-xr-x   <span class="number">6</span> jack jack  <span class="number">4096</span> <span class="number">4</span>月  <span class="number">26</span> <span class="number">09</span>:<span class="number">35</span> ../</span><br><span class="line">drwxr-xr-x   <span class="number">2</span> jack jack  <span class="number">4096</span> <span class="number">4</span>月  <span class="number">26</span> <span class="number">10</span>:<span class="number">00</span> dist/</span><br><span class="line">drwxr-xr-x <span class="number">318</span> jack jack <span class="number">12288</span> <span class="number">4</span>月  <span class="number">26</span> <span class="number">10</span>:<span class="number">00</span> node_modules/</span><br><span class="line">-rw-r--r--   <span class="number">1</span> jack jack   <span class="number">379</span> <span class="number">4</span>月  <span class="number">26</span> <span class="number">10</span>:<span class="number">02</span> package.json</span><br><span class="line">drwxr-xr-x   <span class="number">2</span> jack jack  <span class="number">4096</span> <span class="number">4</span>月  <span class="number">26</span> <span class="number">09</span>:<span class="number">43</span> src/</span><br><span class="line">-rw-r--r--   <span class="number">1</span> jack jack   <span class="number">163</span> <span class="number">4</span>月  <span class="number">26</span> <span class="number">09</span>:<span class="number">46</span> webpack.config.js</span><br><span class="line">jack@jack:~<span class="regexp">/workspace/</span>temp/webpack-demo$ tree dist/</span><br><span class="line">dist/</span><br><span class="line">├── index.html</span><br><span class="line">└── main.js</span><br><span class="line"></span><br><span class="line"><span class="number">0</span> directories, <span class="number">2</span> files</span><br><span class="line">jack@jack:~<span class="regexp">/workspace/</span>temp/webpack-demo$ tree src/</span><br><span class="line">src/</span><br><span class="line">└── index.js</span><br><span class="line"></span><br><span class="line"><span class="number">0</span> directories, <span class="number">1</span> file</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文是作者对webpack的一些初见。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/04/26/js/006-webpack-first-view/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/04/26/js/006-webpack-first-view/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/04/26/js/006-webpack-first-view/" data-id="cjyhx0kdv006qghchjvwtyq7u" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webpack/">webpack</a><span class="article-tag-list-count">2</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-js/005-build-vue-env" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/04/24/js/005-build-vue-env/" class="article-date">
@@ -158,7 +332,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/24/js/005-build-vue-env/" data-id="cjyfq8rap004z9cch30ac337w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/24/js/005-build-vue-env/" data-id="cjyhx0kdt006jghchmlfa44o8" class="article-share-link">
           Share
         </a>
         
@@ -257,7 +431,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/22/life/014-weekly-learn/" data-id="cjyfq8rc700ab9cchgh9vva41" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/22/life/014-weekly-learn/" data-id="cjyhx0kfe00c7ghch4nwg8afn" class="article-share-link">
           Share
         </a>
         
@@ -384,7 +558,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/18/linux/023-create-local-repo-in-centos/" data-id="cjyfq8rhi00m69cch4gl5gvtj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/18/linux/023-create-local-repo-in-centos/" data-id="cjyhx0kg200ejghch2xyqz9up" class="article-share-link">
           Share
         </a>
         
@@ -489,12 +663,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/18/java/044-java-terms/" data-id="cjyfq8rbk00869cchlcf855j8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/18/java/044-java-terms/" data-id="cjyhx0ker009tghchdltmfke0" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/term/">term</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/term/">term</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -577,7 +751,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/17/git/003-install-gitlab-server/" data-id="cjyfq8raf00469cchk201kwki" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/17/git/003-install-gitlab-server/" data-id="cjyhx0kdl005qghchaucf8wps" class="article-share-link">
           Share
         </a>
         
@@ -665,7 +839,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/15/linux/022-su-in-script/" data-id="cjyfq8rhh00m29cchm1anlimn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/15/linux/022-su-in-script/" data-id="cjyhx0kg100eeghchj36xsmam" class="article-share-link">
           Share
         </a>
         
@@ -751,7 +925,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/15/life/013-weekly-learn/" data-id="cjyfq8rc600a99cchcjv30k2i" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/15/life/013-weekly-learn/" data-id="cjyhx0kff00cbghch39y9sez3" class="article-share-link">
           Share
         </a>
         
@@ -837,12 +1011,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/11/java/043-java-annotations/" data-id="cjyfq8rbj00839cchcmoc4qgy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/11/java/043-java-annotations/" data-id="cjyhx0kep009oghch92jbx5pl" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/annotation/">annotation</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/annotation/">annotation</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
 
       </footer>
       </div>
@@ -924,12 +1098,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/10/db/008-pgsql-common-sqls/" data-id="cjyfq8ra6003d9cchlfnk9o56" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/10/db/008-pgsql-common-sqls/" data-id="cjyhx0kdc004rghchi9v2oq3l" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pgsql/">pgsql</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sql/">sql</a><span class="article-tag-list-count">3</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pgsql/">pgsql</a><span class="article-tag-list-count">4</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sql/">sql</a><span class="article-tag-list-count">3</span></li></ul>
 
       </footer>
       </div>
@@ -1017,12 +1191,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/09/java/042-java-command-line-args/" data-id="cjyfq8rbk00889cchdru1p2rk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/09/java/042-java-command-line-args/" data-id="cjyhx0kes009vghcht3jggozw" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
 
       </footer>
       </div>
@@ -1109,7 +1283,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/09/life/012-weekly-learn/" data-id="cjyfq8rc700ad9cchajgqt9df" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/09/life/012-weekly-learn/" data-id="cjyhx0kfe00c9ghchxpe6jzem" class="article-share-link">
           Share
         </a>
         
@@ -1190,7 +1364,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/08/linux/021-ssh-login-too-slow/" data-id="cjyfq8rhe00lt9cchjurd8loh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/08/linux/021-ssh-login-too-slow/" data-id="cjyhx0kfz00e7ghchtf9ev1bt" class="article-share-link">
           Share
         </a>
         
@@ -1302,12 +1476,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/03/java/041-quartz-problems/" data-id="cjyfq8rbj00819cchzg7et93m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/03/java/041-quartz-problems/" data-id="cjyhx0keq009qghcheq3sn60b" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/quartz/">quartz</a><span class="article-tag-list-count">2</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/quartz/">quartz</a><span class="article-tag-list-count">2</span></li></ul>
 
       </footer>
       </div>
@@ -1400,7 +1574,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/02/test/000-katalon/" data-id="cjyfq8rih00ov9cchhu9rudgg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/02/test/000-katalon/" data-id="cjyhx0kgx00hkghchxqrj4k5u" class="article-share-link">
           Share
         </a>
         
@@ -1482,7 +1656,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/01/life/011-weekly-learn/" data-id="cjyfq8rc500a79ccherwvptkz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/01/life/011-weekly-learn/" data-id="cjyhx0kfd00c4ghchcjbb28qu" class="article-share-link">
           Share
         </a>
         
@@ -1562,7 +1736,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/27/ansible/006-ansible-install-keepalived/" data-id="cjyfq8r8w000h9cchy08nr4gk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/27/ansible/006-ansible-install-keepalived/" data-id="cjyhx0k96000hghch7opvepln" class="article-share-link">
           Share
         </a>
         
@@ -1640,12 +1814,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/040-spring-boot-load-properties-order-by-source-code/" data-id="cjyfq8rbh007w9cchmlo1lmvq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/040-spring-boot-load-properties-order-by-source-code/" data-id="cjyhx0keo009lghchi2h1mnkl" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -1729,172 +1903,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/039-java-headless/" data-id="cjyfq8rbh007y9ccheteka3fz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/039-java-headless/" data-id="cjyhx0ken009jghchrj2w394m" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-basic/017-microservice-resource" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/03/25/basic/017-microservice-resource/" class="article-date">
-  <time datetime="2019-03-25T09:32:43.000Z" itemprop="datePublished">2019-03-25</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/03/25/basic/017-microservice-resource/">微服务学习资源</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>resource</p>
-<p>资源系列：</p>
-<p><a href="http://dockone.io/article/8241" target="_blank" rel="noopener">微服务实战（六）：如何做好服务拆分？</a></p>
-<p><a href="https://juejin.im/post/5c49317d5188252d3b3e377b" target="_blank" rel="noopener">微服务不是全部，只是特定领域的子集</a>:<br>该文章提出了一些数据库相关的要求。</p>
-<p><a href="http://www.jiangxinlingdu.com/thought/2019/03/05/microservices.html" target="_blank" rel="noopener">服务框架的技术栈</a>：<br>该文章从顶层梳理了微服务需要的组件和模块。</p>
-<p><a href="http://dockone.io/article/8347" target="_blank" rel="noopener">小型系统如何“微服务”开发</a>：<br>是一个例子。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>resource</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/03/25/basic/017-microservice-resource/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/03/25/basic/017-microservice-resource/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/25/basic/017-microservice-resource/" data-id="cjyfq8r9o001j9cchfjexi0i0" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/microservice/">microservice</a><span class="article-tag-list-count">9</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/038-springmvc-handle-content-type" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/03/25/java/038-springmvc-handle-content-type/" class="article-date">
-  <time datetime="2019-03-25T04:29:42.000Z" itemprop="datePublished">2019-03-25</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/03/25/java/038-springmvc-handle-content-type/">springmvc如何处理content-type源码解析</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>核心类：<br>HttpMessageConverter里定义的处理参数和处理返回值接口：<br>它的实现类就是处理各种格式到java类之间的相互转化实现。</p>
-<p>AbstractMessageConverterMethodProcessor:<br>使用HttpMessageConverter的实现处理方法参数和返回值。</p>
-<p>处理注解了@RequestBody, @ResponseBody的参数和返回值：<br>RequestResponseBodyMethodProcessor</p>
-<p>参考： </p>
-<ol>
-<li><a href="https://juejin.im/post/59e87d566fb9a04509089d65" target="_blank" rel="noopener">Spring源码学习之十一：SpringMVC-@RequestBody接收json数据报415</a></li>
-<li><a href="https://my.oschina.net/u/2377110/blog/1552979" target="_blank" rel="noopener">SpringMVC源码(六)-@RequestBody和@ResponseBody</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>核心类：<br>HttpMessageConverter里定义的处理参数和处理返回值接口：<br>它的实现类就是处理各种格式到java类之间的相互转化实现。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/03/25/java/038-springmvc-handle-content-type/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/03/25/java/038-springmvc-handle-content-type/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/25/java/038-springmvc-handle-content-type/" data-id="cjyfq8rbg007r9cchdl8ylnuh" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
 
       </footer>
       </div>
@@ -1931,7 +1945,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1953,6 +1967,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/24/java/051-spring-http-status-code/">spring如何返回http状态码</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
           </li>
         
@@ -1962,14 +1984,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/17/java/049-spring-autowire-in-dependency/">spring无法注入依赖库中的bean</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
           </li>
         
       </ul>

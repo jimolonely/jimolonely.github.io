@@ -86,6 +86,181 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/003-py-weibo" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/python/003-py-weibo/" class="article-date">
+  <time datetime="2018-01-31T02:03:05.000Z" itemprop="datePublished">2018-01-31</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/31/python/003-py-weibo/">爬取个人微博</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将讲解如何爬取微博,并将内容生成词云.</p>
+<h1 id="爬取准备"><a href="#爬取准备" class="headerlink" title="爬取准备"></a>爬取准备</h1><ol>
+<li>使用Google Chrome浏览器,将Agent调成手机客户端,方法如下:</li>
+</ol>
+<p>F12–&gt;setting–&gt;More Tools–&gt;Network conditions,把User Agent换成手机.</p>
+<img src="/2018/01/31/python/003-py-weibo/000.png">
+<img src="/2018/01/31/python/003-py-weibo/001.png">
+<ol start="2">
+<li><p>登录微博.</p>
+</li>
+<li><p>得到要爬取者的uid: <a href="https://m.weibo.cn/u/xxxxxxxxxxxxxx" target="_blank" rel="noopener">https://m.weibo.cn/u/xxxxxxxxxxxxxx</a></p>
+</li>
+<li><p>在访问主页时得到访问的cookie,复制Cookie.</p>
+</li>
+</ol>
+<img src="/2018/01/31/python/003-py-weibo/002.png">
+<h1 id="爬取代码"><a href="#爬取代码" class="headerlink" title="爬取代码"></a>爬取代码</h1><p>将网页分页保存起来,等会解析.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*-coding:utf8-*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"></span><br><span class="line">user_id = xxxx</span><br><span class="line"></span><br><span class="line">cookie = &#123;</span><br><span class="line">    <span class="string">"Cookie"</span>: <span class="string">"_T_WM=xxx; SCF=xxx.; SUB=xxx; SUHB=xxx; WEIBOCN_FROM=xxx; M_WEIBOCN_PARAMS=xxx"</span>&#125;</span><br><span class="line">url = <span class="string">'http://weibo.cn/u/%d?filter=1&amp;page=1'</span> % user_id</span><br><span class="line"></span><br><span class="line">html = requests.get(url, cookies=cookie).content</span><br><span class="line">selector = etree.HTML(html)</span><br><span class="line">pageNum = (int)(selector.xpath(<span class="string">'//input[@name="mp"]'</span>)[<span class="number">0</span>].attrib[<span class="string">'value'</span>])</span><br><span class="line"></span><br><span class="line">print(<span class="string">u'爬虫准备就绪...'</span>)</span><br><span class="line"></span><br><span class="line">pages = []</span><br><span class="line"><span class="keyword">for</span> page <span class="keyword">in</span> range(<span class="number">1</span>, pageNum + <span class="number">1</span>):</span><br><span class="line">    <span class="comment"># 获取lxml页面</span></span><br><span class="line">    url = <span class="string">'http://weibo.cn/u/%d?filter=1&amp;page=%d'</span> % (user_id, page)</span><br><span class="line">    lxml = requests.get(url, cookies=cookie).content</span><br><span class="line"></span><br><span class="line">    pages.append(lxml.decode(encoding=<span class="string">'utf-8'</span>))</span><br><span class="line">    print(<span class="string">"下载完成第%d页"</span> % page)</span><br><span class="line"></span><br><span class="line">dir_path = <span class="string">"/home/jimo/workspace/temp/python/love/"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">"%s%s"</span> % (dir_path, user_id), <span class="string">"w"</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> page <span class="keyword">in</span> pages:</span><br><span class="line">        f.write(page)</span><br><span class="line">        f.write(<span class="string">"\n"</span>)</span><br><span class="line">    print(<span class="string">u'微博文字爬取完毕'</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="解析代码"><a href="#解析代码" class="headerlink" title="解析代码"></a>解析代码</h1><img src="/2018/01/31/python/003-py-weibo/003.png">
+<p>注意对于中文,词云要指定支持中文的字体.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"><span class="keyword">from</span> wordcloud <span class="keyword">import</span> WordCloud</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">path = <span class="string">"/home/jimo/workspace/temp/python/love/"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">analyze</span><span class="params">(line)</span>:</span></span><br><span class="line">    <span class="string">'''解析html'''</span></span><br><span class="line">    html = etree.HTML(line.encode(encoding=<span class="string">'utf-8'</span>))</span><br><span class="line">    <span class="comment"># 解析微博内容</span></span><br><span class="line">    contents = html.xpath(<span class="string">'//span[@class="ctt"]'</span>)</span><br><span class="line">    content = <span class="string">" "</span>.join([c.xpath(<span class="string">"string(.)"</span>) <span class="keyword">for</span> c <span class="keyword">in</span> contents])</span><br><span class="line">    <span class="comment"># for c in contents:</span></span><br><span class="line">    <span class="comment">#     text = c.xpath("string(.)")</span></span><br><span class="line">    <span class="comment">#     print(text)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 解析发的时间和来自哪里</span></span><br><span class="line">    times = html.xpath(<span class="string">'//span[@class="ct"]'</span>)</span><br><span class="line">    time = []</span><br><span class="line">    fromWhere = []</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> times:</span><br><span class="line">        text = t.xpath(<span class="string">"string(.)"</span>)</span><br><span class="line">        splitIndex = text.index(<span class="string">"来自"</span>)</span><br><span class="line">        time.append(text[:splitIndex - <span class="number">1</span>])</span><br><span class="line">        fromWhere.append(text[splitIndex:])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> content, <span class="string">" "</span>.join(time), <span class="string">" "</span>.join(fromWhere)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_word_cloud</span><span class="params">(content)</span>:</span></span><br><span class="line">    <span class="string">'''生成词云'''</span></span><br><span class="line">    wc = WordCloud(font_path=<span class="string">"SimHei.ttf"</span>, max_font_size=<span class="number">60</span>, min_font_size=<span class="number">10</span>, width=<span class="number">1000</span>, height=<span class="number">800</span>).generate(content)</span><br><span class="line">    plt.figure()</span><br><span class="line">    plt.imshow(wc, interpolation=<span class="string">"bilinear"</span>)</span><br><span class="line">    plt.axis(<span class="string">"off"</span>)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(path + <span class="string">"1786727217"</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    lines = f.readlines()</span><br><span class="line">    contents, times, fromWhere = [], [], []</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">        c, t, f = analyze(line)</span><br><span class="line">        contents.append(c)</span><br><span class="line">        times.append(t)</span><br><span class="line">        fromWhere.append(f)</span><br><span class="line">    generate_word_cloud(<span class="string">" "</span>.join(contents))</span><br><span class="line">    generate_word_cloud(<span class="string">" "</span>.join(fromWhere))</span><br></pre></td></tr></table></figure></p>
+<p>My Love:</p>
+<img src="/2018/01/31/python/003-py-weibo/004.png">
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将讲解如何爬取微博,并将内容生成词云.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/31/python/003-py-weibo/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/31/python/003-py-weibo/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjyhx0kge00fpghchvuykdzn0" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爬虫/">爬虫</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-cloudcompute/000-install-openstack-unbuntu" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" class="article-date">
+  <time datetime="2018-01-26T11:57:01.000Z" itemprop="datePublished">2018-01-26</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/">在ubuntu上安装openstack</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文讲述了在ubuntu16.04上安装openstack的注意事项.<br>如果是redhat或centos,请参考<a href="/2018/03/30/cloudcompute/002-packstack/" title="另一篇文章">另一篇文章</a></p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>安装<a href="https://docs.openstack.org/developer/devstack/index.html" target="_blank" rel="noopener">官网</a>的步骤,<br>有可能会成功.经过反复试验,在不翻墙的情况下还是可以安装成功了.</p>
+<p>下面是步骤:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 1.stack用户</span><br><span class="line"><span class="meta">$</span> sudo useradd -s /bin/bash -d /opt/stack -m stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 2.分配权限</span><br><span class="line"><span class="meta">$</span> echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 3.采用stack用户</span><br><span class="line"><span class="meta">$</span> sudo su - stack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 4.在stack环境下</span><br><span class="line"><span class="meta">$</span> git clone https://git.openstack.org/openstack-dev/devstack</span><br><span class="line"><span class="meta">$</span> cd devstack</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 5.创建local.conf文件,并填入下面的文件</span><br><span class="line">[[local|localrc]]</span><br><span class="line">ADMIN_PASSWORD=secret</span><br><span class="line">DATABASE_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line">RABBIT_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line">SERVICE_PASSWORD=$ADMIN_PASSWORD</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 6.官网说可以直接执行stack.sh了,但经过反复验证,有一个资源下载很慢</span><br><span class="line"><span class="meta">#</span> 就是会去下载此linux镜像:cirros-0.3.5-x86_64-disk.img</span><br><span class="line"><span class="meta">#</span> 可以下载好了,在/opt/stack下建一个files文件夹,放上此文件,不过也不一定</span><br><span class="line"><span class="meta">#</span> 也就12M,慢慢下也能下完</span><br></pre></td></tr></table></figure></p>
+<p>成功的结果:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">=========================</span><br><span class="line">DevStack Component Timing</span><br><span class="line"> (times are in seconds)  </span><br><span class="line">=========================</span><br><span class="line">run_process           89</span><br><span class="line">test_with_retry        4</span><br><span class="line">apt-get-update        17</span><br><span class="line">pip_install          164</span><br><span class="line">osc                  197</span><br><span class="line">wait_for_service      40</span><br><span class="line">dbsync                62</span><br><span class="line">apt-get               16</span><br><span class="line">-------------------------</span><br><span class="line">Unaccounted time     1100</span><br><span class="line">=========================</span><br><span class="line">Total runtime        1689</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">This is your host IP address: 192.168.1.126</span><br><span class="line">This is your host IPv6 address: ::1</span><br><span class="line">Horizon is now available at http://192.168.1.126/dashboard</span><br><span class="line">Keystone is serving at http://192.168.1.126/identity/</span><br><span class="line">The default users are: admin and demo</span><br><span class="line">The password: 1234</span><br><span class="line"></span><br><span class="line">WARNING: </span><br><span class="line">Using lib/neutron-legacy is deprecated, and it will be removed in the future</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Services are running under systemd unit files.</span><br><span class="line">For more information see: </span><br><span class="line">https://docs.openstack.org/devstack/latest/systemd.html</span><br><span class="line"></span><br><span class="line">DevStack Version: queens</span><br><span class="line">Change: 66c893f25c6eb50edef47ec86a6d97fa58d2ea05 Merge "Bump the Cinder LVM backing file size to 24Gb." 2018-01-25 19:26:49 +0000</span><br><span class="line">OS Version: Ubuntu 16.04 xenial</span><br><span class="line"></span><br><span class="line">2018-01-26 10:01:51.399 | stack.sh completed in 1689 seconds.</span><br></pre></td></tr></table></figure></p>
+<p>可以看到接近半小时才整完,而且是反复很多次.</p>
+<p>另外,出错了需要先执行./unstack.sh,再执行stack.sh.</p>
+<p>只要有耐心,一定能装好.</p>
+<p>可以在本地登录:</p>
+<img src="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/000.png">
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文讲述了在ubuntu16.04上安装openstack的注意事项.<br>如果是redhat或centos,请参考<a href="/2018/03/30/cloudcompute/002-packstack/" title="另一篇文章">另一篇文章</a></p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjyhx0kcx0034ghchnoito4cv" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/007-ubuntu-static-ip" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/26/linux/007-ubuntu-static-ip/" class="article-date">
@@ -162,7 +337,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjyfq8rex00l49cch0q5ebj9k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjyhx0kfs00ddghchubfboom3" class="article-share-link">
           Share
         </a>
         
@@ -241,7 +416,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjyfq8rhv00n39cchjvpr0woz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjyhx0kgi00g4ghchz2x9o3ms" class="article-share-link">
           Share
         </a>
         
@@ -330,7 +505,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjyfq8r8i00059cchje3uderi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjyhx0k8t0005ghch839jqw11" class="article-share-link">
           Share
         </a>
         
@@ -412,7 +587,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjyfq8rho00mk9cchfru6lspx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjyhx0kgc00fighchi6r3fkp0" class="article-share-link">
           Share
         </a>
         
@@ -502,7 +677,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjyfq8rig00os9cchak28cvlo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjyhx0kh100hwghchmf9aumbh" class="article-share-link">
           Share
         </a>
         
@@ -735,7 +910,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjyfq8rig00oq9cchhbuoacwq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjyhx0kh000hughchha026h0z" class="article-share-link">
           Share
         </a>
         
@@ -815,7 +990,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjyfq8r8b00019cchv7yjxusw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjyhx0k8p0002ghchqccrj4s8" class="article-share-link">
           Share
         </a>
         
@@ -901,7 +1076,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjyfq8rie00ol9cchqdp9y3ik" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjyhx0kgz00hpghchnov3tbvc" class="article-share-link">
           Share
         </a>
         
@@ -980,7 +1155,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjyfq8rai004e9cchmmapxoyw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjyhx0kdn005yghchl4klmhre" class="article-share-link">
           Share
         </a>
         
@@ -1061,7 +1236,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjyfq8rie00on9cch0ink8osj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjyhx0kgz00hrghchf1s6f9if" class="article-share-link">
           Share
         </a>
         
@@ -1150,7 +1325,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjyfq8rhl00mf9cchnubua4sh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjyhx0kgd00fnghchcih3yszp" class="article-share-link">
           Share
         </a>
         
@@ -1248,7 +1423,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjyfq8rib00og9cchz5atunrz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjyhx0kgw00hfghchlnfa80gt" class="article-share-link">
           Share
         </a>
         
@@ -1328,12 +1503,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjyfq8rch00b29cch151aim7g" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjyhx0kg600eyghchlxh4jndr" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -1421,12 +1596,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjyfq8ri900ob9cchaxg4bwfd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjyhx0kgw00hhghchojrf7yky" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
 
       </footer>
       </div>
@@ -1504,7 +1679,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjyfq8ria00od9cchtd29gcuq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjyhx0kgv00hdghchsuxx9fe9" class="article-share-link">
           Share
         </a>
         
@@ -1591,7 +1766,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjyfq8rhm00mh9cchtddm4ph5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjyhx0kga00fbghcho9mob1q0" class="article-share-link">
           Share
         </a>
         
@@ -1687,7 +1862,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjyfq8ri800o69cchb06j9yjn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjyhx0kgu00haghchtonkf2gl" class="article-share-link">
           Share
         </a>
         
@@ -1761,244 +1936,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjyfq8rhw00n89cch6uxo5y03" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjyhx0kgk00gbghch5zoovqmh" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">72</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/000-latex" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/01/tools/000-latex/" class="article-date">
-  <time datetime="2018-01-01T05:51:55.000Z" itemprop="datePublished">2018-01-01</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/01/tools/000-latex/">不得不会的latex</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-什么是latex"><a href="#1-什么是latex" class="headerlink" title="1.什么是latex"></a>1.什么是latex</h1><p>LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</p>
-<p>参看<a href="https://zh.wikipedia.org/wiki/LaTeX" target="_blank" rel="noopener">wiki</a></p>
-<h1 id="2-latex可以做什么"><a href="#2-latex可以做什么" class="headerlink" title="2.latex可以做什么"></a>2.latex可以做什么</h1><ol>
-<li>书籍排版</li>
-<li>论文</li>
-<li>数学符号</li>
-<li>化学公式</li>
-<li>五线谱</li>
-<li>象棋</li>
-<li>电路图</li>
-</ol>
-<p>只要有相应的语法规则和宏包,就可以表示出来.</p>
-<h1 id="3-编写latex的工具"><a href="#3-编写latex的工具" class="headerlink" title="3.编写latex的工具"></a>3.编写latex的工具</h1><p>可以参考wiki做的对比:<a href="https://en.wikipedia.org/wiki/Comparison_of_TeX_editors" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Comparison_of_TeX_editors</a></p>
-<p>也有在线的网页版本(个人免费),<a href="https://cn.sharelatex.com/user/subscription/plans" target="_blank" rel="noopener">shareLatex</a></p>
-<p>常用的在linux:Texmaker,TeXstuio.</p>
-<p>和一些加插件的编辑器: sublime,visual studio,atom,emacx,vim等.</p>
-<p>更多参考知乎:<a href="https://www.zhihu.com/question/19954023" target="_blank" rel="noopener">知乎</a></p>
-<p>使用vscode时需要注意,需要先安装texlive环境.<br>windows环境没问题,linux下有多个包:</p>
-<img src="/2018/01/01/tools/000-latex/001.png">
-<p>安装上面最基本就可以了,后面还可增加.</p>
-<h1 id="4-让vscode支持中文"><a href="#4-让vscode支持中文" class="headerlink" title="4.让vscode支持中文"></a>4.让vscode支持中文</h1><h2 id="4-1"><a href="#4-1" class="headerlink" title="4.1"></a>4.1</h2><p>其他配置都不用改,直接修改文档:</p>
-<ol>
-<li><p>最前面加上:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%!TEX program = pdflatex</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在要使用中文的地方加上:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;bsmi&#125;</span><br><span class="line">Hello World! 有没有改错,这就是中文</span><br><span class="line">\end&#123;CJK&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>然而这种方法会出现字体支持不全的情况,简体中文很多都没有.</p>
-<h2 id="4-2"><a href="#4-2" class="headerlink" title="4.2"></a>4.2</h2><p>这个方法需要安装xelatex,一般都有了.</p>
-<p>然后设置编译环境:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&quot;latex-workshop.latex.toolchain&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;command&quot;: &quot;xelatex&quot;,</span><br><span class="line">            &quot;args&quot;: [</span><br><span class="line">                &quot;-synctex=1&quot;,</span><br><span class="line">                &quot;-interaction=nonstopmode&quot;,</span><br><span class="line">                &quot;-file-line-error&quot;,</span><br><span class="line">                &quot;-pdf&quot;,</span><br><span class="line">                &quot;%DOC%&quot;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">&quot;editor.fontFamily&quot;: &quot;&apos;Droid Sans Fallback&apos;,&apos;Droid Sans Mono&apos;, &apos;monospace&apos;, monospace&quot;</span><br></pre></td></tr></table></figure></p>
-<p>文档中声明:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br></pre></td></tr></table></figure></p>
-<p>如果中文不能正常显示,那么就需要手动指定字体:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为Droid Sans Fallback</span><br></pre></td></tr></table></figure></p>
-<p>如果没有对应的字体,就需要下载了.</p>
-<p>最后一个简单的例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[30pt,a4paper]&#123;article&#125;</span><br><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包</span><br><span class="line">\setCJKmainfont&#123;Droid Sans Fallback&#125; %设置 CJK 主字体为 Droid Sans Fallback</span><br><span class="line"></span><br><span class="line">\title&#123; hehe第一篇 latex&#125;</span><br><span class="line">\author&#123;jimo \thanks&#123;latex&#125;&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line"></span><br><span class="line">\maketitle</span><br><span class="line"></span><br><span class="line">中文求显示,有没有搞错,这就是中文</span><br><span class="line"></span><br><span class="line">First document. This is a</span><br><span class="line">simple example, with no extra parameters or packages included.</span><br><span class="line"></span><br><span class="line">% 注释不会显示</span><br><span class="line"></span><br><span class="line">\textbf&#123;bold&#125; \underline&#123;underline&#125; \textbf&#123;\textit&#123;italic-bold&#125;&#125;</span><br><span class="line"></span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="5-先看一张图"><a href="#5-先看一张图" class="headerlink" title="5.先看一张图"></a>5.先看一张图</h1><img src="/2018/01/01/tools/000-latex/000.png">
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="1-什么是latex"><a href="#1-什么是latex" class="headerlink" title="1.什么是latex"></a>1.什么是latex</h1><p>LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/01/tools/000-latex/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/01/tools/000-latex/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjyfq8rid00oi9cchlyyu63dn" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-git/000-multi-git-account" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/31/git/000-multi-git-account/" class="article-date">
-  <time datetime="2017-12-31T03:36:45.000Z" itemprop="datePublished">2017-12-31</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/31/git/000-multi-git-account/">一台电脑如何配置多个github账户</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>一台电脑如何配置多个github账户<br>有一个github账户时很简单,不管采用ssh还是https方式提交都没问题,但多个账户时最好采用ssh.</p>
-<p>现在的情况是:以前只有一个账户,全部都采用https的方式,现在多了一个账户,该怎么办?</p>
-<p>下面是我的做法,是通用的.</p>
-<h2 id="如何区别使用的哪种方式"><a href="#如何区别使用的哪种方式" class="headerlink" title="如何区别使用的哪种方式"></a>如何区别使用的哪种方式</h2><p>很简单,2种方法</p>
-<ol>
-<li>在github界面查看:当初是怎样克隆的就是哪种方式.</li>
-</ol>
-<img src="/2017/12/31/git/000-multi-git-account/1-ssh.png">
-<ol start="2">
-<li><p>命令查看:</p>
-<ol>
-<li><p>ssh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --list</span><br><span class="line">...</span><br><span class="line">remote.origin.url=git@github.com:jimolonely/myshell.git</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>https</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --list</span><br><span class="line">...</span><br><span class="line">remote.origin.url=https://github.com/jimolonely/myshell.git</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-</ol>
-<h2 id="如何使用ssh方式"><a href="#如何使用ssh方式" class="headerlink" title="如何使用ssh方式"></a>如何使用ssh方式</h2><p>这个就很容易了.分为6步.</p>
-<ol>
-<li><p>去掉以前的key cache,可有可无,因为可能有其他的ssh key</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh-add -D # 删除所有</span><br><span class="line"><span class="meta">$</span> ssh-add -l</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>生成key</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh-keygen -t rsa -C "xxx@foxmail.com"</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/home/jimo/.ssh/id_rsa): /home/jimo/.ssh/id_rsa_jimo</span><br><span class="line">Enter passphrase (empty for no passphrase):</span><br><span class="line">Enter same passphrase again:</span><br><span class="line">Your identification has been saved in /home/jimo/.ssh/id_rsa_jimo.</span><br><span class="line">Your public key has been saved in /home/jimo/.ssh/id_rsa_jimo.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:a95OgBQ9DBkNw4RM8NKi/NXbbQmJyjHYiwk2UaO+i7k xxx@foxmail.com</span><br><span class="line">The key's randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|  .*.+BO         |</span><br><span class="line">|  oo+ oo=        |</span><br><span class="line">| oo o .  .       |</span><br><span class="line">|o..oo.... .      |</span><br><span class="line">|.* . =.oSo       |</span><br><span class="line">|. = = = ooo .    |</span><br><span class="line">| . + + .o..+     |</span><br><span class="line">|...    o o.      |</span><br><span class="line">|Eo      ..o      |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line">同理生成另外一个.</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>添加到ssh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh-add id_rsa_code</span><br><span class="line">Identity added: id_rsa_code (id_rsa_code)</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh-add id_rsa_jimo</span><br><span class="line">Identity added: id_rsa_jimo (id_rsa_jimo)</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh-add -l</span><br><span class="line">2048 SHA256:UtdQCo1Ca7Gf4ITAsyxxXpjaLXan28CAv1O2QBylWTc id_rsa_code (RSA)</span><br><span class="line">2048 SHA256:a95OgBQ9DBkNw4RM8NKi/NXbbQmJyjHYiwk2UaO+i7k id_rsa_jimo (RSA)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将公钥(id_rsa_code.pub里的)复制到<a href="https://github.com/settings/keys" target="_blank" rel="noopener">github账户ssh里</a></p>
-</li>
-<li><p>配置,在~/.ssh/config下配置:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ cat config</span><br><span class="line"><span class="meta">#</span> Default github account</span><br><span class="line">Host github.com</span><br><span class="line"> HostName github.com</span><br><span class="line"> User git</span><br><span class="line"> IdentityFile /home/jimo/.ssh/id_rsa_jimo</span><br><span class="line"></span><br><span class="line"><span class="meta"> #</span> second account</span><br><span class="line">Host github-code</span><br><span class="line"> HostName github.com</span><br><span class="line"> User git</span><br><span class="line"> IdentityFile /home/jimo/.ssh/id_rsa_code</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>测试:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc .ssh]$ ssh -T github.com</span><br><span class="line">Hi jimolonely! You've successfully authenticated, but GitHub does not provide shell access.</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc .ssh]$ ssh -T github-code</span><br><span class="line">Hi mycodefarm! You've successfully authenticated, but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="如何使用很关键"><a href="#如何使用很关键" class="headerlink" title="如何使用很关键"></a>如何使用很关键</h2><p>到这里,克隆或则添加origin的时候需要注意,使用config里自己定义的Host.</p>
-<p>比如: 创建了一个新账户,叫test,本来克隆该用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:mycodefarm/test.git</span><br></pre></td></tr></table></figure></p>
-<p>但现在需要使用github-code替代 github.com<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github-code:mycodefarm/test.git</span><br></pre></td></tr></table></figure></p>
-<p>另外遇到:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc test]$ git commit -m &apos;first&apos;</span><br><span class="line"></span><br><span class="line">*** 请告诉我你是谁。</span><br><span class="line"></span><br><span class="line">运行</span><br><span class="line"></span><br><span class="line">  git config --global user.email &quot;you@example.com&quot;</span><br><span class="line">  git config --global user.name &quot;Your Name&quot;</span><br><span class="line"></span><br><span class="line">来设置您账号的缺省身份标识。</span><br><span class="line">如果仅在本仓库设置身份标识，则省略 --global 参数。</span><br></pre></td></tr></table></figure></p>
-<p>需要在每个项目单独配置用户名和邮箱,但首先删除全局配置:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global --unset user.name</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc test]$ git config user.name &quot;mycodefarm&quot; &amp;&amp; git config user.email &quot;xx@xx.com&quot;</span><br></pre></td></tr></table></figure></p>
-<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>现在可以混用https和ssh提交了.</p>
-<p>但最好全部改为ssh,因为如果使用了credential.helper store,会把密码存储在~/.git-credentials下,不太好.</p>
-<h1 id="附：使用全局用户名密码的方式"><a href="#附：使用全局用户名密码的方式" class="headerlink" title="附：使用全局用户名密码的方式"></a>附：使用全局用户名密码的方式</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install git -y</span><br><span class="line"></span><br><span class="line">git config --global user.name "jimolonely"</span><br><span class="line">git config --global user.email xxx@163.com</span><br></pre></td></tr></table></figure>
-<h2 id="配置保存密码"><a href="#配置保存密码" class="headerlink" title="配置保存密码"></a>配置保存密码</h2><h3 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global credential.helper store</span><br></pre></td></tr></table></figure>
-<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p>在~目录下创建.gitconfig文件，写入：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[credential]    </span><br><span class="line">    helper = store</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>一台电脑如何配置多个github账户<br>有一个github账户时很简单,不管采用ssh还是https方式提交都没问题,但多个账户时最好采用ssh.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/31/git/000-multi-git-account/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/31/git/000-multi-git-account/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjyfq8rac003w9cchcg48188u" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li></ul>
 
       </footer>
       </div>
@@ -2035,7 +1978,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.18px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.35px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2057,6 +2000,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/24/java/051-spring-http-status-code/">spring如何返回http状态码</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
           </li>
         
@@ -2066,14 +2017,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/17/java/049-spring-autowire-in-dependency/">spring无法注入依赖库中的bean</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/17/linux/027-snap-ubuntu/">snap应用商店</a>
           </li>
         
       </ul>
