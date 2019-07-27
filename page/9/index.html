@@ -86,6 +86,206 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-lang/012-redis-distributed-lock" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/10/lang/012-redis-distributed-lock/" class="article-date">
+  <time datetime="2018-09-10T05:48:49.000Z" itemprop="datePublished">2018-09-10</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/10/lang/012-redis-distributed-lock/">redis分布式锁</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>在许多环境中，分布式锁是一种非常有用的原语，其中不同的进程必须以互斥的方式与共享资源一起运行。</p>
+<p>有许多库和博客文章描述了如何使用Redis实现DLM（分布式锁管理器），但是每个库都使用不同的方法，并且许多库使用简单的方法，与稍微复杂的方法相比可以实现更低的保证设计。</p>
+<p>本文试图提供一种更典型的算法来使用Redis实现分布式锁。 我们提出了一种称为Redlock的算法，它实现了一种我们认为比vanilla单实例方法更安全的DLM。 我们希望社区将对其进行分析，提供反馈，并将其作为实施或更复杂或替代设计的起点。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>在描述算法之前，这里有几个已经可用的实现的链接，可用于参考。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Redlock-rb（Ruby实现）。 还有一个Redlock-rb的分支，它可以添加一个宝石，方便分发，也许更多。</span><br><span class="line">Redlock-py（Python实现）。</span><br><span class="line">Aioredlock（Asyncio Python实现）。</span><br><span class="line">Redlock-php（PHP实现）。</span><br><span class="line">PHPRedisMutex（进一步的PHP实现）</span><br><span class="line">cheprasov / php-redis-lock（用于锁的PHP库）</span><br><span class="line">Redsync.go（Go实现）。</span><br><span class="line">Redisson（Java实现）。</span><br><span class="line">Redis :: DistLock（Perl实现）。</span><br><span class="line">Redlock-cpp（C ++实现）。</span><br><span class="line">Redlock-cs（C＃/ .NET实现）。</span><br><span class="line">RedLock.net（C＃/ .NET实现）。 包括异步和锁扩展支持。</span><br><span class="line">ScarletLock（带可配置数据存储区的C＃.NET实现）</span><br><span class="line">node-redlock（NodeJS实现）。 包括对锁定扩展的支持。</span><br></pre></td></tr></table></figure></p>
+<h1 id="安全和存活保障"><a href="#安全和存活保障" class="headerlink" title="安全和存活保障"></a>安全和存活保障</h1><p>我们将仅使用三个属性对我们的设计进行建模，从我们的角度来看，这些属性是以有效方式使用分布式锁所需的最低保证。</p>
+<ol>
+<li>安全属性：相互排斥。 在任何给定时刻，只有一个客户端可以持有锁。</li>
+<li>活力属性A：无死锁。 最终，即使锁定资源的客户端崩溃或被分区，也始终可以获取锁。</li>
+<li>活力属性B：容错。 只要大多数Redis节点启动，客户端就能够获取和释放锁。</li>
+</ol>
+<h1 id="为什么基于故障转移的实现还不够"><a href="#为什么基于故障转移的实现还不够" class="headerlink" title="为什么基于故障转移的实现还不够"></a>为什么基于故障转移的实现还不够</h1><p>为了理解我们想要改进的内容，让我们分析大多数基于Redis的分布式锁库的当前状态。</p>
+<p>使用Redis锁定资源的最简单方法是在实例中创建key。 key通常使用Redis expires功能在有限的生存时间内创建，因此最终它将被释放（我们列表中的属性2）。 当客户端需要释放资源时，它会删除key。</p>
+<p>从表面上看，这很有效，但存在一个问题：这是我们架构中的单点故障。 如果Redis主机出现故障会怎样？ 好吧，让我们添加一个奴隶！ 如果主服务器不可用，请使用它。 遗憾的是，这不可行。 通过这样做，我们无法实现互斥的安全属性，因为Redis复制是异步的。</p>
+<p>这个模型有明显的竞争条件：</p>
+<ol>
+<li>客户端A获取主服务器中的锁。</li>
+<li>在写入key之前，主机崩溃并发送到从机。</li>
+<li>奴隶被提升为主人。</li>
+<li>客户端B获取对已经拥有锁的相同资源的锁。 安全违规！</li>
+</ol>
+<p>有时在特殊情况下，例如在故障期间，多个客户端可以同时保持锁定，这是完全正常的。 如果是这种情况，您可以使用基于复制的解决方案。 否则，我们建议实施本文档中描述的解决方案。</p>
+<h1 id="使用单个实例正确实现"><a href="#使用单个实例正确实现" class="headerlink" title="使用单个实例正确实现"></a>使用单个实例正确实现</h1><p>在尝试克服上述单实例设置的限制之前，让我们在这个简单的情况下检查如何正确地进行操作，因为这实际上是一个可行的解决方案，在不时可以接受竞争条件的应用程序中，并且因为锁定到 单个实例是我们将用于此处描述的分布式算法的基础。</p>
+<p>要获得锁，可以采取以下措施：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET resource_name my_random_value NX PX 30000</span><br></pre></td></tr></table></figure></p>
+<p>该命令仅在key尚不存在时才设置key（NX选项），过期时间为30000毫秒（PX选项）。 值“myrandomvalue”。 此值必须在所有客户端和所有锁定请求中都是唯一的。</p>
+<p>基本上使用随机值是为了以安全的方式释放锁，使用一个告诉Redis的脚本：仅当key存在且存储在key上的值恰好是我期望的值时才删除key。 这是通过以下Lua脚本完成的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if redis.call(&quot;get&quot;,KEYS[1]) == ARGV[1] then</span><br><span class="line">    return redis.call(&quot;del&quot;,KEYS[1])</span><br><span class="line">else</span><br><span class="line">    return 0</span><br><span class="line">end</span><br></pre></td></tr></table></figure></p>
+<p>这很重要，以避免删除由另一个客户端创建的锁。 例如，客户端可能获得锁定，在某些操作中被阻止的时间超过锁定有效时间（key将到期的时间），并且稍后移除已经由某个其他客户端获取的锁定。 仅使用DEL是不安全的，因为客户端可能会删除另一个客户端的锁定。 使用上面的脚本而不是每个锁都使用随机字符串“签名”，因此只有在客户端尝试删除锁时，锁才会被删除。</p>
+<h1 id="hello"><a href="#hello" class="headerlink" title="hello"></a>hello</h1>
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>在许多环境中，分布式锁是一种非常有用的原语，其中不同的进程必须以互斥的方式与共享资源一起运行。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/10/lang/012-redis-distributed-lock/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/10/lang/012-redis-distributed-lock/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/10/lang/012-redis-distributed-lock/" data-id="cjylc0cat00fj0tcheh5lycnk" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-server/002-tomcat-config" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/10/server/002-tomcat-config/" class="article-date">
+  <time datetime="2018-09-09T23:57:11.000Z" itemprop="datePublished">2018-09-10</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/10/server/002-tomcat-config/">tomcat配置</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>tomcat目前是使用量最大的服务器，不得不学。</p>
+<h1 id="了解目录结构"><a href="#了解目录结构" class="headerlink" title="了解目录结构"></a>了解目录结构</h1><ul>
+<li>/ bin - 启动，关闭和其他脚本。 <em> .sh文件（对于Unix系统）是</em> .bat文件的功能重复（对于Windows系统）。 由于Win32命令行缺少某些功能，因此这里有一些额外的文件。</li>
+<li>/ conf - 配置文件和相关的DTD。 这里最重要的文件是server.xml。 它是容器的主要配置文件。</li>
+<li>/ logs - 默认情况下，日志文件在此处。</li>
+<li>/ webapps - 这是您的webapps的用武之地。</li>
+</ul>
+<h1 id="如何管理APP"><a href="#如何管理APP" class="headerlink" title="如何管理APP"></a>如何管理APP</h1><p><a href="https://tomcat.apache.org/tomcat-8.5-doc/manager-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/manager-howto.html</a></p>
+<h2 id="manager"><a href="#manager" class="headerlink" title="manager"></a>manager</h2><p>manager就是管理app的页面，tomcat自带有，它能做的事情有以下几个：</p>
+<p>//TODO</p>
+<p>但我们直接访问时会发现权限问题：</p>
+
+<p>所以需要做一些配置：</p>
+<p>我们会发现在<code>/webapps/manager/WEB-INF/web.xml</code>下有几个角色的定义：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">120   <span class="comment">&lt;!-- Define a Security Constraint on this Application --&gt;</span></span><br><span class="line">121   <span class="comment">&lt;!-- <span class="doctag">NOTE:</span>  None of these roles are present in the default users file --&gt;</span></span><br><span class="line">122   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">123     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">124       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>HTML Manager interface (for humans)<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">125       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/html/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">126     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">127     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">128        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-gui<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">129     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">130   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">131   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">132     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">133       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>Text Manager interface (for scripts)<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">134       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/text/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">135     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">136     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">137        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-script<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">138     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">139   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">140   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">141     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">142       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>JMX Proxy interface<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">143       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/jmxproxy/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">144     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">145     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">146        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-jmx<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">147     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">148   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">149   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">150     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">151       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>Status interface<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">152       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/status/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">153     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">154     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">155        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-gui<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">156        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-script<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">157        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-jmx<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">158        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-status<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">159     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">160   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>分别是：</p>
+<ol>
+<li>manager-gui — Access to the HTML interface.</li>
+<li>manager-status — Access to the “Server Status” page only.</li>
+<li>manager-script — Access to the tools-friendly plain text interface that is described in this document, and to the “Server Status” page.</li>
+<li>manager-jmx — Access to JMX proxy interface and to the “Server Status” page.</li>
+</ol>
+<p>当然，这几个权限各有各的风险，需要谨慎使用。我们必须使用至少其中一个角色，并设置用户名和密码才能访问管理页面。<br>因此，我们需要在<code>/conf/tomcat-users.xml</code>里进行用户添加：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"jimo"</span> <span class="attr">password</span>=<span class="string">"jimo"</span> <span class="attr">roles</span>=<span class="string">"standard,manager-gui,manager-script,manager-status"</span> /&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="https://stackoverflow.com/questions/38551166/403-access-denied-on-tomcat-8-manager-app-without-prompting-for-user-password" target="_blank" rel="noopener">https://stackoverflow.com/questions/38551166/403-access-denied-on-tomcat-8-manager-app-without-prompting-for-user-password</a></p>
+<h1 id="Host管理"><a href="#Host管理" class="headerlink" title="Host管理"></a>Host管理</h1><h1 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h1><p><a href="https://tomcat.apache.org/tomcat-8.5-doc/cluster-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/cluster-howto.html</a></p>
+<h1 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h1><p><a href="https://tomcat.apache.org/tomcat-8.5-doc/balancer-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/balancer-howto.html</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li><a href="https://tomcat.apache.org/tomcat-8.5-doc/introduction.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/introduction.html</a></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>tomcat目前是使用量最大的服务器，不得不学。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/10/server/002-tomcat-config/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/10/server/002-tomcat-config/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/10/server/002-tomcat-config/" data-id="cjylc0ccl00l40tch92y4qjge" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/005-jdk11-new-feature" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/08/java/005-jdk11-new-feature/" class="article-date">
@@ -282,12 +482,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/08/java/005-jdk11-new-feature/" data-id="cjyhx0ke10075ghchv022styx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/08/java/005-jdk11-new-feature/" data-id="cjylc0c67005n0tchn5u0nkqd" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -379,7 +579,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/08/lang/011-kafka-stream/" data-id="cjyhx0kf600bbghch0x9xp7k2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/08/lang/011-kafka-stream/" data-id="cjylc0caq00fa0tchyi18h0ox" class="article-share-link">
           Share
         </a>
         
@@ -468,12 +668,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/06/maven/001-maven-tutorial/" data-id="cjyhx0kgd00fkghche3kitmz7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/06/maven/001-maven-tutorial/" data-id="cjylc0ccd00kh0tchftntc8lr" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -572,12 +772,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/002-hbase-java/" data-id="cjyhx0kdq0069ghchewk8czqa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/002-hbase-java/" data-id="cjylc0c5x004k0tch1xxlw6nx" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -674,7 +874,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/001-hbase-shell-command/" data-id="cjyhx0kdq0066ghchqp72d5pe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/05/hadoop/001-hbase-shell-command/" data-id="cjylc0c5t004e0tchvzbxg1aw" class="article-share-link">
           Share
         </a>
         
@@ -995,7 +1195,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/04/lang/010-redis-configuration/" data-id="cjyhx0kfa00btghchtjlg5b2q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/04/lang/010-redis-configuration/" data-id="cjylc0car00fc0tch0hjj47zi" class="article-share-link">
           Share
         </a>
         
@@ -1131,7 +1331,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/009-redis-partition/" data-id="cjyhx0kf400b4ghch6dzq1c99" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/009-redis-partition/" data-id="cjylc0cas00ff0tch77bklaps" class="article-share-link">
           Share
         </a>
         
@@ -1281,7 +1481,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/008-redis-lru-cache/" data-id="cjyhx0kf300azghchvd4ewc3j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/008-redis-lru-cache/" data-id="cjylc0cas00fh0tch6u9jknu3" class="article-share-link">
           Share
         </a>
         
@@ -1386,7 +1586,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjyhx0kf200awghchm1kh7u68" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjylc0cao00f50tchadu8b4jy" class="article-share-link">
           Share
         </a>
         
@@ -1513,7 +1713,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjyhx0kf000apghchmpqhnvwo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjylc0cap00f70tchle1mg9yc" class="article-share-link">
           Share
         </a>
         
@@ -1588,7 +1788,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjyhx0kfw00dvghch7j6x3csx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjylc0cbn00id0tchmxkve8nu" class="article-share-link">
           Share
         </a>
         
@@ -1698,7 +1898,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjyhx0kf300b1ghchisxmvmwa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjylc0can00f20tchn274uc98" class="article-share-link">
           Share
         </a>
         
@@ -1825,7 +2025,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjyhx0kez00anghch1akjhhrp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjylc0cak00es0tch664bqtpw" class="article-share-link">
           Share
         </a>
         
@@ -2122,7 +2322,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjyhx0kf100aughchro8dt2ky" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjylc0can00f00tch7q4vf0z2" class="article-share-link">
           Share
         </a>
         
@@ -2284,7 +2484,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjyhx0kgo00goghchh52qs5rs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjylc0ccm00l90tchirwtw4wf" class="article-share-link">
           Share
         </a>
         
@@ -2423,7 +2623,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjyhx0kgl00ggghch6cgz14gb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjylc0cck00l10tchf58hvzuq" class="article-share-link">
           Share
         </a>
         
@@ -2508,7 +2708,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjyhx0kd50041ghch71g3wd58" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjylc0c58002n0tch03ewpdvj" class="article-share-link">
           Share
         </a>
         
@@ -2618,195 +2818,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjyhx0kd4003wghch55yaeu0d" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a><span class="article-tag-list-count">13</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-cloudcompute/012-docker-container" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/05/cloudcompute/012-docker-container/" class="article-date">
-  <time datetime="2018-08-05T05:51:55.000Z" itemprop="datePublished">2018-08-05</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/05/cloudcompute/012-docker-container/">6.容器的使用</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <img src="/2018/08/05/cloudcompute/012-docker-container/000.png">
-<h1 id="暂停"><a href="#暂停" class="headerlink" title="暂停"></a>暂停</h1><p>比如打个快照之类的. <strong>注意看下面的状态</strong><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">3ecd69d08416        ubuntu              "/bin/bash"         45 seconds ago      Up 44 seconds                           confident_kalam</span><br><span class="line">root@jimo-VirtualBox:~# docker pause confident_kalam</span><br><span class="line">confident_kalam</span><br><span class="line">root@jimo-VirtualBox:~# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                  PORTS               NAMES</span><br><span class="line">3ecd69d08416        ubuntu              "/bin/bash"         8 minutes ago       Up 8 minutes (Paused)                       confident_kalam</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker unpause confident_kalam</span><br><span class="line">confident_kalam</span><br><span class="line">root@jimo-VirtualBox:~# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">3ecd69d08416        ubuntu              "/bin/bash"         8 minutes ago       Up 8 minutes                            confident_kalam</span><br></pre></td></tr></table></figure></p>
-<h1 id="删除镜像"><a href="#删除镜像" class="headerlink" title="删除镜像"></a>删除镜像</h1><p>退出的容器依然会占用空间,所以可以删除.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES</span><br><span class="line">3ecd69d08416        ubuntu              "/bin/bash"              15 minutes ago      Up 15 minutes                                   confident_kalam</span><br><span class="line">cfb902a91605        ubuntu              "/bin/bash"              18 minutes ago      Exited (0) 18 minutes ago                       hungry_bell</span><br><span class="line">ee2a6312fbe5        my-image            "sh"                     18 minutes ago      Exited (0) 18 minutes ago                       cocky_payne</span><br><span class="line">ffac6be3da49        busybox             "sh"                     13 days ago         Exited (0) 13 days ago                          zen_leavitt</span><br><span class="line">bdd94e3338fb        ubuntu              "/bin/bash -c 'while…"   13 days ago         Exited (137) 13 days ago                        gifted_hopper</span><br><span class="line">b4027dadae2a        ubuntu              "/bin/bash -c 'while…"   13 days ago         Exited (137) 13 days ago                        eager_easley</span><br><span class="line">5faa46b16ea9        httpd               "httpd-foreground"       13 days ago         Exited (0) 13 days ago                          my-http-server</span><br><span class="line">549aa9db3954        ubuntu              "/bin/bash -c 'while…"   13 days ago         Exited (137) 13 days ago                        elastic_cray</span><br><span class="line">16858e7ee65c        ubuntu              "/bin/bash -c 'while…"   13 days ago         Exited (137) 13 days ago                        clever_murdock</span><br><span class="line">a67b81d3ff90        ubuntu              "/bin/bash -c 'echo …"   13 days ago         Exited (0) 13 days ago                          xenodochial_elbakyan</span><br><span class="line">21f6607ec8dc        ubuntu              "/bin/bash -c 'while…"   13 days ago         Exited (137) 13 days ago                        eager_perlman</span><br><span class="line">e34dcec1bd64        ubuntu              "/bin/basg -c 'while…"   13 days ago         Created                                         happy_hugle</span><br><span class="line">524c62fc3f68        ubuntu              "pwd"                    13 days ago         Exited (0) 13 days ago                          pensive_khorana</span><br><span class="line">80f81f33ed15        registry:latest     "/entrypoint.sh /etc…"   2 weeks ago         Exited (2) 2 weeks ago                          agitated_clarke</span><br><span class="line">06d0403206f8        registry:latest     "/entrypoint.sh /etc…"   2 weeks ago         Created                                         mystifying_hawking</span><br><span class="line">0fe657284887        my-image            "sh"                     2 weeks ago         Exited (0) 2 weeks ago                          determined_boyd</span><br><span class="line">e7bac1b935b3        2d8187e6451a        "sh"                     2 weeks ago         Exited (127) 2 weeks ago                        unruffled_keldysh</span><br><span class="line">3e9f5c9eae7c        2d8187e6451a        "/bin/sh -c '/bin/ba…"   2 weeks ago         Exited (127) 2 weeks ago                        laughing_mendeleev</span><br><span class="line">4a12c1ec8971        ubuntu              "/bin/bash"              2 weeks ago         Exited (127) 2 weeks ago                        eager_austin</span><br><span class="line">2eda339fa711        hello-world         "/hello"                 2 weeks ago         Exited (0) 2 weeks ago                          practical_shaw</span><br><span class="line">01fa717064e8        httpd               "httpd-foreground"       2 weeks ago         Exited (0) 2 weeks ago                          hardcore_lewin</span><br><span class="line">36ee204c603c        httpd               "httpd-foreground"       2 weeks ago         Created                                         eloquent_turing</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker rm 36ee204c603c 01fa717064e8</span><br><span class="line">36ee204c603c</span><br><span class="line">01fa717064e8</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker ps -aq -f status=exited</span><br><span class="line">cfb902a91605</span><br><span class="line">ee2a6312fbe5</span><br><span class="line">ffac6be3da49</span><br><span class="line">bdd94e3338fb</span><br><span class="line">b4027dadae2a</span><br><span class="line">5faa46b16ea9</span><br><span class="line">549aa9db3954</span><br><span class="line">16858e7ee65c</span><br><span class="line">a67b81d3ff90</span><br><span class="line">21f6607ec8dc</span><br><span class="line">524c62fc3f68</span><br><span class="line">80f81f33ed15</span><br><span class="line">0fe657284887</span><br><span class="line">e7bac1b935b3</span><br><span class="line">3e9f5c9eae7c</span><br><span class="line">4a12c1ec8971</span><br><span class="line">2eda339fa711</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker rm -v $(docker ps -aq -f status=exited)</span><br><span class="line">cfb902a91605</span><br><span class="line">ee2a6312fbe5</span><br><span class="line">ffac6be3da49</span><br><span class="line">bdd94e3338fb</span><br><span class="line">b4027dadae2a</span><br><span class="line">5faa46b16ea9</span><br><span class="line">549aa9db3954</span><br><span class="line">16858e7ee65c</span><br><span class="line">a67b81d3ff90</span><br><span class="line">21f6607ec8dc</span><br><span class="line">524c62fc3f68</span><br><span class="line">80f81f33ed15</span><br><span class="line">0fe657284887</span><br><span class="line">e7bac1b935b3</span><br><span class="line">3e9f5c9eae7c</span><br><span class="line">4a12c1ec8971</span><br><span class="line">2eda339fa711</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">3ecd69d08416        ubuntu              "/bin/bash"              17 minutes ago      Up 17 minutes                           confident_kalam</span><br><span class="line">e34dcec1bd64        ubuntu              "/bin/basg -c 'while…"   13 days ago         Created                                 happy_hugle</span><br><span class="line">06d0403206f8        registry:latest     "/entrypoint.sh /etc…"   2 weeks ago         Created                                 mystifying_hawking</span><br><span class="line">root@jimo-VirtualBox:~#</span><br></pre></td></tr></table></figure></p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>一张图理解.内容来自<a href="http://www.cnblogs.com/CloudMan6/p/6961665.html" target="_blank" rel="noopener">blog</a></p>
-<img src="/2018/08/05/cloudcompute/012-docker-container/001.jpg">
-<p><strong>注意以下几点:</strong></p>
-<ol>
-<li>状态的几种变换</li>
-<li>docker run = docker create + docker start</li>
-<li>–restart 只在容器进程退出时才有效.</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <img src="/2018/08/05/cloudcompute/012-docker-container/000.png">
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/08/05/cloudcompute/012-docker-container/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/08/05/cloudcompute/012-docker-container/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjyhx0kd5003zghchboxg8efr" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a><span class="article-tag-list-count">13</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-cloudcompute/011-docker-container" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/04/cloudcompute/011-docker-container/" class="article-date">
-  <time datetime="2018-08-04T05:51:55.000Z" itemprop="datePublished">2018-08-04</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/04/cloudcompute/011-docker-container/">5.docker container run</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>容器的运行,进入与分类.<br><img src="/2018/08/04/cloudcompute/011-docker-container/000.png"></p>
-<h1 id="一闪而过运行容器"><a href="#一闪而过运行容器" class="headerlink" title="一闪而过运行容器"></a>一闪而过运行容器</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker run ubuntu pwd</span><br><span class="line">/</span><br><span class="line">root@jimo-VirtualBox:~#</span><br></pre></td></tr></table></figure>
-<p>查看容器运行状态:发现并没运行,而是一闪而过.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line"></span><br><span class="line">root@jimo-VirtualBox:~# docker container ls -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS                          PORTS               NAMES</span><br><span class="line">524c62fc3f68        ubuntu              "pwd"                    About a minute ago   Exited (0) About a minute ago                       pensive_khorana</span><br></pre></td></tr></table></figure></p>
-<h1 id="长时间运行容器"><a href="#长时间运行容器" class="headerlink" title="长时间运行容器"></a>长时间运行容器</h1><p>因为容器的生命周期依赖于启动时执行的命令，只要该命令不结束，容器也就不会退出。<br>理解了这个原理，我们就可以通过执行一个长期运行的命令来保持容器的运行状态:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:/home/jimo# docker run ubuntu /bin/bash -c "while true ; do sleep 1; done"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 另一终端</span><br><span class="line">root@jimo-VirtualBox:~# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS               NAMES</span><br><span class="line">549aa9db3954        ubuntu              "/bin/bash -c 'while…"   36 seconds ago       Up 34 seconds                           elastic_cray</span><br></pre></td></tr></table></figure></p>
-<p>-d参数: 后台运行.<br>–name : 指定名字,不指定会随机分配.<br>如下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker run --name "my-http-server" -d httpd</span><br><span class="line">5faa46b16ea9437f7230cb6c276014640e7cc73b661341fbe38305d3effbaebd</span><br><span class="line">root@jimo-VirtualBox:~# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS              PORTS               NAMES</span><br><span class="line">5faa46b16ea9        httpd               "httpd-foreground"   5 seconds ago       Up 4 seconds        80/tcp              my-http-server</span><br></pre></td></tr></table></figure></p>
-<p>通过history可看到是通过CMD执行的:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker history httpd</span><br><span class="line">IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT</span><br><span class="line">fb2f3851a971        3 weeks ago         /bin/sh -c #(nop)  CMD ["httpd-foreground"]     0B</span><br></pre></td></tr></table></figure></p>
-<h1 id="停止容器"><a href="#停止容器" class="headerlink" title="停止容器"></a>停止容器</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker stop 549aa9db3954</span><br><span class="line">549aa9db3954</span><br></pre></td></tr></table></figure>
-<h1 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h1><ol>
-<li><p>attach方式:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker run -d -it ubuntu /bin/bash -c "while true;do sleep 2;echo In_container;done"</span><br><span class="line">bdd94e3338fbfebdc2f2b679773f1755796bfee9f3d3da48e765977b311bf0cb</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 可通过 Ctrl+p 然后 Ctrl+q 组合键退出 attach 终端,但启动时要加-it</span><br><span class="line">root@jimo-VirtualBox:~# docker attach bdd94e3338fbfebdc2f2b679773f1755796bfee9f3d3da48e765977b311bf0cb</span><br><span class="line">In_container</span><br><span class="line">In_container</span><br><span class="line">read escape sequence</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>exec方式: docker exec -it ID bash|sh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker exec -it bdd94e3338fb bash</span><br><span class="line">root@bdd94e3338fb:/# ps -elf</span><br><span class="line">F S UID        PID  PPID  C PRI  NI ADDR SZ WCHAN  STIME TTY          TIME CMD</span><br><span class="line">4 S root         1     0  0  80   0 -  4594 wait   06:34 pts/0    00:00:00 /bin/</span><br><span class="line">4 S root        80     0  0  80   0 -  4627 wait   06:37 pts/1    00:00:00 bash</span><br><span class="line">0 S root        93     1  0  80   0 -  1133 hrtime 06:37 pts/0    00:00:00 sleep</span><br><span class="line">4 R root        94    80  0  80   0 -  8600 -      06:37 pts/1    00:00:00 ps -e</span><br><span class="line">root@bdd94e3338fb:/# exit</span><br><span class="line">exit</span><br><span class="line">root@jimo-VirtualBox:~#</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>exec VS attach</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. attach 直接进入容器 启动命令 的终端，不会启动新的进程。</span><br><span class="line">2. exec 则是在容器中打开新的终端，并且可以启动新的进程。</span><br><span class="line">3. 如果想直接在终端中查看启动命令的输出，用 attach；其他情况使用 exec。</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果只是为了查看启动命令的输出，可以使用 docker logs 命令,-f会连续打印输出</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker logs -f bdd94e3338fb</span><br><span class="line">In_container</span><br><span class="line">In_container</span><br><span class="line">In_container</span><br><span class="line">In_container</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="容器分类"><a href="#容器分类" class="headerlink" title="容器分类"></a>容器分类</h1><ol>
-<li>服务类容器以 daemon 的形式运行，对外提供服务。比如 web server，数据库等。通过 -d 以后台方式启动这类容器是非常合适的。如果要排查问题，可以通过 exec -it 进入容器。</li>
-<li>工具类容器通常给能我们提供一个临时的工作环境，通常以 run -it 方式运行,如:<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@jimo-VirtualBox:~# docker run -it busybox</span><br><span class="line">/ # wget www.baidu.com</span><br><span class="line">Connecting to www.baidu.com (61.135.169.121:80)</span><br><span class="line">index.html           100% |**************************************************************************************************************************************************************|  2381   0:00:00 ETA</span><br><span class="line">/ # exit</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="指定容器的方式"><a href="#指定容器的方式" class="headerlink" title="指定容器的方式"></a>指定容器的方式</h1><ol>
-<li>短ID。</li>
-<li>长ID。</li>
-<li>容器名称。 可通过 –name 为容器命名。重命名容器可执行docker rename。</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>容器的运行,进入与分类.<br><img src="/2018/08/04/cloudcompute/011-docker-container/000.png"></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/08/04/cloudcompute/011-docker-container/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/08/04/cloudcompute/011-docker-container/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjyhx0kd4003ughchvxaw0hly" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjylc0c57002k0tchomsdyksq" class="article-share-link">
           Share
         </a>
         
@@ -2838,7 +2850,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -2848,7 +2860,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2870,6 +2882,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/25/java/053-jdk-javac-compile/">javac源码编译到认识编译过程</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
           </li>
         
@@ -2879,14 +2899,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/23/linux/028-ubuntu-application-launcher/">ubuntu制作启动图标</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
           </li>
         
       </ul>

@@ -86,6 +86,172 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/014-java-velocityengine" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/10/java/014-java-velocityengine/" class="article-date">
+  <time datetime="2018-10-10T06:46:49.000Z" itemprop="datePublished">2018-10-10</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/10/10/java/014-java-velocityengine/">java模板类：用代码生成代码</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>尝尝用代码生成代码的元编程方式，写一个AI来编程把。</p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.velocity&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;velocity&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.7&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h1><p>新建一个以vm结尾的文件，里面放模板语法。</p>
+<img src="/2018/10/10/java/014-java-velocityengine/000.png">
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">    #foreach ($filed in $fields)</span><br><span class="line">    <span class="keyword">private</span> String $filed;</span><br><span class="line">    #end</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关于这个语法，参看：<a href="https://velocity.apache.org/engine/1.7/user-guide.html" target="_blank" rel="noopener">https://velocity.apache.org/engine/1.7/user-guide.html</a>.</p>
+<h1 id="编程"><a href="#编程" class="headerlink" title="编程"></a>编程</h1><p>进行动态注入数据，生成代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.velocity.Template;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.VelocityContext;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.app.VelocityEngine;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.runtime.RuntimeConstants;</span><br><span class="line"><span class="keyword">import</span> org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestTemplate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		<span class="keyword">final</span> VelocityEngine velocityEngine = <span class="keyword">new</span> VelocityEngine();</span><br><span class="line">		velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, <span class="string">"classpath"</span>);</span><br><span class="line">		velocityEngine.setProperty(<span class="string">"classpath.resource.loader.class"</span>, ClasspathResourceLoader.class.getName());</span><br><span class="line">		velocityEngine.init();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">final</span> Template template = velocityEngine.getTemplate(<span class="string">"template.vm"</span>);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 准备点数据,可能从配置文件读取</span></span><br><span class="line">		List&lt;String&gt; fields = Arrays.asList(<span class="string">"name"</span>, <span class="string">"age"</span>, <span class="string">"title"</span>, <span class="string">"content"</span>);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">final</span> VelocityContext context = <span class="keyword">new</span> VelocityContext();</span><br><span class="line">		context.put(<span class="string">"fields"</span>, fields);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">final</span> StringWriter writer = <span class="keyword">new</span> StringWriter();</span><br><span class="line">		template.merge(context, writer);</span><br><span class="line">		System.out.println(writer.toString());</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 或者写入文件</span></span><br><span class="line">		Writer fileWriter = <span class="keyword">new</span> PrintWriter(<span class="keyword">new</span> File(<span class="string">"Person.java"</span>));</span><br><span class="line">		template.merge(context, fileWriter);</span><br><span class="line">		fileWriter.flush();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String name;</span><br><span class="line">        <span class="keyword">private</span> String age;</span><br><span class="line">        <span class="keyword">private</span> String title;</span><br><span class="line">        <span class="keyword">private</span> String content;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>尝尝用代码生成代码的元编程方式，写一个AI来编程把。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/10/10/java/014-java-velocityengine/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/10/10/java/014-java-velocityengine/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/10/10/java/014-java-velocityengine/" data-id="cjylc0c6b00640tchka8u59rs" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/元编程/">元编程</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-java/013-java-concurrent-executor" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/10/java/013-java-concurrent-executor/" class="article-date">
+  <time datetime="2018-10-10T00:05:39.000Z" itemprop="datePublished">2018-10-10</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/10/10/java/013-java-concurrent-executor/">java并发-Executor解析</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>推荐用线程池来创建线程，但首先了解所有线程池的接口Executor。</p>
+<h1 id="Executor概览"><a href="#Executor概览" class="headerlink" title="Executor概览"></a>Executor概览</h1><h2 id="Executor接口"><a href="#Executor接口" class="headerlink" title="Executor接口"></a>Executor接口</h2><p>先看看Executor的代码，非常简单，只有一个方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Executor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Executes the given command at some time in the future.  The command</span></span><br><span class="line"><span class="comment">     * may execute in a new thread, in a pooled thread, or in the calling</span></span><br><span class="line"><span class="comment">     * thread, at the discretion of the &#123;<span class="doctag">@code</span> Executor&#125; implementation.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> command the runnable task</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> RejectedExecutionException if this task cannot be</span></span><br><span class="line"><span class="comment">     * accepted for execution</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> NullPointerException if command is null</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Executor的继承层次结构"><a href="#Executor的继承层次结构" class="headerlink" title="Executor的继承层次结构"></a>Executor的继承层次结构</h2><p>子接口：<br>ExecutorService, ScheduledExecutorService</p>
+<p>实现类：<br>AbstractExecutorService, ForkJoinPool, ScheduledThreadPoolExecutor, ThreadPoolExecutor</p>
+<h1 id="Executor是干嘛的"><a href="#Executor是干嘛的" class="headerlink" title="Executor是干嘛的"></a>Executor是干嘛的</h1><p>他是：执行提交的Runnable任务的对象的接口。那使用它有什么好处呢？</p>
+<p>此接口提供了一种将任务提交与每个任务的运行机制分离的方法，包括线程使用，调度等的详细信息。通常使用Executor而不是显式创建线程。 例如，不是为一组任务调用<code>new Thread(new(RunnableTask())).start()</code>，而是使用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Executor executor = anExecutor的实现类;</span><br><span class="line">executor.execute(<span class="keyword">new</span> RunnableTask1());</span><br><span class="line">executor.execute(<span class="keyword">new</span> RunnableTask2());</span><br></pre></td></tr></table></figure></p>
+<h1 id="我们来实现Executor"><a href="#我们来实现Executor" class="headerlink" title="我们来实现Executor"></a>我们来实现Executor</h1><p>先不管JDK实现了怎样的Executor，因为后面的文章还会提到，我们只需要看看我们怎么实现。</p>
+<h2 id="最简单的同步执行"><a href="#最简单的同步执行" class="headerlink" title="最简单的同步执行"></a>最简单的同步执行</h2><p>这个实际上只是进行了封装，没有实际意义。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DirectExecutor</span> <span class="keyword">implements</span> <span class="title">Executor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</span><br><span class="line">		command.run();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="异步执行"><a href="#异步执行" class="headerlink" title="异步执行"></a>异步执行</h2><p>下面的代码创建了一个新的线程来运行任务，和普通的new Thread没什么区别：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadPerTaskExecutor</span> <span class="keyword">implements</span> <span class="title">Executor</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">new</span> Thread(command).start();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="更真实一点"><a href="#更真实一点" class="headerlink" title="更真实一点"></a>更真实一点</h2><p>上面的例子仅仅是说明有这样的可能，作为教学可以，但现实世界不可能这么简单，我们实现这个Executor都是出于某方面目的，比如固定大小线程池，优先级调用等等。</p>
+<p>下面是一个复合的Executor，接收一个Executor，然后接收任务拿给第二个Executor执行，顺序执行任务，使用队列实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SerialExecutor</span> <span class="keyword">implements</span> <span class="title">Executor</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">private</span> Queue&lt;Runnable&gt; tasks = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">	<span class="keyword">final</span> Executor executor;</span><br><span class="line">	<span class="keyword">private</span> Runnable current;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SerialExecutor</span><span class="params">(Executor executor)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.executor = executor;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable r)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// new 一个Runnable，在里面直接执行新的任务,然后执行下一个</span></span><br><span class="line">		<span class="comment">// 这一个新的Runnable追加到队列里，并没立即执行</span></span><br><span class="line">		tasks.offer(() -&gt; &#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				r.run();</span><br><span class="line">			&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">				scheduleNext();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 只有上一个任务执行完了，current才为null</span></span><br><span class="line">		<span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 直到这里才出列被executor执行</span></span><br><span class="line">			scheduleNext();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">scheduleNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> ((current = tasks.poll()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">			executor.execute(current);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>本文参考<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executor.html" target="_blank" rel="noopener">官方文档</a>.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>推荐用线程池来创建线程，但首先了解所有线程池的接口Executor。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/10/10/java/013-java-concurrent-executor/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/10/10/java/013-java-concurrent-executor/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/10/10/java/013-java-concurrent-executor/" data-id="cjylc0c6a00610tchhc90r1oo" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/012-java-concurrent-atomic" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/10/06/java/012-java-concurrent-atomic/" class="article-date">
@@ -157,12 +323,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/06/java/012-java-concurrent-atomic/" data-id="cjyhx0ke5007lghchbwxl2ldr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/06/java/012-java-concurrent-atomic/" data-id="cjylc0c6a005z0tchbnpwfn2y" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -234,12 +400,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/03/java/011-java-concurrent-condition/" data-id="cjyhx0ke6007qghch7p89uxws" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/03/java/011-java-concurrent-condition/" data-id="cjylc0c69005w0tchk39ihe4t" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -320,12 +486,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/02/java/010-concurrent-lock/" data-id="cjyhx0ke4007jghchrv3pdzj9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/02/java/010-concurrent-lock/" data-id="cjylc0c69005u0tchk9iewkb6" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -397,12 +563,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/01/java/009-concurent-tool-class/" data-id="cjyhx0ke3007hghchv5omcntk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/01/java/009-concurent-tool-class/" data-id="cjylc0c68005r0tchg5zo7shp" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -476,12 +642,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/30/java/008-java-concurrent-deadlock/" data-id="cjyhx0ke2007aghchpi3a5kar" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/30/java/008-java-concurrent-deadlock/" data-id="cjylc0c68005p0tchysr21d9i" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -550,7 +716,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/28/basic/002-http/" data-id="cjyhx0k9j000qghchoggyzq9h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/28/basic/002-http/" data-id="cjylc0c4o000t0tcho4oygb91" class="article-share-link">
           Share
         </a>
         
@@ -675,12 +841,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/28/java/007-checkstyle-idea-git-pre-commit/" data-id="cjyhx0ke2007cghchommkr46y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/28/java/007-checkstyle-idea-git-pre-commit/" data-id="cjylc0c66005k0tchz6c5ysgz" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/checkstyle/">checkstyle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/checkstyle/">checkstyle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -750,12 +916,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/27/java/006-ali-java-stadard-graph/" data-id="cjyhx0ke00073ghch8231nrdg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/27/java/006-ali-java-stadard-graph/" data-id="cjylc0c66005j0tcht9fwwllu" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">74</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
 
       </footer>
       </div>
@@ -825,7 +991,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/003-front-end-session-check/" data-id="cjyhx0kdt006hghch2oxoae0x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/003-front-end-session-check/" data-id="cjylc0c60004v0tchgyhag7cc" class="article-share-link">
           Share
         </a>
         
@@ -916,7 +1082,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/002-condition-juge/" data-id="cjyhx0kds006gghch6gxeifs8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/002-condition-juge/" data-id="cjylc0c5z004u0tch2nrgoqy9" class="article-share-link">
           Share
         </a>
         
@@ -1011,7 +1177,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/23/server/005-how-nginx-handle-a-request/" data-id="cjyhx0kgq00gvghchdm6eyyt9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/23/server/005-how-nginx-handle-a-request/" data-id="cjylc0cco00le0tchv2s8t8h0" class="article-share-link">
           Share
         </a>
         
@@ -1143,7 +1309,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/19/server/004-nginx-directives/" data-id="cjyhx0kgp00gtghchg3a2ewoz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/19/server/004-nginx-directives/" data-id="cjylc0ccn00lb0tchwon6ge2d" class="article-share-link">
           Share
         </a>
         
@@ -1200,7 +1366,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/18/server/003-nginx-serve-static/" data-id="cjyhx0kgo00gqghchjlxo2y6u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/18/server/003-nginx-serve-static/" data-id="cjylc0ccm00l60tchl8r2fi84" class="article-share-link">
           Share
         </a>
         
@@ -1276,7 +1442,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/16/scala/003-scala-cheat-sheet/" data-id="cjyhx0kgl00geghch3ycq35a6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/16/scala/003-scala-cheat-sheet/" data-id="cjylc0cci00kw0tchyl0cqv9x" class="article-share-link">
           Share
         </a>
         
@@ -1356,7 +1522,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/15/scala/002-sbt-shoud-know/" data-id="cjyhx0kgj00g9ghchgfwowhwt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/15/scala/002-sbt-shoud-know/" data-id="cjylc0ccg00kr0tch2q18zcsi" class="article-share-link">
           Share
         </a>
         
@@ -1455,7 +1621,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/14/basic/000-ssh-config/" data-id="cjyhx0k9e000oghchzsojwywb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/14/basic/000-ssh-config/" data-id="cjylc0c4n000p0tchmetzm18y" class="article-share-link">
           Share
         </a>
         
@@ -1537,7 +1703,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/13/db/005-connection-pool/" data-id="cjyhx0kdd004wghchdaozx766" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/13/db/005-connection-pool/" data-id="cjylc0c5d00340tchilxjmk2j" class="article-share-link">
           Share
         </a>
         
@@ -1617,212 +1783,12 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/11/db/004-pgsql-function/" data-id="cjyhx0kdb004mghchgf0uyp89" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/11/db/004-pgsql-function/" data-id="cjylc0c5e00370tchj3cuidp0" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pgsql/">pgsql</a><span class="article-tag-list-count">4</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-lang/012-redis-distributed-lock" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/10/lang/012-redis-distributed-lock/" class="article-date">
-  <time datetime="2018-09-10T05:48:49.000Z" itemprop="datePublished">2018-09-10</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/10/lang/012-redis-distributed-lock/">redis分布式锁</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>在许多环境中，分布式锁是一种非常有用的原语，其中不同的进程必须以互斥的方式与共享资源一起运行。</p>
-<p>有许多库和博客文章描述了如何使用Redis实现DLM（分布式锁管理器），但是每个库都使用不同的方法，并且许多库使用简单的方法，与稍微复杂的方法相比可以实现更低的保证设计。</p>
-<p>本文试图提供一种更典型的算法来使用Redis实现分布式锁。 我们提出了一种称为Redlock的算法，它实现了一种我们认为比vanilla单实例方法更安全的DLM。 我们希望社区将对其进行分析，提供反馈，并将其作为实施或更复杂或替代设计的起点。</p>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>在描述算法之前，这里有几个已经可用的实现的链接，可用于参考。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Redlock-rb（Ruby实现）。 还有一个Redlock-rb的分支，它可以添加一个宝石，方便分发，也许更多。</span><br><span class="line">Redlock-py（Python实现）。</span><br><span class="line">Aioredlock（Asyncio Python实现）。</span><br><span class="line">Redlock-php（PHP实现）。</span><br><span class="line">PHPRedisMutex（进一步的PHP实现）</span><br><span class="line">cheprasov / php-redis-lock（用于锁的PHP库）</span><br><span class="line">Redsync.go（Go实现）。</span><br><span class="line">Redisson（Java实现）。</span><br><span class="line">Redis :: DistLock（Perl实现）。</span><br><span class="line">Redlock-cpp（C ++实现）。</span><br><span class="line">Redlock-cs（C＃/ .NET实现）。</span><br><span class="line">RedLock.net（C＃/ .NET实现）。 包括异步和锁扩展支持。</span><br><span class="line">ScarletLock（带可配置数据存储区的C＃.NET实现）</span><br><span class="line">node-redlock（NodeJS实现）。 包括对锁定扩展的支持。</span><br></pre></td></tr></table></figure></p>
-<h1 id="安全和存活保障"><a href="#安全和存活保障" class="headerlink" title="安全和存活保障"></a>安全和存活保障</h1><p>我们将仅使用三个属性对我们的设计进行建模，从我们的角度来看，这些属性是以有效方式使用分布式锁所需的最低保证。</p>
-<ol>
-<li>安全属性：相互排斥。 在任何给定时刻，只有一个客户端可以持有锁。</li>
-<li>活力属性A：无死锁。 最终，即使锁定资源的客户端崩溃或被分区，也始终可以获取锁。</li>
-<li>活力属性B：容错。 只要大多数Redis节点启动，客户端就能够获取和释放锁。</li>
-</ol>
-<h1 id="为什么基于故障转移的实现还不够"><a href="#为什么基于故障转移的实现还不够" class="headerlink" title="为什么基于故障转移的实现还不够"></a>为什么基于故障转移的实现还不够</h1><p>为了理解我们想要改进的内容，让我们分析大多数基于Redis的分布式锁库的当前状态。</p>
-<p>使用Redis锁定资源的最简单方法是在实例中创建key。 key通常使用Redis expires功能在有限的生存时间内创建，因此最终它将被释放（我们列表中的属性2）。 当客户端需要释放资源时，它会删除key。</p>
-<p>从表面上看，这很有效，但存在一个问题：这是我们架构中的单点故障。 如果Redis主机出现故障会怎样？ 好吧，让我们添加一个奴隶！ 如果主服务器不可用，请使用它。 遗憾的是，这不可行。 通过这样做，我们无法实现互斥的安全属性，因为Redis复制是异步的。</p>
-<p>这个模型有明显的竞争条件：</p>
-<ol>
-<li>客户端A获取主服务器中的锁。</li>
-<li>在写入key之前，主机崩溃并发送到从机。</li>
-<li>奴隶被提升为主人。</li>
-<li>客户端B获取对已经拥有锁的相同资源的锁。 安全违规！</li>
-</ol>
-<p>有时在特殊情况下，例如在故障期间，多个客户端可以同时保持锁定，这是完全正常的。 如果是这种情况，您可以使用基于复制的解决方案。 否则，我们建议实施本文档中描述的解决方案。</p>
-<h1 id="使用单个实例正确实现"><a href="#使用单个实例正确实现" class="headerlink" title="使用单个实例正确实现"></a>使用单个实例正确实现</h1><p>在尝试克服上述单实例设置的限制之前，让我们在这个简单的情况下检查如何正确地进行操作，因为这实际上是一个可行的解决方案，在不时可以接受竞争条件的应用程序中，并且因为锁定到 单个实例是我们将用于此处描述的分布式算法的基础。</p>
-<p>要获得锁，可以采取以下措施：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET resource_name my_random_value NX PX 30000</span><br></pre></td></tr></table></figure></p>
-<p>该命令仅在key尚不存在时才设置key（NX选项），过期时间为30000毫秒（PX选项）。 值“myrandomvalue”。 此值必须在所有客户端和所有锁定请求中都是唯一的。</p>
-<p>基本上使用随机值是为了以安全的方式释放锁，使用一个告诉Redis的脚本：仅当key存在且存储在key上的值恰好是我期望的值时才删除key。 这是通过以下Lua脚本完成的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if redis.call(&quot;get&quot;,KEYS[1]) == ARGV[1] then</span><br><span class="line">    return redis.call(&quot;del&quot;,KEYS[1])</span><br><span class="line">else</span><br><span class="line">    return 0</span><br><span class="line">end</span><br></pre></td></tr></table></figure></p>
-<p>这很重要，以避免删除由另一个客户端创建的锁。 例如，客户端可能获得锁定，在某些操作中被阻止的时间超过锁定有效时间（key将到期的时间），并且稍后移除已经由某个其他客户端获取的锁定。 仅使用DEL是不安全的，因为客户端可能会删除另一个客户端的锁定。 使用上面的脚本而不是每个锁都使用随机字符串“签名”，因此只有在客户端尝试删除锁时，锁才会被删除。</p>
-<h1 id="hello"><a href="#hello" class="headerlink" title="hello"></a>hello</h1>
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>在许多环境中，分布式锁是一种非常有用的原语，其中不同的进程必须以互斥的方式与共享资源一起运行。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/09/10/lang/012-redis-distributed-lock/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/09/10/lang/012-redis-distributed-lock/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/10/lang/012-redis-distributed-lock/" data-id="cjyhx0kf400b6ghchku4crtb4" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-server/002-tomcat-config" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/10/server/002-tomcat-config/" class="article-date">
-  <time datetime="2018-09-09T23:57:11.000Z" itemprop="datePublished">2018-09-10</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/10/server/002-tomcat-config/">tomcat配置</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>tomcat目前是使用量最大的服务器，不得不学。</p>
-<h1 id="了解目录结构"><a href="#了解目录结构" class="headerlink" title="了解目录结构"></a>了解目录结构</h1><ul>
-<li>/ bin - 启动，关闭和其他脚本。 <em> .sh文件（对于Unix系统）是</em> .bat文件的功能重复（对于Windows系统）。 由于Win32命令行缺少某些功能，因此这里有一些额外的文件。</li>
-<li>/ conf - 配置文件和相关的DTD。 这里最重要的文件是server.xml。 它是容器的主要配置文件。</li>
-<li>/ logs - 默认情况下，日志文件在此处。</li>
-<li>/ webapps - 这是您的webapps的用武之地。</li>
-</ul>
-<h1 id="如何管理APP"><a href="#如何管理APP" class="headerlink" title="如何管理APP"></a>如何管理APP</h1><p><a href="https://tomcat.apache.org/tomcat-8.5-doc/manager-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/manager-howto.html</a></p>
-<h2 id="manager"><a href="#manager" class="headerlink" title="manager"></a>manager</h2><p>manager就是管理app的页面，tomcat自带有，它能做的事情有以下几个：</p>
-<p>//TODO</p>
-<p>但我们直接访问时会发现权限问题：</p>
-
-<p>所以需要做一些配置：</p>
-<p>我们会发现在<code>/webapps/manager/WEB-INF/web.xml</code>下有几个角色的定义：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">120   <span class="comment">&lt;!-- Define a Security Constraint on this Application --&gt;</span></span><br><span class="line">121   <span class="comment">&lt;!-- <span class="doctag">NOTE:</span>  None of these roles are present in the default users file --&gt;</span></span><br><span class="line">122   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">123     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">124       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>HTML Manager interface (for humans)<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">125       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/html/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">126     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">127     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">128        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-gui<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">129     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">130   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">131   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">132     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">133       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>Text Manager interface (for scripts)<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">134       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/text/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">135     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">136     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">137        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-script<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">138     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">139   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">140   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">141     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">142       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>JMX Proxy interface<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">143       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/jmxproxy/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">144     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">145     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">146        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-jmx<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">147     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">148   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">149   <span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span></span><br><span class="line">150     <span class="tag">&lt;<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">151       <span class="tag">&lt;<span class="name">web-resource-name</span>&gt;</span>Status interface<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span></span><br><span class="line">152       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/status/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">153     <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span></span><br><span class="line">154     <span class="tag">&lt;<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">155        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-gui<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">156        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-script<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">157        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-jmx<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">158        <span class="tag">&lt;<span class="name">role-name</span>&gt;</span>manager-status<span class="tag">&lt;/<span class="name">role-name</span>&gt;</span></span><br><span class="line">159     <span class="tag">&lt;/<span class="name">auth-constraint</span>&gt;</span></span><br><span class="line">160   <span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>分别是：</p>
-<ol>
-<li>manager-gui — Access to the HTML interface.</li>
-<li>manager-status — Access to the “Server Status” page only.</li>
-<li>manager-script — Access to the tools-friendly plain text interface that is described in this document, and to the “Server Status” page.</li>
-<li>manager-jmx — Access to JMX proxy interface and to the “Server Status” page.</li>
-</ol>
-<p>当然，这几个权限各有各的风险，需要谨慎使用。我们必须使用至少其中一个角色，并设置用户名和密码才能访问管理页面。<br>因此，我们需要在<code>/conf/tomcat-users.xml</code>里进行用户添加：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"jimo"</span> <span class="attr">password</span>=<span class="string">"jimo"</span> <span class="attr">roles</span>=<span class="string">"standard,manager-gui,manager-script,manager-status"</span> /&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p><a href="https://stackoverflow.com/questions/38551166/403-access-denied-on-tomcat-8-manager-app-without-prompting-for-user-password" target="_blank" rel="noopener">https://stackoverflow.com/questions/38551166/403-access-denied-on-tomcat-8-manager-app-without-prompting-for-user-password</a></p>
-<h1 id="Host管理"><a href="#Host管理" class="headerlink" title="Host管理"></a>Host管理</h1><h1 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h1><p><a href="https://tomcat.apache.org/tomcat-8.5-doc/cluster-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/cluster-howto.html</a></p>
-<h1 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h1><p><a href="https://tomcat.apache.org/tomcat-8.5-doc/balancer-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/balancer-howto.html</a></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
-<li><a href="https://tomcat.apache.org/tomcat-8.5-doc/introduction.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/introduction.html</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>tomcat目前是使用量最大的服务器，不得不学。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/09/10/server/002-tomcat-config/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/09/10/server/002-tomcat-config/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/10/server/002-tomcat-config/" data-id="cjyhx0kgn00glghch1av381m7" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -1849,7 +1815,7 @@ null==undefined
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -1859,7 +1825,7 @@ null==undefined
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1881,6 +1847,14 @@ null==undefined
       <ul>
         
           <li>
+            <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/25/java/053-jdk-javac-compile/">javac源码编译到认识编译过程</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
           </li>
         
@@ -1890,14 +1864,6 @@ null==undefined
         
           <li>
             <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/23/linux/028-ubuntu-application-launcher/">ubuntu制作启动图标</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/22/life/024-weekly-learn/">2019-30-周报</a>
           </li>
         
       </ul>
