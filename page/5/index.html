@@ -86,6 +86,93 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/030-spring-boot-build-source" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/06/java/030-spring-boot-build-source/" class="article-date">
+  <time datetime="2019-03-06T06:37:12.000Z" itemprop="datePublished">2019-03-06</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/06/java/030-spring-boot-build-source/">spring-boot编译源码</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>学习spring-boot源码第一步： 编译源码，搭建环境。</p>
+<h1 id="编译环境"><a href="#编译环境" class="headerlink" title="编译环境"></a>编译环境</h1><ol>
+<li>ubuntu18.04</li>
+<li>JDK1.8</li>
+<li>maven 3.5.2</li>
+</ol>
+<h1 id="编译过程"><a href="#编译过程" class="headerlink" title="编译过程"></a>编译过程</h1><p>如果直接使用：<code>mvn -Dmaven.test.skip=true clean install</code> 安装，大概会遇到下面的错误：</p>
+<img src="/2019/03/06/java/030-spring-boot-build-source/000.png">
+<p>错误原因是： 内存不足。由于spring-boot-project/spring-boot-tools下的spring-boot-gradle-plugin项目造成的，一个比较暴力的解决办法是直接删掉这个项目下的src/test/java，因为暂时也用不到它。删除后再执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn -Dmaven.test.failure.ignore=true -Dmaven.test.skip=true clean install</span><br></pre></td></tr></table></figure></p>
+<p>编译了哪些模块请看附录， 还是很有价值的。</p>
+<h1 id="导入项目"><a href="#导入项目" class="headerlink" title="导入项目"></a>导入项目</h1><p>idea： file-》open 即可</p>
+<p>遇到一些maven问题，稍微修改下即可。主要是maven版本，idea自带的为3.3.9，需要升级：<br><a href="https://chenyongjun.vip/articles/98" target="_blank" rel="noopener">Properties in parent definition are prohibited</a></p>
+<h1 id="测试项目"><a href="#测试项目" class="headerlink" title="测试项目"></a>测试项目</h1><p>运行自带的项目：<code>spring-boot-samples/spring-boot-sample-test/src/main/java/sample/test/SampleTestApplication.java</code></p>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Reactor Summary:</span><br><span class="line">[INFO] </span><br><span class="line">[INFO] Spring Boot Build .................................. SUCCESS [  <span class="number">2.148</span> s]</span><br><span class="line">[INFO] Spring Boot Dependencies ........................... SUCCESS [  <span class="number">3.160</span> s]</span><br><span class="line">[INFO] Spring Boot Parent ................................. SUCCESS [  <span class="number">0.537</span> s]</span><br><span class="line">[INFO] Spring Boot Tools .................................. SUCCESS [  <span class="number">0.180</span> s]</span><br><span class="line">[INFO] Spring Boot Testing Support ........................ SUCCESS [  <span class="number">6.356</span> s]</span><br><span class="line">[INFO] Spring Boot Configuration Processor ................ SUCCESS [  <span class="number">3.719</span> s]</span><br><span class="line">[INFO] Spring Boot ........................................ SUCCESS [ <span class="number">24.872</span> s]</span><br><span class="line">[INFO] Spring Boot Test ................................... SUCCESS [  <span class="number">5.657</span> s]</span><br><span class="line">[INFO] Spring Boot Auto-Configure Annotation Processor .... SUCCESS [  <span class="number">0.500</span> s]</span><br><span class="line">[INFO] Spring Boot AutoConfigure .......................... SUCCESS [ <span class="number">21.815</span> s]</span><br><span class="line">[INFO] Spring Boot Actuator ............................... SUCCESS [  <span class="number">7.187</span> s]</span><br><span class="line">[INFO] Spring Boot Actuator AutoConfigure ................. SUCCESS [  <span class="number">6.806</span> s]</span><br><span class="line">[INFO] Spring Boot Developer Tools ........................ SUCCESS [  <span class="number">2.604</span> s]</span><br><span class="line">[INFO] Spring Boot Configuration Metadata ................. SUCCESS [  <span class="number">0.556</span> s]</span><br><span class="line">[INFO] Spring Boot Properties Migrator .................... SUCCESS [  <span class="number">0.478</span> s]</span><br><span class="line">[INFO] Spring Boot Test Auto-Configure .................... SUCCESS [  <span class="number">2.757</span> s]</span><br><span class="line">[INFO] Spring Boot Loader ................................. SUCCESS [<span class="number">01</span>:<span class="number">09</span> min]</span><br><span class="line">[INFO] Spring Boot Loader Tools ........................... SUCCESS [  <span class="number">1.346</span> s]</span><br><span class="line">[INFO] Spring Boot Antlib ................................. SUCCESS [  <span class="number">3.436</span> s]</span><br><span class="line">[INFO] Spring Boot Configuration Docs ..................... SUCCESS [  <span class="number">0.506</span> s]</span><br><span class="line">[INFO] Spring Boot Gradle Plugin .......................... SUCCESS [  <span class="number">8.702</span> s]</span><br><span class="line">[INFO] Spring Boot Maven Plugin ........................... SUCCESS [<span class="number">04</span>:<span class="number">34</span> min]</span><br><span class="line">[INFO] Spring Boot Starters ............................... SUCCESS [  <span class="number">6.059</span> s]</span><br><span class="line">[INFO] Spring Boot Logging Starter ........................ SUCCESS [  <span class="number">0.929</span> s]</span><br><span class="line">[INFO] Spring Boot Starter ................................ SUCCESS [  <span class="number">0.664</span> s]</span><br><span class="line">[INFO] Spring Boot ActiveMQ Starter ....................... SUCCESS [  <span class="number">1.166</span> s]</span><br><span class="line">[INFO] Spring Boot AMQP Starter ........................... SUCCESS [  <span class="number">0.288</span> s]</span><br><span class="line">[INFO] Spring Boot AOP Starter ............................ SUCCESS [  <span class="number">0.325</span> s]</span><br><span class="line">[INFO] Spring Boot Artemis Starter ........................ SUCCESS [  <span class="number">1.020</span> s]</span><br><span class="line">[INFO] Spring Boot JDBC Starter ........................... SUCCESS [  <span class="number">0.226</span> s]</span><br><span class="line">[INFO] Spring Boot Batch Starter .......................... SUCCESS [  <span class="number">0.548</span> s]</span><br><span class="line">[INFO] Spring Boot Cache Starter .......................... SUCCESS [  <span class="number">0.247</span> s]</span><br><span class="line">[INFO] Spring Boot Spring Cloud Connectors Starter ........ SUCCESS [  <span class="number">1.282</span> s]</span><br><span class="line">[INFO] Spring Boot Data Cassandra Starter ................. SUCCESS [  <span class="number">0.937</span> s]</span><br><span class="line">[INFO] Spring Boot Data Cassandra Reactive Starter ........ SUCCESS [  <span class="number">0.510</span> s]</span><br><span class="line">[INFO] Spring Boot Data Couchbase Starter ................. SUCCESS [  <span class="number">0.641</span> s]</span><br><span class="line">[INFO] Spring Boot Data Couchbase Reactive Starter ........ SUCCESS [  <span class="number">0.318</span> s]</span><br><span class="line">[INFO] Spring Boot Data Elasticsearch Starter ............. SUCCESS [  <span class="number">2.257</span> s]</span><br><span class="line">[INFO] Spring Boot Data JDBC Starter ...................... SUCCESS [  <span class="number">0.319</span> s]</span><br><span class="line">[INFO] Spring Boot Data JPA Starter ....................... SUCCESS [  <span class="number">1.360</span> s]</span><br><span class="line">[INFO] Spring Boot Data LDAP Starter ...................... SUCCESS [  <span class="number">0.219</span> s]</span><br><span class="line">[INFO] Spring Boot Data MongoDB Starter ................... SUCCESS [  <span class="number">0.716</span> s]</span><br><span class="line">[INFO] Spring Boot Data MongoDB Reactive Starter .......... SUCCESS [  <span class="number">0.241</span> s]</span><br><span class="line">[INFO] Spring Boot Data Neo4j Starter ..................... SUCCESS [  <span class="number">0.485</span> s]</span><br><span class="line">[INFO] Spring Boot Data Redis Starter ..................... SUCCESS [  <span class="number">0.468</span> s]</span><br><span class="line">[INFO] Spring Boot Data Redis Reactive Starter ............ SUCCESS [  <span class="number">0.470</span> s]</span><br><span class="line">[INFO] Spring Boot Json Starter ........................... SUCCESS [  <span class="number">0.362</span> s]</span><br><span class="line">[INFO] Spring Boot Tomcat Starter ......................... SUCCESS [  <span class="number">0.219</span> s]</span><br><span class="line">[INFO] Spring Boot Web Starter ............................ SUCCESS [  <span class="number">0.527</span> s]</span><br><span class="line">[INFO] Spring Boot Data REST Starter ...................... SUCCESS [  <span class="number">0.552</span> s]</span><br><span class="line">[INFO] Spring Boot Data Solr Starter ...................... SUCCESS [  <span class="number">0.654</span> s]</span><br><span class="line">[INFO] Spring Boot FreeMarker Starter ..................... SUCCESS [  <span class="number">0.227</span> s]</span><br><span class="line">[INFO] Spring Boot Groovy Templates Starter ............... SUCCESS [  <span class="number">0.439</span> s]</span><br><span class="line">[INFO] Spring Boot HATEOAS Starter ........................ SUCCESS [  <span class="number">0.313</span> s]</span><br><span class="line">[INFO] Spring Boot Integration Starter .................... SUCCESS [  <span class="number">0.267</span> s]</span><br><span class="line">[INFO] Spring Boot Validation Starter ..................... SUCCESS [  <span class="number">0.217</span> s]</span><br><span class="line">[INFO] Spring Boot Jersey Starter ......................... SUCCESS [  <span class="number">1.550</span> s]</span><br><span class="line">[INFO] Spring Boot Jetty Starter .......................... SUCCESS [  <span class="number">1.195</span> s]</span><br><span class="line">[INFO] Spring Boot JOOQ Starter ........................... SUCCESS [  <span class="number">0.261</span> s]</span><br><span class="line">[INFO] Spring Boot Atomikos JTA Starter ................... SUCCESS [  <span class="number">0.352</span> s]</span><br><span class="line">[INFO] Spring Boot Bitronix JTA Starter ................... SUCCESS [  <span class="number">0.214</span> s]</span><br><span class="line">[INFO] Spring Boot Log4j <span class="number">2</span> Starter ........................ SUCCESS [  <span class="number">0.774</span> s]</span><br><span class="line">[INFO] Spring Boot Mail Starter ........................... SUCCESS [  <span class="number">0.337</span> s]</span><br><span class="line">[INFO] Spring Boot Mustache Starter ....................... SUCCESS [  <span class="number">0.222</span> s]</span><br><span class="line">[INFO] Spring Boot Actuator Starter ....................... SUCCESS [  <span class="number">0.427</span> s]</span><br><span class="line">[INFO] Spring Boot OAuth2/OpenID Connect Client Starter ... SUCCESS [ <span class="number">14.000</span> s]</span><br><span class="line">[INFO] Spring Boot OAuth2 Resource Server Starter ......... SUCCESS [  <span class="number">0.205</span> s]</span><br><span class="line">[INFO] Spring Boot Starter Parent ......................... SUCCESS [  <span class="number">0.149</span> s]</span><br><span class="line">[INFO] Spring Boot Quartz Starter ......................... SUCCESS [  <span class="number">0.258</span> s]</span><br><span class="line">[INFO] Spring Boot Reactor Netty Starter .................. SUCCESS [  <span class="number">0.322</span> s]</span><br><span class="line">[INFO] Spring Boot Security Starter ....................... SUCCESS [  <span class="number">0.206</span> s]</span><br><span class="line">[INFO] Spring Boot Test Starter ........................... SUCCESS [  <span class="number">0.963</span> s]</span><br><span class="line">[INFO] Spring Boot Thymeleaf Starter ...................... SUCCESS [  <span class="number">0.299</span> s]</span><br><span class="line">[INFO] Spring Boot Undertow Starter ....................... SUCCESS [  <span class="number">0.815</span> s]</span><br><span class="line">[INFO] Spring Boot WebFlux Starter ........................ SUCCESS [  <span class="number">1.018</span> s]</span><br><span class="line">[INFO] Spring Boot WebSocket Starter ...................... SUCCESS [  <span class="number">0.265</span> s]</span><br><span class="line">[INFO] Spring Boot Web Services Starter ................... SUCCESS [  <span class="number">0.370</span> s]</span><br><span class="line">[INFO] Spring Boot CLI .................................... SUCCESS [  <span class="number">7.202</span> s]</span><br><span class="line">[INFO] Spring Boot Docs ................................... SUCCESS [  <span class="number">3.744</span> s]</span><br><span class="line">[INFO] Spring Boot Build .................................. SUCCESS [  <span class="number">0.086</span> s]</span><br><span class="line">[INFO] Spring Boot Samples Invoker ........................ SUCCESS [<span class="number">03</span>:<span class="number">40</span> min]</span><br><span class="line">[INFO] Spring Boot Tests .................................. SUCCESS [  <span class="number">0.111</span> s]</span><br><span class="line">[INFO] Spring Boot Integration Tests ...................... SUCCESS [  <span class="number">0.101</span> s]</span><br><span class="line">[INFO] Spring Boot Configuration Processor Tests .......... SUCCESS [  <span class="number">0.235</span> s]</span><br><span class="line">[INFO] Spring Boot DevTools Tests ......................... SUCCESS [  <span class="number">0.264</span> s]</span><br><span class="line">[INFO] Spring Boot Hibernate <span class="number">5.2</span> tests .................... SUCCESS [  <span class="number">2.060</span> s]</span><br><span class="line">[INFO] Spring Boot Server Tests ........................... SUCCESS [  <span class="number">0.574</span> s]</span><br><span class="line">[INFO] Spring Boot Launch Script Integration Tests ........ SUCCESS [ <span class="number">10.431</span> s]</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD SUCCESS</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: <span class="number">12</span>:<span class="number">36</span> min</span><br><span class="line">[INFO] Finished at: <span class="number">2019</span>-<span class="number">03</span>-<span class="number">06</span>T14:<span class="number">46</span>:<span class="number">31</span>+<span class="number">08</span>:<span class="number">00</span></span><br><span class="line">[INFO] Final Memory: <span class="number">730</span>M/<span class="number">1412</span>M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>学习spring-boot源码第一步： 编译源码，搭建环境。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/06/java/030-spring-boot-build-source/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/06/java/030-spring-boot-build-source/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/030-spring-boot-build-source/" data-id="cjymy53z700cn6ochgd4x9nyu" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-life/007-weekly-learn" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/03/04/life/007-weekly-learn/" class="article-date">
@@ -185,7 +272,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/04/life/007-weekly-learn/" data-id="cjylc0cay00g10tchzg1k7hmr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/04/life/007-weekly-learn/" data-id="cjymy540400fo6ochchui8i9h" class="article-share-link">
           Share
         </a>
         
@@ -263,7 +350,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/01/life/006-chrome-theme/" data-id="cjylc0caz00g30tch2upfc4j5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/01/life/006-chrome-theme/" data-id="cjymy540300fj6ochfu5zjedd" class="article-share-link">
           Share
         </a>
         
@@ -345,7 +432,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/029-eureka-record/" data-id="cjylc0c6l00750tchavehi8ro" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/029-eureka-record/" data-id="cjymy53z900cv6ochxo160u20" class="article-share-link">
           Share
         </a>
         
@@ -425,7 +512,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/028-equals-hashcode/" data-id="cjylc0c6k00720tchlklg5pa5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/028-equals-hashcode/" data-id="cjymy53z500cg6ochqu9rjmps" class="article-share-link">
           Share
         </a>
         
@@ -538,7 +625,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/basic/015-xml/" data-id="cjylc0c4v001i0tch6ixlirjq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/basic/015-xml/" data-id="cjymy53ur001d6och8s1yju8d" class="article-share-link">
           Share
         </a>
         
@@ -640,7 +727,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/life/005-weekly-learn/" data-id="cjylc0cb000g80tchywmw0on0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/life/005-weekly-learn/" data-id="cjymy540100fe6ochbdmx3bza" class="article-share-link">
           Share
         </a>
         
@@ -726,7 +813,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/26/algorithm/002-skip-list/" data-id="cjylc0c4800060tchb5fqhaf6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/26/algorithm/002-skip-list/" data-id="cjymy53tk00086ochq5s0dtqb" class="article-share-link">
           Share
         </a>
         
@@ -805,7 +892,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/25/java/027-cglib/" data-id="cjylc0c6j00700tchl9keherm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/25/java/027-cglib/" data-id="cjymy53z500ce6ochg3l38h4a" class="article-share-link">
           Share
         </a>
         
@@ -888,7 +975,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/22/java/026-java-create-instance/" data-id="cjylc0c6i006x0tchx185idqx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/22/java/026-java-create-instance/" data-id="cjymy53z300c66ochjdqg4u9t" class="article-share-link">
           Share
         </a>
         
@@ -1056,7 +1143,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/lang/013-redis-design-principle/" data-id="cjylc0cau00fm0tchpnd3myro" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/21/lang/013-redis-design-principle/" data-id="cjymy53zw00ez6ochlfd45nbf" class="article-share-link">
           Share
         </a>
         
@@ -1183,7 +1270,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/java/025-spring-source/" data-id="cjylc0c6i006v0tch1eati4kt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/21/java/025-spring-source/" data-id="cjymy53z400cb6ochzgk8dlqt" class="article-share-link">
           Share
         </a>
         
@@ -1258,7 +1345,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/20/maven/002-maven-install-linux/" data-id="cjylc0cc000jj0tchb7bmslc1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/20/maven/002-maven-install-linux/" data-id="cjymy541400ix6ochha9vde13" class="article-share-link">
           Share
         </a>
         
@@ -1332,7 +1419,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/19/basic/014-code-optimization-way/" data-id="cjylc0c4u001e0tchlj73jqc7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/19/basic/014-code-optimization-way/" data-id="cjymy53us001g6ochiykd32vp" class="article-share-link">
           Share
         </a>
         
@@ -1416,7 +1503,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/19/db/006-mysql-error-1133/" data-id="cjylc0c5e00380tchc05371ic" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/19/db/006-mysql-error-1133/" data-id="cjymy53va00376och8t424hrc" class="article-share-link">
           Share
         </a>
         
@@ -1526,7 +1613,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/15/linux/019-keepalived-learn/" data-id="cjylc0cbr00iq0tch7v8f3a1e" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/15/linux/019-keepalived-learn/" data-id="cjymy540x00ib6ochhb6x6zq5" class="article-share-link">
           Share
         </a>
         
@@ -1663,7 +1750,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/04/scala/004-scala-style/" data-id="cjylc0ccj00kz0tchqhlth45m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/04/scala/004-scala-style/" data-id="cjymy541n00ki6och5ats4oc8" class="article-share-link">
           Share
         </a>
         
@@ -1777,7 +1864,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/03/spark/005-big-data-tutorial/" data-id="cjylc0ccs00lq0tchjkinhcpi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/03/spark/005-big-data-tutorial/" data-id="cjymy541v00l96och2b134zew" class="article-share-link">
           Share
         </a>
         
@@ -1855,7 +1942,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/29/life/004-new-year/" data-id="cjylc0caw00fw0tchvjsnwydx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/29/life/004-new-year/" data-id="cjymy540400fm6ochjukfq16w" class="article-share-link">
           Share
         </a>
         
@@ -1936,90 +2023,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/28/java/024-java-fix-problem/" data-id="cjylc0c6g006o0tchkgwn8dxv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/28/java/024-java-fix-problem/" data-id="cjymy53z200c46ochtifucnes" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/018-ubuntu-java" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/27/linux/018-ubuntu-java/" class="article-date">
-  <time datetime="2019-01-27T01:50:17.000Z" itemprop="datePublished">2019-01-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/27/linux/018-ubuntu-java/">ubuntu安装/更新Java</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="ubuntu18-x"><a href="#ubuntu18-x" class="headerlink" title="ubuntu18.x"></a>ubuntu18.x</h1><p>参考<a href="https://linuxconfig.org/how-to-install-java-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">文章</a></p>
-<h2 id="安装相应版本Java"><a href="#安装相应版本Java" class="headerlink" title="安装相应版本Java"></a>安装相应版本Java</h2><p>JDK11（默认）<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install openjdk-11-jdk</span><br></pre></td></tr></table></figure></p>
-<p>JDK8<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install openjdk-8-jdk</span><br></pre></td></tr></table></figure></p>
-<h2 id="切换版本"><a href="#切换版本" class="headerlink" title="切换版本"></a>切换版本</h2><p>注意对于安装多个jdk版本时如何切换jdk版本：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo update-alternatives --config java</span><br><span class="line">有 2 个候选项可用于替换 java (提供 /usr/bin/java)。</span><br><span class="line"></span><br><span class="line">  选择       路径                                          优先级  状态</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">* 0            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1101      自动模式</span><br><span class="line">  1            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1101      手动模式</span><br><span class="line">  2            /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java   1081      手动模式</span><br><span class="line"></span><br><span class="line">要维持当前值[*]请按&lt;回车键&gt;，或者键入选择的编号：2</span><br><span class="line">update-alternatives: 使用 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java 来在手动模式中提供 /usr/bin/java (java)</span><br><span class="line"></span><br><span class="line">jack@jack:~/workspace/iad-boot/nacos-server-0.8.0/nacos$ java -version</span><br><span class="line">openjdk version "1.8.0_191"</span><br><span class="line">OpenJDK Runtime Environment (build 1.8.0_191-8u191-b12-0ubuntu0.18.04.1-b12)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 25.191-b12, mixed mode)</span><br></pre></td></tr></table></figure>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="ubuntu18-x"><a href="#ubuntu18-x" class="headerlink" title="ubuntu18.x"></a>ubuntu18.x</h1><p>参考<a href="https://linuxconfig.org/how-to-install-java-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">文章</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/01/27/linux/018-ubuntu-java/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/01/27/linux/018-ubuntu-java/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/27/linux/018-ubuntu-java/" data-id="cjylc0cbq00il0tch5f2f9vsz" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">76</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">8</span></li></ul>
 
       </footer>
       </div>
@@ -2046,7 +2055,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -2056,7 +2065,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2078,6 +2087,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/28/tools/017-pandoc/">强大的pandoc</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
           </li>
         
@@ -2091,10 +2104,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/24/java/051-spring-http-status-code/">spring如何返回http状态码</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
           </li>
         
       </ul>

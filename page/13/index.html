@@ -86,6 +86,96 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-hexo/001-hexo-backup" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/02/20/hexo/001-hexo-backup/" class="article-date">
+  <time datetime="2018-02-20T05:51:55.000Z" itemprop="datePublished">2018-02-20</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/02/20/hexo/001-hexo-backup/">hexo换电脑或备份</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文对hexo的源代码如何备份做一个方案的探讨.我们知道hexo生成的静态页面放在public目录下,<br>每次将这个目录推送到github上,但是hexo本身却没上传,如果换电脑就无力回天了.下面就是一些解决方案.</p>
+<h1 id="1-暴力备份"><a href="#1-暴力备份" class="headerlink" title="1.暴力备份"></a>1.暴力备份</h1><p>如果不嫌麻烦,每次更新博客后都手动将hexo源代码备份,即使是这样也需要知道哪些是必须备份的.<br>下面是所有文件:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myblog]$ ls -lha</span><br><span class="line">总用量 240K</span><br><span class="line">drwxr-xr-x   8 jimo jimo 4.0K 12月 27 18:12 .</span><br><span class="line">drwxr-xr-x  26 jimo jimo 4.0K 5月  16 21:29 ..</span><br><span class="line">-rw-r--r--   1 jimo jimo 2.1K 4月  27 11:19 _config.yml</span><br><span class="line">-rw-r--r--   1 jimo jimo  174 5月  17 20:20 db.json</span><br><span class="line">drwxr-xr-x  13 jimo jimo 4.0K 5月  15 12:47 .deploy_git</span><br><span class="line">-rw-r--r--   1 jimo jimo   65 12月 23 21:46 .gitignore</span><br><span class="line">drwxr-xr-x 298 jimo jimo  12K 12月 23 22:14 node_modules</span><br><span class="line">-rw-r--r--   1 jimo jimo  483 12月 23 22:14 package.json</span><br><span class="line">-rw-r--r--   1 jimo jimo 106K 12月 23 22:14 package-lock.json</span><br><span class="line">drwxr-xr-x  12 jimo jimo 4.0K 1月   1 15:48 public</span><br><span class="line">drwxr-xr-x   2 jimo jimo 4.0K 12月 23 21:46 scaffolds</span><br><span class="line">drwxr-xr-x   4 jimo jimo 4.0K 12月 27 18:10 source</span><br><span class="line">drwxr-xr-x   3 jimo jimo 4.0K 12月 23 21:46 themes</span><br><span class="line">-rw-r--r--   1 jimo jimo  73K 12月 23 21:46 yarn.lock</span><br></pre></td></tr></table></figure></p>
+<p>需要备份的有:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_config.yml，themes/，source/，scaffolds/，package.json，.gitignore</span><br></pre></td></tr></table></figure></p>
+<p>不需要的有: 到时候npm install再安装一遍即可.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.git/，node_modules/，public/，.deploy_git/，db.json</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-自动备份"><a href="#2-自动备份" class="headerlink" title="2.自动备份"></a>2.自动备份</h1><p>既然要备份,为什么不做成自动的呢? 其实源码也可以push到github上嘛,那现在就有2个仓库,一个<br>用来存hexo源码,一个用来存博客.这样的话每次得2次push.</p>
+<p>当然首先我肯定会想到写一个脚本,把这两步放在一起,大概如下:<br>backup.sh<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/bash</span><br><span class="line"></span><br><span class="line">hexo g &amp;&amp; hexo d # 先更新博客</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 再更新源码</span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update'</span><br><span class="line">git push</span><br></pre></td></tr></table></figure></p>
+<p>注意在.gitignore把不需要的过滤掉就行了.</p>
+<h1 id="3-持续集成"><a href="#3-持续集成" class="headerlink" title="3.持续集成"></a>3.持续集成</h1><p>我们也可以把这2步交给持续集成的框架,常用的有<a href="https://www.appveyor.com/" target="_blank" rel="noopener">appveyor</a>,<a href="https://www.travis-ci.org/" target="_blank" rel="noopener">travis-ci</a>.</p>
+<p>可以参考<a href="https://formulahendry.github.io/2016/12/04/hexo-ci/" target="_blank" rel="noopener">这个博客</a></p>
+<h1 id="4-多分支同步"><a href="#4-多分支同步" class="headerlink" title="4.多分支同步"></a>4.多分支同步</h1><p>不需要2个仓库,使用同一个仓库的2个分之即可.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">作者：CrazyMilk</span><br><span class="line">链接：https://www.zhihu.com/question/21193762/answer/79109280</span><br><span class="line">来源：知乎</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br><span class="line"></span><br><span class="line">其实，Hexo生成的文件里面是有一个.gitignore的，所以它的本意应该也是想我们把这些文件放到GitHub上存放的。但是考虑到如果每个GitHub Pages都需要额外的一个仓库存放这些文件，就显得特别冗余了。这个时候就可以用分支的思路！一个分支用来存放Hexo生成的网站原始的文件，另一个分支用来存放生成的静态网页。最近我也用GitHub Pages搭建了一个独立博客，想到了这个方法，使用之后真的特别简洁。为了更直观地说明，奉上使用这种方法不同时候的流程：</span><br><span class="line"></span><br><span class="line">一、关于搭建的流程</span><br><span class="line">1. 创建仓库，http://CrazyMilk.github.io；</span><br><span class="line">2. 创建两个分支：master 与 hexo；</span><br><span class="line">3. 设置hexo为默认分支（因为我们只需要手动管理这个分支上的Hexo网站文件）；</span><br><span class="line">4. 使用git clone git@github.com:CrazyMilk/CrazyMilk.github.io.git拷贝仓库；</span><br><span class="line">5. 在本地http://CrazyMilk.github.io文件夹下通过Git bash依次执行npm install hexo、hexo init、npm install 和 npm install hexo-deployer-git（此时当前分支应显示为hexo）;</span><br><span class="line">6. 修改_config.yml中的deploy参数，分支应为master；</span><br><span class="line">7. 依次执行git add .、git commit -m &quot;...&quot;、git push origin hexo提交网站相关的文件；</span><br><span class="line">8. 执行hexo g -d生成网站并部署到GitHub上。</span><br><span class="line">这样一来，在GitHub上的http://CrazyMilk.github.io仓库就有两个分支，一个hexo分支用来存放网站的原始文件，一个master分支用来存放生成的静态网页。完美( •̀ ω •́ )y！</span><br><span class="line"></span><br><span class="line">二、关于日常的改动流程在本地对博客进行修改（添加新博文、修改样式等等）后，通过下面的流程进行管理。</span><br><span class="line">1. 依次执行git add .、git commit -m &quot;...&quot;、git push origin hexo指令将改动推送到GitHub（此时当前分支应为hexo）；2. 然后才执行hexo g -d发布网站到master分支上。</span><br><span class="line">虽然两个过程顺序调转一般不会有问题，不过逻辑上这样的顺序是绝对没问题的（例如突然死机要重装了，悲催....的情况，调转顺序就有问题了）。</span><br><span class="line">三、本地资料丢失后的流程当重装电脑之后，或者想在其他电脑上修改博客，可以使用下列步骤：</span><br><span class="line">1. 使用git clone git@github.com:CrazyMilk/CrazyMilk.github.io.git拷贝仓库（默认分支为hexo）；</span><br><span class="line">2. 在本地新拷贝的http://CrazyMilk.github.io文件夹下通过Git bash依次执行下列指令：npm install hexo、npm install、npm install hexo-deployer-git（记得，不需要hexo init这条指令）。</span><br></pre></td></tr></table></figure>
+<h1 id="5-使用插件"><a href="#5-使用插件" class="headerlink" title="5.使用插件"></a>5.使用插件</h1><p>可以更新使用最新的 hexo-deployer-git 插件，因为没有发布到 npm 的原因，必须得从 github 安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install git+git@github.com:hexojs/hexo-deployer-git.git --save</span><br></pre></td></tr></table></figure></p>
+<p>在项目根目录下的 _config.yml 里面就可以这样配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># _config.yaml</span><br><span class="line">deploy:</span><br><span class="line">  - type: git</span><br><span class="line">    repo: git@github.com:&lt;username&gt;/&lt;username&gt;.github.io.git</span><br><span class="line">    branch: master</span><br><span class="line">  - type: git</span><br><span class="line">    repo: git@github.com:&lt;username&gt;/&lt;username&gt;.github.io.git</span><br><span class="line">    branch: src</span><br><span class="line">    extend_dirs: /</span><br><span class="line">    ignore_hidden: false</span><br><span class="line">    ignore_pattern:</span><br><span class="line">        public: .</span><br></pre></td></tr></table></figure></p>
+<p>这样，在每次写完博客的时候时候使用 hexo d 命令就能将所有其他文件发布到 src 分支换电脑的时候就能通过 git 重新下载下来整个项目，然后本地切换到远端的 src 分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout origin/src</span><br></pre></td></tr></table></figure></p>
+<p>就能重新获得所有的源文件，就能重新 hexo d 发布对于每一个从 git 下载下来的项目或者主题，最好把每个的 .git 文件夹删掉，否则得通过 submodule 的方式来安装。</p>
+<h1 id="6-总结"><a href="#6-总结" class="headerlink" title="6.总结"></a>6.总结</h1><p>个人觉得方法2最简单也不容易出错.</p>
+<p>以下是我的shell脚本<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/bash</span><br><span class="line"><span class="meta">#</span>--------------------------------------------</span><br><span class="line"><span class="meta">#</span> 提交博客脚本,同步hexo源码和推送博客修改到不同仓库</span><br><span class="line"><span class="meta">#</span> author：jimolonely</span><br><span class="line"><span class="meta">#</span> site：jimolonely.github.io</span><br><span class="line"><span class="meta">#</span> slogan：shell is a way!</span><br><span class="line"><span class="meta">#</span>--------------------------------------------</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 接受git commit 提交参数</span><br><span class="line">msg="$*"</span><br><span class="line"></span><br><span class="line">if [ -z "$msg" ];then</span><br><span class="line">    msg=$(git status --short)</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br><span class="line"></span><br><span class="line">git status</span><br><span class="line">git add .</span><br><span class="line">git commit -m "$msg"</span><br><span class="line">git push</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文对hexo的源代码如何备份做一个方案的探讨.我们知道hexo生成的静态页面放在public目录下,<br>每次将这个目录推送到github上,但是hexo本身却没上传,如果换电脑就无力回天了.下面就是一些解决方案.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/02/20/hexo/001-hexo-backup/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/02/20/hexo/001-hexo-backup/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/02/20/hexo/001-hexo-backup/" data-id="cjymy53vs004k6och5ze14b0y" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a><span class="article-tag-list-count">2</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/005-latex2" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/02/07/tools/005-latex2/" class="article-date">
@@ -162,12 +252,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjylc0ccy00mc0tch6izmsnm2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjymy542400m06och0gd3od8p" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">13</span></li></ul>
 
       </footer>
       </div>
@@ -256,12 +346,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/01/linux/012-linux-fun-tools/" data-id="cjylc0cbm00i80tchpyrftr0s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/01/linux/012-linux-fun-tools/" data-id="cjymy540q00ho6ochn8p5kyoq" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">13</span></li></ul>
 
       </footer>
       </div>
@@ -350,7 +440,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjylc0cc700k30tcho0kueuf3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjymy541e00jo6oche7p1app9" class="article-share-link">
           Share
         </a>
         
@@ -431,7 +521,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjylc0c4y001t0tchhsl0spzw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjymy53uu001p6ochz415lkd2" class="article-share-link">
           Share
         </a>
         
@@ -521,7 +611,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjylc0cbh00ht0tchnzqiizzg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjymy540o00hj6och3k75nr6d" class="article-share-link">
           Share
         </a>
         
@@ -600,7 +690,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjylc0ccf00kp0tchi2vvxl60" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjymy541i00k36ochy2cza4u0" class="article-share-link">
           Share
         </a>
         
@@ -689,7 +779,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjylc0c4000010tch67k2j2qu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjymy53te00046ochxwhp6bc0" class="article-share-link">
           Share
         </a>
         
@@ -771,7 +861,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjylc0cc800k80tch7qq5hid2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjymy541f00jr6ochhavon525" class="article-share-link">
           Share
         </a>
         
@@ -861,12 +951,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjylc0ccz00mf0tch1vgfhb4q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjymy542300ly6och1rxlulq5" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">13</span></li></ul>
 
       </footer>
       </div>
@@ -1094,12 +1184,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjylc0ccx00m70tch0pdps7os" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjymy542200lv6ochdcy1wsys" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/resource/">resource</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/resource/">resource</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">13</span></li></ul>
 
       </footer>
       </div>
@@ -1174,7 +1264,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjylc0c4300020tchy4jmobn2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjymy53t800016ochyw291r9b" class="article-share-link">
           Share
         </a>
         
@@ -1260,12 +1350,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjylc0ccw00m50tchvhrofa42" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjymy542200lt6och1j9oayhc" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">13</span></li></ul>
 
       </footer>
       </div>
@@ -1339,7 +1429,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjylc0c5s004c0tchsgi3gnb9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjymy53vp004c6ochuus7evve" class="article-share-link">
           Share
         </a>
         
@@ -1420,12 +1510,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjylc0ccv00m20tch1hmmzqe7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjymy542100lq6ochnh9swx23" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asciidoc/">asciidoc</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">12</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asciidoc/">asciidoc</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">13</span></li></ul>
 
       </footer>
       </div>
@@ -1509,7 +1599,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjylc0cc600k00tchd9s6bd7k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjymy541b00jj6ochzec8vkpi" class="article-share-link">
           Share
         </a>
         
@@ -1607,7 +1697,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjylc0ccv00m00tch2eoyrpbt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjymy541x00lg6ochyaww5h6v" class="article-share-link">
           Share
         </a>
         
@@ -1687,7 +1777,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjylc0cc100jm0tch7d6cef61" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjymy541500iz6ochtnr5376t" class="article-share-link">
           Share
         </a>
         
@@ -1780,7 +1870,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjylc0ccu00lx0tchxf2jnal2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjymy541y00lj6ochgnanggxo" class="article-share-link">
           Share
         </a>
         
@@ -1863,99 +1953,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjylc0cct00lv0tch6zug8kxo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjymy541x00le6ochue2qd06s" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">4</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-python/000-pyodbc" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/02/python/000-pyodbc/" class="article-date">
-  <time datetime="2018-01-02T12:03:01.000Z" itemprop="datePublished">2018-01-02</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/02/python/000-pyodbc/">python使用pyodbc</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>使用pyodbc</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pyodbc</span><br></pre></td></tr></table></figure>
-<p>如果出现:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">src/pyodbc.h:56:10: 致命错误：sql.h：没有那个文件或目录</span><br><span class="line">     #include &lt;sql.h&gt;</span><br><span class="line">              ^~~~~~~</span><br><span class="line">    编译中断。</span><br><span class="line">    error: command 'gcc' failed with exit status 1</span><br></pre></td></tr></table></figure></p>
-<p>则再安装:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo pacman -S unixodbc</span><br></pre></td></tr></table></figure></p>
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><ol>
-<li><p>需要安装驱动,我使用freetds,如果linux没有自带安装源可以下载:<a href="http://www.freetds.org/" target="_blank" rel="noopener">http://www.freetds.org/</a></p>
-</li>
-<li><p>配置/etc/odbcinst.ini:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat /etc/odbcinst.ini </span><br><span class="line">[SQL Server]</span><br><span class="line">Description = FreeTDS ODBC driver for MSSQL</span><br><span class="line"></span><br><span class="line">Driver = /usr/lib/libtdsodbc.so</span><br><span class="line"></span><br><span class="line">Setup = /usr/lib/libtdsS.so</span><br><span class="line"></span><br><span class="line">FileUsage = 1</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>测试</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> pyodbc</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;cnxn = pyodbc.connect(<span class="string">'DRIVER=&#123;SQL Server&#125;;SERVER=host\\sql;DATABASE=testDB;UID=sa;PWD=myPassword'</span>)</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>使用pyodbc</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/02/python/000-pyodbc/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/02/python/000-pyodbc/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjylc0cc500jv0tch8mioy9wu" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -1982,7 +1985,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -1992,7 +1995,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.59px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.59px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.53px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.35px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.59px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.35px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.59px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.59px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.06px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.53px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.53px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.18px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.59px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.18px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.59px;">hexo</a> <a href="/tags/html/" style="font-size: 10.59px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.59px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.76px;">javascript</a> <a href="/tags/js/" style="font-size: 13.53px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.59px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.18px;">latex</a> <a href="/tags/life/" style="font-size: 18.82px;">life</a> <a href="/tags/linux/" style="font-size: 19.41px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.18px;">math</a> <a href="/tags/maven/" style="font-size: 12.94px;">maven</a> <a href="/tags/microservice/" style="font-size: 14.71px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.59px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.18px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.35px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.35px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pgsql/" style="font-size: 11.76px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.65px;">python</a> <a href="/tags/quartz/" style="font-size: 10.59px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 15.88px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.29px;">scala</a> <a href="/tags/shell/" style="font-size: 12.35px;">shell</a> <a href="/tags/spark/" style="font-size: 11.76px;">spark</a> <a href="/tags/spring/" style="font-size: 12.94px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.35px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 12.94px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.18px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.59px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.35px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.47px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.12px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.59px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.18px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.59px;">webpack</a> <a href="/tags/week/" style="font-size: 18.24px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 12.94px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2014,6 +2017,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/28/tools/017-pandoc/">强大的pandoc</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
           </li>
         
@@ -2027,10 +2034,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/24/java/051-spring-http-status-code/">spring如何返回http状态码</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/23/java/050-java-run-js/">java运行js脚本</a>
           </li>
         
       </ul>
