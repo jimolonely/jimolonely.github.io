@@ -86,6 +86,219 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/017-java-static-and-dynamic-proxy" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/17/java/017-java-static-and-dynamic-proxy/" class="article-date">
+  <time datetime="2018-10-17T06:36:23.000Z" itemprop="datePublished">2018-10-17</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/10/17/java/017-java-static-and-dynamic-proxy/">java静态代理和动态代理</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文以图片为例实现java版本的动静态代理，并分析他们的区别。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>我们使用一个具有展示功能的图片接口为例，通过代理类实现AOP功能，在展示的前后做一些事情。</p>
+<h1 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h1><p>接口：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Image</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实现类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PngImage</span> <span class="keyword">implements</span> <span class="title">Image</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">display</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"展示png图片："</span> + name);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JpgImage</span> <span class="keyword">implements</span> <span class="title">Image</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">display</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"展示jpg图片："</span> + name);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代理类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImageProxy</span> <span class="keyword">implements</span> <span class="title">Image</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Image image;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ImageProxy</span><span class="params">(Image image)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.image = image;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">display</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"调整下图片大小,美化一下..."</span>);</span><br><span class="line">		image.display(name);</span><br><span class="line">		System.out.println(<span class="string">"图片资源清理..."</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> PngImage pngImage = <span class="keyword">new</span> PngImage();</span><br><span class="line">ImageProxy proxy = <span class="keyword">new</span> ImageProxy(pngImage);</span><br><span class="line">proxy.display(<span class="string">"jimo.png"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> JpgImage jpgImage = <span class="keyword">new</span> JpgImage();</span><br><span class="line">proxy = <span class="keyword">new</span> ImageProxy(jpgImage);</span><br><span class="line">proxy.display(<span class="string">"jimo.jpg"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">调整下图片大小,美化一下...</span><br><span class="line">展示png图片：jimo.png</span><br><span class="line">图片资源清理...</span><br><span class="line">调整下图片大小,美化一下...</span><br><span class="line">展示jpg图片：jimo.jpg</span><br><span class="line">图片资源清理...</span><br></pre></td></tr></table></figure></p>
+<h1 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h1><p>新的代理类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DynamicImageProxy</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">display</span><span class="params">(String name, Image image)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">final</span> Image proxiedImage = (Image) Proxy.newProxyInstance(Image.class.getClassLoader(),</span><br><span class="line">				<span class="keyword">new</span> Class[]&#123;Image.class&#125;,</span><br><span class="line">				<span class="keyword">new</span> ImageProxyHandler(image));</span><br><span class="line">		proxiedImage.display(name);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ImageProxyHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">private</span> Object image;</span><br><span class="line"></span><br><span class="line">		ImageProxyHandler(Object image) &#123;</span><br><span class="line">			<span class="keyword">this</span>.image = image;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">			System.out.println(<span class="string">"调整下图片大小,美化一下..."</span>);</span><br><span class="line">			<span class="keyword">final</span> Object invoke = method.invoke(image, args);</span><br><span class="line">			System.out.println(<span class="string">"图片资源清理..."</span>);</span><br><span class="line">			<span class="keyword">return</span> invoke;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需要解释一下Proxy.newProxyInstance()方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> 返回指定接口的被代理类的实例，该接口将方法调用分派给指定的调用处理程序</span></span><br><span class="line"><span class="comment"> * loader：定义被代理类的class loader</span></span><br><span class="line"><span class="comment"> * interfaces: 被代理类实现的接口，可能不止一个</span></span><br><span class="line"><span class="comment"> * h： 处理程序，处理被代理类，调用其方法，加一些处理</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">newProxyInstance</span><span class="params">(ClassLoader loader,</span></span></span><br><span class="line"><span class="function"><span class="params">                      Class&lt;?&gt;[] interfaces,</span></span></span><br><span class="line"><span class="function"><span class="params">                      InvocationHandler h)</span></span></span><br><span class="line"><span class="function">                               <span class="keyword">throws</span> IllegalArgumentException</span></span><br><span class="line"><span class="function">等价于：</span></span><br><span class="line"><span class="function">Proxy.<span class="title">getProxyClass</span><span class="params">(loader, interfaces)</span>.</span></span><br><span class="line"><span class="function">         <span class="title">getConstructor</span><span class="params">(new Class[] &#123; InvocationHandler.class &#125;)</span>.</span></span><br><span class="line"><span class="function">         <span class="title">newInstance</span><span class="params">(new Object[] &#123; handler &#125;)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到我们是通过反射来调用对象的方法。</p>
+<p>使用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> PngImage pngImage = <span class="keyword">new</span> PngImage();</span><br><span class="line">DynamicImageProxy.display(<span class="string">"jimo.png"</span>, pngImage);</span><br><span class="line"></span><br><span class="line">DynamicImageProxy.display(<span class="string">"jimo.jpg"</span>, <span class="keyword">new</span> JpgImage());</span><br></pre></td></tr></table></figure></p>
+<p>结果当然是一样的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">调整下图片大小,美化一下...</span><br><span class="line">展示png图片：jimo.png</span><br><span class="line">图片资源清理...</span><br><span class="line">调整下图片大小,美化一下...</span><br><span class="line">展示jpg图片：jimo.jpg</span><br><span class="line">图片资源清理...</span><br></pre></td></tr></table></figure></p>
+<h1 id="动静态代理的区别"><a href="#动静态代理的区别" class="headerlink" title="动静态代理的区别"></a>动静态代理的区别</h1><p>静态代理类：由程序员创建或由特定工具自动生成源代码，再对其编译。在程序运行前，代理类的.class文件就已经存在了。<br>动态代理类：在程序运行时，运用反射机制动态创建而成。<br>静态代理通常只代理一个类，动态代理是代理一个接口下的多个实现类。<br>静态代理事先知道要代理的是什么，而动态代理不知道要代理什么东西，只有在运行时才知道。</p>
+<p>说明：本文的静态代理并不只针对一个类，而是一个接口，实际上很多场景没有接口，只有一个类，针对每个类都需要写一个代理类。而java里的动态代理使用接口的代理范围更广泛。</p>
+<h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><h2 id="1-设计模式里的代理模式"><a href="#1-设计模式里的代理模式" class="headerlink" title="1.设计模式里的代理模式"></a>1.设计模式里的代理模式</h2><p>下面是一个简单的例子：</p>
+<h2 id="2-AOP"><a href="#2-AOP" class="headerlink" title="2.AOP"></a>2.AOP</h2><p>比如spring的AOP，或者本文的例子。</p>
+<h2 id="3-RPC"><a href="#3-RPC" class="headerlink" title="3.RPC"></a>3.RPC</h2><ol>
+<li>关于RPC和RESTful接口的区别需要了解下：<a href="https://www.cnblogs.com/jager/p/6519321.html" target="_blank" rel="noopener">参考</a></li>
+</ol>
+<p><a href="https://www.zhihu.com/question/41609070" target="_blank" rel="noopener">知乎</a>上有一段比较简明：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">http好比普通话，rpc好比团伙内部黑话。</span><br><span class="line"></span><br><span class="line">讲普通话，好处就是谁都听得懂，谁都会讲。</span><br><span class="line"></span><br><span class="line">讲黑话，好处是可以更精简、更加保密、更加可定制，坏处就是要求“说”黑话的那一方（client端）也要懂，</span><br><span class="line">而且一旦大家都说一种黑话了，换黑话就困难了。</span><br></pre></td></tr></table></figure></p>
+<p>在我们使用Java实现RPC时，会遇到客户端和服务端都要调用同一个接口，所以那个接口应该是公用的。当然，学习和做demo的时候都是放在一个项目里，而项目开发可以提取出一个公共模块，专门存放远程接口，参考<a href="https://blog.csdn.net/gao763024185/article/details/79916406" target="_blank" rel="noopener">https://blog.csdn.net/gao763024185/article/details/79916406</a>.</p>
+<p>而今天我们关注RPC中的代理模式的使用，大家可以参考以下资料学习完整的RPC：</p>
+<ol>
+<li><a href="https://github.com/apache/incubator-dubbo" target="_blank" rel="noopener">dubbo</a></li>
+<li><a href="https://blog.csdn.net/u011350550/article/details/80582837" target="_blank" rel="noopener">RPC原理及JAVA实现</a></li>
+<li><a href="https://www.cnblogs.com/codingexperience/p/5930752.html" target="_blank" rel="noopener">Java实现简单的RPC框架</a></li>
+</ol>
+<p>下面我们省略RPC里的服务端和客户端的网络请求以及注册中心，直接关注代理模块：</p>
+<p>项目结构：<br><img src="/2018/10/17/java/017-java-static-and-dynamic-proxy/000.png"></p>
+<p>下面是代理类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientProxy</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> ClientInvoker invoker = <span class="keyword">new</span> ClientInvoker();</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">getObject</span><span class="params">(Class&lt;?&gt; clazz)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span>  Proxy.newProxyInstance(</span><br><span class="line">				clazz.getClassLoader(),</span><br><span class="line">				<span class="keyword">new</span> Class&lt;?&gt;[]&#123;clazz&#125;,</span><br><span class="line">				<span class="keyword">new</span> InvocationHandler() &#123;</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">						<span class="comment">// 模拟参数</span></span><br><span class="line">						<span class="keyword">final</span> Object params = <span class="keyword">new</span> Object();</span><br><span class="line"></span><br><span class="line">						<span class="keyword">return</span> invoker.invoke(params, <span class="string">"localhost"</span>, <span class="number">8088</span>);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样客户端就可以统一请求，获取自己需要的对象了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> HelloService helloService = (HelloService) ClientProxy.getObject(HelloService.class);</span><br><span class="line">helloService.sayHello();</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文以图片为例实现java版本的动静态代理，并分析他们的区别。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/10/17/java/017-java-static-and-dynamic-proxy/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/10/17/java/017-java-static-and-dynamic-proxy/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/10/17/java/017-java-static-and-dynamic-proxy/" data-id="cjyp5ayv400d217chu2srl2ci" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-java/016-java-consurrent-pool" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/13/java/016-java-consurrent-pool/" class="article-date">
+  <time datetime="2018-10-13T09:57:43.000Z" itemprop="datePublished">2018-10-13</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/10/13/java/016-java-consurrent-pool/">java并发-线程池</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这一篇以ThreadPoolExecutor为例学习线程池。</p>
+<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>首先要知道线程池是什么，用来干什么。</p>
+<h2 id="解决什么问题"><a href="#解决什么问题" class="headerlink" title="解决什么问题"></a>解决什么问题</h2><ol>
+<li>提高多个异步任务的性能，减少每个任务的调用开销</li>
+<li>管理资源：线程资源，消耗的资源，基础统计数据（如运行完的线程数）</li>
+</ol>
+<h1 id="ThreadPoolExecutor"><a href="#ThreadPoolExecutor" class="headerlink" title="ThreadPoolExecutor"></a>ThreadPoolExecutor</h1><p>这个类比较复杂，提供了很多可调的参数，可以构造丰富的线程池，适应不同场景。我们大可使用<code>Executors.newXXXThreadPool()</code><br>这个工厂方法来创建线程池实例，那也是非常简单和初级的。现在我们会学习为什么这个类可以实现如此多的线程池类型。</p>
+<p>接下来就是了解这些参数。</p>
+<h2 id="core-max-pool-size"><a href="#core-max-pool-size" class="headerlink" title="core/max pool size"></a>core/max pool size</h2><p>既然是个池子，肯定有容量把。这里有2个关于容量的参数：corePoolSize ，maximumPoolSize.</p>
+<ol>
+<li>运行的线程数 <code>&lt; corePoolSize</code>: 直接创建新的线程来处理请求；</li>
+<li>运行的线程数介于corePoolSize和maximumPoolSize之间，只有当队列满了才会创建新线程；</li>
+</ol>
+<p>当corePoolSize==maximumPoolSize时，就是FixedThreadPool了。</p>
+<p>这两个参数的设置：</p>
+<ol>
+<li>构造方法</li>
+<li><code>setCorePoolSize(int) 和 setMaximumPoolSize(int)</code> 动态修改</li>
+</ol>
+<h2 id="keep-alive-time"><a href="#keep-alive-time" class="headerlink" title="keep-alive time"></a>keep-alive time</h2><p>当前线程数大于corePoolSize时，为了节省资源，空闲（Idle）的线程会在超过 <code>keepAliveTime</code>参数设定的时间后被终止。</p>
+<p>设置这个值也可以动静结合：</p>
+<ol>
+<li>构造方法</li>
+<li><code>setKeepAliveTime(long, TimeUnit)</code></li>
+</ol>
+<p>如果<code>allowCoreThreadTimeOut(true)</code>方法被调用，则当线程数小于corePoolSize时也可以终止，默认是false的。</p>
+<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>这个队列是用来存储线程的，会在以下情况用到：</p>
+<ol>
+<li>线程数 &lt; corePoolSize,直接创建新线程，不使用队列；</li>
+<li>线程数介于corePoolSize和maximumPoolSize之间，优先缓存到队列中；</li>
+<li>队列满了，则再创建线程，直到线程数达到maxmimumPoolSize, 后面再有线程就会被拒绝。</li>
+</ol>
+<p>ThreadPoolExecutor使用的是<code>BlockingQueue</code>队列，排队也有排队的策略，排队论就不说了，下面是这里几种策略：</p>
+<ol>
+<li></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>这一篇以ThreadPoolExecutor为例学习线程池。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/10/13/java/016-java-consurrent-pool/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/10/13/java/016-java-consurrent-pool/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/10/13/java/016-java-consurrent-pool/" data-id="cjyp5ayul00cy17chishkoemn" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/016-linux-centos-cmd" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/10/12/linux/016-linux-centos-cmd/" class="article-date">
@@ -150,7 +363,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/12/linux/016-linux-centos-cmd/" data-id="cjynpjiue00i9h2chrsioxzwu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/12/linux/016-linux-centos-cmd/" data-id="cjyp5ayx100ij17ch9olww8g2" class="article-share-link">
           Share
         </a>
         
@@ -251,7 +464,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/11/java/015-java-concurrent-executor-service/" data-id="cjynpjioy005rh2chsimm1dkn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/11/java/015-java-concurrent-executor-service/" data-id="cjyp5ayvd00d517ch57ifa2w2" class="article-share-link">
           Share
         </a>
         
@@ -330,12 +543,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/10/java/014-java-velocityengine/" data-id="cjynpjiox005mh2chjietks6l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/10/java/014-java-velocityengine/" data-id="cjyp5ayuv00d017chcjzp37s5" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/元编程/">元编程</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/元编程/">元编程</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -415,12 +628,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/10/java/013-java-concurrent-executor/" data-id="cjynpjiow005fh2chsz9voau3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/10/java/013-java-concurrent-executor/" data-id="cjyp5ayud00cw17ch2p6jzp42" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -500,12 +713,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/06/java/012-java-concurrent-atomic/" data-id="cjynpjiov005dh2chsjarnln8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/06/java/012-java-concurrent-atomic/" data-id="cjyp5ayu000cu17ch523j3dn9" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -577,12 +790,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/03/java/011-java-concurrent-condition/" data-id="cjynpjiov005ah2ch7bqhmovj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/03/java/011-java-concurrent-condition/" data-id="cjyp5ayte00co17chm3egmr59" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -663,12 +876,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/02/java/010-concurrent-lock/" data-id="cjynpjiou0055h2chwk3588sd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/02/java/010-concurrent-lock/" data-id="cjyp5aytr00cs17chd3ffmj87" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -740,12 +953,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/10/01/java/009-concurent-tool-class/" data-id="cjynpjiow005ih2ch0b75h0cf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/10/01/java/009-concurent-tool-class/" data-id="cjyp5aytq00cq17ch1f1yyyxx" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -819,12 +1032,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/30/java/008-java-concurrent-deadlock/" data-id="cjynpjiot0053h2chpc18kh3q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/30/java/008-java-concurrent-deadlock/" data-id="cjyp5aytc00cl17chiceu7sm2" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -893,7 +1106,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/28/basic/002-http/" data-id="cjynpjinf000th2che312zou2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/28/basic/002-http/" data-id="cjyp5aypt000x17chvyumyxs7" class="article-share-link">
           Share
         </a>
         
@@ -1018,12 +1231,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/28/java/007-checkstyle-idea-git-pre-commit/" data-id="cjynpjiox005kh2ch38wxz35b" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/28/java/007-checkstyle-idea-git-pre-commit/" data-id="cjyp5aytd00cm17ch4sbins5y" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/checkstyle/">checkstyle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/checkstyle/">checkstyle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -1093,12 +1306,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/27/java/006-ali-java-stadard-graph/" data-id="cjynpjios0050h2ch3rqfx1y3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/27/java/006-ali-java-stadard-graph/" data-id="cjyp5ayrk006b17chb51yip9u" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -1168,7 +1381,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/003-front-end-session-check/" data-id="cjynpjit300dxh2chvx9t7k29" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/003-front-end-session-check/" data-id="cjyp5ayr5004x17che0ia7jvi" class="article-share-link">
           Share
         </a>
         
@@ -1259,7 +1472,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/002-condition-juge/" data-id="cjynpjit400e0h2chhwq2qt5z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/25/js/002-condition-juge/" data-id="cjyp5ayr4004t17chjazzorri" class="article-share-link">
           Share
         </a>
         
@@ -1354,7 +1567,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/23/server/005-how-nginx-handle-a-request/" data-id="cjynpjiva00l0h2chpr1kduwi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/23/server/005-how-nginx-handle-a-request/" data-id="cjyp5ayy400lf17ch3sst4zw0" class="article-share-link">
           Share
         </a>
         
@@ -1486,7 +1699,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/19/server/004-nginx-directives/" data-id="cjynpjiv900kyh2cho2d93rr7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/19/server/004-nginx-directives/" data-id="cjyp5ayy300lc17chdji72fw9" class="article-share-link">
           Share
         </a>
         
@@ -1543,7 +1756,7 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/18/server/003-nginx-serve-static/" data-id="cjynpjiv800kvh2ch8095cbf7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/18/server/003-nginx-serve-static/" data-id="cjyp5ayy300la17ch2sdh27bt" class="article-share-link">
           Share
         </a>
         
@@ -1619,191 +1832,12 @@ null==undefined
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/16/scala/003-scala-cheat-sheet/" data-id="cjynpjiv300keh2ch0l49c72p" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/16/scala/003-scala-cheat-sheet/" data-id="cjyp5ayy000l017ch4gdkxrge" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-scala/002-sbt-shoud-know" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/15/scala/002-sbt-shoud-know/" class="article-date">
-  <time datetime="2018-09-15T06:13:33.000Z" itemprop="datePublished">2018-09-15</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/15/scala/002-sbt-shoud-know/">sbt那些事</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>sbt(scala build tool)是scala的构建工具，在使用过程中有些基础的要点。</p>
-<h1 id="sbt的安装"><a href="#sbt的安装" class="headerlink" title="sbt的安装"></a>sbt的安装</h1><p>注意修改maven镜像,位于<code>~/.sbt</code>,新建一个<code>repostories</code>文件，改为阿里云的镜像：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># cat ~/.sbt/repositories</span><br><span class="line">[repositories]</span><br><span class="line">local</span><br><span class="line">aliyun: http://maven.aliyun.com/nexus/content/groups/public</span><br><span class="line">jcenter: http://jcenter.bintray.com</span><br><span class="line">typesafe: http://repo.typesafe.com/typesafe/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext], bootOnly</span><br></pre></td></tr></table></figure></p>
-<h1 id="sbt-console"><a href="#sbt-console" class="headerlink" title="sbt console"></a>sbt console</h1><p>运行<code>sbt console</code>就可以进入scala命令行。</p>
-<h2 id="帮助"><a href="#帮助" class="headerlink" title="帮助"></a>帮助</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">scala&gt;</span> :help</span><br><span class="line">All commands can be abbreviated, e.g., :he instead of :help.</span><br><span class="line">:completions &lt;string&gt;    output completions for the given string</span><br><span class="line">:edit &lt;id&gt;|&lt;line&gt;        edit history</span><br><span class="line">:help [command]          print this summary or command-specific help</span><br><span class="line">:history [num]           show the history (optional num is commands to show)</span><br><span class="line">:h? &lt;string&gt;             search the history</span><br><span class="line">:imports [name name ...] show import history, identifying sources of names</span><br><span class="line">:implicits [-v]          show the implicits in scope</span><br><span class="line">:javap &lt;path|class&gt;      disassemble a file or class name</span><br><span class="line">:line &lt;id&gt;|&lt;line&gt;        place line(s) at the end of history</span><br><span class="line">:load &lt;path&gt;             interpret lines in a file</span><br><span class="line">:paste [-raw] [path]     enter paste mode or paste a file</span><br><span class="line">:power                   enable power user mode</span><br><span class="line">:quit                    exit the interpreter</span><br><span class="line">:replay [options]        reset the repl and replay all previous commands</span><br><span class="line">:require &lt;path&gt;          add a jar to the classpath</span><br><span class="line">:reset [options]         reset the repl to its initial state, forgetting all session entries</span><br><span class="line">:save &lt;path&gt;             save replayable session to a file</span><br><span class="line">:sh &lt;command line&gt;       run a shell command (result is implicitly =&gt; List[String])</span><br><span class="line">:settings &lt;options&gt;      update compiler options, if possible; see reset</span><br><span class="line">:silent                  disable/enable automatic printing of results</span><br><span class="line">:type [-v] &lt;expr&gt;        display the type of an expression without evaluating it</span><br><span class="line">:kind [-v] &lt;type&gt;        display the kind of a type. see also :help kind</span><br><span class="line">:warnings                show the suppressed warnings from the most recent line which had any</span><br></pre></td></tr></table></figure>
-<h2 id="清空界面"><a href="#清空界面" class="headerlink" title="清空界面"></a>清空界面</h2><p><code>Ctrl+L</code>应该是个通用快捷键了。</p>
-<h2 id="重新加载"><a href="#重新加载" class="headerlink" title="重新加载"></a>重新加载</h2><p>这是个常用的命令，毕竟你不想重新开一遍：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; :reset</span><br><span class="line"><span class="type">Resetting</span> interpreter state.</span><br><span class="line"><span class="type">Forgetting</span> <span class="keyword">this</span> session history:</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span>&#123;&#125;</span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">FooMaker</span></span>&#123;</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>() = <span class="keyword">new</span> <span class="type">Foo</span></span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
-<h2 id="退出"><a href="#退出" class="headerlink" title="退出"></a>退出</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">scala&gt;</span> :quit</span><br><span class="line"></span><br><span class="line">[success] Total time: 10763 s, completed Sep 15, 2018 2:19:20 PM</span><br></pre></td></tr></table></figure>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>sbt(scala build tool)是scala的构建工具，在使用过程中有些基础的要点。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/09/15/scala/002-sbt-shoud-know/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/09/15/scala/002-sbt-shoud-know/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/15/scala/002-sbt-shoud-know/" data-id="cjynpjiv600koh2chfs5zn4hv" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sbt/">sbt</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-basic/000-ssh-config" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/14/basic/000-ssh-config/" class="article-date">
-  <time datetime="2018-09-14T09:07:43.000Z" itemprop="datePublished">2018-09-14</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/14/basic/000-ssh-config/">ssh连接超时配置</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文解释ssh的超时配置。</p>
-<h1 id="服务端和客户端"><a href="#服务端和客户端" class="headerlink" title="服务端和客户端"></a>服务端和客户端</h1><p>本文约定：</p>
-<ol>
-<li>客户端： 本机（想连远程主机）</li>
-<li>服务端： 远程主机</li>
-</ol>
-<h1 id="配置文件地址"><a href="#配置文件地址" class="headerlink" title="配置文件地址"></a>配置文件地址</h1><p>分为sshd配置（守护进程）和ssh配置。<br>centos/ubuntu<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/etc/ssh/sshd_config： 作为服务端的配置</span><br><span class="line">/etc/ssh/ssh_config： 作为客户端的配置</span><br></pre></td></tr></table></figure></p>
-<h1 id="超时配置"><a href="#超时配置" class="headerlink" title="超时配置"></a>超时配置</h1><p>当连上远程的ssh服务器，如果没有操作，一会就断开连接了，这个时间可以设置得长一些。</p>
-<h2 id="在客户端修改"><a href="#在客户端修改" class="headerlink" title="在客户端修改"></a>在客户端修改</h2><p>也就是在你本机上修改<code>/etc/ssh/ssh_config</code>文件，这样所有的连接都会起作用：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Host *</span><br><span class="line">ServerAliveInterval <span class="number">120</span> <span class="comment"># 秒</span></span><br></pre></td></tr></table></figure></p>
-<p>每隔120秒模拟发送按键事件，防止断开，一般是你可能会遇到这个问题有用：<br><code>packet_write_wait: Connection to 192.168.100.11 port 22: Broken pipe</code></p>
-<h2 id="在服务端修改"><a href="#在服务端修改" class="headerlink" title="在服务端修改"></a>在服务端修改</h2><p>当然，如果你只想针对某台服务器修改，就可以在服务端去修改（注意需要遵守规范，毕竟服务端是大家共有的）。</p>
-<h3 id="方式1"><a href="#方式1" class="headerlink" title="方式1"></a>方式1</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ClientAliveInterval 10m          # 10 minutes</span><br><span class="line">ClientAliveCountMax 2           # 2 次</span><br></pre></td></tr></table></figure>
-<h3 id="方式2"><a href="#方式2" class="headerlink" title="方式2"></a>方式2</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> vi /etc/ssh/sshd_config</span><br><span class="line">ClientAliveInterval 20m          # 20 minutes</span><br><span class="line">ClientAliveCountMax 0            # 0 次</span><br></pre></td></tr></table></figure>
-<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><p>这两种方法之间有一点区别。 对于第一种方法，sshd将通过加密通道发送消息，此处称为Client Alive Messages，如果客户端处于非活动状态10分钟，则从客户端请求响应。 sshd守护程序将最多发送这些消息两次。 如果在发送客户端活动消息时达到此阈值，sshd将断开客户端的连接。</p>
-<p>但对于第二种方法，如果客户端处于非活动状态20分钟，sshd将不会发送客户端活动消息并直接终止会话。</p>
-<h1 id="直接修改超时时间"><a href="#直接修改超时时间" class="headerlink" title="直接修改超时时间"></a>直接修改超时时间</h1><ol>
-<li><p>修改/etc/profile下tmout参数<br>  如：sudo vi /etc/profile<br>  tmout=300<br>  就是300秒后闲置自动退出；</p>
-</li>
-<li><p>在未设置TMOUT或者设置TMOUT=0时，此闲置超时自动退出的功能禁用。</p>
-</li>
-</ol>
-<p>这个很简单。</p>
-<h1 id="重启ssh服务"><a href="#重启ssh服务" class="headerlink" title="重启ssh服务"></a>重启ssh服务</h1><p>修改了任何配置记得重启服务（对应修改的哪端就重启哪端）<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> service sshd restart</span><br><span class="line"><span class="meta">#</span> service ssh restart</span><br></pre></td></tr></table></figure></p>
-<p>注意：在ubuntu上先安装<code>openssh-server</code>:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install openssh-server</span><br></pre></td></tr></table></figure></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.51cto.com/9237101/1907424" target="_blank" rel="noopener">http://blog.51cto.com/9237101/1907424</a></p>
-<p><a href="https://www.thegeekdiary.com/centos-rhel-how-to-setup-session-idle-timeout-inactivity-timeout-for-ssh-auto-logout/" target="_blank" rel="noopener">https://www.thegeekdiary.com/centos-rhel-how-to-setup-session-idle-timeout-inactivity-timeout-for-ssh-auto-logout/</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文解释ssh的超时配置。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/09/14/basic/000-ssh-config/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/09/14/basic/000-ssh-config/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/14/basic/000-ssh-config/" data-id="cjynpjinc000oh2ch5cax467x" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/basic/">basic</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -1840,7 +1874,7 @@ null==undefined
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1862,6 +1896,14 @@ null==undefined
       <ul>
         
           <li>
+            <a href="/2019/07/30/android/001-android-webdav-client/">android web-dav client</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/29/life/025-weekly-learn/">2019-31-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/28/java/055-java-webdav-client/">java实现web-dav客户端</a>
           </li>
         
@@ -1871,14 +1913,6 @@ null==undefined
         
           <li>
             <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/25/java/053-jdk-javac-compile/">javac源码编译到认识编译过程</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
           </li>
         
       </ul>

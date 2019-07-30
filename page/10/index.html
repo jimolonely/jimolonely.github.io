@@ -86,6 +86,307 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-server/001-nginx-http-load-balance" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/30/server/001-nginx-http-load-balance/" class="article-date">
+  <time datetime="2018-08-30T00:40:53.000Z" itemprop="datePublished">2018-08-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/30/server/001-nginx-http-load-balance/">nginx-HTTP负载均衡</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文关于nginx的HTTP负载均衡。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>略</p>
+<h1 id="代理HTTP流量到一组服务器"><a href="#代理HTTP流量到一组服务器" class="headerlink" title="代理HTTP流量到一组服务器"></a>代理HTTP流量到一组服务器</h1><p>无非就是来了HTTP请求，我应该发给谁（哪个服务器），分发的过程就是nginx做的事情，当然我们可以配置。</p>
+<h2 id="指定服务器"><a href="#指定服务器" class="headerlink" title="指定服务器"></a>指定服务器</h2><p>我们使用upstream来定义一组服务器，名字叫backend。<strong>注意：下面的server不是server块，而是一条指令</strong>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    upstream backend &#123;</span><br><span class="line">        server backend1.example.com weight=5;</span><br><span class="line">        server backend2.example.com;</span><br><span class="line">        server 192.0.0.1 backup;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="配置代理"><a href="#配置代理" class="headerlink" title="配置代理"></a>配置代理</h2><p>也就很简单了，使用proxy_pass.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http://backend;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当然，根据不同的协议，还有其他选择： fastcgi_pass, memcached_pass, scgi_pass, or uwsgi_pass</p>
+<h2 id="完整配置"><a href="#完整配置" class="headerlink" title="完整配置"></a>完整配置</h2><p><strong>默认情况，ngnix使用轮询（Round Robin）算法分配流量</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    upstream backend &#123;</span><br><span class="line">        server backend1.example.com;</span><br><span class="line">        server backend2.example.com;</span><br><span class="line">        server 192.0.0.1 backup;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    server &#123;</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://backend;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h1><p>nginx一共配备了5种算法，下面介绍。</p>
+<h2 id="1-Round-Robin（轮询）"><a href="#1-Round-Robin（轮询）" class="headerlink" title="1.Round Robin（轮询）"></a>1.Round Robin（轮询）</h2><p>请求在服务器之间均匀分布，会考虑服务器权重。 默认情况下使用此方法（无需启动指令）：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">   server backend1.example.com;</span><br><span class="line">   server backend2.example.com;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-Least-Connections（最少连接数）"><a href="#2-Least-Connections（最少连接数）" class="headerlink" title="2.Least Connections（最少连接数）"></a>2.Least Connections（最少连接数）</h2><p>将请求发送到具有 <strong>最少活动连接数</strong> 的服务器，同时考虑服务器权重：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    least_conn;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-IP-Hash"><a href="#3-IP-Hash" class="headerlink" title="3.IP Hash"></a>3.IP Hash</h2><p>从客户端IP地址确定向其发送请求的服务器。<br>在这种情况下，使用IPv4地址的前三个八位字节或整个IPv6地址来计算哈希值。 <strong>该方法保证来自同一地址的请求到达同一服务器，除非它不可用</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    ip_hash;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果需要从负载平衡轮换中临时删除其中一个服务器，则可以使用 <strong>down</strong> 参数对其进行标记，以便保留客户端IP地址的当前哈希值。<br>此服务器要处理的请求将自动发送到组中的下一个服务器：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">    server backend3.example.com down;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-一般HASH"><a href="#4-一般HASH" class="headerlink" title="4.一般HASH"></a>4.一般HASH</h2><p>发送请求的服务器是从用户定义的 <strong>键（键值对的键）</strong> 确定的，该key可以是文本字符串，变量或他们的组合。</p>
+<p>例如，key可以是配对的源IP地址和端口，也可以是本示例中的URI：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    hash $request_uri consistent;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>hash指令的可选参数 <strong>consistent</strong> 启用ketama一致哈希负载平衡。 根据用户定义的散列键值，请求均匀分布在所有上游(upstream)服务器上。 如果将上游服务器添加到上游组或从上游组中删除，则仅重新映射几个key，这在负载平衡缓存服务器或其他累积状态的应用程序的情况下 <strong>最小化缓存未命中</strong> 。</p>
+<h2 id="5-Least-Time-最小时间，只在NGINX-PLUS有"><a href="#5-Least-Time-最小时间，只在NGINX-PLUS有" class="headerlink" title="5.Least Time(最小时间，只在NGINX PLUS有)"></a>5.Least Time(最小时间，只在NGINX PLUS有)</h2><p>对于每个请求，NGINX Plus选择具有最低平均延迟和最低活动连接数的服务器，其中最低平均延迟是根据包含的 <strong>least_time</strong> 指令中的参数计算的,参数如下：</p>
+<ol>
+<li>header - 从服务器接收第一个字节的时间</li>
+<li>last_byte - 从服务器接收完整响应的时间 </li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    least_time header;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="服务器权重"><a href="#服务器权重" class="headerlink" title="服务器权重"></a>服务器权重</h1><p>默认情况，weight都是1，每个服务器权重一样，但可以改变：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    server backend1.example.com weight=5;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">    server 192.0.0.1 backup;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在上述示例中，backend1.example.com的权重为5; 其他两台服务器具有默认权重（1），但IP地址为192.0.0.1的服务器标记为 <strong>备份服务器</strong> ，除非其他两台服务器都不可用，否则不会接收请求。<br>通过这种权重配置，每六个请求中就有五个发送到backend1.example.com，一个发送到backend2.example.com。</p>
+<h1 id="服务器慢启动"><a href="#服务器慢启动" class="headerlink" title="服务器慢启动"></a>服务器慢启动</h1><p>服务器慢启动功能可防止最近恢复的服务器被连接淹没，因为这可能会超时并导致服务器再次被标记为失败。</p>
+<p>在NGINX Plus中，慢启动允许上游服务器在恢复或可用之后 <strong>逐渐将其权重从零恢复到其标准值</strong> 。 这可以使用server指令的slow_start参数来完成：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    server backend1.example.com slow_start=30s;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">    server 192.0.0.1 backup;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>时间值（此处为30秒）设置NGINX Plus将服务器连接数增加到最大值的时间。</p>
+<p><strong>请注意，如果组中只有一个服务器，则忽略server指令的max_fails，fail_timeout和slow_start参数，并且永远不会将服务器视为不可用。</strong></p>
+<h1 id="启用会话保持"><a href="#启用会话保持" class="headerlink" title="启用会话保持"></a>启用会话保持</h1><p>会话保持 意味着NGINX Plus识别用户会话并将给定会话中的所有请求路由到 <strong>同一上游服务器</strong> 。</p>
+<p>NGINX Plus支持三种会话保持方法，使用sticky指令设置。 （对于使用NGINX OSS的会话持久性，请使用如上所述的hash或ip_hash指令。）</p>
+<h2 id="1-Sticky-Cookie"><a href="#1-Sticky-Cookie" class="headerlink" title="1.Sticky Cookie"></a>1.Sticky Cookie</h2><p>NGINX Plus为来自上游组的第一个响应添加会话cookie，并识别发送响应的服务器。 客户端的下一个请求包含cookie值，NGINX Plus将请求路由到响应第一个请求的上游服务器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">    sticky cookie srv_id expires=1h domain=.example.com path=/;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在该示例中，srv_id是cookie的名称。 可选的expires参数设置浏览器保留cookie的时间（此处为1小时）。 可选的domain参数定义为其设置cookie的域，可选的path参数定义cookie的设置路径。 这是最简单的会话持久性方法。</p>
+<h2 id="2-Sticky-Route"><a href="#2-Sticky-Route" class="headerlink" title="2.Sticky Route"></a>2.Sticky Route</h2><p>NGINX Plus在收到第一个请求时为客户端分配“路由”。 将所有后续请求与server指令的route参数进行比较，以标识请求被代理到的服务器。 路由信息来自cookie或URI。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    server backend1.example.com route=a;</span><br><span class="line">    server backend2.example.com route=b;</span><br><span class="line">    sticky route $route_cookie $route_uri;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-Cookie-learn"><a href="#3-Cookie-learn" class="headerlink" title="3.Cookie learn"></a>3.Cookie learn</h2><p>NGINX Plus首先通过检查请求和响应来查找会话标识符。 然后NGINX Plus“学习”哪个上游服务器对应哪个会话标识符。 通常，这些标识符在HTTP cookie中传递。 如果请求包含已经“学习”的会话标识符，NGINX Plus会将请求转发到相应的服务器：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">   server backend1.example.com;</span><br><span class="line">   server backend2.example.com;</span><br><span class="line">   sticky learn</span><br><span class="line">       create=$upstream_cookie_examplecookie</span><br><span class="line">       lookup=$cookie_examplecookie</span><br><span class="line">       zone=client_sessions:1m</span><br><span class="line">       timeout=1h;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在该示例中，其中一个上游服务器通过在响应中设置cookie EXAMPLECOOKIE来创建会话。</p>
+<p>必需的create参数指定一个变量，指示如何创建新会话。 在该示例中，从上游服务器发送的cookie EXAMPLECOOKIE创建新会话。</p>
+<p>lookup参数指定如何搜索现有会话。 在我们的示例中，在客户端发送的cookie EXAMPLECOOKIE中搜索现有会话。</p>
+<p>zone参数指定共享内存区域，其中保留有关粘性会话的所有信息。 在我们的示例中，该区域名为client_sessions，大小为1兆字节。</p>
+<p>这是一种比前两种方法更复杂的会话持久性方法，因为它不需要在客户端保留任何cookie：<strong>所有信息都保存在服务器端的共享内存区域中</strong> 。</p>
+<h1 id="限制连接数"><a href="#限制连接数" class="headerlink" title="限制连接数"></a>限制连接数</h1><p>使用NGINX Plus，可以通过使用max_conns参数指定最大数量来限制与上游服务器的连接数。</p>
+<p>如果已达到max_conns限制，则将请求 <strong>置于队列中</strong> 以进行进一步处理，前提是还包括queue指令以设置可同时在队列中的最大请求数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    server backend1.example.com max_conns=3;</span><br><span class="line">    server backend2.example.com;</span><br><span class="line">    queue 100 timeout=70;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果队列填满了请求，或者在可选的timeout参数指定的超时期间无法选择上游服务器，<strong>则客户端会收到错误</strong> 。</p>
+<p>请注意，如果在其他工作进程中打开了空闲的keepalive连接，则会忽略max_conns限制。 因此，在与多个工作进程共享内存的配置中，与服务器的连接总数可能会超过max_conns值。</p>
+<h1 id="被动健康检查"><a href="#被动健康检查" class="headerlink" title="被动健康检查"></a>被动健康检查</h1><p>当NGINX认为服务器不可用时，它会暂时停止向服务器发送请求，直到它再次被视为活动状态。 server指令的以下参数配置NGINX认为服务器不可用的条件：</p>
+<ul>
+<li>max_fails - 设置NGINX将服务器标记为不可用的连续失败尝试次数。</li>
+<li>fail_timeout - 必须先设置max_fails参数指定的失败尝试次数，fail_timeout为NGINX认为服务器不可用的时间长度。</li>
+</ul>
+<p>默认值为1次尝试和10秒超时。 因此，如果服务器不接受或不响应（即一个）请求，NGINX会立即认为服务器不可用10秒钟。</p>
+<p>以下示例显示如何设置这些参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;</span><br><span class="line">    server backend1.example.com;</span><br><span class="line">    server backend2.example.com max_fails=3 fail_timeout=30s;</span><br><span class="line">    server backend3.example.com max_fails=2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="积极健康检查"><a href="#积极健康检查" class="headerlink" title="积极健康检查"></a>积极健康检查</h1><p>接下来是一些用于跟踪NGINX Plus中服务器可用性的更复杂功能。</p>
+<p>定期向每个服务器发送特殊请求并检查满足某些条件的响应可以监视服务器的可用性。</p>
+<p>要在nginx.conf文件中启用此类型的运行状况监视，请在将请求传递到上游组的位置包含health_check指令。 此外，上游组必须包含zone指令以定义共享内存区域，其中存储有关运行状况的信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    upstream backend &#123;</span><br><span class="line">        zone backend 64k;</span><br><span class="line">        server backend1.example.com;</span><br><span class="line">        server backend2.example.com;</span><br><span class="line">        server backend3.example.com;</span><br><span class="line">        server backend4.example.com;</span><br><span class="line">    &#125;</span><br><span class="line">    server &#123;</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://backend;</span><br><span class="line">            health_check;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>zone指令定义在工作进程之间共享的内存区域，用于存储服务器组的配置。 这使工作进程能够使用同一组计数器来跟踪来自上游服务器的响应。 上游组的动态配置也需要zone指令。</li>
+<li>不带任何参数的health_check指令使用默认设置配置运行状况监视：NGINX Plus每5秒向后端组中的每个服务器发送一个请求。 如果发生任何通信错误或超时（或代理服务器以2_xx_或3_xx_之外的状态代码响应），则该服务器的运行状况检查将失败。 任何未通过运行状况检查的服务器都被认为是不健康的，并且NGINX Plus会停止向客户端发送请求，直到它再次通过运行状况检查。</li>
+</ul>
+<p>可以使用health_check指令的参数覆盖默认行为。 这里，interval参数将运行状况检查之间的持续时间减少到5秒。 failure = 3参数表示在连续3次健康检查失败而不是默认值1之后服务器被认为是不健康的。使用pass参数，服务器需要通过2次连续检查（而不是1次）才能再次被视为健康。</p>
+<p>要定义要请求的URI（此处为/ some / path）而不是默认值，请包含uri参数。 URI附加到服务器的域名或IP地址，由上游块中的server指令指定。 例如，对于上面配置的后端组中的第一个服务器，运行状况检查是对<a href="http://backend1.example.com/some/path的请求。" target="_blank" rel="noopener">http://backend1.example.com/some/path的请求。</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">    proxy_pass http://backend;</span><br><span class="line">    health_check interval=5 fails=3 passes=2 uri=/some/path;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后，您可以设置响应必须满足NGINX Plus的自定义条件，以使服务器健康。 条件在匹配块中指定，然后由health_check指令的match参数引用。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    # ...</span><br><span class="line">    match server_ok &#123;</span><br><span class="line">        status 200-399;</span><br><span class="line">        body !~ &quot;maintenance mode&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    server &#123;</span><br><span class="line">        # ...</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://backend;</span><br><span class="line">            health_check match=server_ok;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果响应中的状态代码在200到399范围内，并且响应正文与指定的正则表达式不匹配，则传递运行状况检查。</p>
+<p>match指令使NGINX Plus能够检查状态，标题字段和响应正文。 使用此指令可以验证状态代码是否在指定范围内，响应包括标题，或者标题或正文与正则表达式匹配（以任何组合形式）。 match指令可以包含一个状态条件，一个正文条件和多个标题条件。 要使运行状况检查成功，响应必须满足匹配块中指定的所有条件。</p>
+<p>例如，以下匹配块要求响应具有状态代码200，包含具有精确值text / html的Content-Type标头，并在正文中包含文本“Welcome to nginx！”：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">match welcome &#123;</span><br><span class="line">    status 200;</span><br><span class="line">    header Content-Type = text/html;</span><br><span class="line">    body ~ &quot;Welcome to nginx!&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在以下使用感叹号（！）的示例中，块匹配响应其中状态代码不是301,302,303和307，并且Refresh不在标题中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">match not_redirect &#123;</span><br><span class="line">    status ! 301-303 307;</span><br><span class="line">    header ! Refresh;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>还可以为NGINX Plus代理的非HTTP协议启用运行状况检查：FastCGI，memcached，SCGI和uwsgi。</p>
+<h1 id="与多个工作进程共享数据"><a href="#与多个工作进程共享数据" class="headerlink" title="与多个工作进程共享数据"></a>与多个工作进程共享数据</h1><p>如果上游块不包含zone指令，则每个工作进程都会保留其自己的服务器组配置副本，并维护自己的一组相关计数器。 计数器包括组中每个服务器的当前连接数以及将请求传递到服务器的失败尝试次数。 因此，无法动态修改服务器组配置。</p>
+<p>当zone指令包含在上游块中时，上游组的配置保存在所有工作进程之间共享的内存区域中。 此方案是可动态配置的，因为工作进程访问组配置的相同副本并使用相同的相关计数器。</p>
+<p>zone指令对于活动运行状况检查和上游组的动态重新配置是必需的。 但是，上游组的其他功能也可以从该指令的使用中受益。</p>
+<p>例如，如果未共享组的配置，则每个工作进程都会维护自己的计数器，以便将请求传递给服务器（由max_fails参数设置失败）。 在这种情况下，每个请求只能访问一个工作进程。 当选择处理请求的工作进程无法将请求传输到服务器时，其他工作进程对此一无所知。 虽然某些工作进程可以认为服务器不可用，但其他人可能仍会向此服务器发送请求。 对于最终被视为不可用的服务器，fail_timeout参数设置的时间范围内的失败尝试次数必须等于max_fails乘以工作进程数。 另一方面，zone指令保证了预期的行为。</p>
+<p>同样，如果没有zone指令，Least Connections负载平衡方法可能无法正常工作，至少在低负载下。 此方法将请求传递给具有最少活动连接数的服务器。 如果未共享组的配置，则每个工作进程使用其自己的计数器作为连接数，并可能将请求发送到另一个工作进程刚刚发送请求的同一服务器。 但是，您可以增加请求数以减少此影响。 在高负载下，请求在工作进程之间均匀分布，并且最少连接方法按预期工作。</p>
+<h3 id="设置zone大小"><a href="#设置zone大小" class="headerlink" title="设置zone大小"></a>设置zone大小</h3><p>不可能推荐理想的内存区大小，因为使用模式差异很大。 所需的内存量取决于启用了哪些功能（例如会话持久性，运行状况检查或DNS重新解析）以及如何识别上游服务器。</p>
+<p>例如，使用sticky_route会话持久性方法并启用单个运行状况检查，256 KB区域可以容纳有关指示的上游服务器数量的信息：</p>
+<ul>
+<li>128台服务器（每台服务器定义为IP地址：端口对）</li>
+<li>88个服务器（每个服务器定义为主机名：主机名解析为单个IP地址的端口对）</li>
+<li>12个服务器（每个服务器定义为主机名：主机名解析为多个IP地址的端口对）</li>
+</ul>
+<h1 id="使用DNS配置HTTP负载均衡"><a href="#使用DNS配置HTTP负载均衡" class="headerlink" title="使用DNS配置HTTP负载均衡"></a>使用DNS配置HTTP负载均衡</h1><p>可以使用DNS在运行时修改服务器组的配置。</p>
+<p>对于在服务器指令中使用域名标识的上游组中的服务器，NGINX Plus可以监视对应DNS记录中IP地址列表的更改，并自动将更改应用于上游组的负载平衡，而无需 重启。 这可以通过将http块中的resolver指令和resolve参数包含在server指令中来完成：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    resolver 10.0.0.1 valid=300s ipv6=off;</span><br><span class="line">    resolver_timeout 10s;</span><br><span class="line">    server &#123;</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://backend;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    upstream backend &#123;</span><br><span class="line">        zone backend 32k;</span><br><span class="line">        least_conn;</span><br><span class="line">        # ...</span><br><span class="line">        server backend1.example.com resolve;</span><br><span class="line">        server backend2.example.com resolve;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在该示例中，server指令的resolve参数告诉NGINX Plus定期将backend1.example.com和backend2.example.com域名重新解析为IP地址。</p>
+<p>解析器指令定义NGINX Plus向其发送请求的DNS服务器的IP地址（此处为10.0.0.1）。默认情况下，NGINX Plus会以记录中的生存时间（TTL）指定的频率重新解析DNS记录，但您可以使用有效参数覆盖TTL值;在示例中，它是300秒或5分钟。</p>
+<p>可选的ipv6 = off参数表示只有IPv4地址用于负载均衡，但默认情况下支持解析IPv4和IPv6地址。</p>
+<p>如果域名解析为多个IP地址，则地址将保存到上游配置并进行负载平衡。在我们的示例中，服务器根据最小连接负载平衡方法进行负载平衡。如果服务器的IP地址列表已更改，NGINX Plus会立即在新的地址集中启动负载平衡。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>好吧，看到后面有点烦了。</p>
+<p><a href="https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/" target="_blank" rel="noopener">https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文关于nginx的HTTP负载均衡。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/08/30/server/001-nginx-http-load-balance/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/08/30/server/001-nginx-http-load-balance/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjyp5ayy100l517ch717xyjhm" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/load-balance/">load balance</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-server/000-nginx-begin" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/server/000-nginx-begin/" class="article-date">
+  <time datetime="2018-08-29T07:15:08.000Z" itemprop="datePublished">2018-08-29</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/server/000-nginx-begin/">nginx for beginners</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这是nginx的入门一文。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>略</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>略</p>
+<h1 id="入门指导"><a href="#入门指导" class="headerlink" title="入门指导"></a>入门指导</h1><p><a href="https://nginx.org/en/docs/beginners_guide.html" target="_blank" rel="noopener">https://nginx.org/en/docs/beginners_guide.html</a></p>
+<h1 id="配置文件地址"><a href="#配置文件地址" class="headerlink" title="配置文件地址"></a>配置文件地址</h1><p>/usr/local/nginx/conf, /etc/nginx, or/usr/local/etc/nginx.</p>
+<img src="/2018/08/29/server/000-nginx-begin/000.png">
+<h1 id="日志的位置"><a href="#日志的位置" class="headerlink" title="日志的位置"></a>日志的位置</h1><p>/usr/local/nginx/logs or /var/log/nginx</p>
+<h1 id="启动，停止和重新加载配置"><a href="#启动，停止和重新加载配置" class="headerlink" title="启动，停止和重新加载配置"></a>启动，停止和重新加载配置</h1><h2 id="start"><a href="#start" class="headerlink" title="start"></a>start</h2><img src="/2018/08/29/server/000-nginx-begin/001.png">
+<h2 id="reload"><a href="#reload" class="headerlink" title="reload"></a>reload</h2><p>重新加载配置文件<br><img src="/2018/08/29/server/000-nginx-begin/002.png"></p>
+<h2 id="reopen"><a href="#reopen" class="headerlink" title="reopen"></a>reopen</h2><p>重新打开log文件<br> <img src="/2018/08/29/server/000-nginx-begin/003.png"></p>
+<h2 id="quit"><a href="#quit" class="headerlink" title="quit"></a>quit</h2><p>优雅的关闭<br> <img src="/2018/08/29/server/000-nginx-begin/004.png"></p>
+<h2 id="stop"><a href="#stop" class="headerlink" title="stop"></a>stop</h2><p>快速关闭<br> <img src="/2018/08/29/server/000-nginx-begin/005.png"></p>
+<h2 id="quit和stop的区别"><a href="#quit和stop的区别" class="headerlink" title="quit和stop的区别"></a>quit和stop的区别</h2><p>quit：相当于发送SIGQUIT信号，等待nginx工作线程完成才退出，很友好；<br>stop：相当于发送SIGTERM信号，要你强制退出。<br><img src="/2018/08/29/server/000-nginx-begin/006.png"></p>
+<h2 id="查看状态"><a href="#查看状态" class="headerlink" title="查看状态"></a>查看状态</h2> <img src="/2018/08/29/server/000-nginx-begin/007.png">
+<p><a href="https://nginx.org/en/docs/control.html" target="_blank" rel="noopener">https://nginx.org/en/docs/control.html</a></p>
+<h1 id="配置文件结构"><a href="#配置文件结构" class="headerlink" title="配置文件结构"></a>配置文件结构</h1><p><a href="https://docs.nginx.com/nginx/admin-guide/basic-functionality/managing-configuration-files/" target="_blank" rel="noopener">https://docs.nginx.com/nginx/admin-guide/basic-functionality/managing-configuration-files/</a></p>
+<p>nginx由模块组成，这些模块由配置文件中指定的指令控制。 指令分为简单指令和块指令。 一个简单的指令包括由空格分隔的名称和参数，以分号（;）结尾。 块指令与简单指令具有相同的结构，但它不是以分号结尾，而是以大括号（{和}）包围的一组附加指令结束。 如果块指令在大括号内包含其他指令，则称为上下文（示例：events，http，server和location）。</p>
+<p>放置在任何上下文之外的配置文件中的指令被认为是在主上下文中。 事件和http指令驻留在主上下文中，服务器位于http中，位于服务器中。</p>
+<p>＃符号后面的其余部分被视为评论。</p>
+<p>我来翻译翻译上面的话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">主上下文</span><br><span class="line">模块</span><br><span class="line">	简单指令 ;</span><br><span class="line">	块指令&#123;&#125;</span><br><span class="line">		包含简单指令</span><br><span class="line">		形成上下文(context)</span><br><span class="line"># 评论</span><br></pre></td></tr></table></figure></p>
+<p>下面是分别描述</p>
+<h2 id="指令"><a href="#指令" class="headerlink" title="指令"></a>指令</h2><p>以分号结尾的命令，包含在块中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">user             nobody;</span><br><span class="line">error_log        logs/error.log notice;</span><br><span class="line">worker_processes 1;</span><br></pre></td></tr></table></figure></p>
+<h2 id="指定配置文件地址"><a href="#指定配置文件地址" class="headerlink" title="指定配置文件地址"></a>指定配置文件地址</h2><p>nginx.conf可以包含单个模块的配置文件引用，配置文件位于/etc/nginx/conf.d<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">include conf.d/http;</span><br><span class="line">include conf.d/stream;</span><br><span class="line">include conf.d/exchange-enhanced;</span><br></pre></td></tr></table></figure></p>
+<h2 id="上下文"><a href="#上下文" class="headerlink" title="上下文"></a>上下文</h2><p>一般来说有几种context:</p>
+<ol>
+<li>events:通用连接处理</li>
+<li>http:HTTP流量相关</li>
+<li>mail：邮件流量相关</li>
+<li>stream：TCP和UDP流量相关 </li>
+</ol>
+<h2 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">user nobody; # a directive in the 'main' context</span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    # configuration of connection processing</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    # Configuration specific to HTTP and affecting all virtual servers  </span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        # configuration of HTTP virtual server 1       </span><br><span class="line">        location /one &#123;</span><br><span class="line">            # configuration for processing URIs starting with '/one'</span><br><span class="line">        &#125;</span><br><span class="line">        location /two &#123;</span><br><span class="line">            # configuration for processing URIs starting with '/two'</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    </span><br><span class="line">    server &#123;</span><br><span class="line">        # configuration of HTTP virtual server 2</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">stream &#123;</span><br><span class="line">    # Configuration specific to TCP/UDP and affecting all virtual servers</span><br><span class="line">    server &#123;</span><br><span class="line">        # configuration of TCP virtual server 1 </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="服务静态内容"><a href="#服务静态内容" class="headerlink" title="服务静态内容"></a>服务静态内容</h1><p>首先，我们会用到2个模块：http和server<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    server &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后再server里定义location指令，指定根路径和image路径<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">server &#123;</span><br><span class="line">        location / &#123;</span><br><span class="line">            root /mnt/e/data/www;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        location /images &#123;</span><br><span class="line">            root /mnt/e/data;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>看下完整配置：<br> <img src="/2018/08/29/server/000-nginx-begin/008.png"></p>
+<p>看下我们的静态资源：</p>
+<img src="/2018/08/29/server/000-nginx-begin/009.png">
+<p>如果nginx在运行，需要重新加载下配置：<br> <img src="/2018/08/29/server/000-nginx-begin/010.png"></p>
+<p>结果：<br>默认是在80端口</p>
+ <img src="/2018/08/29/server/000-nginx-begin/011.png">
+<img src="/2018/08/29/server/000-nginx-begin/012.png">
+<img src="/2018/08/29/server/000-nginx-begin/013.png">
+<h1 id="设置一个简单的代理服务器"><a href="#设置一个简单的代理服务器" class="headerlink" title="设置一个简单的代理服务器"></a>设置一个简单的代理服务器</h1><p>这个例子将会在一个nginx配置文件里配置多个服务器，只是端口号不同而已。<br>看完整配置：</p>
+ <img src="/2018/08/29/server/000-nginx-begin/014.png">
+<p>看下文件目录：</p>
+<img src="/2018/08/29/server/000-nginx-begin/015.png">
+<p>重新加载配置。</p>
+<p>我们访问被代理的8080服务器，没问题：</p>
+ <img src="/2018/08/29/server/000-nginx-begin/016.png">
+<p>访问代理服务器80端口也可以：</p>
+ <img src="/2018/08/29/server/000-nginx-begin/017.png">
+<p>接下来是关键：8080下没有静态资源的，只有代理服务器上有：</p>
+ <img src="/2018/08/29/server/000-nginx-begin/018.png">
+ <img src="/2018/08/29/server/000-nginx-begin/019.png">
+<p>这就完成了一个简单的CDN服务器配置。</p>
+<h1 id="接下来学什么"><a href="#接下来学什么" class="headerlink" title="接下来学什么"></a>接下来学什么</h1><p>也就是作为nginx管理员要学什么，也就是nginx可以做什么，也就是闲的无聊，下面就是了：</p>
+<ol>
+<li>负载均衡：HTTP，TCP/UDP</li>
+<li>内容缓存：CDN等</li>
+<li>Web服务器：静态或动态的</li>
+<li>安全控制</li>
+<li>监控：log，活动等</li>
+<li>高可用：你懂的</li>
+<li>动态模块：cookie，GEOIP，Filter，JS等</li>
+<li>邮件代理服务器</li>
+</ol>
+<p>其实上述涉及了一个核心概念：代理。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>这是nginx的入门一文。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/08/29/server/000-nginx-begin/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/08/29/server/000-nginx-begin/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjyp5ayy100l317chygxgmlbv" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-cloudcompute/014-docker-network" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/07/cloudcompute/014-docker-network/" class="article-date">
@@ -157,7 +458,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjynpjinz002nh2ch5klp7n0k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjyp5ayqd002p17chjh0048lk" class="article-share-link">
           Share
         </a>
         
@@ -267,7 +568,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjynpjiny002kh2chxzk4b7sz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjyp5ayqc002n17chmcdaqeml" class="article-share-link">
           Share
         </a>
         
@@ -351,7 +652,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjynpjinx002hh2ch0pbz2tq9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjyp5ayqb002k17chfk6tl04f" class="article-share-link">
           Share
         </a>
         
@@ -455,7 +756,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjynpjinx002fh2cho100l5x8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjyp5ayqa002j17ch3skj2ft1" class="article-share-link">
           Share
         </a>
         
@@ -541,12 +842,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjynpjivq00mhh2chc0tuhfdm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjyp5ayyl00mx17ch9hrasyaf" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -641,7 +942,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjynpjinw002ch2chgw1k8n4g" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjyp5ayqa002h17chf6eybynv" class="article-share-link">
           Share
         </a>
         
@@ -731,7 +1032,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjynpjinw002bh2chq65onyjs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjyp5ayq9002f17chfe7gjkco" class="article-share-link">
           Share
         </a>
         
@@ -854,12 +1155,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjynpjios004yh2chxdigj2p5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjyp5ayrj006917chgl99pepu" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -971,7 +1272,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjynpjinu0027h2ch0a3gzwww" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjyp5ayq8002c17chg8oksehv" class="article-share-link">
           Share
         </a>
         
@@ -1080,7 +1381,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjynpjinv0029h2ch6fji97p0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjyp5ayq7002717chzbrkyjmt" class="article-share-link">
           Share
         </a>
         
@@ -1160,12 +1461,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjynpjitl00fnh2ch9nrutqsx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjyp5ayw400fk17chfclo0i3w" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">23</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">24</span></li></ul>
 
       </footer>
       </div>
@@ -1236,7 +1537,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjynpjiud00i6h2chuyxp97hq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjyp5aywz00ic17chxr1azrto" class="article-share-link">
           Share
         </a>
         
@@ -1345,12 +1646,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/23/java/003-design-pattern-type/" data-id="cjynpjioq004uh2ch0uuq7izx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/23/java/003-design-pattern-type/" data-id="cjyp5ayrj006717ch59d7my5w" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -1438,7 +1739,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/22/js/001-npms/" data-id="cjynpjit300dvh2choes4khlb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/22/js/001-npms/" data-id="cjyp5ayr3004s17chex303f4y" class="article-share-link">
           Share
         </a>
         
@@ -1640,12 +1941,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/21/elasticsearch/005-all-know/" data-id="cjynpjiod003sh2ch93g36kol" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/21/elasticsearch/005-all-know/" data-id="cjyp5ayqs003u17chndewn3aa" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -1732,7 +2033,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/11/cloudcompute/006-nova01/" data-id="cjynpjint0024h2chb846au88" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/11/cloudcompute/006-nova01/" data-id="cjyp5ayq7002917ch40fulloi" class="article-share-link">
           Share
         </a>
         
@@ -1820,12 +2121,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/01/java/002-jconsole/" data-id="cjynpjioq004vh2chl453owj0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/01/java/002-jconsole/" data-id="cjyp5ayri006517ch2wowdmq9" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">77</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
 
       </footer>
       </div>
@@ -1914,195 +2215,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/30/cloudcompute/015-virtualbox-install-openstack/" data-id="cjynpjinz002lh2ch6z80a1tn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/06/30/cloudcompute/015-virtualbox-install-openstack/" data-id="cjyp5ayqd002r17ch81est1y0" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-life/000-open-new-life" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/26/life/000-open-new-life/" class="article-date">
-  <time datetime="2018-06-26T05:51:55.000Z" itemprop="datePublished">2018-06-26</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/26/life/000-open-new-life/">打开新的人生路</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天是我在学校的最后一天,看起来还是那么平常.<br>整栋宿舍楼的楼梯间都是废纸屑,看着倍感凄凉.<br>天气也很配合的变成了吹着冷风的阴天.<br>刷着注销的一卡通再也进不去图书馆.<br>低年级的同学们奋力备考.<br>这是新征途的开始.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>今天是我在学校的最后一天,看起来还是那么平常.<br>整栋宿舍楼的楼梯间都是废纸屑,看着倍感凄凉.<br>天气也很配合的变成了吹着冷风的阴天.<br>刷着注销的一卡通再也进不去图书馆.<br>低年级的同学们奋力备考.<br>这是新征途的开始.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/06/26/life/000-open-new-life/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/06/26/life/000-open-new-life/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/26/life/000-open-new-life/" data-id="cjynpjiti00fdh2ch0d69xjk9" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">23</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/013-linux-backup" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/21/linux/013-linux-backup/" class="article-date">
-  <time datetime="2018-06-21T05:51:55.000Z" itemprop="datePublished">2018-06-21</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/21/linux/013-linux-backup/">linux-backup</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文讲述备份系统要注意哪些方面．<br>关于重装系统应该做什么参看：<a href="http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" target="_blank" rel="noopener">build-linux</a>,<a href="http://jimolonely.github.io/2018/07/19/linux/001-linux-manjaro/" target="_blank" rel="noopener">manjaro-build</a></p>
-<h1 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h1><p>能同步的就同步了，不需要拷贝，比如以下的数据:</p>
-<ol>
-<li>浏览器书签：使用chrome或firefox都是可以的.</li>
-<li>云同步：比如百度云，坚果云等．推荐坚果云，速度快，实时同步．</li>
-</ol>
-<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>一般我的重要代码都是同步到github，重装系统前确定所有github项目都已经同步．</p>
-<h1 id="重要数据"><a href="#重要数据" class="headerlink" title="重要数据"></a>重要数据</h1><p>以下目录需要查看：</p>
-<ol>
-<li>book</li>
-<li>software: democross,idea-pro(恢复时需要构建path)</li>
-<li>VirtualBox VMs: 里面的虚拟机需要备份</li>
-<li><p>workspace: 注意备份myblog. 其结构如下：</p>
-<img src="/2018/06/21/linux/013-linux-backup/000.png">
-<img src="/2018/06/21/linux/013-linux-backup/001.png">
-</li>
-<li><p>视频,图片，文档</p>
-</li>
-</ol>
-<h1 id="软件"><a href="#软件" class="headerlink" title="软件"></a>软件</h1><ol>
-<li>wps</li>
-<li>keepassx2</li>
-<li>vim</li>
-<li>vs</li>
-<li>nutstore</li>
-<li>VYM</li>
-<li>dbeaver</li>
-<li>idea,pycharm</li>
-<li>wechat</li>
-</ol>
-<p>另外：</p>
-<ol>
-<li>git 需要配置ssh登录</li>
-<li>maven和pip需要配置镜像</li>
-</ol>
-<p><strong>便签：　内容需要同步</strong></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文讲述备份系统要注意哪些方面．<br>关于重装系统应该做什么参看：<a href="http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" target="_blank" rel="noopener">build-linux</a>,<a href="http://jimolonely.github.io/2018/07/19/linux/001-linux-manjaro/" target="_blank" rel="noopener">manjaro-build</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/06/21/linux/013-linux-backup/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/06/21/linux/013-linux-backup/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/21/linux/013-linux-backup/" data-id="cjynpjiuc00i4h2chiin4cm47" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
 
       </footer>
       </div>
@@ -2139,7 +2257,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2161,6 +2279,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/07/30/android/001-android-webdav-client/">android web-dav client</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/29/life/025-weekly-learn/">2019-31-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/07/28/java/055-java-webdav-client/">java实现web-dav客户端</a>
           </li>
         
@@ -2170,14 +2296,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/25/java/053-jdk-javac-compile/">javac源码编译到认识编译过程</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
           </li>
         
       </ul>
