@@ -86,6 +86,102 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/009-write-my-own-os" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/02/linux/009-write-my-own-os/" class="article-date">
+  <time datetime="2018-04-02T02:04:45.000Z" itemprop="datePublished">2018-04-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/02/linux/009-write-my-own-os/">写自己的操作系统1</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>从零写自己的操作系统.</p>
+<h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>来自youtube上一位腼腆的牛人推出的<a href="http://wyoos.org/" target="_blank" rel="noopener">视频</a>.</p>
+<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><p>完成一个自己的系统的iso文件,在屏幕上打印一句话,效果如下:</p>
+<img src="/2018/04/02/linux/009-write-my-own-os/000.png">
+<h1 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h1><ol>
+<li>makefle</li>
+<li>ASM汇编</li>
+<li>链接</li>
+<li>C++</li>
+</ol>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>types.h: 声明数据类型<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> __TYPES_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __TYPES_H</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">char</span>                     <span class="keyword">int8_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">char</span>           <span class="keyword">uint8_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">short</span>                   <span class="keyword">int16_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">short</span>         <span class="keyword">uint16_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span>                     <span class="keyword">int32_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">int</span>           <span class="keyword">uint32_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="keyword">int</span>           <span class="keyword">int64_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="keyword">uint64_t</span>;</span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+<p>kernel.cpp:打印逻辑<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"types.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printf</span><span class="params">(<span class="keyword">char</span>* str)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">uint16_t</span>* VideoMemory = (<span class="keyword">uint16_t</span>*)<span class="number">0xb8000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; str[i] != <span class="string">'\0'</span>; ++i)</span><br><span class="line">        VideoMemory[i] = (VideoMemory[i] &amp; <span class="number">0xFF00</span>) | str[i];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*constructor)</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> constructor start_ctors;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> constructor end_ctors;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">callConstructors</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(constructor* i = &amp;start_ctors; i != &amp;end_ctors; i++)</span><br><span class="line">        (*i)();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">kernelMain</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* multiboot_structure, <span class="keyword">uint32_t</span> <span class="comment">/*multiboot_magic*/</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Hello World! --- jimo - OS1"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>loader.s:从硬件启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">.set MAGIC, 0x1badb002</span><br><span class="line">.set FLAGS, (1&lt;&lt;0 | 1&lt;&lt;1)</span><br><span class="line">.set CHECKSUM, -(MAGIC + FLAGS)</span><br><span class="line"></span><br><span class="line">.section .multiboot</span><br><span class="line">    .long MAGIC</span><br><span class="line">    .long FLAGS</span><br><span class="line">    .long CHECKSUM</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.section .text</span><br><span class="line">.extern kernelMain</span><br><span class="line">#.extern callConstructors</span><br><span class="line">.global loader</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">loader:</span><br><span class="line">    mov $kernel_stack, %esp</span><br><span class="line">    call callConstructors</span><br><span class="line">    push %eax</span><br><span class="line">    push %ebx</span><br><span class="line">    call kernelMain</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">_stop:</span><br><span class="line">    cli</span><br><span class="line">    hlt</span><br><span class="line">    jmp _stop</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.section .bss</span><br><span class="line">.space 2*1024*1024; # 2 MiB</span><br><span class="line">kernel_stack:</span><br></pre></td></tr></table></figure></p>
+<p>linker.ld:用于链接,手写<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">ENTRY(loader)</span><br><span class="line">OUTPUT_FORMAT(elf32-i386)</span><br><span class="line">OUTPUT_ARCH(i386:i386)</span><br><span class="line"></span><br><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">  . = 0x0100000;</span><br><span class="line"></span><br><span class="line">  .text :</span><br><span class="line">  &#123;</span><br><span class="line">    *(.multiboot)</span><br><span class="line">    *(.text*)</span><br><span class="line">    *(.rodata)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .data  :</span><br><span class="line">  &#123;</span><br><span class="line">    start_ctors = .;</span><br><span class="line">    KEEP(*( .init_array ));</span><br><span class="line">    KEEP(*(SORT_BY_INIT_PRIORITY( .init_array.* )));</span><br><span class="line">    end_ctors = .;</span><br><span class="line"></span><br><span class="line">    *(.data)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .bss  :</span><br><span class="line">  &#123;</span><br><span class="line">    *(.bss)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /DISCARD/ : &#123; *(.fini_array*) *(.comment) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>makefile:方便make<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">GCCPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore</span><br><span class="line">ASPARAMS = --32</span><br><span class="line">LDPARAMS = -melf_i386</span><br><span class="line"></span><br><span class="line">objects = loader.o kernel.o</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">%.o: %.cpp</span></span><br><span class="line">	gcc <span class="variable">$(GCCPARAMS)</span> -c -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">%.o: %.s</span></span><br><span class="line">	as <span class="variable">$(ASPARAMS)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">mykernel.bin: linker.ld <span class="variable">$(objects)</span></span></span><br><span class="line">	ld <span class="variable">$(LDPARAMS)</span> -T <span class="variable">$&lt;</span> -o <span class="variable">$@</span> <span class="variable">$(objects)</span></span><br><span class="line"></span><br><span class="line"><span class="section">install: mykernel.bin</span></span><br><span class="line">	sudo cp <span class="variable">$&lt;</span> /boot/mykernel.bin</span><br><span class="line"></span><br><span class="line"><span class="section">mykernel.iso: mykernel.bin</span></span><br><span class="line">	rm -rf iso</span><br><span class="line">	mkdir iso</span><br><span class="line">	mkdir iso/boot</span><br><span class="line">	mkdir iso/boot/grub</span><br><span class="line">	cp mykernel.bin iso/boot/mykernel.bin</span><br><span class="line">	echo 'set timeout=0'                      &gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo 'set default=0'                     &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo ''                                  &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo 'menuentry <span class="string">"My Operating System"</span> &#123;' &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '  multiboot /boot/mykernel.bin'    &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '  boot'                            &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '&#125;'                                 &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">	rm -rf iso</span><br><span class="line"></span><br><span class="line"><span class="section">run: mykernel.iso</span></span><br><span class="line">	(killall VirtualBox &amp;&amp; sleep 1) || true</span><br><span class="line">	VirtualBox --startvm 'my-os' &amp;</span><br></pre></td></tr></table></figure></p>
+<h1 id="编译与链接"><a href="#编译与链接" class="headerlink" title="编译与链接"></a>编译与链接</h1><p>1.编译cpp<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make kernel.o</span><br><span class="line">gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -c -o kernel.o kernel.cpp</span><br><span class="line">kernel.cpp: 在函数‘void kernelMain(const void*, uint32_t)’中:</span><br><span class="line">kernel.cpp:26:41: 警告：ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]</span><br><span class="line">     printf("Hello World! --- jimo - OS1");</span><br></pre></td></tr></table></figure></p>
+<p>2.编译loader<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make loader.o</span><br><span class="line">as --32 -o loader.o loader.s</span><br><span class="line">loader.s: Assembler messages:</span><br><span class="line">loader.s: 警告：end of file not at end of a line; newline inserted</span><br></pre></td></tr></table></figure></p>
+<p>3.链接<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make mykernel.bin</span><br><span class="line">gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -c -o kernel.o kernel.cpp</span><br><span class="line">kernel.cpp: 在函数‘void kernelMain(const void*, unsigned int)’中:</span><br><span class="line">kernel.cpp:24:41: 警告：ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]</span><br><span class="line">     printf("Hello World! --- jimo - OS1");</span><br><span class="line">                                         ^</span><br><span class="line">ld -melf_i386 -T linker.ld -o mykernel.bin loader.o kernel.o</span><br></pre></td></tr></table></figure></p>
+<p>4.制作ISO文件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make mykernel.iso</span><br><span class="line">rm -rf iso</span><br><span class="line">mkdir iso</span><br><span class="line">mkdir iso/boot</span><br><span class="line">mkdir iso/boot/grub</span><br><span class="line">cp mykernel.bin iso/boot/mykernel.bin</span><br><span class="line">echo 'set timeout=0'                      &gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo 'set default=0'                     &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo ''                                  &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo 'menuentry "My Operating System" &#123;' &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '  multiboot /boot/mykernel.bin'    &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '  boot'                            &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '&#125;'                                 &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">xorriso 1.4.8 : RockRidge filesystem manipulator, libburnia project.</span><br><span class="line"></span><br><span class="line">Drive current: -outdev 'stdio:mykernel.iso'</span><br><span class="line">Media current: stdio file, overwriteable</span><br><span class="line">Media status : is blank</span><br><span class="line">Media summary: 0 sessions, 0 data blocks, 0 data, 25.7g free</span><br><span class="line">Added to ISO image: directory '/'='/tmp/grub.lWPSfY'</span><br><span class="line">xorriso : UPDATE : 633 files added in 1 seconds</span><br><span class="line">Added to ISO image: directory '/'='/home/jimo/workspace/temp/os/iso'</span><br><span class="line">xorriso : UPDATE : 637 files added in 1 seconds</span><br><span class="line">xorriso : NOTE : Copying to System Area: 512 bytes from file '/usr/lib/grub/i386-pc/boot_hybrid.img'</span><br><span class="line">ISO image produced: 8831 sectors</span><br><span class="line">Written to medium : 8831 sectors at LBA 0</span><br><span class="line">Writing to 'stdio:mykernel.iso' completed successfully.</span><br><span class="line"></span><br><span class="line">rm -rf iso</span><br></pre></td></tr></table></figure></p>
+<p>如果这一步出现错误,比如没有xorriso,那么请安装<a href="https://dev.lovelyhq.com/libburnia" target="_blank" rel="noopener">libisoburn</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">grub-mkrescue：错误： xorriso not found.</span><br></pre></td></tr></table></figure></p>
+<p>这时当前目录下有iso文件了:</p>
+<img src="/2018/04/02/linux/009-write-my-own-os/001.png">
+<p>5.导入虚拟机新建就ok了.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>从零写自己的操作系统.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/02/linux/009-write-my-own-os/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/02/linux/009-write-my-own-os/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjysja7gf00its3chl927zluc" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-shell/001-shell-common-use" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/01/shell/001-shell-common-use/" class="article-date">
@@ -160,7 +256,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/01/shell/001-shell-common-use/" data-id="cjyr643mw00fj3fchhid6410f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/01/shell/001-shell-common-use/" data-id="cjysja7hi00m7s3chsoxl88c4" class="article-share-link">
           Share
         </a>
         
@@ -245,7 +341,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjyr643iu00283fch44qudlq5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjysja7ae002os3chcaq0c148" class="article-share-link">
           Share
         </a>
         
@@ -329,7 +425,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjyr643it00263fched2emrb4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjysja7ad002ms3chs8nu4sfj" class="article-share-link">
           Share
         </a>
         
@@ -406,7 +502,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjyr643j300323fchzwhb60dv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjysja7a4001os3chd5n9nm08" class="article-share-link">
           Share
         </a>
         
@@ -532,7 +628,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjyr643n900gr3fch2bbsoblv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjysja7hx00ngs3chnuf2nele" class="article-share-link">
           Share
         </a>
         
@@ -637,7 +733,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjyr643is00213fchlgoy7nv9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjysja7ad002ks3chz5ff90zl" class="article-share-link">
           Share
         </a>
         
@@ -723,7 +819,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjyr643mj00eb3fchskn4jbky" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjysja7h100krs3chytstj5c0" class="article-share-link">
           Share
         </a>
         
@@ -801,12 +897,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjyr643jp004u3fchyuaucrhx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjysja7bh005zs3chg6l7l4ar" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
 
       </footer>
       </div>
@@ -885,12 +981,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/001-junit-design-pattern/" data-id="cjyr643jo004q3fch4rtsjg20" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/001-junit-design-pattern/" data-id="cjysja7bj0064s3chufvecemr" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/junit/">junit</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/junit/">junit</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -960,7 +1056,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjyr643jc003t3fch4leni19n" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjysja7ap003qs3ch7m6guiif" class="article-share-link">
           Share
         </a>
         
@@ -1054,7 +1150,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjyr643jd003v3fchf9ban28d" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjysja7aq003us3chbphucmo8" class="article-share-link">
           Share
         </a>
         
@@ -1138,7 +1234,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjyr643jb003r3fchwg3uwq6a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjysja7ao003ns3chpfayvm6z" class="article-share-link">
           Share
         </a>
         
@@ -1214,7 +1310,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjyr643ku008r3fchxh8d1zhv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjysja7b5004ws3chwd9mvoa2" class="article-share-link">
           Share
         </a>
         
@@ -1315,7 +1411,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjyr643mk00ef3fch1i0ak3e0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjysja7gz00kms3chub977iiz" class="article-share-link">
           Share
         </a>
         
@@ -1408,7 +1504,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjyr643jb003o3fchf7lhdsrm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjysja7ao003ps3chxu5fil6t" class="article-share-link">
           Share
         </a>
         
@@ -1493,7 +1589,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjyr643ja003k3fchin9046ss" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjysja7an003ms3ch0itidyrj" class="article-share-link">
           Share
         </a>
         
@@ -1589,7 +1685,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjyr643l000973fchbl8d51jm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjysja7b90059s3ch46haakyp" class="article-share-link">
           Share
         </a>
         
@@ -1668,7 +1764,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjyr643hv00053fchki4zid2l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjysja78v0008s3chlbu6grsd" class="article-share-link">
           Share
         </a>
         
@@ -1747,96 +1843,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjyr643kz00953fch0tka7evp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjysja7b70050s3ch0dbngu8q" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ant/">ant</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-lang/000-groovy" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/06/lang/000-groovy/" class="article-date">
-  <time datetime="2018-03-06T01:18:25.000Z" itemprop="datePublished">2018-03-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/06/lang/000-groovy/">Groovy必经之路</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这种胶水脚本语言不得不了解.</p>
-<h1 id="Groovy简介"><a href="#Groovy简介" class="headerlink" title="Groovy简介"></a>Groovy简介</h1><p>官网首页说得很清楚:<a href="http://groovy-lang.org" target="_blank" rel="noopener">http://groovy-lang.org</a></p>
-<p>apache groovy是一种强大的，可选择的类型和动态语言，具有静态类型和静态编译功能，适用于java平台，旨在通过简洁，熟悉和易于学习的语法提高开发人员的生产力。<br>它可以与任何Java程序顺利集成，并立即为您的应用程序提供强大的功能，包括脚本功能，特定领域的语言创作，运行时和编译时元编程和函数式编程.</p>
-<h1 id="Groovy如何学习"><a href="#Groovy如何学习" class="headerlink" title="Groovy如何学习"></a>Groovy如何学习</h1><p>将官网的例子全部跑一遍就ok了:</p>
-<ol>
-<li><p><a href="http://groovy-lang.org/documentation.html#gettingstarted" target="_blank" rel="noopener">http://groovy-lang.org/documentation.html#gettingstarted</a></p>
-</li>
-<li><p><a href="http://groovy-lang.org/differences.html" target="_blank" rel="noopener">Groovy与Java的区别</a></p>
-</li>
-<li><a href="https://www.ibm.com/developerworks/cn/education/java/j-groovy/j-groovy.html" target="_blank" rel="noopener">IBM写的教程也可以</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这种胶水脚本语言不得不了解.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/06/lang/000-groovy/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/06/lang/000-groovy/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjyr643l0009a3fchh8ymn4sd" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groovy/">groovy</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ant/">ant</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
 
       </footer>
       </div>
@@ -1849,7 +1861,7 @@ ga('send', 'pageview');
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/11/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/13/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/11/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/13/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -1873,7 +1885,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1882,7 +1894,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
     </div>
   </div>
 
@@ -1893,6 +1905,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/08/01/java/056-mybatis-generate-plugin/">mybatis生成插件</a>
+          </li>
         
           <li>
             <a href="/2019/07/30/android/001-android-webdav-client/">android web-dav client</a>
@@ -1908,10 +1924,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/28/tools/017-pandoc/">强大的pandoc</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
           </li>
         
       </ul>

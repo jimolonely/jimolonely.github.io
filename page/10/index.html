@@ -86,6 +86,303 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-lang/003-redis-datatype" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/31/lang/003-redis-datatype/" class="article-date">
+  <time datetime="2018-08-31T06:10:00.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/31/lang/003-redis-datatype/">redis数据类型</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>Redis不是普通的键值存储，它实际上是一个数据结构服务器，支持不同类型的值。 这意味着，在传统的键值存储中，您将字符串键与字符串值相关联，在Redis中，值不仅限于简单的字符串，还可以包含更复杂的数据结构。 以下是Redis支持的所有数据结构的列表，本教程将单独介绍它们：</p>
+<ul>
+<li>安全的二进制字符串。</li>
+<li>列表：根据插入顺序排序的字符串元素的集合。它们基本上是链表。</li>
+<li>集合：唯一的未排序字符串元素的集合。</li>
+<li>排序集(sorted set)，类似于集，但每个字符串元素与浮点数值相关联，称为分数。元素总是按其分数排序，因此与集合不同，可以检索一系列元素（例如，您可能会问：给我前10个，或者下10个）。</li>
+<li>散列，是由与值相关联的字段组成的映射。字段和值都是字符串。这与Ruby或Python哈希非常相似。</li>
+<li>位数组（或简称位图）：可以使用特殊命令处理字符串值，如位数组：您可以设置和清除各个位，将所有位设置为1，查找第一组或未设置位，等等。</li>
+<li>HyperLogLogs：这是一个概率数据结构，用于估计集合的基数。不要害怕，它比看起来更简单…请参阅本教程的HyperLogLog部分。</li>
+</ul>
+<h1 id="Redis-Keys"><a href="#Redis-Keys" class="headerlink" title="Redis Keys"></a>Redis Keys</h1><p>Redis键是二进制安全的，这意味着您可以使用任何二进制序列作为键，从“foo”这样的字符串到JPEG文件的内容。空字符串也是有效键。</p>
+<p>关于键的一些其他规则：</p>
+<ul>
+<li>很长的Key不是一个好主意。例如，1024字节的key不仅是内存方面的坏主意，而且因为在数据集中查找key可能需要几次昂贵的key比较。即使当前的任务是匹配大值的存在，hash它（例如使用SHA1）也是一个更好的主意，特别是从内存和带宽的角度来看。</li>
+<li>非常短的键往往不是一个好主意。如果您可以改写“user：1000：followers”，那么将“u1000flw”写为关键字几乎没有意义。前者更易读，与key和值使用的空间相比，增加的空间较小。虽然短键显然会消耗更少的内存，但您的工作就是找到合适的平衡点。</li>
+<li>尝试坚持使用架构。例如，“object-type：id”是一个好主意，如“user：1000”。点或短划线通常用于多字词字段，如“comment：1234：reply.to”或“comment：1234：reply-to”。</li>
+<li>允许的最大key大小为512 MB。</li>
+</ul>
+<h1 id="Redis-Strings"><a href="#Redis-Strings" class="headerlink" title="Redis Strings"></a>Redis Strings</h1><p>Redis String类型是可以与Redis密钥关联的最简单的值类型。 它是Memcached中唯一的数据类型，因此对于新手来说，在Redis中使用它也是非常自然的。</p>
+<p>由于Redis键是字符串，当我们使用字符串类型作为值时，我们将字符串映射到另一个字符串。 字符串数据类型对许多用例很有用，例如缓存HTML片段或页面。</p>
+<p>让我们使用redis-cli对字符串类型进行一些操作（所有示例都将在本教程中通过redis-cli执行）。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; set mykey somevalue</span><br><span class="line">OK</span><br><span class="line">&gt; get mykey</span><br><span class="line">&quot;somevalue&quot;</span><br></pre></td></tr></table></figure></p>
+<p>正如您所看到的，使用SET和GET命令是我们设置和检索字符串值的方式。 请注意，即使key与非字符串值相关联，SET也将替换已存在于key中的任何现有值。 所以SET执行一项赋值任务。</p>
+<p>值可以是各种字符串（包括二进制数据），例如，您可以将jpeg图像存储在值中。 值不能大于512 MB。</p>
+<p>SET命令有一些有趣的选项，它们作为附加参数提供。 例如，如果key已经存在，我可能会要求SET失败，或者相反(如果key存在也能成功）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; set mykey newval xx # 只有mykey存在(exist)才会成功，所以失败了</span><br><span class="line">(nil)</span><br><span class="line">&gt; set mykey newval nx # mykey不存在(not exist)也会成功，默认就是</span><br><span class="line">OK</span><br></pre></td></tr></table></figure></p>
+<p>即使字符串是Redis的基本值，也可以使用它们执行有趣的操作。 例如，一个是原子增量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; set counter 100</span><br><span class="line">OK</span><br><span class="line">&gt; incr counter</span><br><span class="line">(integer) 101</span><br><span class="line">&gt; incr counter</span><br><span class="line">(integer) 102</span><br><span class="line">&gt; incrby counter 50</span><br><span class="line">(integer) 152</span><br></pre></td></tr></table></figure></p>
+<p>INCR命令将字符串值解析为整数，将其递增1，最后将获取的值设置为新值。还有其他类似的命令，如INCRBY，DECR和DECRBY。在内部，它始终是相同的命令，以稍微不同的方式运作。</p>
+<p>INCR是原子的意味着什么？即使是针对相同key发布INCR的多个客户端也不会进入竞争状态。例如，客户端1读取“10”和客户端2同时读取“10”，两者都增加到11，并将新值设置为11 永远不会发生. 并且当所有其他客户端不同时执行读取命令时或执行增量设置操作，最终值将始终为12。</p>
+<p>有许多用于操作字符串的命令。例如，GETSET命令将键设置为新值，并将旧值作为结果返回。例如，如果您的系统在每次网站收到新访问者时使用INCR递增Redis key，则可以使用此命令。您可能希望每小时收集一次此信息，而不会丢失一个增量。您可以GETSET键，为其指定新值“0”并返回旧值。</p>
+<p>在单个命令中设置或检索多个键的值的能力对于减少延迟也是有用的。 因此，有MSET和MGET命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; mset a 10 b 20 c 30</span><br><span class="line">OK</span><br><span class="line">&gt; mget a b c</span><br><span class="line">1) &quot;10&quot;</span><br><span class="line">2) &quot;20&quot;</span><br><span class="line">3) &quot;30&quot;</span><br></pre></td></tr></table></figure></p>
+<h1 id="修改和查询key空间"><a href="#修改和查询key空间" class="headerlink" title="修改和查询key空间"></a>修改和查询key空间</h1><p>有些命令没有在特定类型上定义，但是为了与键的空间交互很有用，因此可以与任何类型的键一起使用。</p>
+<p>例如，EXISTS命令返回1或0以表示数据库中是否存在给定键，而DEL命令删除键和关联值，无论值是什么。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; set mykey hello</span><br><span class="line">OK</span><br><span class="line">&gt; exists mykey</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; del mykey</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; exists mykey</span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure></p>
+<p>从示例中，您还可以看到DEL本身如何返回1或0，具体取决于key是否被删除（它是否存在）（没有具有该名称的key）。</p>
+<p>有许多与key空间相关的命令，但上面两个是与TYPE命令一起必不可少的命令，它返回存储在指定键中的值的类型：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; set mykey x</span><br><span class="line">OK</span><br><span class="line">&gt; type mykey</span><br><span class="line">string</span><br><span class="line">&gt; del mykey</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; type mykey</span><br><span class="line">none</span><br></pre></td></tr></table></figure></p>
+<h1 id="Redis到期：生存时间有限的key"><a href="#Redis到期：生存时间有限的key" class="headerlink" title="Redis到期：生存时间有限的key"></a>Redis到期：生存时间有限的key</h1><p>在继续使用更复杂的数据结构之前，我们需要讨论另一个无论值类型如何都能工作的特性，并称为Redis过期。 您可以为key设置超时，这是一个有限的生存时间。 当生存时间过去时，key会自动销毁，就像用户使用key调用DEL命令一样。</p>
+<p>关于Redis到期的一些快速信息：</p>
+<ul>
+<li>它们可以使用秒或毫秒精度进行设置。</li>
+<li>但是，到期时间分辨率始终为1毫秒。</li>
+<li>有关过期的信息将被复制并保留在磁盘上，当Redis服务器保持停止时，这个时间实际上会消失（这意味着Redis会在key即将过期时保存key过期的日期）。</li>
+</ul>
+<p>设置过期是很容易的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; set key some-value</span><br><span class="line">OK</span><br><span class="line">&gt; expire key 5</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; get key (immediately)</span><br><span class="line">&quot;some-value&quot;</span><br><span class="line">&gt; get key (after some time)</span><br><span class="line">(nil)</span><br></pre></td></tr></table></figure></p>
+<p>两个GET调用之间的key消失了，因为第二个调用被延迟超过5秒。 在上面的示例中，我们使用EXPIRE来设置（它也可以用来设置一个已经有一个过期时间的键的不同过期时间，就像PERSIST可以用来删除过期时间并使key永久持久化）。 但是，我们也可以使用其他Redis命令创建过期密钥。 例如，使用SET选项：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; set key 100 ex 10</span><br><span class="line">OK</span><br><span class="line">&gt; ttl key</span><br><span class="line">(integer) 9</span><br></pre></td></tr></table></figure></p>
+<p>上面的示例设置一个字符串值为100的密钥，其过期为十秒。 稍后调用TTL命令以检查密钥的剩余生存时间。</p>
+<p>要以毫秒为单位设置和检查过期，请检查PEXPIRE和PTTL命令以及SET选项的完整列表。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set k jimo px 5000                                                               </span><br><span class="line">OK                                                                                               </span><br><span class="line">127.0.0.1:6379&gt; ttl k                                                                            </span><br><span class="line">(integer) 1                                                                                      </span><br><span class="line">127.0.0.1:6379&gt; ttl k                                                                            </span><br><span class="line">(integer) -2</span><br></pre></td></tr></table></figure>
+<h1 id="Redis列表"><a href="#Redis列表" class="headerlink" title="Redis列表"></a>Redis列表</h1><p>为了解释List数据类型，最好从一点理论开始，因为术语List经常被信息技术人员以不正当的方式使用。例如，“Python Lists”不是名称所暗示的（Linked Lists），而是Arrays（实际上相同的数据类型在Ruby中称为Array）。</p>
+<p>从非常一般的角度来看，List只是一系列有序元素：10,20,1,2,3 是一个列表。<strong>但是使用Array实现的List的属性与使用Linked List实现的List的属性非常不同</strong> 。</p>
+<p>Redis列表通过 <strong>Linked List</strong> 实现。这意味着即使列表中有数百万个元素，也会在常量时间内在列表的头部或尾部添加新元素。使用LPUSH命令将新元素添加到具有十个元素的列表头部的速度与将一个元素添加到具有1000万个元素的列表头部相同。</p>
+<p>有什么缺点？在使用Array（常量时间索引访问）实现的列表中，通过索引访问元素非常快，而在链接列表实现的列表中则不是那么快（其中操作需要与所访问元素的索引成比例的工作量）。</p>
+<p>Redis列表是使用 <strong>链表</strong> 实现的，因为对于数据库系统而言，能够以非常快的方式将元素添加到很长的列表中是至关重要的。正如您将在片刻中看到的那样，Redis Lists可以在恒定时间内以恒定长度获取。</p>
+<p>当快速访问大量元素集合的中间位置很重要时，可以使用不同的数据结构，称为排序集（sorted set）。排序集将在本教程后面介绍。</p>
+<h2 id="Redis列表的第一步"><a href="#Redis列表的第一步" class="headerlink" title="Redis列表的第一步"></a>Redis列表的第一步</h2><p>LPUSH命令将新元素添加到左侧（头部）的列表中，而RPUSH命令将新元素添加到右侧（尾部）的列表中。 最后，LRANGE命令从列表中提取元素范围：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; rpush mylist A</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; rpush mylist B</span><br><span class="line">(integer) 2</span><br><span class="line">&gt; lpush mylist first</span><br><span class="line">(integer) 3</span><br><span class="line">&gt; lrange mylist 0 -1</span><br><span class="line">1) &quot;first&quot;</span><br><span class="line">2) &quot;A&quot;</span><br><span class="line">3) &quot;B&quot;</span><br></pre></td></tr></table></figure></p>
+<p>请注意，LRANGE需要两个索引，即要返回的范围的第一个和最后一个元素。 两个索引都可以是负数，告诉Redis从结尾开始计数：所以-1是最后一个元素，-2是列表的倒数第二个元素，依此类推。</p>
+<p>如您所见，RPUSH附加了列表右侧的元素，而最后的LPUSH附加了左侧的元素。</p>
+<p>这两个命令都是可变参数命令，这意味着您可以在一次调用中将多个元素自由地推送到列表中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; rpush mylist 1 2 3 4 5 &quot;foo bar&quot;</span><br><span class="line">(integer) 9</span><br><span class="line">&gt; lrange mylist 0 -1</span><br><span class="line">1) &quot;first&quot;</span><br><span class="line">2) &quot;A&quot;</span><br><span class="line">3) &quot;B&quot;</span><br><span class="line">4) &quot;1&quot;</span><br><span class="line">5) &quot;2&quot;</span><br><span class="line">6) &quot;3&quot;</span><br><span class="line">7) &quot;4&quot;</span><br><span class="line">8) &quot;5&quot;</span><br><span class="line">9) &quot;foo bar&quot;</span><br></pre></td></tr></table></figure>
+<p>Redis列表中定义的一个重要操作是弹出元素的能力。 Popping元素是从列表中检索元素并同时从列表中删除元素的操作。 您可以从左侧和右侧弹出元素，类似于如何在列表的两侧推送元素：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; rpush mylist a b c</span><br><span class="line">(integer) 3</span><br><span class="line">&gt; rpop mylist</span><br><span class="line">&quot;c&quot;</span><br><span class="line">&gt; rpop mylist</span><br><span class="line">&quot;b&quot;</span><br><span class="line">&gt; rpop mylist</span><br><span class="line">&quot;a&quot;</span><br></pre></td></tr></table></figure></p>
+<p>我们添加了三个元素并弹出了三个元素，因此在这个命令序列的末尾，列表为空，并且没有更多元素可以弹出。 如果我们尝试弹出另一个元素，这就是我们得到的结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; rpop mylist</span><br><span class="line">(nil)</span><br></pre></td></tr></table></figure></p>
+<p>Redis返回NULL值以表示列表中没有元素。</p>
+<h2 id="列表的常见用例"><a href="#列表的常见用例" class="headerlink" title="列表的常见用例"></a>列表的常见用例</h2><p>列表对于许多任务很有用，两个非常有代表性的用例如下：</p>
+<ul>
+<li>记住用户发布到社交网络的最新更新。</li>
+<li>进程之间的通信，使用生产者将item推入列表的消费者 - 生产者模式，以及消费者（通常是工人）消费这些item和执行的操作。 Redis具有特殊的列表命令，使这个用例更加可靠和高效。</li>
+</ul>
+<p>例如，流行的Ruby库resque和sidekiq都使用Redis列表来实现后台作业。</p>
+<p>流行的Twitter社交网络将用户发布的最新推文收录到Redis列表中。</p>
+<p>要逐步描述常见用例，请假设您的主页显示在照片共享社交网络中发布的最新照片，并且您希望加快访问速度。</p>
+<ul>
+<li>每次用户发布新照片时，我们都会将其ID添加到带有LPUSH的列表中。</li>
+<li>当用户访问主页时，我们使用LRANGE 0 9来获取最新的10个帖子。</li>
+</ul>
+<h2 id="上限列表"><a href="#上限列表" class="headerlink" title="上限列表"></a>上限列表</h2><p>在许多用例中，我们只想使用列表来存储最新的项目，无论它们是什么：社交网络更新，日志或其他任何内容。</p>
+<p>Redis允许我们使用列表作为上限集合，只记住最新的N项并使用 <strong>LTRIM</strong> 命令丢弃所有最旧的项。</p>
+<p>LTRIM命令类似于LRANGE，但它不是显示指定范围的元素，而是将此范围设置为新列表值。 超出给定范围之外的所有元素。</p>
+<p>一个例子将使它更清楚：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; rpush mylist 1 2 3 4 5</span><br><span class="line">(integer) 5</span><br><span class="line">&gt; ltrim mylist 0 2</span><br><span class="line">OK</span><br><span class="line">&gt; lrange mylist 0 -1</span><br><span class="line">1) &quot;1&quot;</span><br><span class="line">2) &quot;2&quot;</span><br><span class="line">3) &quot;3&quot;</span><br></pre></td></tr></table></figure></p>
+<p>上面的LTRIM命令告诉Redis只从索引0到2中获取列表元素，其他所有内容都将被丢弃。 这允许一个非常简单但有用的模式：一起执行List推操作+ List修剪操作以添加新元素并丢弃超出限制的元素：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LPUSH mylist &lt;some element&gt;</span><br><span class="line">LTRIM mylist 0 999</span><br></pre></td></tr></table></figure></p>
+<p>上面的组合添加了一个新元素，并且只将1000个最新元素放入列表中。 使用LRANGE，您可以访问top items，而无需记住非常旧的数据。</p>
+<p><strong>注意：虽然LRANGE在技术上是一个O（N）命令，但是向列表的头部或尾部访问小范围是一个恒定时间操作</strong>。</p>
+<h2 id="列表阻塞操作"><a href="#列表阻塞操作" class="headerlink" title="列表阻塞操作"></a>列表阻塞操作</h2><p>列表具有使其适合实现队列的特殊功能，并且通常作为进程间通信系统的构建块：阻塞操作。</p>
+<p>想象一下，您希望使用一个流程将item推送到列表中，并使用不同的流程来实际对这些item进行某种工作。 这是通常的生产者/消费者设置，可以通过以下简单方式实现：</p>
+<ul>
+<li>要将项目推入列表，生产者调用LPUSH。</li>
+<li>要从列表中提取/处理项目，消费者会调用RPOP。</li>
+</ul>
+<p>但是有时候列表可能是空的并且没有任何东西可以处理，所以RPOP只返回NULL。 在这种情况下，消费者被迫等待一段时间并再次使用RPOP重试。 这称为 <strong>轮询</strong> ，在这种情况下不是一个好主意，因为它有几个缺点：</p>
+<ol>
+<li>强制Redis和客户端处理无用命令（当列表为空时所有请求都不会完成实际工作，它们只会返回NULL）。</li>
+<li>为item处理添加延迟，因为在工作程序收到NULL之后，它会等待一段时间。 为了使延迟更小，我们可以在对RPOP的呼叫之间等待更少，从而放大问题1的效果，即对Redis的无用呼叫。</li>
+</ol>
+<p>所以Redis实现了名为BRPOP和BLPOP的命令，它们是RPOP和LPOP的版本，如果列表为空则能够阻塞：只有当新元素添加到列表中时，或者当用户指定的超时时，它们才会返回调用者。</p>
+<p>这是我们可以在worker中使用的BRPOP调用的示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; brpop tasks 5</span><br><span class="line">1) &quot;tasks&quot;</span><br><span class="line">2) &quot;do_something&quot;</span><br></pre></td></tr></table></figure></p>
+<p>这意味着：“等待列表任务中的元素，但是如果5秒后没有元素可用则返回”。</p>
+<p>请注意，您可以使用0作为超时来永久等待元素，并且您还可以指定多个列表而不仅仅是一个，以便同时在多个列表上等待，并在第一个列表收到元素时收到通知。</p>
+<p>关于BRPOP的一些注意事项：</p>
+<ol>
+<li>客户端以有序的方式等待服务：阻塞列表的第一个客户端首先获得服务，以此类推。</li>
+<li>与RPOP相比，返回值是不同的：它是一个双元素数组，它还包含键的名称，因为BRPOP和BLPOP能够阻止等待来自多个列表的元素。</li>
+<li>如果达到超时，则返回NULL。</li>
+</ol>
+<p>关于列表和阻止操作，您应该了解更多内容。 我们建议您阅读以下内容：</p>
+<ul>
+<li>可以使用RPOPLPUSH构建更安全的队列或轮换队列。</li>
+<li>还有一个阻塞命令的变体，称为BRPOPLPUSH。</li>
+</ul>
+<p><strong><em>brpop: block rpop</em></strong></p>
+<h1 id="自动创建和删除key"><a href="#自动创建和删除key" class="headerlink" title="自动创建和删除key"></a>自动创建和删除key</h1><p>到目前为止，在我们的示例中，我们从不必在推送元素之前创建空列表，或者在内部不再包含元素时删除空列表。 Redis负责在列表为空时删除键，或者如果键不存在并且我们尝试向其添加元素，例如，使用LPUSH则创建空列表。</p>
+<p>这不是特定于列表，它适用于由多个元素组成的所有Redis数据类型 - 集合，排序集和散列。</p>
+<p>基本上我们可以用三个规则来概括行为：</p>
+<ol>
+<li>当我们向聚合数据类型添加元素时，如果目标键不存在，则在添加元素之前会创建空聚合数据类型。</li>
+<li>当我们从聚合数据类型中删除元素时，如果值保持为空，则会自动销毁该键。</li>
+<li>使用空键调用LLEN（返回列表长度）等只读命令或删除元素的写命令总是产生相同的结果，就好像键持有类型的空聚合类型一样 命令期望找到。</li>
+</ol>
+<p>规则1的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; del mylist</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; lpush mylist 1 2 3</span><br><span class="line">(integer) 3</span><br></pre></td></tr></table></figure></p>
+<p>但是，如果key存在，我们无法对错误的类型执行操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; set foo bar</span><br><span class="line">OK</span><br><span class="line">&gt; lpush foo 1 2 3</span><br><span class="line">(error) WRONGTYPE Operation against a key holding the wrong kind of value</span><br><span class="line">&gt; type foo</span><br><span class="line">string</span><br></pre></td></tr></table></figure></p>
+<p>规则2的示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; lpush mylist 1 2 3</span><br><span class="line">(integer) 3</span><br><span class="line">&gt; exists mylist</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; lpop mylist</span><br><span class="line">&quot;3&quot;</span><br><span class="line">&gt; lpop mylist</span><br><span class="line">&quot;2&quot;</span><br><span class="line">&gt; lpop mylist</span><br><span class="line">&quot;1&quot;</span><br><span class="line">&gt; exists mylist</span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure></p>
+<p>弹出所有元素后，键不再存在。</p>
+<p>规则3的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; del mylist</span><br><span class="line">(integer) 0</span><br><span class="line">&gt; llen mylist</span><br><span class="line">(integer) 0</span><br><span class="line">&gt; lpop mylist</span><br><span class="line">(nil)</span><br></pre></td></tr></table></figure></p>
+<h1 id="Redis-Hashes"><a href="#Redis-Hashes" class="headerlink" title="Redis Hashes"></a>Redis Hashes</h1><p>Redis哈希看起来正是人们可能期望使用字段值对来查看“哈希”：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt; hmset user:1000 username antirez birthyear 1977 verified 1</span><br><span class="line">OK</span><br><span class="line">&gt; hget user:1000 username</span><br><span class="line">&quot;antirez&quot;</span><br><span class="line">&gt; hget user:1000 birthyear</span><br><span class="line">&quot;1977&quot;</span><br><span class="line">&gt; hgetall user:1000</span><br><span class="line">1) &quot;username&quot;</span><br><span class="line">2) &quot;antirez&quot;</span><br><span class="line">3) &quot;birthyear&quot;</span><br><span class="line">4) &quot;1977&quot;</span><br><span class="line">5) &quot;verified&quot;</span><br><span class="line">6) &quot;1&quot;</span><br></pre></td></tr></table></figure></p>
+<p>虽然散列很方便表示对象，但实际上可以放入散列中的字段数没有实际限制（除了可用内存），因此您可以在应用程序中以多种不同方式使用散列。</p>
+<p>命令HMSET设置哈希的多个字段，而HGET检索单个字段。 HMGET类似于HGET，但返回一组值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; hmget user:1000 username birthyear no-such-field</span><br><span class="line">1) &quot;antirez&quot;</span><br><span class="line">2) &quot;1977&quot;</span><br><span class="line">3) (nil)</span><br></pre></td></tr></table></figure>
+<p>还有一些命令能够对各个字段执行操作，例如HINCRBY：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; hincrby user:1000 birthyear 10</span><br><span class="line">(integer) 1987</span><br><span class="line">&gt; hincrby user:1000 birthyear 10</span><br><span class="line">(integer) 1997</span><br></pre></td></tr></table></figure>
+<p>您可以在文档中找到哈希命令的完整列表。</p>
+<p>值得注意的是，小哈希（即，具有小值的少数元素）以特殊方式编码在存储器中，使得它们非常有效地存储。</p>
+<h1 id="Redis-Sets"><a href="#Redis-Sets" class="headerlink" title="Redis Sets"></a>Redis Sets</h1><p>Redis集是字符串的无序集合。 SADD命令将新元素添加到集合中。 也可以针对集合执行许多其他操作，例如测试给定元素是否已存在，执行多个集合之间的交集，并集或差异等等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; sadd myset 1 2 3</span><br><span class="line">(integer) 3</span><br><span class="line">&gt; smembers myset</span><br><span class="line">1. 3</span><br><span class="line">2. 1</span><br><span class="line">3. 2</span><br></pre></td></tr></table></figure>
+<p>在这里，我已经为我的集合添加了三个元素，并告诉Redis返回所有元素。 如您所见，它们没有排序 - Redis可以在每次调用时以任意顺序返回元素，因为没有与用户签订元素排序的合同。</p>
+<p>Redis有命令来测试成员属性。 例如，检查元素是否存在：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; sismember myset 3</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; sismember myset 30</span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure></p>
+<p>“3”是该组的成员，而“30”不是。</p>
+<p>集合适用于表示对象之间的关系。 例如，我们可以轻松使用集合来实现标签。</p>
+<p>对此问题进行建模的一种简单方法是为我们要标记的每个对象设置一个集合。 该集包含与该对象关联的标记的ID。</p>
+<p>一个例子是标记新闻文章。 如果文章ID 1000标记有标记1,2,5和77，则集合可以将这些标记ID与新闻项相关联：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; sadd news:1000:tags 1 2 5 77</span><br><span class="line">(integer) 4</span><br></pre></td></tr></table></figure></p>
+<p>我们也可能想要反向关系：用给定标签标记的所有新闻的列表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; sadd tag:1:news 1000</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; sadd tag:2:news 1000</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; sadd tag:5:news 1000</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; sadd tag:77:news 1000</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure></p>
+<p>获取给定对象的所有标记是微不足道的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; smembers news:1000:tags</span><br><span class="line">1. 5</span><br><span class="line">2. 1</span><br><span class="line">3. 77</span><br><span class="line">4. 2</span><br></pre></td></tr></table></figure></p>
+<p>注意：在示例中，我们假设您有另一个数据结构，例如Redis哈希，它将标记ID映射到标记名称。</p>
+<p>使用正确的Redis命令仍然可以轻松实现其他非平凡的操作。 例如，我们可能想要一起列出标签1,2,10和27的所有对象的列表。 我们可以使用SINTER命令执行此操作，该命令执行不同组之间的交集。 我们可以用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; sinter tag:1:news tag:2:news tag:10:news tag:27:news</span><br><span class="line">... results here ...</span><br></pre></td></tr></table></figure></p>
+<p>除了交集之外，您还可以执行联合，差集，提取随机元素等等。</p>
+<p>提取元素的命令称为SPOP，可以方便地模拟某些问题。 例如，为了实现基于网络的扑克游戏，您可能希望用set代表您的套牌。 想象一下，我们使用一个字符前缀（C）lubs，（D）iamonds，（H）earts，（S）pades：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;  sadd deck C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 CJ CQ CK</span><br><span class="line">   D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 DJ DQ DK H1 H2 H3</span><br><span class="line">   H4 H5 H6 H7 H8 H9 H10 HJ HQ HK S1 S2 S3 S4 S5 S6</span><br><span class="line">   S7 S8 S9 S10 SJ SQ SK</span><br><span class="line">   (integer) 52</span><br></pre></td></tr></table></figure>
+<p>现在我们想为每位玩家提供5张牌。 <strong>SPOP命令删除一个随机元素</strong>，将其返回给客户端，因此在这种情况下它是完美的操作。</p>
+<p>然而，如果我们直接在我们的牌组中调用它，在下一场比赛中我们将需要再次填充牌组，这可能并不理想。 因此，首先，我们可以将存储在卡片组中的集合的副本复制到game：1：deck。</p>
+<p>这是使用SUNIONSTORE完成的，SUNIONSTORE通常执行多个集合之间的并集，并将结果存储到另一个集合中。 但是，由于单个集合的结合本身，我可以复制我的套牌：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; sunionstore game:1:deck deck</span><br><span class="line">(integer) 52</span><br></pre></td></tr></table></figure></p>
+<p>现在我准备为第一位玩家提供五张牌：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; spop game:1:deck</span><br><span class="line">&quot;C6&quot;</span><br><span class="line">&gt; spop game:1:deck</span><br><span class="line">&quot;CQ&quot;</span><br><span class="line">&gt; spop game:1:deck</span><br><span class="line">&quot;D1&quot;</span><br><span class="line">&gt; spop game:1:deck</span><br><span class="line">&quot;CJ&quot;</span><br><span class="line">&gt; spop game:1:deck</span><br><span class="line">&quot;SJ&quot;</span><br></pre></td></tr></table></figure></p>
+<p>一对千斤顶，不是很好……</p>
+<p>现在是介绍set命令的好时机，该命令提供了一组内的元素数量。 这通常在集合论的上下文中称为集合的基数，因此Redis命令称为SCARD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; scard game:1:deck</span><br><span class="line">(integer) 47</span><br></pre></td></tr></table></figure>
+<p>数学运算：52 - 5 = 47。</p>
+<p>当您需要获取随机元素而不从集合中删除它们时，SRANDMEMBER命令适合该任务。 它还具有返回重复和非重复元素的能力。</p>
+<h1 id="Redis-sorted-set"><a href="#Redis-sorted-set" class="headerlink" title="Redis sorted set"></a>Redis sorted set</h1><p>排序集是一种数据类型，类似于Set和Hash之间的混合。 与集合一样，有序集合由唯一的，非重复的字符串元素组成，因此在某种意义上，有序集合也是一个集合。</p>
+<p>但是，虽然内部集合中的元素没有排序，但是有序集合中的每个元素都与浮点值相关联，称为分数（这就是为什么类型也类似于散列，因为每个元素都映射到一个值）。</p>
+<p>此外，排序集合中的元素按顺序排列（因此它们不是根据请求排序的，顺序是用于表示排序集合的数据结构的特性）。 它们按照以下规则排序：</p>
+<ol>
+<li>如果A和B是两个具有不同分数的元素，如果A.score是&gt; B.score ，那么A&gt; B。</li>
+<li>如果A和B具有完全相同的分数，那么如果A字符串在字典上大于B字符串，则A&gt; B. A和B字符串不能相等，因为有序集只有唯一元素。</li>
+</ol>
+<p>让我们从一个简单的例子开始，添加一些选定的黑客名称作为有序集合元素，其出生年份为“得分”。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&gt; zadd hackers 1940 &quot;Alan Kay&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1957 &quot;Sophie Wilson&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1953 &quot;Richard Stallman&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1949 &quot;Anita Borg&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1965 &quot;Yukihiro Matsumoto&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1914 &quot;Hedy Lamarr&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1916 &quot;Claude Shannon&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1969 &quot;Linus Torvalds&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd hackers 1912 &quot;Alan Turing&quot;</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure></p>
+<p>正如您所看到的，ZADD与SADD类似，但需要一个额外的参数（放在要添加的元素之前），这是分数。 ZADD也是可变参数，因此您可以自由指定多个得分-值对，即使在上面的示例中未使用它。</p>
+<p>对于排序集，返回按出生年份排序的黑客列表是微不足道的，因为实际上它们已经排序了。</p>
+<p>实现说明：排序集是通过包含跳过列表和散列表的双端口数据结构实现的，因此每次添加元素时，Redis都会执行O（log（N））操作。 这很好，但是当我们要求排序的元素时，Redis根本不需要做任何工作，它已经全部排序了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; zrange hackers 0 -1</span><br><span class="line">1) &quot;Alan Turing&quot;</span><br><span class="line">2) &quot;Hedy Lamarr&quot;</span><br><span class="line">3) &quot;Claude Shannon&quot;</span><br><span class="line">4) &quot;Alan Kay&quot;</span><br><span class="line">5) &quot;Anita Borg&quot;</span><br><span class="line">6) &quot;Richard Stallman&quot;</span><br><span class="line">7) &quot;Sophie Wilson&quot;</span><br><span class="line">8) &quot;Yukihiro Matsumoto&quot;</span><br><span class="line">9) &quot;Linus Torvalds&quot;</span><br></pre></td></tr></table></figure>
+<p>注意：0和-1表示从元素索引0到最后一个元素（-1就像在LRANGE命令的情况下一样工作）。</p>
+<p>如果我想以相反的方式排序它们，最小到最老的怎么办？ 使用ZREVRANGE而不是ZRANGE：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; zrevrange hackers 0 -1</span><br><span class="line">1) &quot;Linus Torvalds&quot;</span><br><span class="line">2) &quot;Yukihiro Matsumoto&quot;</span><br><span class="line">3) &quot;Sophie Wilson&quot;</span><br><span class="line">4) &quot;Richard Stallman&quot;</span><br><span class="line">5) &quot;Anita Borg&quot;</span><br><span class="line">6) &quot;Alan Kay&quot;</span><br><span class="line">7) &quot;Claude Shannon&quot;</span><br><span class="line">8) &quot;Hedy Lamarr&quot;</span><br><span class="line">9) &quot;Alan Turing&quot;</span><br></pre></td></tr></table></figure></p>
+<p>使用WITHSCORES参数也可以返回分数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&gt; zrange hackers 0 -1 withscores</span><br><span class="line">1) &quot;Alan Turing&quot;</span><br><span class="line">2) &quot;1912&quot;</span><br><span class="line">3) &quot;Hedy Lamarr&quot;</span><br><span class="line">4) &quot;1914&quot;</span><br><span class="line">5) &quot;Claude Shannon&quot;</span><br><span class="line">6) &quot;1916&quot;</span><br><span class="line">7) &quot;Alan Kay&quot;</span><br><span class="line">8) &quot;1940&quot;</span><br><span class="line">9) &quot;Anita Borg&quot;</span><br><span class="line">10) &quot;1949&quot;</span><br><span class="line">11) &quot;Richard Stallman&quot;</span><br><span class="line">12) &quot;1953&quot;</span><br><span class="line">13) &quot;Sophie Wilson&quot;</span><br><span class="line">14) &quot;1957&quot;</span><br><span class="line">15) &quot;Yukihiro Matsumoto&quot;</span><br><span class="line">16) &quot;1965&quot;</span><br><span class="line">17) &quot;Linus Torvalds&quot;</span><br><span class="line">18) &quot;1969&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Range操作"><a href="#Range操作" class="headerlink" title="Range操作"></a>Range操作</h2><p>排序集比这更强大。 他们可以在范围内操作。 让我们得到所有出生到1950年的人。 我们使用ZRANGEBYSCORE命令来执行此操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; zrangebyscore hackers -inf 1950</span><br><span class="line">1) &quot;Alan Turing&quot;</span><br><span class="line">2) &quot;Hedy Lamarr&quot;</span><br><span class="line">3) &quot;Claude Shannon&quot;</span><br><span class="line">4) &quot;Alan Kay&quot;</span><br><span class="line">5) &quot;Anita Borg&quot;</span><br></pre></td></tr></table></figure></p>
+<p>我们要求Redis以负无穷大和1950之间的分数返回所有元素（包括两个极值）。</p>
+<p>也可以删除元素范围。 让我们从排序集中删除1940年到1960年间出生的所有黑客：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; zremrangebyscore hackers 1940 1960</span><br><span class="line">(integer) 4</span><br></pre></td></tr></table></figure></p>
+<p>ZREMRANGEBYSCORE可能不是最好的命令名，但它可能非常有用，并返回已删除元素的数量。</p>
+<p>为有序集元素定义的另一个非常有用的操作是get-rank操作。 可以询问有序元素集中元素的位置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; zrank hackers &quot;Anita Borg&quot;</span><br><span class="line">(integer) 4</span><br></pre></td></tr></table></figure>
+<p>考虑到按降序排序的元素，ZREVRANK命令也可用于获得排名。</p>
+<h1 id="词典分数"><a href="#词典分数" class="headerlink" title="词典分数"></a>词典分数</h1><p>使用Redis 2.8的最新版本，引入了一个新功能，允许按字典顺序获取范围，假设排序集中的元素都插入了相同的相同分数（元素与C memcmp函数进行比较，每个Redis实例都将使用相同的输出进行回复）。</p>
+<p>使用词典范围操作的主要命令是ZRANGEBYLEX，ZREVRANGEBYLEX，ZREMRANGEBYLEX和ZLEXCOUNT。</p>
+<p>例如，让我们再次添加我们的着名黑客列表，但这次使用所有元素的得分为零：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; zadd hackers 0 &quot;Alan Kay&quot; 0 &quot;Sophie Wilson&quot; 0 &quot;Richard Stallman&quot; 0</span><br><span class="line">  &quot;Anita Borg&quot; 0 &quot;Yukihiro Matsumoto&quot; 0 &quot;Hedy Lamarr&quot; 0 &quot;Claude Shannon&quot;</span><br><span class="line">  0 &quot;Linus Torvalds&quot; 0 &quot;Alan Turing&quot;</span><br></pre></td></tr></table></figure></p>
+<p>由于排序集排序规则，它们已经按字典顺序排序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; zrange hackers 0 -1</span><br><span class="line">1) &quot;Alan Kay&quot;</span><br><span class="line">2) &quot;Alan Turing&quot;</span><br><span class="line">3) &quot;Anita Borg&quot;</span><br><span class="line">4) &quot;Claude Shannon&quot;</span><br><span class="line">5) &quot;Hedy Lamarr&quot;</span><br><span class="line">6) &quot;Linus Torvalds&quot;</span><br><span class="line">7) &quot;Richard Stallman&quot;</span><br><span class="line">8) &quot;Sophie Wilson&quot;</span><br><span class="line">9) &quot;Yukihiro Matsumoto&quot;</span><br></pre></td></tr></table></figure>
+<p>使用ZRANGEBYLEX我们可以要求词典范围：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; zrangebylex hackers [B [P</span><br><span class="line">1) &quot;Claude Shannon&quot;</span><br><span class="line">2) &quot;Hedy Lamarr&quot;</span><br><span class="line">3) &quot;Linus Torvalds&quot;</span><br></pre></td></tr></table></figure></p>
+<p>范围可以是包含的或排他的（取决于第一个字符），字符串无限和负无限分别用+和 - 字符串指定。 有关更多信息，请参阅文档。</p>
+<p>此功能很重要，因为它允许我们使用有序集作为通用索引。 例如，如果要通过128位无符号整数参数索引元素，则需要做的就是将元素添加到具有相同分数的排序集中（例如0），但使用由128组成的16字节前缀 big endian中的位数。 由于big endian中的数字按字典顺序排列（以原始字节顺序排列）实际上也是按数字顺序排序的，因此可以在128位空间中请求范围，并获取元素的值以丢弃前缀。</p>
+<p>如果您想在更严肃的演示环境中查看该功能，请查看Redis自动完成演示。</p>
+<p><a href="http://autocomplete.redis.io/" target="_blank" rel="noopener">http://autocomplete.redis.io/</a></p>
+<h1 id="更新得分：排行榜"><a href="#更新得分：排行榜" class="headerlink" title="更新得分：排行榜"></a>更新得分：排行榜</h1><p>在切换到下一个主题之前，关于排序集的最后一个注释。 排序集的分数可以随时更新。 只针对已经包含在已排序集合中的元素调用ZADD将使用O（log（N））时间复杂度更新其得分（和位置）。 因此，当有大量更新时，排序集合是合适的。</p>
+<p>由于这个特性，常见的用例是排行榜。 典型的应用程序是一个Facebook游戏，您可以将用户按高分排序，加上排名操作，以显示前N个用户以及排行榜中的用户排名（例如，“ 你是这里＃4932的最佳成绩“）。</p>
+<h1 id="位图"><a href="#位图" class="headerlink" title="位图"></a>位图</h1><p>位图不是实际的数据类型，而是在String类型上定义的一组面向位的操作。 由于字符串是二进制安全blob，并且它们的最大长度为512 MB，因此它们适合设置232个不同的位。</p>
+<p>位操作分为两组：恒定时单位(single bit)操作，如将位设置为1或0，或获取其值，以及对位组进行操作，例如计算给定位范围内的设置位数 （例如，人口统计）。</p>
+<p>位图的最大优势之一是它们在存储信息时通常可以节省大量空间。 例如，在通过增量用户ID表示不同用户的系统中，可以使用仅512MB的存储器记住40亿用户的单个位信息（例如，知道用户是否想要接收新闻通讯）。</p>
+<p>使用SETBIT和GETBIT命令设置和检索位：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; setbit key 10 1</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; getbit key 10</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; getbit key 11</span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure>
+<p>SETBIT命令的第一个参数是位号，第二个参数是将该位设置为1或0的值。如果寻址位超出当前字符串长度，命令会自动放大字符串。</p>
+<p>GETBIT只返回指定索引处的位值。 超出范围的位（寻址存储在目标密钥中的字符串长度之外的位）始终被认为是零。</p>
+<p>有三组命令在一组位上运行：</p>
+<ol>
+<li>BITOP在不同的字符串之间执行逐位操作。 提供的操作是AND，OR，XOR和NOT。</li>
+<li>BITCOUNT执行填充计数，报告设置为1的位数。</li>
+<li>BITPOS查找具有指定值0或1的第一个位。</li>
+</ol>
+<p>BITPOS和BITCOUNT都能够以字符串的字节范围运行，而不是在字符串的整个长度上运行。 以下是BITCOUNT调用的一个简单示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; setbit key 0 1</span><br><span class="line">(integer) 0</span><br><span class="line">&gt; setbit key 100 1</span><br><span class="line">(integer) 0</span><br><span class="line">&gt; bitcount key</span><br><span class="line">(integer) 2</span><br></pre></td></tr></table></figure></p>
+<p>位图的常见用例是：</p>
+<ul>
+<li>各种实时分析。</li>
+<li>存储与对象ID关联的节省空间但高性能的布尔信息。</li>
+</ul>
+<p>例如，想象一下您想知道网站用户每日访问的最长连续性。 您开始计算从零开始的天数，即您将网站公开的日期，并在每次用户访问网站时使用SETBIT设置一些。 作为位索引，您只需获取当前的unix时间，减去初始偏移量，然后除以3600 * 24。</p>
+<p>这种方式对于每个用户，您都有一个包含每天访问信息的小字符串。 使用BITCOUNT可以轻松获得给定用户访问网站的天数，同时只需几次BITPOS调用，或者只是获取和分析位图客户端，就可以轻松计算出最长的条纹。</p>
+<p>位图很容易分割成多个键，例如为了分片数据集，因为通常最好避免使用大键。 要在不同的key上拆分位图而不是将所有的位都设置为key，一个简单的策略就是每个key存储M位并获得带有 位号/M 的key名称和第N位用于在key内部用位寻址 - 位号MOD M.</p>
+<h1 id="HyperLogLogs"><a href="#HyperLogLogs" class="headerlink" title="HyperLogLogs"></a>HyperLogLogs</h1><p>HyperLogLog是用于计算唯一事物的概率数据结构（从技术上讲，这被称为估计集合的基数）。通常计算唯一项目需要使用与您想要计算的项目数量成比例的内存量，因为您需要记住过去已经看过的元素，以避免多次计算它们。然而，有一组算法可以交换内存以获得精确度：以标准错误的估计度量结束，在Redis实现的情况下小于1％。这种算法的神奇之处在于你不再需要使用与计数项目数量成比例的内存量，而是可以使用恒定的内存量！在最坏的情况下12k字节，或者如果您的HyperLogLog（我们从现在开始称它们为HLL）已经看到的元素非常少，则要少得多。</p>
+<p>Redis中的HLL虽然在技术上是一种不同的数据结构，但是被编码为Redis字符串，因此您可以调用GET来序列化HLL，并使用SET将其反序列化回服务器。</p>
+<p>从概念上讲，HLL API就像使用Sets来执行相同的任务一样。 您可以将每个观察到的元素SADD到一个集合中，并使用SCARD来检查集合中的元素数量，这是唯一的，因为SADD不会重新添加现有元素。</p>
+<p>虽然您没有真正将项添加到HLL中，因为数据结构只包含不包含实际元素的状态，所以API是相同的：</p>
+<ul>
+<li>每次看到新元素时，都会使用PFADD将其添加到计数中。</li>
+<li>每次要检索到目前为止使用PFADD添加的唯一元素的当前近似值时，都使用PFCOUNT。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; pfadd hll a b c d</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; pfcount hll</span><br><span class="line">(integer) 4</span><br></pre></td></tr></table></figure>
+<p>此数据结构的用例示例是计算用户每天在搜索表单中执行的唯一查询。</p>
+<p>Redis还能够执行HLL的联合，请查看完整文档以获取更多信息。</p>
+<h1 id="其他值得注意的功能"><a href="#其他值得注意的功能" class="headerlink" title="其他值得注意的功能"></a>其他值得注意的功能</h1><p>Redis API中还有其他重要的内容无法在本文档的上下文中进行探讨，但值得您关注：</p>
+<ol>
+<li>可以递增地迭代大集合的key空间。</li>
+<li>可以运行Lua脚本服务器端来改善延迟和带宽。</li>
+<li>Redis也是Pub-Sub服务器。</li>
+</ol>
+<h1 id="接下来干什么"><a href="#接下来干什么" class="headerlink" title="接下来干什么"></a>接下来干什么</h1><p><a href="https://redis.io/topics/data-types-intro" target="_blank" rel="noopener">data-type</a><br><a href="https://redis.io/documentation" target="_blank" rel="noopener">DOC</a><br><a href="https://redis.io/topics/twitter-clone" target="_blank" rel="noopener">twitter</a><br><a href="https://redis.io/commands#cluster" target="_blank" rel="noopener">command</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>Redis不是普通的键值存储，它实际上是一个数据结构服务器，支持不同类型的值。 这意味着，在传统的键值存储中，您将字符串键与字符串值相关联，在Redis中，值不仅限于简单的字符串，还可以包含更复杂的数据结构。 以下是Redis支持的所有数据结构的列表，本教程将单独介绍它们：</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/08/31/lang/003-redis-datatype/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/08/31/lang/003-redis-datatype/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjysja7bg005us3chh6lfxhu0" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-server/001-nginx-http-load-balance" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/30/server/001-nginx-http-load-balance/" class="article-date">
@@ -234,7 +531,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjyr643ms00f73fchojm4jxlf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjysja7he00lvs3ch9ukvuq7a" class="article-share-link">
           Share
         </a>
         
@@ -373,7 +670,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjyr643mr00f23fchf9exqs3s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjysja7hd00lss3chea991em1" class="article-share-link">
           Share
         </a>
         
@@ -458,7 +755,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjyr643iz002n3fchuvqzffic" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjysja7ak0039s3chvgyup3qn" class="article-share-link">
           Share
         </a>
         
@@ -568,7 +865,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjyr643j0002s3fch9vkief4m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjysja7aj0038s3chhwik2rml" class="article-share-link">
           Share
         </a>
         
@@ -652,7 +949,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjyr643j0002q3fcheaikvbfo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjysja7aj0035s3cheypw08p3" class="article-share-link">
           Share
         </a>
         
@@ -756,7 +1053,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjyr643iy002l3fchcrm7d4fe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjysja7ai0033s3chqajf509k" class="article-share-link">
           Share
         </a>
         
@@ -842,12 +1139,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjyr643nb00gz3fchud53o9km" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjysja7i000nns3chn404dsq8" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
 
       </footer>
       </div>
@@ -942,7 +1239,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjyr643iy002j3fch24tbqnsg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjysja7ai0031s3chj31gw5mh" class="article-share-link">
           Share
         </a>
         
@@ -1032,7 +1329,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjyr643iw002g3fchor5s7t0w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjysja7ah002ys3ch3kwcinoo" class="article-share-link">
           Share
         </a>
         
@@ -1155,12 +1452,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjyr643jr004z3fchofvg0g66" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjysja7bj0066s3ch7zzeoldr" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
 
       </footer>
       </div>
@@ -1272,7 +1569,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjyr643ix002i3fchhuqh3ffe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjysja7ah0030s3chiz6bk8ih" class="article-share-link">
           Share
         </a>
         
@@ -1381,7 +1678,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjyr643iw002e3fch0uvuxwp3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjysja7ag002ws3cht38bbz9y" class="article-share-link">
           Share
         </a>
         
@@ -1461,7 +1758,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjyr643l900a03fchzqe0iodb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjysja7fj00g7s3chaqbhe152" class="article-share-link">
           Share
         </a>
         
@@ -1537,7 +1834,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjyr643ly00cd3fchrjkyztr6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjysja7gi00j5s3ch5k9kgucx" class="article-share-link">
           Share
         </a>
         
@@ -1646,12 +1943,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/23/java/003-design-pattern-type/" data-id="cjyr643jq004x3fch9lpt0mzg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/23/java/003-design-pattern-type/" data-id="cjysja7bk0069s3chzkafyf1o" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
 
       </footer>
       </div>
@@ -1739,7 +2036,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/22/js/001-npms/" data-id="cjyr643kr008j3fchqdp7n6nv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/22/js/001-npms/" data-id="cjysja7b5004vs3chhtfvecf1" class="article-share-link">
           Share
         </a>
         
@@ -1941,12 +2238,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/21/elasticsearch/005-all-know/" data-id="cjyr643jh00453fche5im2uqr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/21/elasticsearch/005-all-know/" data-id="cjysja7as0043s3chvw49djjb" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
 
       </footer>
       </div>
@@ -2033,7 +2330,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/11/cloudcompute/006-nova01/" data-id="cjyr643iv002b3fchpvmhloe3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/11/cloudcompute/006-nova01/" data-id="cjysja7af002ts3chkyua44jf" class="article-share-link">
           Share
         </a>
         
@@ -2121,106 +2418,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/01/java/002-jconsole/" data-id="cjyr643jp004s3fchwc67rdl9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/01/java/002-jconsole/" data-id="cjysja7bi0061s3chxauyvf5g" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">78</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-cloudcompute/015-virtualbox-install-openstack" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/30/cloudcompute/015-virtualbox-install-openstack/" class="article-date">
-  <time datetime="2018-06-30T05:51:55.000Z" itemprop="datePublished">2018-06-30</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/30/cloudcompute/015-virtualbox-install-openstack/">Virtualbox安装openstack</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="环境介绍"><a href="#环境介绍" class="headerlink" title="环境介绍"></a>环境介绍</h1><p>安装一个控制节点[4G+40G],计算节点[2G+20G]</p>
-<p>ubuntu16.04</p>
-<h1 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h1><p>控制节点配置3块网卡(一块用作通信,一块用作neturon通信,一块用作连接外网),如下:</p>
-<img src="/2018/06/30/cloudcompute/015-virtualbox-install-openstack/001.png">
-<p>计算节点配置2块网卡(不需要连接外网):<br><img src="/2018/06/30/cloudcompute/015-virtualbox-install-openstack/000.png"></p>
-<p>先修改root密码:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo su -</span><br><span class="line">[sudo] password for jimo:</span><br><span class="line">root@controller:~# passwd</span><br><span class="line">Enter new UNIX password:</span><br><span class="line">Retype new UNIX password:</span><br><span class="line">passwd:</span><br></pre></td></tr></table></figure></p>
-<h2 id="配置SSH"><a href="#配置SSH" class="headerlink" title="配置SSH"></a>配置SSH</h2><p>在controller查看ip:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ip r</span><br></pre></td></tr></table></figure></p>
-<p>然后在主机中通过ssh访问:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh jimo@192.168.0.104</span><br></pre></td></tr></table></figure></p>
-<p>允许root用户SSH访问:<br>编辑配置文件: /etc/ssh/sshd_config:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure></p>
-<p>记得重启ssh服务</p>
-<h2 id="配置IP"><a href="#配置IP" class="headerlink" title="配置IP"></a>配置IP</h2><p>其中一块配置静态IP,其他交给openstack.<br>编辑 /etc/network/interfaces:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> interfaces(5) file used by ifup(8) and ifdown(8)</span><br><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line">auto enp0s3</span><br><span class="line">iface enp0s3 inet static</span><br><span class="line">address 192.168.0.10</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 192.168.0.1</span><br><span class="line">dns-nameservers 192.168.0.1</span><br><span class="line"></span><br><span class="line">auto enp0s8</span><br><span class="line">iface enp0s8 inet manual</span><br><span class="line"></span><br><span class="line">auto enp0s9</span><br><span class="line">iface enp0s9 inet manual</span><br></pre></td></tr></table></figure></p>
-<p>同样将计算节点也配置成这样,IP为20.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">auto lo</span><br><span class="line">iface lo inet loopback</span><br><span class="line"></span><br><span class="line">auto enp0s3</span><br><span class="line">iface enp0s3 inet static</span><br><span class="line">address 192.168.0.20</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 192.168.0.1</span><br><span class="line">dns-nameservers 192.168.0.1</span><br><span class="line"></span><br><span class="line">auto enp0s8</span><br><span class="line">iface enp0s8 inet manual</span><br></pre></td></tr></table></figure></p>
-<p>现在相互间应该可以ping通,控制节点可以访问网络.</p>
-<h1 id="安装openstack"><a href="#安装openstack" class="headerlink" title="安装openstack"></a>安装openstack</h1><p>我们使用<a href="https://docs.openstack.org/devstack/latest/" target="_blank" rel="noopener">devstack</a></p>
-<p>保证有pip和git<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install python-pip</span><br><span class="line"><span class="meta">$</span> sudo apt install git</span><br></pre></td></tr></table></figure></p>
-<p>创建stack用户并获取devstack:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">jimo@controller:~$ sudo useradd -s /bin/bash -d /opt/stack -m stack</span><br><span class="line">[sudo] password for jimo: </span><br><span class="line">jimo@controller:~$ echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack</span><br><span class="line">stack ALL=(ALL) NOPASSWD: ALL</span><br><span class="line">jimo@controller:~$ sudo su - stack</span><br><span class="line">stack@controller:~$ pwd</span><br><span class="line">/opt/stack</span><br><span class="line">stack@controller:~$ ls</span><br><span class="line">examples.desktop</span><br><span class="line">stack@controller:~$ git clone https://git.openstack.org/openstack-dev/devstack</span><br><span class="line">Cloning into 'devstack'...</span><br><span class="line">remote: Counting objects: 41926, done.</span><br><span class="line">remote: Compressing objects: 100% (20930/20930), done.</span><br><span class="line">remote: Total 41926 (delta 29730), reused 32028 (delta 20336)</span><br><span class="line">Receiving objects: 100% (41926/41926), 8.51 MiB | 969.00 KiB/s, done.</span><br><span class="line">Resolving deltas: 100% (29730/29730), done.</span><br><span class="line">Checking connectivity... done.</span><br><span class="line">stack@controller:~$ cd devstack/</span><br><span class="line">stack@controller:~/devstack$</span><br></pre></td></tr></table></figure></p>
-<p>同时更换root和stack用户的pip源,切换到stack用户并更换pip源为豆瓣的:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> su - stack</span><br><span class="line">root@controller:~# su - stack</span><br><span class="line">stack@controller:~$ mkdir .pip</span><br><span class="line">stack@controller:~$ cd .pip/</span><br><span class="line">stack@controller:~/.pip$ vim pip.conf</span><br><span class="line">stack@controller:~/.pip$ cat pip.conf </span><br><span class="line">[global]</span><br><span class="line">index-url =https://pypi.douban.com/simple/</span><br><span class="line">download_cache = ~/.cache/pip</span><br><span class="line">[install]</span><br><span class="line">use-mirrors =true </span><br><span class="line">mirrors =http://pypi.douban.com/simple/ </span><br><span class="line">trusted-host =pypi.douban.com</span><br></pre></td></tr></table></figure></p>
-<p>接着在devstack目录下创建local.conf文件,内容如下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[[local|localrc]]</span><br><span class="line"></span><br><span class="line">MULTI_HOST=true</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> management &amp; api network</span><br><span class="line">HOST_IP=192.168.0.10</span><br><span class="line">LOGFILE=/opt/stack/logs/stack.sh.log</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Credentials</span><br><span class="line">ADMIN_PASSWORD=1234</span><br><span class="line">MYSQL_PASSWORD=1234</span><br><span class="line">RABBIT_PASSWORD=1234</span><br><span class="line">SERVICE_PASSWORD=1234</span><br><span class="line">SERVICE_TOKEN=abcdefghijklmnopqrstuvwxyz</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> enable neutron-ml2-vlan</span><br><span class="line">disable_service n-net</span><br><span class="line">enable_service q-svc,q-agt,q-dhcp,q-l3,q-meta,neutron,q-lbaas,q-fwaas</span><br><span class="line">Q_AGENT=linuxbridge</span><br><span class="line">ENABLE_TENANT_VLANS=True</span><br><span class="line">TENANT_VLAN_RANGE=3001:4000</span><br><span class="line">PHYSICAL_NETWORK=default</span><br><span class="line"></span><br><span class="line">LOG_COLOR=True</span><br><span class="line">LOGDIR=$DEST/logs</span><br><span class="line">SCREEN_LOGDIR=$LOGDIR/screen</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> use TryStack git mirror</span><br><span class="line">GIT_BASE=http://git.trystack.cn</span><br><span class="line">NOVNC_REPO=http://git.trystack.cn/kanaka/noVNC.git</span><br><span class="line">SPICE_REPO=http://git.trystack.cn/git/spice/spice-html5.git</span><br></pre></td></tr></table></figure></p>
-<p>然后就可以执行stack.sh了.</p>
-<p>计算节点的配置:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">[[local|localrc]]</span><br><span class="line"></span><br><span class="line">MULTI_HOST=true</span><br><span class="line"><span class="meta">#</span> management &amp; api network</span><br><span class="line">HOST_IP=192.168.0.20</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Credentials</span><br><span class="line">ADMIN_PASSWORD=1234</span><br><span class="line">MYSQL_PASSWORD=1234</span><br><span class="line">RABBIT_PASSWORD=1234</span><br><span class="line">SERVICE_PASSWORD=1234</span><br><span class="line">SERVICE_TOKEN=abcdefghijklmnopqrstuvwxyz</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Service information</span><br><span class="line">SERVICE_HOST=192.168.0.10</span><br><span class="line">MYSQL_HOST=$SERVICE_HOST</span><br><span class="line">RABBIT_HOST=$SERVICE_HOST</span><br><span class="line">GLANCE_HOSTPORT=$SERVICE_HOST:9292</span><br><span class="line">Q_HOST=$SERVICE_HOST</span><br><span class="line">KEYSTONE_AUTH_HOST=$SERVICE_HOST</span><br><span class="line">KEYSTONE_SERVICE_HOST=$SERVICE_HOST</span><br><span class="line"></span><br><span class="line">ENABLED_SERVICES=n-cpu,q-agt,neutron</span><br><span class="line">Q_AGENT=linuxbridge</span><br><span class="line">ENABLE_TENANT_VLANS=True</span><br><span class="line">TENANT_VLAN_RANGE=3001:4000</span><br><span class="line">PHYSICAL_NETWORK=default</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> vnc config</span><br><span class="line">NOVA_VNC_ENABLED=True</span><br><span class="line">NOVNCPROXY_URL="http://$SERVICE_HOST:6080/vnc_auto.html"</span><br><span class="line">VNCSERVER_LISTEN=$HOST_IP</span><br><span class="line">VNCSERVER_PROXYCLIENT_ADDRESS=$VNCSERVER_LISTEN</span><br><span class="line"></span><br><span class="line">LOG_COLOR=True</span><br><span class="line">LOGDIR=$DEST/logs</span><br><span class="line">SCREEN_LOGDIR=$LOGDIR/screen</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> use TryStack git mirror</span><br><span class="line">GIT_BASE=http://git.trystack.cn</span><br><span class="line">NOVNC_REPO=http://git.trystack.cn/kanaka/noVNC.git</span><br><span class="line">SPICE_REPO=http://git.trystack.cn/git/spice/spice-html5.git</span><br></pre></td></tr></table></figure></p>
-<p><strong>在虚拟机中不要关闭,休眠即可,因为下次还得重新执行stack.sh</strong></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="环境介绍"><a href="#环境介绍" class="headerlink" title="环境介绍"></a>环境介绍</h1><p>安装一个控制节点[4G+40G],计算节点[2G+20G]</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/06/30/cloudcompute/015-virtualbox-install-openstack/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/06/30/cloudcompute/015-virtualbox-install-openstack/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/06/30/cloudcompute/015-virtualbox-install-openstack/" data-id="cjyr643j1002u3fchnezwic2v" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
 
       </footer>
       </div>
@@ -2233,7 +2436,7 @@ ga('send', 'pageview');
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/9/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/11/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/9/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/11/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -2257,7 +2460,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 10.63px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2266,7 +2469,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
     </div>
   </div>
 
@@ -2277,6 +2480,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/08/01/java/056-mybatis-generate-plugin/">mybatis生成插件</a>
+          </li>
         
           <li>
             <a href="/2019/07/30/android/001-android-webdav-client/">android web-dav client</a>
@@ -2292,10 +2499,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/07/28/tools/017-pandoc/">强大的pandoc</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/27/java/054-why-need-thread-pool/">线程池的原理，为什么需要线程池</a>
           </li>
         
       </ul>
