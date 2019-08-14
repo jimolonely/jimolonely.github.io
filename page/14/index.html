@@ -86,6 +86,421 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-ai/000-perceptron" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/11/ai/000-perceptron/" class="article-date">
+  <time datetime="2018-01-11T07:38:42.000Z" itemprop="datePublished">2018-01-11</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/11/ai/000-perceptron/">神经元的实现</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将使用python实现一个神经元(感知器).</p>
+<p>本文来自<a href="https://www.zybuluo.com/hanbingtao/note/433855" target="_blank" rel="noopener">https://www.zybuluo.com/hanbingtao/note/433855</a></p>
+<p>理论请参考上文.下面是python2和3的实现</p>
+<h1 id="python2"><a href="#python2" class="headerlink" title="python2"></a>python2</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, input_num, activator)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        初始化感知器，设置输入参数的个数，以及激活函数。</span></span><br><span class="line"><span class="string">        激活函数的类型为double -&gt; double</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        self.activator = activator</span><br><span class="line">        <span class="comment"># 权重向量初始化为0</span></span><br><span class="line">        self.weights = [<span class="number">0.0</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(input_num)]</span><br><span class="line">        <span class="comment"># 偏置项初始化为0</span></span><br><span class="line">        self.bias = <span class="number">0.0</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        打印学习到的权重、偏置项</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'weights\t:%s\nbias\t:%f\n'</span> % (self.weights, self.bias)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, input_vec)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        输入向量，输出感知器的计算结果</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把input_vec[x1,x2,x3...]和weights[w1,w2,w3,...]打包在一起</span></span><br><span class="line">        <span class="comment"># 变成[(x1,w1),(x2,w2),(x3,w3),...]</span></span><br><span class="line">        <span class="comment"># 然后利用map函数计算[x1*w1, x2*w2, x3*w3]</span></span><br><span class="line">        <span class="comment"># 最后利用reduce求和</span></span><br><span class="line">        <span class="keyword">return</span> self.activator(</span><br><span class="line">            reduce(<span class="keyword">lambda</span> a, b: a + b,</span><br><span class="line">                   map(<span class="keyword">lambda</span> (x, w): x * w,  </span><br><span class="line">                       zip(input_vec, self.weights))</span><br><span class="line">                , <span class="number">0.0</span>) + self.bias)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self, input_vecs, labels, iteration, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        输入训练数据：一组向量、与每个向量对应的label；以及训练轮数、学习率</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(iteration):</span><br><span class="line">            self._one_iteration(input_vecs, labels, rate)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_one_iteration</span><span class="params">(self, input_vecs, labels, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        一次迭代，把所有的训练数据过一遍</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把输入和输出打包在一起，成为样本的列表[(input_vec, label), ...]</span></span><br><span class="line">        <span class="comment"># 而每个训练样本是(input_vec, label)</span></span><br><span class="line">        samples = zip(input_vecs, labels)</span><br><span class="line">        <span class="comment"># 对每个样本，按照感知器规则更新权重</span></span><br><span class="line">        <span class="keyword">for</span> (input_vec, label) <span class="keyword">in</span> samples:</span><br><span class="line">            <span class="comment"># 计算感知器在当前权重下的输出</span></span><br><span class="line">            output = self.predict(input_vec)</span><br><span class="line">            <span class="comment"># 更新权重</span></span><br><span class="line">            self._update_weights(input_vec, output, label, rate)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_weights</span><span class="params">(self, input_vec, output, label, rate)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        按照感知器规则更新权重</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># 把input_vec[x1,x2,x3,...]和weights[w1,w2,w3,...]打包在一起</span></span><br><span class="line">        <span class="comment"># 变成[(x1,w1),(x2,w2),(x3,w3),...]</span></span><br><span class="line">        <span class="comment"># 然后利用感知器规则更新权重</span></span><br><span class="line">        delta = label - output</span><br><span class="line">        self.weights = map(</span><br><span class="line">            <span class="keyword">lambda</span> (x, w): w + rate * delta * x,</span><br><span class="line">            zip(input_vec, self.weights))</span><br><span class="line">        <span class="comment"># 更新bias</span></span><br><span class="line">        self.bias += rate * delta</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    定义激活函数f</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_training_dataset</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    基于and真值表构建训练数据</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="comment"># 构建训练数据</span></span><br><span class="line">    <span class="comment"># 输入向量列表</span></span><br><span class="line">    input_vecs = [[<span class="number">1</span>,<span class="number">1</span>], [<span class="number">0</span>,<span class="number">0</span>], [<span class="number">1</span>,<span class="number">0</span>], [<span class="number">0</span>,<span class="number">1</span>]]</span><br><span class="line">    <span class="comment"># 期望的输出列表，注意要与输入一一对应</span></span><br><span class="line">    <span class="comment"># [1,1] -&gt; 1, [0,0] -&gt; 0, [1,0] -&gt; 0, [0,1] -&gt; 0</span></span><br><span class="line">    labels = [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]</span><br><span class="line">    <span class="keyword">return</span> input_vecs, labels    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_and_perceptron</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    使用and真值表训练感知器</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="comment"># 创建感知器，输入参数个数为2（因为and是二元函数），激活函数为f</span></span><br><span class="line">    p = Perceptron(<span class="number">2</span>, f)</span><br><span class="line">    <span class="comment"># 训练，迭代10轮, 学习速率为0.1</span></span><br><span class="line">    input_vecs, labels = get_training_dataset()</span><br><span class="line">    p.train(input_vecs, labels, <span class="number">10</span>, <span class="number">0.1</span>)</span><br><span class="line">    <span class="comment">#返回训练好的感知器</span></span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>: </span><br><span class="line">    <span class="comment"># 训练and感知器</span></span><br><span class="line">    and_perception = train_and_perceptron()</span><br><span class="line">    <span class="comment"># 打印训练获得的权重</span></span><br><span class="line">    <span class="keyword">print</span> and_perception</span><br><span class="line">    <span class="comment"># 测试</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'1 and 1 = %d'</span> % and_perception.predict([<span class="number">1</span>, <span class="number">1</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'0 and 0 = %d'</span> % and_perception.predict([<span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'1 and 0 = %d'</span> % and_perception.predict([<span class="number">1</span>, <span class="number">0</span>])</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'0 and 1 = %d'</span> % and_perception.predict([<span class="number">0</span>, <span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<h1 id="python3"><a href="#python3" class="headerlink" title="python3"></a>python3</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> reduce</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Perceptron</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, input_num, activator)</span>:</span></span><br><span class="line">        self.activator = activator</span><br><span class="line">        self.weights = [<span class="number">0.0</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(input_num)]</span><br><span class="line">        self.bias = <span class="number">0.0</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self, input_vec, iteration, labels, rate)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(iteration):</span><br><span class="line">            self._one_iteration(input_vec, labels, rate)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_one_iteration</span><span class="params">(self, input_vec, labels, rate)</span>:</span></span><br><span class="line">        samples = zip(input_vec, labels)</span><br><span class="line">        <span class="keyword">for</span> (vec, label) <span class="keyword">in</span> samples:</span><br><span class="line">            output = self.predict(vec)</span><br><span class="line">            self._update_weights(vec, output, label, rate)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, vec)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.activator(</span><br><span class="line">            reduce(</span><br><span class="line">                <span class="keyword">lambda</span> a, b: a + b,</span><br><span class="line">                list(map(</span><br><span class="line">                    <span class="keyword">lambda</span> x, w: x * w,</span><br><span class="line">                    vec, self.weights</span><br><span class="line">                )), <span class="number">0.0</span></span><br><span class="line">            ) + self.bias</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_update_weights</span><span class="params">(self, vec, output, label, rate)</span>:</span></span><br><span class="line">        delta = label - output</span><br><span class="line">        self.weights = list(map(</span><br><span class="line">            <span class="keyword">lambda</span> x, w: w + rate * delta * x,  <span class="comment"># 在python2里是用的(x,w)形式</span></span><br><span class="line">            vec, self.weights</span><br><span class="line">        ))</span><br><span class="line">        self.bias += rate * delta</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'weights: %s\nbias: %s\n'</span> % (self.weights, self.bias)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">activator</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_data_sets</span><span class="params">()</span>:</span></span><br><span class="line">    x = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">1</span>, <span class="number">0</span>], [<span class="number">1</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">0</span>]]</span><br><span class="line">    labels = [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>]</span><br><span class="line">    <span class="keyword">return</span> x, labels</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">()</span>:</span></span><br><span class="line">    p = Perceptron(<span class="number">2</span>, activator)</span><br><span class="line">    x, labels = get_data_sets()</span><br><span class="line">    p.train(x, <span class="number">20</span>, labels, <span class="number">0.05</span>)</span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    p = train()</span><br><span class="line">    print(p)</span><br><span class="line">    <span class="comment"># 测试</span></span><br><span class="line">    print(<span class="string">'1 and 1 = %d'</span> % p.predict([<span class="number">1</span>, <span class="number">1</span>]))</span><br><span class="line">    print(<span class="string">'0 and 0 = %d'</span> % p.predict([<span class="number">0</span>, <span class="number">0</span>]))</span><br><span class="line">    print(<span class="string">'1 and 0 = %d'</span> % p.predict([<span class="number">1</span>, <span class="number">0</span>]))</span><br><span class="line">    print(<span class="string">'0 and 1 = %d'</span> % p.predict([<span class="number">0</span>, <span class="number">1</span>]))</span><br></pre></td></tr></table></figure>
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">weights: [0.1, 0.05]</span><br><span class="line">bias: -0.1</span><br><span class="line"></span><br><span class="line">1 and 1 = 1</span><br><span class="line">0 and 0 = 0</span><br><span class="line">1 and 0 = 0</span><br><span class="line">0 and 1 = 0</span><br></pre></td></tr></table></figure>
+<p>其实上面就是梯度下降的过程.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将使用python实现一个神经元(感知器).</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/11/ai/000-perceptron/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/11/ai/000-perceptron/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjzav3pqw0005gnchwkprkggo" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/">AI</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-tools/002-speed-test" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/11/tools/002-speed-test/" class="article-date">
+  <time datetime="2018-01-11T01:34:41.000Z" itemprop="datePublished">2018-01-11</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/11/tools/002-speed-test/">如何测网速</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>有一些很简单的方法可以测网速,windows就不说了,360搞定,主要说下linux下.</p>
+<h1 id="1-通过web在线测试"><a href="#1-通过web在线测试" class="headerlink" title="1.通过web在线测试"></a>1.通过web在线测试</h1><p>访问<a href="http://www.speedtest.net/" target="_blank" rel="noopener">http://www.speedtest.net/</a></p>
+<p>点击Go即可.</p>
+<img src="/2018/01/11/tools/002-speed-test/000.png">
+<h1 id="2-通过命令"><a href="#2-通过命令" class="headerlink" title="2.通过命令"></a>2.通过命令</h1><p>不用那么麻烦,装一个speed-test命令搞定.</p>
+<h3 id="2-1-安装方法很多"><a href="#2-1-安装方法很多" class="headerlink" title="2.1 安装方法很多:"></a>2.1 安装方法很多:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pip install speedtest-cli</span><br><span class="line"></span><br><span class="line">easy_install speedtest-cli</span><br><span class="line"></span><br><span class="line">pip install git+https://github.com/sivel/speedtest-cli.git</span><br><span class="line">or</span><br><span class="line">git clone https://github.com/sivel/speedtest-cli.git</span><br><span class="line">python speedtest-cli/setup.py install</span><br><span class="line"></span><br><span class="line">wget -O speedtest-cli https://raw.github.com/sivel/speedtest-cli/master/speedtest_cli.py</span><br><span class="line">chmod +x speedtest-cli</span><br></pre></td></tr></table></figure>
+<h3 id="2-2-测试网速-直接用命令"><a href="#2-2-测试网速-直接用命令" class="headerlink" title="2.2 测试网速:直接用命令"></a>2.2 测试网速:直接用命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ speedtest-cli</span><br><span class="line">Retrieving speedtest.net configuration...</span><br><span class="line">Testing from China Education and Research Network Center (222.18.40.107)...</span><br><span class="line">Retrieving speedtest.net server list...</span><br><span class="line">Selecting best server based on ping...</span><br><span class="line">Hosted by University of Electronic Science and Technology of China (Chengdu) [0.92 km]: 11.835 ms</span><br><span class="line">Testing download speed................................................................................</span><br><span class="line">Download: 2.18 Mbit/s</span><br><span class="line">Testing upload speed......................................................................................................</span><br><span class="line">Upload: 6.14 Mbit/s</span><br></pre></td></tr></table></figure>
+<h3 id="2-3-将结果分享"><a href="#2-3-将结果分享" class="headerlink" title="2.3 将结果分享:"></a>2.3 将结果分享:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ speedtest-cli --share</span><br><span class="line">Retrieving speedtest.net configuration...</span><br><span class="line">Testing from China Education and Research Network Center (222.18.40.107)...</span><br><span class="line">Retrieving speedtest.net server list...</span><br><span class="line">Selecting best server based on ping...</span><br><span class="line">Hosted by University of Electronic Science and Technology of China (Chengdu) [0.92 km]: 8.673 ms</span><br><span class="line">Testing download speed................................................................................</span><br><span class="line">Download: 2.03 Mbit/s</span><br><span class="line">Testing upload speed......................................................................................................</span><br><span class="line">Upload: 6.47 Mbit/s</span><br><span class="line">Share results: http://www.speedtest.net/result/6954831465.png</span><br></pre></td></tr></table></figure>
+<p>访问链接查看结果:</p>
+<img src="/2018/01/11/tools/002-speed-test/001.png">
+<h3 id="2-4-查看所有服务"><a href="#2-4-查看所有服务" class="headerlink" title="2.4 查看所有服务"></a>2.4 查看所有服务</h3><p>后面是距离<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> speedtest-cli --list | head -n 10</span><br><span class="line">Retrieving speedtest.net configuration...</span><br><span class="line"> 4575) China Mobile Group Sichuan (Chengdu, China) [0.92 km]</span><br><span class="line">11444) University of Electronic Science and Technology of China (Chengdu, China) [0.92 km]</span><br><span class="line"> 2461) China Unicom (Chengdu, China) [0.92 km]</span><br><span class="line"> 4624) ChinaTelecom (Chengdu, China) [0.92 km]</span><br><span class="line"> 5726) China Unicom Chong Qing Branch (Chongqing, China) [270.20 km]</span><br><span class="line"> 5530) CCN (Chongqing, China) [270.20 km]</span><br><span class="line"> 3973) China Telecom (Lanzhou, China) [597.25 km]</span><br><span class="line"> 4690) China Unicom Lanzhou Branch Co.Ltd (Lanzhou, China) [597.25 km]</span><br><span class="line"> 5292) China Mobile Group Shaanxi Company Limited (Xi'an, China) [604.70 km]</span><br></pre></td></tr></table></figure></p>
+<p>其他用法查看帮助.</p>
+<p>另外:上面的单位是Mbit,而不是MB,这两个相差了8倍的关系,所以我的下载速度是很慢的(300KB左右),因为被限速了…</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>有一些很简单的方法可以测网速,windows就不说了,360搞定,主要说下linux下.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/11/tools/002-speed-test/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/11/tools/002-speed-test/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjzav3pwc00gignchgv3wy44k" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-hadoop/000-config-environment" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/hadoop/000-config-environment/" class="article-date">
+  <time datetime="2018-01-10T08:57:35.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/hadoop/000-config-environment/">配置hadoop环境变量</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="http://ftp.cuhk.edu.hk/pub/packages/apache.org/hadoop/common/current/hadoop-3.0.0.tar.gz" target="_blank" rel="noopener">下载</a><br>完后的hadoop需要配置各个组件的的环境变量.</p>
+<p>参考<a href="https://wiki.apache.org/hadoop/HowToSetupYourDevelopmentEnvironment" target="_blank" rel="noopener">wiki-hadoop</a></p>
+<h1 id="在linux中"><a href="#在linux中" class="headerlink" title="在linux中"></a>在linux中</h1><p>一般作为开发环境才需要配置.</p>
+<p>以前是这样,打开.bashrc或者.bash_profile<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_COMMON_HOME=xxx/hadoop-2.9.0/share/hadoop/common</span><br><span class="line">export HADOOP_HDFS_HOME=xxx/hadoop-2.9.0/share/hadoop/hdfs</span><br><span class="line">export HADOOP_MAPRED_HOME=xxx/hadoop-2.9.0/share/hadoop/mapreduce</span><br><span class="line">export HADOOP_YARN_HOME=xxx/hadoop-2.9.0/share/hadoop/yarn</span><br><span class="line">export PATH=$HADOOP_COMMON_HOME/bin:$HADOOP_HDFS_HOME/bin:$HADOOP_MAPRED_HOME/bin:$PATH</span><br></pre></td></tr></table></figure></p>
+<p>但是如果并没有安装hadoop,而只是下载了源码,其实那几个命令都在hadoop/bin下了,所以只需要配:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME=/home/jimo/workspace/temp/hadoop/hadoop-3.0.0</span><br><span class="line">export PATH=$HADOOP_HOME/bin:$PATH</span><br></pre></td></tr></table></figure></p>
+<h1 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h1><p><a href="https://wiki.apache.org/hadoop/HadoopUnderIDEA" target="_blank" rel="noopener">配置IDEA的Hadoop开发环境</a><br><a href="https://wiki.apache.org/hadoop/EclipseEnvironment" target="_blank" rel="noopener">配置Eclipse的Hadoop开发环境</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p><a href="http://ftp.cuhk.edu.hk/pub/packages/apache.org/hadoop/common/current/hadoop-3.0.0.tar.gz" target="_blank" rel="noopener">下载</a><br>完后的hadoop需要配置各个组件的的环境变量.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/10/hadoop/000-config-environment/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/10/hadoop/000-config-environment/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjzav3psl004ignch5ijrmtr7" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-tools/001-asciidoc" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/07/tools/001-asciidoc/" class="article-date">
+  <time datetime="2018-01-07T09:00:18.000Z" itemprop="datePublished">2018-01-07</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/07/tools/001-asciidoc/">asciidoc转pdf</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Asciidoc"><a href="#Asciidoc" class="headerlink" title="Asciidoc"></a>Asciidoc</h1><p>本文将要说明如何快速应对新知识的摄取方式.比如如何将Asciidoc转化为pdf.</p>
+<h2 id="1-是什么"><a href="#1-是什么" class="headerlink" title="1.是什么"></a>1.是什么</h2><p>asciidoc是什么? google一下:<a href="http://asciidoc.org/" target="_blank" rel="noopener">http://asciidoc.org/</a></p>
+<p>就是类似于markdown的一种文本编辑语言,看到github上有用这种方式写书的,需要学习下.</p>
+<h2 id="2-怎么做"><a href="#2-怎么做" class="headerlink" title="2.怎么做"></a>2.怎么做</h2><p>先安装<a href="https://github.com/asciidoctor/asciidoctor-pdf" target="_blank" rel="noopener">asciidoc-pdf</a>:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 1.检查ruby</span><br><span class="line">[jimo@jimo-pc blockchain]$ ruby -v</span><br><span class="line">ruby 2.4.2p198 (2017-09-14 revision 59899) [x86_64-linux]</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 2.检查gem</span><br><span class="line">[jimo@jimo-pc blockchain]$ gem -v</span><br><span class="line">2.6.13</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 3.安装</span><br><span class="line"><span class="meta">$</span> gem install asciidoctor-pdf --pre</span><br><span class="line">WARNING:  You don't have /home/jimo/.gem/ruby/2.4.0/bin in your PATH,</span><br><span class="line">	  gem executables will not run.</span><br><span class="line">Successfully installed asciidoctor-pdf-1.5.0.alpha.16</span><br><span class="line">invalid options: -ri</span><br><span class="line">(invalid options are ignored)</span><br><span class="line">Parsing documentation for asciidoctor-pdf-1.5.0.alpha.16</span><br><span class="line">Done installing documentation for asciidoctor-pdf after 0 seconds</span><br><span class="line">1 gem installed</span><br></pre></td></tr></table></figure></p>
+<p>可以看到有个警告,所以把路径/home/jimo/.gem/ruby/2.4.0/bin加到PATH就行了.</p>
+<p>然后转换:<br>直接转换失败了,先转成html,再用浏览器打印成pdf即可.</p>
+<p>进入源码目录:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc bitcoinbook-second_edition_print_1]$ asciidoctor book.asciidoc</span><br></pre></td></tr></table></figure></p>
+<p>更多问题可参考:<a href="https://github.com/bitcoinbook/bitcoinbook/issues/399" target="_blank" rel="noopener">https://github.com/bitcoinbook/bitcoinbook/issues/399</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <h1 id="Asciidoc"><a href="#Asciidoc" class="headerlink" title="Asciidoc"></a>Asciidoc</h1><p>本文将要说明如何快速应对新知识的摄取方式.比如如何将Asciidoc转化为pdf.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/07/tools/001-asciidoc/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/07/tools/001-asciidoc/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjzav3pwb00gdgnchm18jw30a" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asciidoc/">asciidoc</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-python/001-music21" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/06/python/001-music21/" class="article-date">
+  <time datetime="2018-01-06T07:32:29.000Z" itemprop="datePublished">2018-01-06</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/06/python/001-music21/">music21</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
+<h1 id="music21是什么"><a href="#music21是什么" class="headerlink" title="music21是什么"></a>music21是什么</h1><p>music21是一个基于python的计算机辅助音乐学工具包。该系统自2008年以来一直在不断发展壮大。<br>music21中的方法和传统已被用在许多以前的软件系统中。</p>
+<p>music21中的21指的是在MIT中所有的课程都有数字和音乐，还有其他一些人文科学部门，编号为21. </p>
+<p>MIT的音乐部门以及哈佛大学，史密斯学院和圣约克山学院帮助把这个工具包从最简单的根源变成了一个成熟的系统。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接用pip就行,更多安装参考官方文档<a href="http://web.mit.edu/music21/doc/installing/index.html" target="_blank" rel="noopener">music</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> pip install music21</span><br></pre></td></tr></table></figure></p>
+<h1 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h1><h3 id="1-展示一个音符"><a href="#1-展示一个音符" class="headerlink" title="1. 展示一个音符"></a>1. 展示一个音符</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> music21 <span class="keyword">import</span> *</span><br><span class="line">In [<span class="number">2</span>]: n = note.Note(<span class="string">"D#3"</span>)</span><br><span class="line">In [<span class="number">3</span>]: n.duration.type = <span class="string">'half'</span></span><br><span class="line">In [<span class="number">4</span>]: n.show()</span><br></pre></td></tr></table></figure>
+<p>你以为会出现图片,但由于没有打开mxl文件的应用会报错:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SubConverterException: Cannot find a valid application path <span class="keyword">for</span> format musicxml. Specify this <span class="keyword">in</span> your Environment by calling environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/path/to/application'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这时安装<a href="https://musescore.org/zh-hans" target="_blank" rel="noopener">musescore</a>,这个跨平台的开源乐谱编辑器.其路径默认在/usr/bin/musescore</p>
+<p>然后配置路径再显示: (注意:这个environment是music21下的)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">7</span>]: environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/usr/bin/musescore'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: n.show()</span><br><span class="line">qt5ct: using qt5ct plugin</span><br></pre></td></tr></table></figure></p>
+<p>应该会打开musescore软件:</p>
+<img src="/2018/01/06/python/001-music21/000.png">
+<h3 id="2-播放midi"><a href="#2-播放midi" class="headerlink" title="2.播放midi"></a>2.播放midi</h3><p>同样需要配置midi播放器:这里使用timidity<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">9</span>]: littleMelody = converter.parse(<span class="string">"tinynotation: 3/4 c4 d8 f g16 a g f#"</span>)</span><br><span class="line">In [<span class="number">13</span>]: environment.set(<span class="string">'midiPath'</span>, <span class="string">'/usr/bin/timidity'</span>)</span><br><span class="line">In [<span class="number">14</span>]: littleMelody.show(<span class="string">'midi'</span>)</span><br><span class="line">Requested buffer size <span class="number">32768</span>, fragment size <span class="number">8192</span></span><br><span class="line">ALSA pcm <span class="string">'default'</span> set buffer size <span class="number">32768</span>, period size <span class="number">8192</span> bytes</span><br><span class="line">Playing /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">MIDI file: /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">Format: <span class="number">1</span>  Tracks: <span class="number">1</span>  Divisions: <span class="number">1024</span></span><br><span class="line">Sequence: </span><br><span class="line">No instrument mapped to tone bank <span class="number">0</span>, program <span class="number">0</span> - this instrument will <span class="keyword">not</span> be heard</span><br><span class="line">No pre-resampling cache hit</span><br><span class="line">Last <span class="number">1</span> MIDI events are ignored</span><br><span class="line">Playing time: ~<span class="number">4</span> seconds</span><br><span class="line">Notes cut: <span class="number">0</span></span><br><span class="line">Notes lost totally: <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到,默认这些临时文件都在/tmp/music21/下.</p>
+<h3 id="3-其他"><a href="#3-其他" class="headerlink" title="3.其他"></a>3.其他</h3><p>还可以生成图片,读取mxl文件,生成和弦等.</p>
+<p>如果不想配置软件,就直接去tmp目录下查看文件.</p>
+<p>学习还是官方文档最好:<a href="http://web.mit.edu/music21/doc/index.html" target="_blank" rel="noopener">music21-doc</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/06/python/001-music21/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/06/python/001-music21/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjzav3pvl00eegnch2l9avls4" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/music/">music</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-spark/04-pyspark-jupyter" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/05/spark/04-pyspark-jupyter/" class="article-date">
@@ -170,7 +585,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjysja7ho00mos3ch41dqwwd3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjzav3pwa00gbgnchbhd2bls4" class="article-share-link">
           Share
         </a>
         
@@ -250,7 +665,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjysja7h300kzs3ch3zuoo7vh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjzav3pvg00dugnchrj4xtcs0" class="article-share-link">
           Share
         </a>
         
@@ -343,7 +758,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjysja7hp00mrs3chz7nbx87q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjzav3pw900g8gnchp5tgvw7t" class="article-share-link">
           Share
         </a>
         
@@ -426,7 +841,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjysja7hm00mks3chhv6iaixa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjzav3pw700g4gnch1j7cuirn" class="article-share-link">
           Share
         </a>
         
@@ -513,7 +928,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjysja7gv00k8s3chzwv9qp3y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjzav3pvk00e9gnchwptslqba" class="article-share-link">
           Share
         </a>
         
@@ -609,7 +1024,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjysja7ho00mms3chbk39lnr3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjzav3pw300fwgnch3tnjoqhm" class="article-share-link">
           Share
         </a>
         
@@ -683,7 +1098,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjysja7h900lis3chxfmydstr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjzav3pvt00f0gnch1ltwc2l7" class="article-share-link">
           Share
         </a>
         
@@ -792,12 +1207,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjysja7hs00mys3chi8txb6z7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjzav3pwc00gggnchsg5qfdi3" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">13</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -915,7 +1330,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjysja7ar003zs3ch98j6s8io" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjzav3psg0044gnchbej23h2m" class="article-share-link">
           Share
         </a>
         
@@ -996,12 +1411,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjysja7gc00ils3chr7qz5z32" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjzav3pv000c2gnchjks7l06p" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">2</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">2</span></li></ul>
 
       </footer>
       </div>
@@ -1079,7 +1494,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjysja7h700lbs3ch75bxu7uh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjzav3pvs00eygnchfkykxae8" class="article-share-link">
           Share
         </a>
         
@@ -1160,7 +1575,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjysja7hk00mfs3chrro26b7t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjzav3pw600g1gnch4m3iurja" class="article-share-link">
           Share
         </a>
         
@@ -1296,12 +1711,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjysja7hj00mas3chmj3gvmbz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjzav3pw000fpgnchu1k9uyk4" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -1377,12 +1792,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjysja7gc00ijs3chxqu2d9h2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjzav3puw00bsgnchmwtliirm" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -1454,620 +1869,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjysja7ga00ies3chh5h7l566" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="cjzav3puy00bxgnchtocaxwue" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/003-split-file" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/27/linux/003-split-file/" class="article-date">
-  <time datetime="2017-12-27T08:35:58.000Z" itemprop="datePublished">2017-12-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/27/linux/003-split-file/">linux下分割合并文件命令</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>分割与合并文件操作.</p>
-<h2 id="分割与合并文件"><a href="#分割与合并文件" class="headerlink" title="分割与合并文件"></a>分割与合并文件</h2><p>有时候大文件分割后更方便传输。<br>以一张图片为例：<br>分割：默认分割<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 1.5M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">[jimo@jimo-pc shell]$ split 1.png </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 2.9M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
-<p>合并：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 254K 11月 12 18:31 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 259K 11月 12 18:31 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 264K 11月 12 18:31 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo 238K 11月 12 18:31 xad</span><br><span class="line">-rw-r--r-- 1 jimo jimo 270K 11月 12 18:31 xae</span><br><span class="line">-rw-r--r-- 1 jimo jimo 184K 11月 12 18:31 xaf</span><br></pre></td></tr></table></figure></p>
-<p>指定每个文件大小：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc shell]$ split 1.png -b 500KB </span><br><span class="line">[jimo@jimo-pc shell]$ ls -lh</span><br><span class="line">总用量 4.4M</span><br><span class="line">-rwxrwxrwx 1 jimo jimo 1.5M 9月  17 20:31 1.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 1.5M 11月 12 18:32 2.png</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xaa</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xab</span><br><span class="line">-rw-r--r-- 1 jimo jimo 489K 11月 12 18:35 xac</span><br><span class="line">-rw-r--r-- 1 jimo jimo  972 11月 12 18:35 xad</span><br></pre></td></tr></table></figure></p>
-<p>类似的命令可以看csplit</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>分割与合并文件操作.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/27/linux/003-split-file/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/27/linux/003-split-file/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="cjysja7g900i9s3chmolpo7ht" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/002-system-info" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/27/linux/002-system-info/" class="article-date">
-  <time datetime="2017-12-27T08:33:44.000Z" itemprop="datePublished">2017-12-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/27/linux/002-system-info/">查看linux系统相关信息</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>查看系统的一些信息.</p>
-<h2 id="1-查看内存型号"><a href="#1-查看内存型号" class="headerlink" title="1.查看内存型号"></a>1.查看内存型号</h2><p>当需要换内存时需要<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo dmidecode -t memory</span><br><span class="line"><span class="meta">#</span> dmidecode 3.1</span><br><span class="line">Getting SMBIOS data from sysfs.</span><br><span class="line">SMBIOS 2.8 present.</span><br><span class="line"></span><br><span class="line">Handle 0x0046, DMI type 16, 23 bytes</span><br><span class="line">Physical Memory Array</span><br><span class="line">	Location: System Board Or Motherboard</span><br><span class="line">	Use: System Memory</span><br><span class="line">	Error Correction Type: None</span><br><span class="line">	Maximum Capacity: 16 GB</span><br><span class="line">	Error Information Handle: Not Provided</span><br><span class="line">	Number Of Devices: 2</span><br><span class="line"></span><br><span class="line">Handle 0x0047, DMI type 17, 40 bytes</span><br><span class="line">Memory Device</span><br><span class="line">	Array Handle: 0x0046</span><br><span class="line">	Error Information Handle: Not Provided</span><br><span class="line">	Total Width: 64 bits</span><br><span class="line">	Data Width: 64 bits</span><br><span class="line">	Size: 4096 MB</span><br><span class="line">	Form Factor: SODIMM</span><br><span class="line">	Set: None</span><br><span class="line">	Locator: DIMM A</span><br><span class="line">	Bank Locator: BANK 0</span><br><span class="line">	Type: DDR3</span><br><span class="line">	Type Detail: Synchronous</span><br><span class="line">	Speed: 1600 MT/s</span><br><span class="line">	Manufacturer: Samsung</span><br><span class="line">	Serial Number: 12151215</span><br><span class="line">	Asset Tag: 9876543210</span><br><span class="line">	Part Number: M471B5173QH0-YK0  </span><br><span class="line">	Rank: 1</span><br><span class="line">	Configured Clock Speed: 1600 MT/s</span><br><span class="line">	Minimum Voltage: Unknown</span><br><span class="line">	Maximum Voltage: Unknown</span><br><span class="line">	Configured Voltage: 1.35 V</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
-<h2 id="2-查看磁盘使用情况"><a href="#2-查看磁盘使用情况" class="headerlink" title="2.查看磁盘使用情况"></a>2.查看磁盘使用情况</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ df</span><br><span class="line">文件系统        容量  已用  可用 已用% 挂载点</span><br><span class="line">dev             5.9G     0  5.9G    0% /dev</span><br><span class="line">run             5.9G  1.4M  5.9G    1% /run</span><br><span class="line">/dev/sda2       211G   77G  124G   39% /</span><br><span class="line">tmpfs           5.9G   79M  5.8G    2% /dev/shm</span><br><span class="line">tmpfs           5.9G     0  5.9G    0% /sys/fs/cgroup</span><br><span class="line">tmpfs           5.9G   44M  5.8G    1% /tmp</span><br><span class="line">/dev/sda1       300M  256K  300M    1% /boot/efi</span><br><span class="line">tmpfs           1.2G   16K  1.2G    1% /run/user/1000</span><br></pre></td></tr></table></figure>
-<p>也可以使用di命令，不过需要安装。</p>
-<h2 id="3-测试硬盘读写速度"><a href="#3-测试硬盘读写速度" class="headerlink" title="3.测试硬盘读写速度"></a>3.测试硬盘读写速度</h2><p>写：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ dd if=/dev/zero of=/tmp/output.img bs=8k count=256k conv=fdatasync; rm -rf /tmp/output.img</span><br><span class="line">记录了262144+0 的读入</span><br><span class="line">记录了262144+0 的写出</span><br><span class="line">2147483648 bytes (2.1 GB, 2.0 GiB) copied, 0.591138 s, 3.6 GB/s</span><br></pre></td></tr></table></figure></p>
-<p>读：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo hdparm -Tt /dev/sda</span><br><span class="line">[sudo] jimo 的密码：</span><br><span class="line"></span><br><span class="line">/dev/sda:</span><br><span class="line"> Timing cached reads: 17230 MB in  2.00 seconds = 8622.86 MB/sec</span><br><span class="line"> Timing buffered disk reads: 978 MB in  3.01 seconds = 325.39 MB/sec</span><br></pre></td></tr></table></figure></p>
-<p>看起来SSD还不错。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>查看系统的一些信息.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/27/linux/002-system-info/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/27/linux/002-system-info/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="cjysja7g700i4s3chhqeck8xo" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/001-linux-manjaro" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/27/linux/001-linux-manjaro/" class="article-date">
-  <time datetime="2017-12-27T08:29:07.000Z" itemprop="datePublished">2017-12-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/27/linux/001-linux-manjaro/">配置manjaro</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="manjaro"><a href="#manjaro" class="headerlink" title="manjaro"></a>manjaro</h1><p>讲了manjaro如何配置. 如果要备份系统，<a href="http://jimolonely.github.io/2018/07/19/linux/013-linux-backup/" target="_blank" rel="noopener">查看备份系统要点</a>.</p>
-<h2 id="配置鏡像"><a href="#配置鏡像" class="headerlink" title="配置鏡像"></a>配置鏡像</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ nano /etc/pacman-mirrors.conf</span><br><span class="line">OnlyCountry=China</span><br><span class="line"></span><br><span class="line">[jimo@jimo-pc ~]$ sudo pacman-mirrors -g</span><br><span class="line">.: Info Downloading mirrors from repo.manjaro.org</span><br><span class="line">.: Info Using custom mirror file</span><br><span class="line">.: Info Querying mirrors - This may take some time</span><br><span class="line">   0.490 China          : https://mirrors.ustc.edu.cn/manjaro/</span><br><span class="line">   0.291 China          : http://ftp.cuhk.edu.hk/pub/Linux/manjaro/</span><br><span class="line">   1.109 China          : ftp://ftp.cuhk.edu.hk/pub/Linux/manjaro/</span><br><span class="line">   0.131 China          : http://mirrors.tuna.tsinghua.edu.cn/manjaro/</span><br><span class="line">   0.279 China          : https://mirrors.zju.edu.cn/manjaro/</span><br><span class="line">.: Info Writing mirror list</span><br><span class="line">   China           : http://mirrors.tuna.tsinghua.edu.cn/manjaro/stable</span><br><span class="line">   China           : https://mirrors.zju.edu.cn/manjaro/stable</span><br><span class="line">   China           : https://mirrors.ustc.edu.cn/manjaro/stable</span><br><span class="line">   China           : http://ftp.cuhk.edu.hk/pub/Linux/manjaro/stable</span><br><span class="line">.: Info Mirror list generated and saved to: /etc/pacman.d/mirrorlist</span><br></pre></td></tr></table></figure>
-<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> /etc/pacman.conf</span><br><span class="line">[archlinuxcn]</span><br><span class="line">SigLevel = Optional TrustedOnly</span><br><span class="line">Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch</span><br></pre></td></tr></table></figure></p>
-<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -Syy &amp;&amp; sudo pacman -S archlinuxcn-keyring</span><br></pre></td></tr></table></figure></p>
-<h2 id="中文輸入法"><a href="#中文輸入法" class="headerlink" title="中文輸入法"></a>中文輸入法</h2><p>有了上面的鏡像，可以配置下面的輸入法。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -S fcitx-sogoupinyin</span><br><span class="line">sudo pacman -S fcitx-im # 全部安装</span><br><span class="line">sudo pacman -S fcitx-configtool # 图形化配置工具</span><br></pre></td></tr></table></figure></p>
-<p>then<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nano ~/.xprofile</span><br><span class="line">export GTK_IM_MODULE=fcitx</span><br><span class="line">export QT_IM_MODULE=fcitx</span><br><span class="line">export XMODIFIERS="@im=fcitx"</span><br></pre></td></tr></table></figure></p>
-<h2 id="VIM"><a href="#VIM" class="headerlink" title="VIM"></a>VIM</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo pacman -S vim</span><br></pre></td></tr></table></figure>
-<h2 id="Chrome"><a href="#Chrome" class="headerlink" title="Chrome"></a>Chrome</h2><p>通過源安裝太慢了。</p>
-<p>[jimo@jimo-pc ~]$ sudo pacman -Sy google-chrome</p>
-<p>但可以使用yaourt安裝<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>首先安裝yaourt</span><br><span class="line">sudo pacman -S yaourt</span><br><span class="line"><span class="meta">#</span> 再安裝chrome</span><br><span class="line">yaourt google-chrome</span><br></pre></td></tr></table></figure></p>
-<p>不過可以使用Chromium<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc ~]$ sudo pacman -Sy chromium</span><br></pre></td></tr></table></figure></p>
-<h2 id="快捷鍵設置"><a href="#快捷鍵設置" class="headerlink" title="快捷鍵設置"></a>快捷鍵設置</h2><p>在鍵盤設置裏进行快捷键设置</p>
-<table>
-<thead>
-<tr>
-<th>功能</th>
-<th>快捷键</th>
-<th>命令</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>截图</td>
-<td>Ctrl+Alt+A</td>
-<td>xfce4-screenshooter -rc</td>
-</tr>
-<tr>
-<td>查找程序</td>
-<td>super</td>
-<td>xfce4-appfinder</td>
-</tr>
-<tr>
-<td>锁屏</td>
-<td>super+L</td>
-<td>xflock4</td>
-</tr>
-</tbody>
-</table>
-<p>下面是常用的默认快捷键:可以在设置编辑器里面看</p>
-<table>
-<thead>
-<tr>
-<th>功能</th>
-<th>快捷键</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>最大化窗口</td>
-<td>Alt+F10</td>
-</tr>
-<tr>
-<td>最小化窗口</td>
-<td>Alt+F9</td>
-</tr>
-<tr>
-<td>切换窗口</td>
-<td>Alt+Tab</td>
-</tr>
-<tr>
-<td>显示桌面</td>
-<td>Ctrl+Alt+D</td>
-</tr>
-<tr>
-<td>关闭窗口</td>
-<td>Alt+F4</td>
-</tr>
-</tbody>
-</table>
-<h2 id="安装mariadb"><a href="#安装mariadb" class="headerlink" title="安装mariadb"></a>安装mariadb</h2><p>用mariadb替代mysql</p>
-<p><a href="https://downloads.mariadb.org/mariadb/repositories/#mirror=tuna&amp;distro=Arch+Linux&amp;distro_release=opensuse42-amd64--opensuse42" target="_blank" rel="noopener">参考文档</a><br><a href="https://wiki.archlinux.org/index.php/MySQL" target="_blank" rel="noopener">文档二</a></p>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>按下面的额顺序：</p>
-<p>先安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pacman -S mariadb</span><br></pre></td></tr></table></figure></p>
-<p>设置开机启动:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable mysqld.service</span><br></pre></td></tr></table></figure></p>
-<p>开启服务：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql</span><br></pre></td></tr></table></figure></p>
-<p>启动数据库：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start mysqld.service</span><br></pre></td></tr></table></figure></p>
-<p>自定义安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql_secure_installation</span><br></pre></td></tr></table></figure></p>
-<p>停止服务：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl stop mysqld.service</span><br></pre></td></tr></table></figure></p>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>修改编码：/etc/mysql/my.cnf<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[client]</span><br><span class="line">default-character-set = utf8mb4</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">collation_server = utf8mb4_unicode_ci</span><br><span class="line">character_set_client = utf8mb4</span><br><span class="line">character_set_server = utf8mb4</span><br><span class="line">skip-character-set-client-handshake</span><br><span class="line"></span><br><span class="line">[mysql]</span><br><span class="line">default-character-set = utf8mb4</span><br></pre></td></tr></table></figure></p>
-<p>然后查看：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show variables like 'character%';</span><br><span class="line">+--------------------------+----------------------------+</span><br><span class="line">| Variable_name            | Value                      |</span><br><span class="line">+--------------------------+----------------------------+</span><br><span class="line">| character_set_client     | utf8mb4                    |</span><br><span class="line">| character_set_connection | utf8mb4                    |</span><br><span class="line">| character_set_database   | utf8mb4                    |</span><br><span class="line">| character_set_filesystem | binary                     |</span><br><span class="line">| character_set_results    | utf8mb4                    |</span><br><span class="line">| character_set_server     | utf8mb4                    |</span><br><span class="line">| character_set_system     | utf8                       |</span><br><span class="line">| character_sets_dir       | /usr/share/mysql/charsets/ |</span><br><span class="line">+--------------------------+----------------------------+</span><br></pre></td></tr></table></figure></p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>按照通用<a href="https://github.com/jimolonely/myshell/blob/master/build-mysystem.md" target="_blank" rel="noopener">系統構建</a></p>
-<h3 id="QQ"><a href="#QQ" class="headerlink" title="QQ"></a>QQ</h3><p>可一使用deepin的qq。<br>使用命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yaourt -Sy deepin.com.qq.im</span><br></pre></td></tr></table></figure></p>
-<p>假如安装不成功，可以在manjaro的包管理器中选择库-extra模块，搜索qq找到安装。</p>
-<p>不过我的电脑上有些字体乱码。</p>
-<h3 id="openjdk源码"><a href="#openjdk源码" class="headerlink" title="openjdk源码"></a>openjdk源码</h3><p>直接在库里面找到下载即可</p>
-<h3 id="性能监控"><a href="#性能监控" class="headerlink" title="性能监控"></a>性能监控</h3><p>包括网速，内存，CPU等，Xface自带有多面板功能，可以添加，具体步骤如下：</p>
-<p>设置–面板–项目–+，同样可以自定义面板位置和大小，都在外观选项里。</p>
-<h3 id="自带单词查询"><a href="#自带单词查询" class="headerlink" title="自带单词查询"></a>自带单词查询</h3><p>使用look命令查询单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myshell]$ look car</span><br><span class="line">look: /usr/share/dict/words: 没有那个文件或目录</span><br></pre></td></tr></table></figure></p>
-<p>这个字典文件怎么下载呢？很简单，在软件管理里搜索words，即可安装，安装后有很多语言的单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/usr/share/dict/american-english</span><br><span class="line">/usr/share/dict/british</span><br><span class="line">/usr/share/dict/british-english</span><br><span class="line">/usr/share/dict/catala</span><br><span class="line">/usr/share/dict/catalan</span><br><span class="line">/usr/share/dict/finnish</span><br><span class="line">/usr/share/dict/french</span><br><span class="line">/usr/share/dict/german</span><br><span class="line">/usr/share/dict/italian</span><br><span class="line">/usr/share/dict/ngerman</span><br><span class="line">/usr/share/dict/ogerman</span><br><span class="line">/usr/share/dict/spanish</span><br><span class="line">/usr/share/dict/usa</span><br><span class="line">/usr/share/licenses/words/copyright-ca</span><br><span class="line">/usr/share/licenses/words/copyright-de</span><br><span class="line">/usr/share/licenses/words/copyright-en</span><br><span class="line">/usr/share/licenses/words/copyright-es</span><br><span class="line">/usr/share/licenses/words/copyright-fi</span><br><span class="line">/usr/share/licenses/words/copyright-fr</span><br><span class="line">/usr/share/licenses/words/copyright-it</span><br></pre></td></tr></table></figure></p>
-<p>现在我要查询zero开头的单词：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myshell]$ look zer</span><br><span class="line">zero</span><br><span class="line">zeroed</span><br><span class="line">zeroes</span><br><span class="line">zeroing</span><br><span class="line">zero's</span><br><span class="line">zeros</span><br><span class="line">zeroth</span><br></pre></td></tr></table></figure></p>
-<h3 id="u盘启动盘制作软件"><a href="#u盘启动盘制作软件" class="headerlink" title="u盘启动盘制作软件"></a>u盘启动盘制作软件</h3><p>MultiWriter:</p>
-<img src="/2017/12/27/linux/001-linux-manjaro/000.png">
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="manjaro"><a href="#manjaro" class="headerlink" title="manjaro"></a>manjaro</h1><p>讲了manjaro如何配置. 如果要备份系统，<a href="http://jimolonely.github.io/2018/07/19/linux/013-linux-backup/" target="_blank" rel="noopener">查看备份系统要点</a>.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/27/linux/001-linux-manjaro/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/27/linux/001-linux-manjaro/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="cjysja7g800i6s3cha4p43bhl" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/manjaro/">manjaro</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/000-build-mysystem" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/27/linux/000-build-mysystem/" class="article-date">
-  <time datetime="2017-12-27T08:24:19.000Z" itemprop="datePublished">2017-12-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/27/linux/000-build-mysystem/">如何构建个性化linux系统</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="最新部分"><a href="#最新部分" class="headerlink" title="最新部分"></a>最新部分</h1><p>从零开始配置ubuntu</p>
-<h2 id="基础配置"><a href="#基础配置" class="headerlink" title="基础配置"></a>基础配置</h2><ol start="0">
-<li>更换下载源： 软件更新里选择从其他站点下载，选择阿里云</li>
-<li>拷贝我的密码脚本到系统（python3 -m http:server）</li>
-<li>打开firefox,登录，firefox会同步插件</li>
-<li>登录ubuntu账户</li>
-<li>打开软件更新，检查更新，更新完毕重启系统（搜索update-manager）</li>
-<li>去搜狗输入法官方网站下载ubuntu的包，安装</li>
-<li>安装网络监控插件： <ol>
-<li>安装chrome-gnome-shell： <code>apt install chrome-gnome-shell</code></li>
-<li>然后在firefox里安装gnome shell integration插件</li>
-<li>访问：<a href="https://extensions.gnome.org/extension/120/system-monitor/" target="_blank" rel="noopener">https://extensions.gnome.org/extension/120/system-monitor/</a>，安装</li>
-</ol>
-</li>
-<li>重启系统，使插件和输入法生效</li>
-<li>安装坚果云：去坚果云官网下载安装包，安装</li>
-<li><a href="## screen shot">安装截图软件flame</a></li>
-<li>配置快捷键：<ol>
-<li>命令行界面的： 粘贴改为Ctrl+V</li>
-<li>系统快捷键： <ol>
-<li>主目录： 改为WIN+E</li>
-<li>自定义截图快捷键：运行flameshot gui，Ctrl+Alt+A</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>登录todoist账号（系统同步），同步清单 </p>
-<ol>
-<li>使用ubuntu自带的TODO软件，选择扩展，打开Todoist，就会自动同步Todoist的列表了</li>
-</ol>
-</li>
-<li><p>建立常用目录：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/workspace/Git -pv</span><br><span class="line">mkdir ~/software/source -pv</span><br></pre></td></tr></table></figure>
-</li>
-<li><a href="/2019/07/14/linux/025-ubuntu-use-navidia-card/" title="ubuntu下使用NVIDIA显卡">ubuntu下使用NVIDIA显卡</a>
-</li>
-</ol>
-<h2 id="必要软件安装"><a href="#必要软件安装" class="headerlink" title="必要软件安装"></a>必要软件安装</h2><h3 id="git"><a href="#git" class="headerlink" title="git"></a>git</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install git -y</span><br></pre></td></tr></table></figure>
-<p>然后是配置多用户、多git地址的方法，参考 <a href="/2017/12/31/git/000-multi-git-account/" title="一台电脑如何配置多个github账户">一台电脑如何配置多个github账户</a></p>
-<p>我的git账户有：</p>
-<ol>
-<li>github</li>
-<li>gitlab</li>
-<li>公司内部的gitlab</li>
-</ol>
-<h3 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h3><p>首先安装java<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install default-jdk -y</span><br><span class="line">java -version</span><br></pre></td></tr></table></figure></p>
-<p>因为默认是JDK11或最新版本Java，如果需要JDK8，那么再安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install openjdk-8-jdk -y</span><br><span class="line">java -version</span><br></pre></td></tr></table></figure></p>
-<p>然后参考<a href="/2019/01/27/linux/018-ubuntu-java/" title="ubuntu安装/更新Java">ubuntu安装/更新Java</a>切换java版本</p>
-<h3 id="maven"><a href="#maven" class="headerlink" title="maven"></a>maven</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install maven</span><br><span class="line">mvn -v</span><br></pre></td></tr></table></figure>
-<p>然后修改为阿里云的镜像，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir ~/.m2</span><br><span class="line">$ cp /etc/maven/settings.xml ~/.m2/</span><br><span class="line">$ vi ~/.m2/setting.xml</span><br></pre></td></tr></table></figure></p>
-<p>修改镜像：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;mirror&gt;</span><br><span class="line">      &lt;id&gt;alimaven&lt;/id&gt;</span><br><span class="line">      &lt;name&gt;aliyun maven&lt;/name&gt;</span><br><span class="line">      &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">      &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;</span><br><span class="line">&lt;/mirror&gt;</span><br></pre></td></tr></table></figure></p>
-<p>其他类型的linux系统可能不在那，但一定会在用户目录下，可以参考idea的目录：</p>
-<img src="/2017/12/27/linux/000-build-mysystem/000.png">
-<h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><a href="/2017/12/31/linux/006-vim/" title="获取vimrc文件">获取vimrc文件</a>
-<p>安装管理插件：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装vbundle</span><br><span class="line">git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim</span><br></pre></td></tr></table></figure></p>
-<p>不过还没完，需要进入vim安装插件，在正常模式输入：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:BundleInstall</span><br></pre></td></tr></table></figure></p>
-<p>安装自动补全插件：</p>
-<p>等安装完成后进入~/.vim/bundle/YouCompleteMe安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~/.vim/bundle/YouCompleteMe</span><br><span class="line">./install.py --all</span><br></pre></td></tr></table></figure></p>
-<h3 id="vscode"><a href="#vscode" class="headerlink" title="vscode"></a>vscode</h3><p>使用ubuntu自带商店安装就是非常慢,  可以使用 <a href="https://code.visualstudio.com/docs/setup/linux" target="_blank" rel="noopener">官方推荐</a> 安装。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor &gt; microsoft.gpg</span><br><span class="line">sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/</span><br><span class="line">sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" &gt; /etc/apt/sources.list.d/vscode.list'</span><br><span class="line"></span><br><span class="line">sudo apt-get install apt-transport-https</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install code # or code-insiders</span><br></pre></td></tr></table></figure></p>
-<p>然后是vscode的自定义，主要是快捷键： <a href="/2019/07/14/tools/016-vscode-config/" title="vscode自定义配置">vscode自定义配置</a></p>
-<h3 id="intellij"><a href="#intellij" class="headerlink" title="intellij"></a>intellij</h3><p>虽然商店有，但是下载太慢，还是去官网下吧。</p>
-<p>配置导入，记得将之前idea的配置备份打包。</p>
-<p>下载安装后，使用自定义application launcher制作启动图标。</p>
-<h3 id="VPN软件"><a href="#VPN软件" class="headerlink" title="VPN软件"></a>VPN软件</h3><p>这个就不说了，自己想办法，为了装Google浏览器及其同步。</p>
-<h3 id="chrome浏览器"><a href="#chrome浏览器" class="headerlink" title="chrome浏览器"></a>chrome浏览器</h3><p>因为chrome有同步，所以不用备份</p>
-<p>开启vpn后，去官网下载chrome，然后登录，同步。</p>
-<h3 id="ubuntu-下有道云"><a href="#ubuntu-下有道云" class="headerlink" title="ubuntu 下有道云"></a>ubuntu 下有道云</h3><p>参考github: <a href="https://github.com/jamasBian/youdao-note-electron" target="_blank" rel="noopener">https://github.com/jamasBian/youdao-note-electron</a></p>
-<p>因为18.10网页版访问不了。</p>
-<h3 id="nodejs-amp-npm"><a href="#nodejs-amp-npm" class="headerlink" title="nodejs &amp; npm"></a>nodejs &amp; npm</h3><p>nodejs和npm直接装就行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install nodejs</span><br><span class="line"><span class="meta">$</span> sudo apt install npm</span><br></pre></td></tr></table></figure></p>
-<p>但是npm需要配置为非root用户也可以安装包：</p>
-<p>参考： <a href="/2018/07/22/js/001-npms/" title="npm非root安装包问题">npm非root安装包问题</a></p>
-<p>再配一下镜像这些。</p>
-<h3 id="Android-Studio"><a href="#Android-Studio" class="headerlink" title="Android Studio"></a>Android Studio</h3><h2 id="工作相关"><a href="#工作相关" class="headerlink" title="工作相关"></a>工作相关</h2><h3 id="github项目拉取"><a href="#github项目拉取" class="headerlink" title="github项目拉取"></a>github项目拉取</h3><ol>
-<li>hexo-src： 编译</li>
-<li>MyCost</li>
-</ol>
-<h3 id="公司邮箱"><a href="#公司邮箱" class="headerlink" title="公司邮箱"></a>公司邮箱</h3><p>使用Thunderbird登录公司邮箱</p>
-<h1 id="可选安装"><a href="#可选安装" class="headerlink" title="可选安装"></a>可选安装</h1><p>下面是根据需要再安装的软件。</p>
-<h2 id="其他开发环境相关"><a href="#其他开发环境相关" class="headerlink" title="其他开发环境相关"></a>其他开发环境相关</h2><h3 id="python"><a href="#python" class="headerlink" title="python"></a>python</h3><p>(一般都自带了)</p>
-<h4 id="更换pypi镜像地址"><a href="#更换pypi镜像地址" class="headerlink" title="更换pypi镜像地址"></a>更换pypi镜像地址</h4><p>在~/.pip/pip.conf下配上阿里云的：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">index-url = http://mirrors.aliyun.com/pypi/simple/</span><br><span class="line">[install]</span><br><span class="line">trusted-host=mirrors.aliyun.com</span><br></pre></td></tr></table></figure></p>
-<h2 id="数据库相关"><a href="#数据库相关" class="headerlink" title="数据库相关"></a>数据库相关</h2><p>使用idea自带的数据库客户端就很强大。</p>
-<h3 id="1-dbeaver"><a href="#1-dbeaver" class="headerlink" title="1. dbeaver"></a>1. dbeaver</h3><h3 id="2-mysql"><a href="#2-mysql" class="headerlink" title="2. mysql"></a>2. mysql</h3><h2 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h2><h3 id="eclipse"><a href="#eclipse" class="headerlink" title="eclipse"></a>eclipse</h3><h3 id="5-UML绘图工具"><a href="#5-UML绘图工具" class="headerlink" title="5.UML绘图工具"></a>5.UML绘图工具</h3><p>一些在线的绘图工具有些不错,但绘图不标准,下面是经过实践的安装版linux下的UML绘制工具:</p>
-<ol>
-<li>umlet</li>
-<li>umbrello</li>
-</ol>
-<h3 id="6-linux下的绘图工具推荐"><a href="#6-linux下的绘图工具推荐" class="headerlink" title="6.linux下的绘图工具推荐"></a>6.linux下的绘图工具推荐</h3><ol>
-<li><a href="https://wiki.gnome.org/Apps/Dia/Download" target="_blank" rel="noopener">Dia</a></li>
-<li><a href="http://www.edrawsoft.cn/" target="_blank" rel="noopener">Edraws</a></li>
-<li><a href="https://github.com/knsv/mermaid" target="_blank" rel="noopener">像编程一样绘图,可嵌入各个编辑器插件-mermaid</a></li>
-</ol>
-<h3 id="7-linux下录屏工具"><a href="#7-linux下录屏工具" class="headerlink" title="7.linux下录屏工具"></a>7.linux下录屏工具</h3><ol>
-<li><a href="http://www.maartenbaert.be/simplescreenrecorder/" target="_blank" rel="noopener">SimpleScreenRecorder</a></li>
-</ol>
-<h3 id="8-linux下视频剪辑软件"><a href="#8-linux下视频剪辑软件" class="headerlink" title="8.linux下视频剪辑软件"></a>8.linux下视频剪辑软件</h3><ol>
-<li><a href="https://kdenlive.org/" target="_blank" rel="noopener">kdenlive</a></li>
-</ol>
-<h2 id="辅助工具"><a href="#辅助工具" class="headerlink" title="辅助工具"></a>辅助工具</h2><h3 id="1-keepassx-用于管理密码"><a href="#1-keepassx-用于管理密码" class="headerlink" title="1.keepassx ,用于管理密码"></a>1.keepassx ,用于管理密码</h3><h3 id="2-baidupcs"><a href="#2-baidupcs" class="headerlink" title="2.baidupcs"></a>2.baidupcs</h3><p>一个百度云命令行工具，地址：<a href="https://github.com/GangZhuo/BaiduPCS" target="_blank" rel="noopener">https://github.com/GangZhuo/BaiduPCS</a></p>
-<h3 id="3-浏览器"><a href="#3-浏览器" class="headerlink" title="3.浏览器"></a>3.浏览器</h3><h4 id="3-2firefox"><a href="#3-2firefox" class="headerlink" title="3.2firefox"></a>3.2firefox</h4><h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><p>只需要备份工作空间即可，将workspace打包然后放到backup目录：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tar -cf workspace.tar ~/workspace/</span><br><span class="line">mv workspace.tar ~/backup/ -u</span><br></pre></td></tr></table></figure></p>
-<h2 id="network-indicator"><a href="#network-indicator" class="headerlink" title="network indicator"></a>network indicator</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:fossfreedom/indicator-sysmonitor  </span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install indicator-sysmonitor</span><br></pre></td></tr></table></figure>
-<p><a href="https://blog.csdn.net/bfboys/article/details/53031998" target="_blank" rel="noopener">refrence</a></p>
-<p>在18.x上上面的indicator经常卡死，所以需要换换：</p>
-<p><a href="https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet" target="_blank" rel="noopener">https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet</a></p>
-<h2 id="screen-shot"><a href="#screen-shot" class="headerlink" title="screen shot"></a>screen shot</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Ctrl+Alt+A: gnome-screenshot -ac</span><br></pre></td></tr></table></figure>
-<p>不过，我更喜欢flameshot：和qq/微信截图一样方便<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install flameshot</span><br><span class="line"></span><br><span class="line">flameshot gui</span><br></pre></td></tr></table></figure></p>
-<p>然后旧版本不支持文字，可以手动安装最新版：<br><a href="https://github.com/lupoDharkael/flameshot/issues/11#issuecomment-397700634" target="_blank" rel="noopener">github</a></p>
-<p>或者直接安装deb包。</p>
-<h2 id="Ubuntu-18-x的右键问题"><a href="#Ubuntu-18-x的右键问题" class="headerlink" title="Ubuntu 18.x的右键问题"></a>Ubuntu 18.x的右键问题</h2><p>现在2指单击代表右键，3指单击代表中间键。</p>
-<p>如果实在不习惯，可以安装gnome-tweaks.如下，选择区域.</p>
-<img src="/2017/12/27/linux/000-build-mysystem/001.png">
-<h2 id="Ubuntu播放wmv格式视频"><a href="#Ubuntu播放wmv格式视频" class="headerlink" title="Ubuntu播放wmv格式视频"></a>Ubuntu播放wmv格式视频</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt-get install smplayer</span><br></pre></td></tr></table></figure>
-<p>安装完成后，在Ubuntu的系统设置-&gt;详细信息-&gt;默认应用程序-&gt;视频中，讲播放视频的默认软件改为smplayer就可以了.</p>
-<p>mp4等各种格式都能播放。</p>
-<h2 id="ubuntu下的FTP软件"><a href="#ubuntu下的FTP软件" class="headerlink" title="ubuntu下的FTP软件"></a>ubuntu下的FTP软件</h2><p>在ubunut商店有：filezilla.</p>
-<h2 id="ubuntu下载btorrent"><a href="#ubuntu下载btorrent" class="headerlink" title="ubuntu下载btorrent"></a>ubuntu下载btorrent</h2><p>使用软件：ktorrent<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install ktorrent</span><br></pre></td></tr></table></figure></p>
-<h2 id="ubuntu下载迅雷链接"><a href="#ubuntu下载迅雷链接" class="headerlink" title="ubuntu下载迅雷链接"></a>ubuntu下载迅雷链接</h2><p>迅雷下载协议是经过加密的,如：<br>thunder://QUFlZDJrOi8vfGZpbGV8JUU4JUExJThDJUU1JUIwJUI4JUU4JUI1JUIwJUU4JTgyJTg5LlRoZS5XYWxraW5nLkRlYWQuUzA2RTAxLiVFNCVCOCVBRCVFOCU4QiVCMSVFNSVBRCU5NyVFNSVCOSU5NS5IRFRWcmlwLjEwMjR4NTc2Lm1wNHw2NDg3NTg1MDl8ZjIyZmI2OTRjMDQ0ZmYyNjU0MjhhNTEzNWVhYzhiOTB8aD12eXFsNHFjNHpmYmx0eWNqdW1rcnNibDJza2JscTJsZnwvWlo=<br>直接在Linux下面是没有办法下载的。</p>
-<p>先解码：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo url | base64 -d</span><br></pre></td></tr></table></figure></p>
-<p>显示结果是：<br>AAed2k://|file|%E8%A1%8C%E5%B0%B8%E8%B5%B0%E8%82%89.The.Walking.Dead.S06E01.%E4%B8%AD%E8%8B%B1%E5%AD%97%E5%B9%95.HDTVrip.1024x576.mp4|648758509|f22fb694c044ff265428a5135eac8b90|h=vyql4qc4zfbltycjumkrsbl2skblq2lf|/ZZ</p>
-<p>所以解密后的地址是：ed2k://|file|%E8%A1%8C%E5%B0%B8%E8%B5%B0%E8%82%89.The.Walking.Dead.S06E01.%E4%B8%AD%E8%8B%B1%E5%AD%97%E5%B9%95.HDTVrip.1024x576.mp4|648758509|f22fb694c044ff265428a5135eac8b90|h=vyql4qc4zfbltycjumkrsbl2skblq2lf|/</p>
-<p>安装amule软件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install amule</span><br></pre></td></tr></table></figure></p>
-<p>复制解密后的地址，粘贴到amule里即可.</p>
-<h2 id="ubuntu电子书阅读器"><a href="#ubuntu电子书阅读器" class="headerlink" title="ubuntu电子书阅读器"></a>ubuntu电子书阅读器</h2><p>calibre</p>
-<p>FBReader</p>
-<p>推荐fbreader.</p>
-<h2 id="ubuntu-todo-list"><a href="#ubuntu-todo-list" class="headerlink" title="ubuntu todo list"></a>ubuntu todo list</h2><p>ubuntu18.04自带了一款todo应用，我开始一直以为它很简陋，连同步功能都没有，<br>然后发现还有一个插件，可以连接到<a href="https://todoist.com" target="_blank" rel="noopener">todoist</a>,实现同步。</p>
-<p>于是注册了账号，使用了下，还不错。</p>
-<h1 id="ubuntu-单点登录账户"><a href="#ubuntu-单点登录账户" class="headerlink" title="ubuntu 单点登录账户"></a>ubuntu 单点登录账户</h1><p>ubuntu也像windows有账户了，可以试试。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="最新部分"><a href="#最新部分" class="headerlink" title="最新部分"></a>最新部分</h1><p>从零开始配置ubuntu</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/27/linux/000-build-mysystem/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/27/linux/000-build-mysystem/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="cjysja7g900ibs3chi5gm6zsy" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">8</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-design-pattern/command" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/24/design-pattern/command/" class="article-date">
-  <time datetime="2017-12-24T03:48:17.000Z" itemprop="datePublished">2017-12-24</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/24/design-pattern/command/">command模式实现undo/redo操作</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文将实现一个带有undo/redo操作的计算器来理解command模式.</p>
-<p>首先看看原先的command类图:</p>
-<img src="/2017/12/24/design-pattern/command/000.png">
-<p>然后看看我们这个计算器类图:</p>
-<img src="/2017/12/24/design-pattern/command/001.png">
-<p>下面是代码,简单包懂.</p>
-<p>我们有个计算器:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="comment">//相当于Receiver,真正做事情的对象</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Calculator</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> a;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> b;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> Operation &#123;</span><br><span class="line">        ADD, SUB, MUL, DIV</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Operation operation;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Calculator</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b, Operation operation)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.a = a;</span><br><span class="line">        <span class="keyword">this</span>.b = b;</span><br><span class="line">        <span class="keyword">this</span>.operation = operation;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (operation) &#123;</span><br><span class="line">            <span class="keyword">case</span> ADD:</span><br><span class="line">                result = a + b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SUB:</span><br><span class="line">                result = a - b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MUL:</span><br><span class="line">                result = a * b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> DIV:</span><br><span class="line">                <span class="keyword">if</span> (b == <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"除数为0"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                result = a / b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"计算:"</span> + a + getOp() + b + <span class="string">"="</span> + result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String op = getOp();</span><br><span class="line">        <span class="keyword">return</span> a + op + b + <span class="string">"="</span> + result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getOp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String op = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">switch</span> (operation) &#123;</span><br><span class="line">            <span class="keyword">case</span> ADD:</span><br><span class="line">                op = <span class="string">"+"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SUB:</span><br><span class="line">                op = <span class="string">"-"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MUL:</span><br><span class="line">                op = <span class="string">"*"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> DIV:</span><br><span class="line">                op = <span class="string">"/"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> op;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>总的命令接口:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span></span>;<span class="comment">//执行或重做</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span></span>;<span class="comment">//撤销</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>具体的命令实现:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ComputeCommand</span> <span class="keyword">implements</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Calculator calculator;</span><br><span class="line">    <span class="keyword">private</span> Calculator preCalculator;<span class="comment">//上一步的计算,用于回退</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ComputeCommand</span><span class="params">(Calculator calculator)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.calculator = calculator;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.preCalculator = calculator;</span><br><span class="line">        calculator.compute();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//这里的撤销是执行上一次运算</span></span><br><span class="line">        preCalculator.compute();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> calculator.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>然后是Invoker,这里为User类:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Stack;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用计算器的用户,对于Invoker</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Stack&lt;Command&gt; undos;</span><br><span class="line">    <span class="keyword">private</span> Stack&lt;Command&gt; redos;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.undos = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">        <span class="keyword">this</span>.redos = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (undos.size() == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"没有撤销步骤"</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Command cmd = undos.pop();</span><br><span class="line"><span class="comment">//        cmd.undo();//撤销不需要再计算了,假如是累计计算撤销才有用</span></span><br><span class="line">        redos.push(cmd);</span><br><span class="line">        System.out.println(<span class="string">"撤销:"</span> + cmd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">redo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (redos.size() == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"没有重做步骤"</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Command cmd = redos.pop();</span><br><span class="line">        cmd.execute();</span><br><span class="line">        undos.push(cmd);</span><br><span class="line">        System.out.println(<span class="string">"重做:"</span> + cmd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//这才是用户调用的接口</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compute</span><span class="params">(Calculator.Operation operation, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        ComputeCommand computeCommand = <span class="keyword">new</span> ComputeCommand(<span class="keyword">new</span> Calculator(a, b, operation));</span><br><span class="line">        computeCommand.execute();</span><br><span class="line">        undos.add(computeCommand);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>最后是Client,相当于整个应用界面:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.compute(Calculator.Operation.ADD, <span class="number">100</span>, <span class="number">20</span>);</span><br><span class="line">        user.compute(Calculator.Operation.SUB, -<span class="number">100</span>, <span class="number">50</span>);</span><br><span class="line">        user.compute(Calculator.Operation.MUL, <span class="number">10</span>, <span class="number">30</span>);</span><br><span class="line">        user.undo();</span><br><span class="line">        user.undo();</span><br><span class="line">        user.redo();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>运行结果:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">计算:100+20=120</span><br><span class="line">计算:-100-50=-150</span><br><span class="line">计算:10*30=300</span><br><span class="line">撤销:10*30=300</span><br><span class="line">撤销:-100-50=-150</span><br><span class="line">计算:-100-50=-150</span><br><span class="line">重做:-100-50=-150</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文将实现一个带有undo/redo操作的计算器来理解command模式.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/24/design-pattern/command/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/24/design-pattern/command/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/24/design-pattern/command/" data-id="cjysja7am003is3chqdg7gq15" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
 
       </footer>
       </div>
@@ -2094,7 +1901,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -2104,7 +1911,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2126,23 +1933,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/08/01/java/056-mybatis-generate-plugin/">mybatis生成插件</a>
+            <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
           </li>
         
           <li>
-            <a href="/2019/07/30/android/001-android-webdav-client/">android web-dav client</a>
+            <a href="/2019/08/12/linux/029-syslog/">认识syslog</a>
           </li>
         
           <li>
-            <a href="/2019/07/29/life/025-weekly-learn/">2019-31-周报</a>
+            <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
           </li>
         
           <li>
-            <a href="/2019/07/28/java/055-java-webdav-client/">java实现web-dav客户端</a>
+            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
           <li>
-            <a href="/2019/07/28/tools/017-pandoc/">强大的pandoc</a>
+            <a href="/2019/08/05/life/026-weekly-learn/">2019-32-周报</a>
           </li>
         
       </ul>

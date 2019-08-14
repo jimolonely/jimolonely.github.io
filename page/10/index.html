@@ -86,6 +86,550 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-lang/007-redis-mass-insertion" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/03/lang/007-redis-mass-insertion/" class="article-date">
+  <time datetime="2018-09-03T01:29:01.000Z" itemprop="datePublished">2018-09-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/03/lang/007-redis-mass-insertion/">redis批量插入</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>有时，Redis实例需要在很短的时间内加载大量预先存在的或用户生成的数据，以便尽可能快地创建数百万个key。</p>
+<p>这称为大量插入，本文档的目标是提供有关如何尽快为Redis提供数据的信息。</p>
+<img src="/2018/09/03/lang/007-redis-mass-insertion/000.png">
+<h1 id="使用Luke协议"><a href="#使用Luke协议" class="headerlink" title="使用Luke协议"></a>使用Luke协议</h1><p>使用普通的Redis客户端进行大量插入并不是一个好主意，原因有几个：在另一个命令之后发送一个命令的天真方法很慢，因为你必须为每个命令支付往返时间。 可以使用流水线操作，但是为了大量插入许多记录，您需要在同时读取回复时编写新命令，以确保尽可能快地插入。</p>
+<p>只有一小部分客户端支持非阻塞I/O，并非所有客户端都能够以有效的方式解析回复以最大化吞吐量。 由于所有这些原因，将数据大量导入Redis的首选方法是以原始格式生成包含Redis协议的文本文件，以便调用插入所需数据所需的命令。</p>
+<p>例如，如果我需要生成一个大型数据集，其中表格中有数十亿个键：`keyN - &gt; ValueN’我将创建一个包含Redis协议格式的以下命令的文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SET Key0 Value0</span><br><span class="line">SET Key1 Value1</span><br><span class="line">...</span><br><span class="line">SET KeyN ValueN</span><br></pre></td></tr></table></figure></p>
+<p>创建此文件后，剩下的操作是尽快将其提供给Redis。 在过去，执行此操作的方法是使用netcat和以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(cat data.txt; sleep 10) | nc localhost 6379 &gt; /dev/null</span><br></pre></td></tr></table></figure>
+<p>但是，这不是一种非常可靠的方法来执行批量导入，因为netcat并不真正知道何时传输了所有数据并且无法检查错误。 在2.6或更高版本的Redis中，redis-cli实用程序支持一种称为管道模式的新模式，该模式是为了执行大规模插入而设计的。</p>
+<p>使用管道模式运行的命令如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat data.txt | redis-cli --pipe</span><br></pre></td></tr></table></figure></p>
+<p>这将产生类似于此的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">All data transferred. Waiting for the last reply...</span><br><span class="line">Last reply received from server.</span><br><span class="line">errors: 0, replies: 1000000</span><br></pre></td></tr></table></figure></p>
+<p>redis-cli实用程序还将确保仅将从Redis实例接收的错误重定向到标准输出。</p>
+<h1 id="生成Redis协议"><a href="#生成Redis协议" class="headerlink" title="生成Redis协议"></a>生成Redis协议</h1><p>Redis协议生成和解析非常简单，并在此处记录。 但是，为了生成大规模插入目标的协议，您不需要了解协议的每个细节，而只需要按以下方式表示每个命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">*&lt;args&gt;&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">$&lt;len&gt;&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">&lt;arg0&gt;&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">&lt;arg1&gt;&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">...</span><br><span class="line">&lt;argN&gt;&lt;cr&gt;&lt;lf&gt;</span><br></pre></td></tr></table></figure></p>
+<p>其中 <code>&lt;cr&gt;</code> 表示“\ r”（或ASCII字符13），<code>&lt;lf&gt;</code> 表示“\ n”（或ASCII字符10）。</p>
+<p>例如，命令 <code>SET key value</code> 由以下协议表示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">*3&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">$3&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">SET&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">$3&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">key&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">$5&lt;cr&gt;&lt;lf&gt;</span><br><span class="line">value&lt;cr&gt;&lt;lf&gt;</span><br></pre></td></tr></table></figure>
+<p>或表示为带引号的字符串：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n&quot;</span><br></pre></td></tr></table></figure></p>
+<p>您需要为大量插入生成的文件只是由以上述方式表示的命令组成，一个接一个。</p>
+<p>以下Ruby函数生成有效的协议：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_redis_proto</span><span class="params">(*cmd)</span></span></span><br><span class="line">    proto = <span class="string">""</span></span><br><span class="line">    proto &lt;&lt; <span class="string">"*"</span>+cmd.length.to_s+<span class="string">"\r\n"</span></span><br><span class="line">    cmd.each&#123;<span class="params">|arg|</span></span><br><span class="line">        proto &lt;&lt; <span class="string">"$"</span>+arg.to_s.bytesize.to_s+<span class="string">"\r\n"</span></span><br><span class="line">        proto &lt;&lt; arg.to_s+<span class="string">"\r\n"</span></span><br><span class="line">    &#125;</span><br><span class="line">    proto</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">puts gen_redis_proto(<span class="string">"SET"</span>,<span class="string">"mykey"</span>,<span class="string">"Hello World!"</span>).inspect</span><br></pre></td></tr></table></figure></p>
+<p>使用上述函数，可以使用以下程序轻松生成上例中的键值对：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(0...1000).each&#123;|n|</span><br><span class="line">    STDOUT.write(gen_redis_proto(&quot;SET&quot;,&quot;Key#&#123;n&#125;&quot;,&quot;Value#&#123;n&#125;&quot;))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们可以直接在管道中运行程序到redis-cli，以便执行我们的第一次批量导入会话。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ ruby proto.rb | redis-cli --pipe</span><br><span class="line">All data transferred. Waiting for the last reply...</span><br><span class="line">Last reply received from server.</span><br><span class="line">errors: 0, replies: 1000</span><br></pre></td></tr></table></figure>
+<h1 id="管道模式如何工作"><a href="#管道模式如何工作" class="headerlink" title="管道模式如何工作"></a>管道模式如何工作</h1><p>在redis-cli的管道模式中需要的魔法是和netcat一样快，并且仍然能够理解服务器同时发送最后一个回复的时间。</p>
+<p>这是通过以下方式获得的：</p>
+<ul>
+<li>redis-cli –pipe尝试尽可能快地向服务器发送数据。</li>
+<li>同时，它在可用时读取数据，尝试解析它。</li>
+<li>一旦没有更多数据要从stdin读取，它就会发送一个带有随机20字节字符串的特殊ECHO命令：我们确定这是发送的最新命令，如果收到相同的20字节作为批量回复，我们确信我们可以匹配回复检查。</li>
+<li>一旦发送了这个特殊的最终命令，接收回复的代码就会开始匹配这20个字节的回复。 当达到匹配的回复时，它可以成功退出。</li>
+</ul>
+<p>使用这个技巧,为了了解我们发送的命令数量，我们不需要解析我们发送给服务器的协议，只是回复即可。</p>
+<p>但是，在解析回复时，我们会对所有已解析的回复进行计数，以便最后我们能够告诉用户大量插入会话传输到服务器的命令数量。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>有时，Redis实例需要在很短的时间内加载大量预先存在的或用户生成的数据，以便尽可能快地创建数百万个key。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/03/lang/007-redis-mass-insertion/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/03/lang/007-redis-mass-insertion/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjzav3pu4009mgnchzp21ctix" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-lang/006-redis-transaction" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/03/lang/006-redis-transaction/" class="article-date">
+  <time datetime="2018-09-03T00:07:48.000Z" itemprop="datePublished">2018-09-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/03/lang/006-redis-transaction/">redis事务</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>MULTI，EXEC，DISCARD和WATCH是Redis交易的基础。它们允许在一个步骤中执行一组命令，具有两个重要保证：</p>
+<ul>
+<li><p>事务中的所有命令都被序列化并按顺序执行。在执行Redis事务的过程中，不会发生由另一个客户端发出的请求。这可以保证命令作为单个隔离操作执行。</p>
+</li>
+<li><p>要么处理所有命令，要么都不处理，因此Redis事务也是原子的。 EXEC命令触发事务中所有命令的执行，因此如果客户端在调用MULTI命令之前在事务上下文中丢失了与服务器的连接，则不执行任何操作，而如果调用EXEC命令，则执行所有操作。使用 仅追加文件 时，Redis确保使用单个write（2）系统调用在磁盘上写入事务。但是，如果Redis服务器以某种困难的方式崩溃或被系统管理员杀死，则可能只注册了部分操作。 Redis将在重新启动时检测到此情况，并将退出并显示错误。使用redis-check-aof工具可以修复仅删除部分事务的append only文件，以便服务器可以重新启动。</p>
+</li>
+</ul>
+<p>从版本2.2开始，Redis允许对上述两者进行额外保证，其形式为 <strong>乐观锁定</strong>，其方式与check and set（CAS）操作非常相似。这将在本页后面介绍。</p>
+<img src="/2018/09/03/lang/006-redis-transaction/000.png">
+<h1 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h1><p>使用MULTI命令输入Redis事务。 该命令总是回复OK。 此时，用户可以发出多个命令。 Redis不会执行这些命令，而是将它们排队。 调用EXEC后执行所有命令。</p>
+<p>而调用DISCARD将刷新事务队列并退出事务。</p>
+<p>以下示例以原子方式递增键foo和bar。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">&gt; INCR foo</span><br><span class="line">QUEUED</span><br><span class="line">&gt; INCR bar</span><br><span class="line">QUEUED</span><br><span class="line">&gt; EXEC</span><br><span class="line">1) (integer) 1</span><br><span class="line">2) (integer) 1</span><br></pre></td></tr></table></figure></p>
+<p>从上面的会话中可以看出，EXEC返回一个回复数组，其中每个元素都是事务中单个命令的回复，其顺序与发出命令的顺序相同。</p>
+<p>当Redis连接在MULTI请求的上下文中时，所有命令都将使用字符串QUEUED进行回复（从Redis协议的角度发送为状态回复）。 排队命令只是在调用EXEC时被调度执行。</p>
+<h1 id="事务中的错误"><a href="#事务中的错误" class="headerlink" title="事务中的错误"></a>事务中的错误</h1><p>在事务期间，可能会遇到两种命令错误：</p>
+<ol>
+<li>命令可能无法排队，因此在调用EXEC之前可能会出错。 例如，命令可能在语法错误（错误的参数数量，错误的命令名称，……），或者可能存在一些关键条件，如内存不足情况（如果服务器配置为使用maxmemory具有内存限制） 指示）。</li>
+<li>调用EXEC后命令可能会失败，例如，因为我们对具有错误值的键执行了操作（比如对字符串值调用列表操作）。</li>
+</ol>
+<p>客户端通过检查排队命令的返回值来感知在EXEC调用之前发生的第一类错误：<strong>如果命令回复QUEUED，则它正确排队</strong>，否则Redis会返回错误。 如果在排队命令时出错，大多数客户端将中止丢弃该事务的事务。</p>
+<p>但是从Redis 2.6.5开始，服务器会记住在命令累积期间出错，并且拒绝执行事务，在EXEC期间返回错误，并自动丢弃事务。</p>
+<p>在Redis 2.6.5之前，行为是仅使用成功排队的命令子集来执行事务，以防客户端调用EXEC而不管以前的错误。 新行为使得使用流水线操作混合事务变得更加简单，因此可以立即发送整个事务，稍后立即读取所有回复。</p>
+<p>EXEC之后发生的错误不是以特殊方式处理的：即使某些命令在事务期间失败，所有其他命令也将被执行。</p>
+<p>在协议级别上更清楚。 在以下示例中，即使语法正确，执行时一个命令也会失败：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Trying 127.0.0.1...</span><br><span class="line">Connected to localhost.</span><br><span class="line">Escape character is &apos;^]&apos;.</span><br><span class="line">MULTI</span><br><span class="line">+OK</span><br><span class="line">SET a 3</span><br><span class="line">abc</span><br><span class="line">+QUEUED</span><br><span class="line">LPOP a</span><br><span class="line">+QUEUED</span><br><span class="line">EXEC</span><br><span class="line">*2</span><br><span class="line">+OK</span><br><span class="line">-ERR Operation against a key holding the wrong kind of value</span><br></pre></td></tr></table></figure></p>
+<p>EXEC返回两元素批量字符串回复，其中一个是OK代码，另一个是-ERR回复。 由客户端库来查找向用户提供错误的合理方法。</p>
+<p>重要的是要注意，<strong>即使命令失败，队列中的所有其他命令也会被处理</strong> - Redis不会停止处理命令。</p>
+<p>再一次使用telnet的有线协议的另一个例子显示了ASAP如何报告语法错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MULTI</span><br><span class="line">+OK</span><br><span class="line">INCR a b c</span><br><span class="line">-ERR wrong number of arguments for &apos;incr&apos; command</span><br></pre></td></tr></table></figure></p>
+<p>这次由于语法错误，错误的INCR命令根本没有排队。</p>
+<h1 id="为什么Redis不支持回滚？"><a href="#为什么Redis不支持回滚？" class="headerlink" title="为什么Redis不支持回滚？"></a>为什么Redis不支持回滚？</h1><p>如果您有关系数据库背景，Redis命令在事务期间可能会失败，但仍然Redis将执行事务的其余部分而不是回滚，这可能看起来很奇怪。</p>
+<p>但是对于这种行为有很好的意见：</p>
+<ul>
+<li>只有在使用错误的语法调用时才会失败Redis命令（并且在命令排队期间无法检测到问题），或者对于持有错误数据类型的键，Redis命令可能会失败：这意味着实际上失败的命令是编程错误的结果， 以及在开发过程中很可能检测到的一种错误，而不是在生产中。</li>
+<li>Redis内部简化且速度更快，因为它不需要回滚的能力。</li>
+</ul>
+<p>反对Redis观点的论点是错误发生，但应该注意的是，通常回滚不会使您免于编程错误。 例如，如果查询将键增加2而不是1，或者增加错误的键，则回滚机制无法提供帮助。 鉴于没有人可以将程序员从他或她的错误中解救出来，并且Redis命令失败所需的错误类型不太可能进入生产阶段，我们选择了更简单，更快速的方法，即不支持错误回滚。</p>
+<h1 id="丢弃命令队列"><a href="#丢弃命令队列" class="headerlink" title="丢弃命令队列"></a>丢弃命令队列</h1><p>DISCARD可用于中止交易。 在这种情况下，不执行任何命令，并且连接状态恢复正常。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; SET foo 1</span><br><span class="line">OK</span><br><span class="line">&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">&gt; INCR foo</span><br><span class="line">QUEUED</span><br><span class="line">&gt; DISCARD</span><br><span class="line">OK</span><br><span class="line">&gt; GET foo</span><br><span class="line">&quot;1&quot;</span><br></pre></td></tr></table></figure></p>
+<h1 id="使用CAS乐观锁"><a href="#使用CAS乐观锁" class="headerlink" title="使用CAS乐观锁"></a>使用CAS乐观锁</h1><p>WATCH用于为Redis事务提供检查和设置（CAS）行为。</p>
+<p>监视WATCHed键 以检测对它们的更改。 如果在EXEC命令之前修改了至少一个监视key，则整个事务将中止，并且EXEC返回Null应答以通知该事务失败。</p>
+<p>例如，假设我们需要将键的值原子递增1（假设Redis没有INCR）。</p>
+<p>第一次尝试可能如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">val = GET mykey</span><br><span class="line">val = val + 1</span><br><span class="line">SET mykey $val</span><br></pre></td></tr></table></figure></p>
+<p>只有当我们有一个客户在给定时间内执行操作时，这才能可靠地工作。 如果多个客户端几乎在同一时间尝试递增key，则会出现竞争条件。 例如，客户端A和B将读取旧值，例如，10。两个客户端的值将增加到11，最后SET key的值。 所以最终值将是11而不是12。</p>
+<p>感谢WATCH，我们能够非常好地模拟问题：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">WATCH mykey</span><br><span class="line">val = GET mykey</span><br><span class="line">val = val + 1</span><br><span class="line">MULTI</span><br><span class="line">SET mykey $val</span><br><span class="line">EXEC</span><br></pre></td></tr></table></figure></p>
+<p>使用上面的代码，如果存在竞争条件而另一个客户端在我们调用WATCH和调用EXEC之间的时间内修改了val的结果，则事务将失败。</p>
+<p>我们只需重复操作，希望这次我们不会再遇到新的竞争。 这种形式的锁称为乐观锁，是一种非常强大的锁形式。 在许多用例中，多个客户端将访问不同的key，因此不太可能发生冲突 - 通常不需要重复操作。</p>
+<h1 id="WATCH解释"><a href="#WATCH解释" class="headerlink" title="WATCH解释"></a>WATCH解释</h1><p>那么WATCH究竟是什么呢？ 这是一个使EXEC成为条件的命令：只有在没有修改任何WATCHed键时，我们才会要求Redis执行事务,（但是它们可能会被交易中的同一客户更改而不会中止）否则交易根本不会输入。 （请注意，如果你观察一个易失性key并且Redis在你看完key后使key到期，那么EXEC仍然有用）。</p>
+<p>可以多次调用WATCH。 简单地说，所有WATCH呼叫都会有效监视从呼叫开始的更改，直到调用EXEC。 您还可以向单个WATCH呼叫发送任意数量的key。</p>
+<p>调用EXEC时，无论事务是否中止，所有键都是UNWATCHed。 此外，当客户端连接关闭时，所有内容都会被UNWATCHed。</p>
+<p>也可以使用UNWATCH命令（不带参数）来刷新 <strong>所有</strong> 被监视的键。 有时这很有用，因为我们乐观地锁定了几个键，因为我们可能需要执行一个事务来改变这些键，但是在读完键的当前内容后我们不想继续。 当发生这种情况时，我们只需调用UNWATCH，以便连接可以自由地用于新事务。</p>
+<h2 id="使用WATCH实现ZPOP"><a href="#使用WATCH实现ZPOP" class="headerlink" title="使用WATCH实现ZPOP"></a>使用WATCH实现ZPOP</h2><p>一个很好的例子来说明如何使用WATCH创建新的原子操作，因为Redis不支持ZPOP，这个操作以原子方式从排序集（sorted set）中弹出具有较低分数的元素。 这是最简单的实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">WATCH zset</span><br><span class="line">element = ZRANGE zset 0 0</span><br><span class="line">MULTI</span><br><span class="line">ZREM zset element</span><br><span class="line">EXEC</span><br></pre></td></tr></table></figure>
+<p>如果EXEC失败（即返回Null回复），我们只需重复操作。</p>
+<h1 id="Redis脚本和事务"><a href="#Redis脚本和事务" class="headerlink" title="Redis脚本和事务"></a>Redis脚本和事务</h1><p>根据定义，Redis脚本是事务性的，因此您可以使用Redis事务执行所有操作，也可以使用脚本执行操作，通常脚本更简单，更快速。</p>
+<p>这种重复是因为在Redis 2.6中引入了脚本，而事务早就存在了。 但是，我们不太可能在短时间内删除对事务的支持，因为即使不使用Redis脚本，它仍然可以避免竞争条件，特别是因为Redis事务的实现复杂性很小，因此在语义上似乎是合适的。</p>
+<p><strong>然而，在不久的将来，我们将看到整个用户群只是使用脚本并非不可能。 如果发生这种情况，我们可能会弃用并最终删除交易</strong>。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>MULTI，EXEC，DISCARD和WATCH是Redis交易的基础。它们允许在一个步骤中执行一组命令，具有两个重要保证：</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/03/lang/006-redis-transaction/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/03/lang/006-redis-transaction/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjzav3pu3009kgnch41oo62d6" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-linux/015-vim-command" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/02/linux/015-vim-command/" class="article-date">
+  <time datetime="2018-09-02T08:47:03.000Z" itemprop="datePublished">2018-09-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/02/linux/015-vim-command/">vim</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>以下是一些常用的vi命令</p>
+<h1 id="注释多行"><a href="#注释多行" class="headerlink" title="注释多行"></a>注释多行</h1><p>可以使用替换命令 : <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">以下操作均在命令模式：</span><br><span class="line">```shell</span><br><span class="line"># 首先我们显示行号</span><br><span class="line">:set nu</span><br><span class="line"># 以#号注释10到20行</span><br><span class="line">:10,20s/^/#</span><br><span class="line"># 取消注释</span><br><span class="line">:10,20s/^#/</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>以下是一些常用的vi命令</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/02/linux/015-vim-command/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/02/linux/015-vim-command/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjzav3pv500clgnch1j0xna90" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">2</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-lang/005-redis-pubsub" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/02/lang/005-redis-pubsub/" class="article-date">
+  <time datetime="2018-09-02T07:26:06.000Z" itemprop="datePublished">2018-09-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/02/lang/005-redis-pubsub/">redis pub/sub</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>SUBSCRIBE，UNSUBSCRIBE和PUBLISH实现发布/订阅消息传递范例，其中（引用维基百科）发件人（发布者）未被编程为将其消息发送给特定接收者（订阅者）。 相反，发布的消息被表征为信道，而不知道可能存在什么（如果有的话）订户。 订阅者表达对一个或多个频道的兴趣，并且仅接收感兴趣的消息，而不知道存在哪些（如果有的话）发布者。 发布者和订阅者的这种分离可以实现更大的可扩展性和更动态的网络拓扑。</p>
+<p>例如，为了订阅频道foo和bar，客户端发出SUBSCRIBE，提供频道名称：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SUBSCRIBE foo bar</span><br></pre></td></tr></table></figure></p>
+<p>其他客户端发送到这些频道的消息将由Redis推送到所有订阅的客户端。</p>
+<p>订阅一个或多个频道的客户端不应发出命令，尽管它可以订阅和取消订阅其他频道。 对订阅和取消订阅操作的回复以消息的形式发送，以便客户端可以只读取连贯的消息流，其中第一个元素指示消息的类型。 订阅客户端上下文中允许的命令是SUBSCRIBE，PSUBSCRIBE，UNSUBSCRIBE，PUNSUBSCRIBE，PING和QUIT。</p>
+<p>请注意，redis-cli在订阅模式下不会接受任何命令，只能使用Ctrl-C退出该模式。</p>
+<h1 id="推送消息的格式"><a href="#推送消息的格式" class="headerlink" title="推送消息的格式"></a>推送消息的格式</h1><p>消息是具有三个元素的Array回复。</p>
+<p>第一个元素是消息的类型：</p>
+<ul>
+<li><p>subscribe：表示我们成功订阅了作为回复中第二个元素的通道。 第三个参数表示我们当前订阅的频道数。</p>
+</li>
+<li><p>unsubscribe：表示我们成功取消订阅作为回复中第二个元素的频道。 第三个参数表示我们当前订阅的频道数。 当最后一个参数为零时，我们不再订阅任何通道，并且客户端可以发出任何类型的Redis命令，因为我们在Pub / Sub状态之外。</p>
+</li>
+<li><p>message：它是由另一个客户端发出的PUBLISH命令接收的消息。 第二个元素是原始通道的名称，第三个参数是实际的消息有效负载。</p>
+</li>
+</ul>
+<h1 id="数据库和范围"><a href="#数据库和范围" class="headerlink" title="数据库和范围"></a>数据库和范围</h1><p>Pub / Sub与key空间无关。 它被认为不会在任何级别上干扰它，包括数据库号。</p>
+<p>数据库1上的订阅者将听到db 10上的发布。</p>
+<p>如果您需要某种范围，请在通道前加上环境名称（测试，登台，生产……）。</p>
+<h1 id="有线协议示例"><a href="#有线协议示例" class="headerlink" title="有线协议示例"></a>有线协议示例</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">SUBSCRIBE first second</span><br><span class="line">*3</span><br><span class="line">$9</span><br><span class="line">subscribe</span><br><span class="line">$5</span><br><span class="line">first</span><br><span class="line">:1</span><br><span class="line">*3</span><br><span class="line">$9</span><br><span class="line">subscribe</span><br><span class="line">$6</span><br><span class="line">second</span><br><span class="line">:2</span><br></pre></td></tr></table></figure>
+<p>此时，我们从另一个客户端发出针对名为second的通道的PUBLISH操作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; PUBLISH second Hello</span><br></pre></td></tr></table></figure></p>
+<p>这是第一个客户端收到的内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">*3</span><br><span class="line">$7</span><br><span class="line">message</span><br><span class="line">$6</span><br><span class="line">second</span><br><span class="line">$5</span><br><span class="line">Hello</span><br></pre></td></tr></table></figure></p>
+<p>现在，客户端使用UNSUBSCRIBE命令从所有通道取消订阅，而无需其他参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">UNSUBSCRIBE</span><br><span class="line">*3</span><br><span class="line">$11</span><br><span class="line">unsubscribe</span><br><span class="line">$6</span><br><span class="line">second</span><br><span class="line">:1</span><br><span class="line">*3</span><br><span class="line">$11</span><br><span class="line">unsubscribe</span><br><span class="line">$5</span><br><span class="line">first</span><br><span class="line">:0</span><br></pre></td></tr></table></figure></p>
+<h1 id="模式匹配订阅"><a href="#模式匹配订阅" class="headerlink" title="模式匹配订阅"></a>模式匹配订阅</h1><p>Redis Pub / Sub实现支持模式匹配。 客户端可以订阅glob样式模式，以便接收发送到与给定模式匹配的通道名称的所有消息。</p>
+<p>例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PSUBSCRIBE news.*</span><br></pre></td></tr></table></figure></p>
+<p>将收到发送到频道news.art.figurative，news.music.jazz等的所有消息。所有的glob样式模式都是有效的，因此支持多个通配符。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PUNSUBSCRIBE news.*</span><br></pre></td></tr></table></figure></p>
+<p>然后将取消订阅该模式的客户端。 此连接不会影响其他订阅。</p>
+<p>由于模式匹配而收到的消息以不同的格式发送：</p>
+<ul>
+<li>消息的类型是pmessage：它是由另一个客户端发出的PUBLISH命令接收的消息，匹配模式匹配订阅。 第二个元素是匹配的原始模式，第三个元素是原始通道的名称，最后一个元素是实际的消息有效负载。</li>
+</ul>
+<p>与SUBSCRIBE和UNSUBSCRIBE类似，系统通过使用与订阅和取消订阅消息格式相同的格式发送类型为psubscribe和punsubscribe的消息来确认PSUBSCRIBE和PUNSUBSCRIBE命令。</p>
+<h1 id="匹配模式和频道订阅的消息"><a href="#匹配模式和频道订阅的消息" class="headerlink" title="匹配模式和频道订阅的消息"></a>匹配模式和频道订阅的消息</h1><p>如果客户端订阅了与已发布消息匹配的多个模式，或者如果订阅了与该消息匹配的模式和信道，则客户端可以多次接收单个消息。 如下例所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SUBSCRIBE foo</span><br><span class="line">PSUBSCRIBE f*</span><br></pre></td></tr></table></figure></p>
+<p>在上面的示例中，如果将消息发送到通道foo，则客户端将收到两条消息：一个是message消息，一个是pmessage。</p>
+<h1 id="带模式匹配的订阅计数的含义"><a href="#带模式匹配的订阅计数的含义" class="headerlink" title="带模式匹配的订阅计数的含义"></a>带模式匹配的订阅计数的含义</h1><p>在订阅，取消订阅，psubscribe和punsubscribe消息类型中，最后一个参数是仍处于活动状态的订阅计数。 <strong>此数字实际上是客户端仍订阅的通道和模式的总数</strong>。 因此，只有当此计数从所有通道和模式取消订阅后降至零时，客户端才会退出发布/订阅状态。</p>
+<h1 id="编程示例"><a href="#编程示例" class="headerlink" title="编程示例"></a>编程示例</h1><p>Pieter Noordhuis使用EventMachine和Redis提供了一个很好的例子来创建一个多用户高性能的Web聊天。<br><a href="https://gist.github.com/pietern/348262" target="_blank" rel="noopener">code</a></p>
+<h1 id="客户端库实现提示"><a href="#客户端库实现提示" class="headerlink" title="客户端库实现提示"></a>客户端库实现提示</h1><p>因为收到的所有消息都包含导致消息传递的原始订阅（message类型为通道，而pmessage类型为原始模式）客户端库可能会将原始订阅绑定到回调（可以是匿名函数， 块，函数指针），使用哈希表。</p>
+<p>当收到消息时，可以进行O（1）查找，以便将消息传递给已注册的回调。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>SUBSCRIBE，UNSUBSCRIBE和PUBLISH实现发布/订阅消息传递范例，其中（引用维基百科）发件人（发布者）未被编程为将其消息发送给特定接收者（订阅者）。 相反，发布的消息被表征为信道，而不知道可能存在什么（如果有的话）订户。 订阅者表达对一个或多个频道的兴趣，并且仅接收感兴趣的消息，而不知道存在哪些（如果有的话）发布者。 发布者和订阅者的这种分离可以实现更大的可扩展性和更动态的网络拓扑。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/02/lang/005-redis-pubsub/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/02/lang/005-redis-pubsub/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjzav3pu2009ggnch04her35y" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-lang/004-redis-pipelining" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/01/lang/004-redis-pipelining/" class="article-date">
+  <time datetime="2018-09-01T15:08:56.000Z" itemprop="datePublished">2018-09-01</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/01/lang/004-redis-pipelining/">redis pipelining</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用pipelining技术加速Redis查询</p>
+<h1 id="请求-响应协议和RTT"><a href="#请求-响应协议和RTT" class="headerlink" title="请求/响应协议和RTT"></a>请求/响应协议和RTT</h1><p>Redis是一个使用 客户端-服务器 模型的TCP服务器，也就是所谓的请求/响应协议。</p>
+<p>这意味着通常通过以下步骤完成请求：</p>
+<ul>
+<li>客户端向服务器发送查询，并通常以阻塞方式从套接字读取服务器响应。</li>
+<li>服务器处理该命令并将响应发送回客户端。</li>
+</ul>
+<p>因此，例如，四个命令序列是这样的：</p>
+<ul>
+<li>客户端：INCR X.</li>
+<li>服务器：1</li>
+<li>客户端：INCR X.</li>
+<li>服务器：2</li>
+<li>客户端：INCR X.</li>
+<li>服务器：3</li>
+<li>客户端：INCR X.</li>
+<li>服务器：4</li>
+</ul>
+<p>客户端端和服务器通过网络链接连接。这样的链接可以非常快（环回接口）或非常慢（在因特网上建立的连接，在两个主机之间有许多跳）。无论网络延迟是什么，数据包都有一段时间从客户端传输到服务器，然后从服务器返回到客户端以进行回复。</p>
+<p>此时间称为RTT（往返时间,round trip time）。当客户端需要连续执行许多请求时（例如，将多个元素添加到同一列表或使用许多键填充数据库），很容易看出这会如何影响性能。例如，如果RTT时间是250毫秒（在因特网上的链路非常慢的情况下），即使服务器能够每秒处理100k个请求，我们也只能够以每秒最多四个请求进行处理。</p>
+<p>如果使用的接口是环回接口，则RTT要短得多（例如我的主机报告为0.044毫秒，ping 127.0.0.1），但如果你需要连续执行多次写入，它仍然很多。</p>
+<p>幸运的是，有一种方法可以改进这个用例。</p>
+<h1 id="Redis-Pipelining"><a href="#Redis-Pipelining" class="headerlink" title="Redis Pipelining"></a>Redis Pipelining</h1><p>可以实现请求/响应服务器，以便即使客户端尚未读取旧响应，它也能够处理新请求。 这样就可以在不等待回复的情况下向服务器发送多个命令，最后只需一步即可读取回复。</p>
+<p>这被称为流水线技术，并且是几十年来广泛使用的技术。 例如，许多POP3协议实现已经支持此功能，大大加快了从服务器下载新电子邮件的过程。</p>
+<p>Redis从很早就开始支持流水线操作，因此无论您运行什么版本，都可以使用Redis进行流水线操作。 这是使用原始netcat实用程序的示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ (printf &quot;PING\r\nPING\r\nPING\r\n&quot;; sleep 1) | nc localhost 6379</span><br><span class="line">+PONG</span><br><span class="line">+PONG</span><br><span class="line">+PONG</span><br></pre></td></tr></table></figure>
+<p>这次我们不是为每次连接都支付RTT开销，而是为这三个命令只支付一次。</p>
+<p>为了非常明确，使用流水线操作我们的第一个示例的操作顺序如下：</p>
+<ul>
+<li>客户端：INCR X.</li>
+<li>客户端：INCR X.</li>
+<li>客户端：INCR X.</li>
+<li>客户端：INCR X.</li>
+<li>服务器：1</li>
+<li>服务器：2</li>
+<li>服务器：3</li>
+<li>服务器：4</li>
+</ul>
+<p>重要说明：当客户端使用流水线发送命令时，服务器将被强制使用内存对回复进行排队。 因此，如果您需要使用流水线发送大量命令，最好将它们作为具有合理数量的批次发送，例如10k命令，读取回复，然后再次发送另外10k命令，依此类推。 速度几乎相同，但使用的额外内存将最多为排队10k命令的回复所需的数量。</p>
+<h1 id="这不仅仅是RTT的问题"><a href="#这不仅仅是RTT的问题" class="headerlink" title="这不仅仅是RTT的问题"></a>这不仅仅是RTT的问题</h1><p>流水线技术不仅仅是为了减少由于往返时间而导致的延迟成本的一种方式，它实际上大大提高了您在给定Redis服务器中每秒可执行的总操作量。 这是因为，在不使用流水线技术的情况下，从访问数据结构和产生回复的角度来看，为每个命令提供服务是非常便宜的，但是从执行套接字I/O的角度来看，这是非常昂贵的。 这涉及调用read（）和write（）系统调用，这意味着从用户域到内核域。 上下文切换是一个巨大的速度惩罚。</p>
+<p>使用流水线操作时，通常使用单个read（）系统调用读取许多命令，并使用单个write（）系统调用传递多个回复。 因此，每秒执行的总查询数最初会随着较长的管道线性增加而增加，最终达到不使用流水线技术获得的基线的10倍，如下图所示：</p>
+<img src="/2018/09/01/lang/004-redis-pipelining/000.png">
+<h1 id="一些现实世界的代码示例"><a href="#一些现实世界的代码示例" class="headerlink" title="一些现实世界的代码示例"></a>一些现实世界的代码示例</h1><p>在下面的基准测试中，我们将使用支持流水线操作的Redis Ruby客户端来测试由于流水线操作而导致的速度提升：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">'rubygems'</span></span><br><span class="line"><span class="keyword">require</span> <span class="string">'redis'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bench</span><span class="params">(descr)</span></span></span><br><span class="line">    start = Time.now</span><br><span class="line">    <span class="keyword">yield</span></span><br><span class="line">    puts <span class="string">"<span class="subst">#&#123;descr&#125;</span> <span class="subst">#&#123;Time.now-start&#125;</span> seconds"</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">without_pipelining</span></span></span><br><span class="line">    r = Redis.new</span><br><span class="line">    <span class="number">10000</span>.times &#123;</span><br><span class="line">        r.ping</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">with_pipelining</span></span></span><br><span class="line">    r = Redis.new</span><br><span class="line">    r.pipelined &#123;</span><br><span class="line">        <span class="number">10000</span>.times &#123;</span><br><span class="line">            r.ping</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">bench(<span class="string">"without pipelining"</span>) &#123;</span><br><span class="line">    without_pipelining</span><br><span class="line">&#125;</span><br><span class="line">bench(<span class="string">"with pipelining"</span>) &#123;</span><br><span class="line">    with_pipelining</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行上面的简单脚本将在我的Mac OS X系统中提供以下数字，运行在环回接口上，其中流水线将提供最小的改进，因为RTT已经非常低：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">without pipelining 1.185238 seconds</span><br><span class="line">with pipelining 0.250783 seconds</span><br></pre></td></tr></table></figure>
+<p>如您所见，使用流水线技术，我们将传输速度提高了五倍。</p>
+<h1 id="流水线VS脚本"><a href="#流水线VS脚本" class="headerlink" title="流水线VS脚本"></a>流水线VS脚本</h1><p>使用Redis脚本（在Redis 2.6或更高版本中可用），可以使用执行服务器端所需的大量工作的脚本更有效地解决流水线操作的大量用例。 脚本编写的一大优点是它能够以最小的延迟读取和写入数据，使读取，计算，写入等操作非常快（流水线在这种情况下无法帮助，因为客户端在调用write命令之前需要回复read命令）。</p>
+<p>有时，应用程序可能还希望在管道中发送EVAL或EVALSHA命令。 这是完全可能的，Redis使用SCRIPT LOAD命令显式支持它（它保证可以调用EVALSHA而不会出现失败的风险）。</p>
+<h1 id="附录：为什么即使在环回接口上，繁忙的循环也很慢？"><a href="#附录：为什么即使在环回接口上，繁忙的循环也很慢？" class="headerlink" title="附录：为什么即使在环回接口上，繁忙的循环也很慢？"></a>附录：为什么即使在环回接口上，繁忙的循环也很慢？</h1><p>即使有了本页所涉及的所有背景，你仍然可能想知道为什么Redis基准测试如下（伪代码），即使在loopback接口中执行，当服务器和客户端在同一台物理机器上运行时也很慢：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FOR-ONE-SECOND:</span><br><span class="line">    Redis.SET(&quot;foo&quot;,&quot;bar&quot;)</span><br><span class="line">END</span><br></pre></td></tr></table></figure></p>
+<p>毕竟，如果Redis进程和基准测试都在同一个box中运行，那么这难道不是通过内存从一个地方复制到另一个地方而没有任何实际延迟和实际网络的消息吗？</p>
+<p>原因是系统中的进程并不总是在运行，实际上是内核调度程序让进程运行，所以会发生的情况是，例如，允许运行基准测试，从Redis服务器读取回复（相关）执行的最后一个命令），并写入一个新命令。该命令现在位于loopback接口缓冲区中，但是为了由服务器读取，内核应该调度服务器进程（当前在系统调用中被阻止）以运行，等等。因此，实际上，由于内核调度程序的工作原理，环回接口仍然涉及类似网络的延迟。</p>
+<p>基本上，繁忙的循环基准测试是在网络服务器中测量性能时可以做的 <strong>最愚蠢</strong> 的事情。明智之举就是以这种方式避免基准测试。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><a href="https://redis.io/topics/pipelining" target="_blank" rel="noopener">https://redis.io/topics/pipelining</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>使用pipelining技术加速Redis查询</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/01/lang/004-redis-pipelining/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/01/lang/004-redis-pipelining/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjzav3pu1009dgnch3r2vmohm" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-lang/003-redis-datatype" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/31/lang/003-redis-datatype/" class="article-date">
@@ -369,7 +913,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjysja7bg005us3chh6lfxhu0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjzav3pu2009ignchl3mllfl9" class="article-share-link">
           Share
         </a>
         
@@ -531,12 +1075,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjysja7he00lvs3ch9ukvuq7a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjzav3pvy00fhgnchhxb1r3uf" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/load-balance/">load balance</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/load-balance/">load balance</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -670,12 +1214,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjysja7hd00lss3chea991em1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjzav3pvx00fdgnchglt6pn71" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -755,7 +1299,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjysja7ak0039s3chvgyup3qn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjzav3prx002qgnchgewcyl36" class="article-share-link">
           Share
         </a>
         
@@ -865,7 +1409,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjysja7aj0038s3chhwik2rml" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjzav3pry002tgnch4mb4wtkv" class="article-share-link">
           Share
         </a>
         
@@ -949,7 +1493,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjysja7aj0035s3cheypw08p3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjzav3prw002pgnchdj3900ly" class="article-share-link">
           Share
         </a>
         
@@ -1053,7 +1597,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjysja7ai0033s3chqajf509k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjzav3prw002ngnch1xfwcmn4" class="article-share-link">
           Share
         </a>
         
@@ -1139,7 +1683,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjysja7i000nns3chn404dsq8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjzav3pwh00gzgnchivz759vy" class="article-share-link">
           Share
         </a>
         
@@ -1239,7 +1783,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjysja7ai0031s3chj31gw5mh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjzav3prv002lgnch85bb1x96" class="article-share-link">
           Share
         </a>
         
@@ -1329,7 +1873,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjysja7ah002ys3ch3kwcinoo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjzav3pru002ignchh78m066t" class="article-share-link">
           Share
         </a>
         
@@ -1452,7 +1996,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjysja7bj0066s3ch7zzeoldr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjzav3psx005mgnch1nih8kfq" class="article-share-link">
           Share
         </a>
         
@@ -1569,7 +2113,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjysja7ah0030s3chiz6bk8ih" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjzav3prt002hgnchvcj1peuk" class="article-share-link">
           Share
         </a>
         
@@ -1678,7 +2222,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjysja7ag002ws3cht38bbz9y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjzav3prs002dgnchmednqg7r" class="article-share-link">
           Share
         </a>
         
@@ -1758,12 +2302,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjysja7fj00g7s3chaqbhe152" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjzav3pua00a2gnchhus8u4bh" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">24</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li></ul>
 
       </footer>
       </div>
@@ -1834,596 +2378,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjysja7gi00j5s3ch5k9kgucx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjzav3pv500cognchqaq78kv3" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">52</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/003-design-pattern-type" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/23/java/003-design-pattern-type/" class="article-date">
-  <time datetime="2018-07-23T02:33:09.000Z" itemprop="datePublished">2018-07-23</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/23/java/003-design-pattern-type/">design pattern types</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>设计模式的类型</p>
-<p>创建型：隐藏创建逻辑创建对象。<br>结构型：关心对象和类的组合，继承接口等<br>行为型：关心对象的交流和通信<br>J2EE型：java源代码中的模式</p>
-<img src="/2018/07/23/java/003-design-pattern-type/000.png">
-<p>更细致的分类如下图：</p>
-<ol>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/factory" target="_blank" rel="noopener">Factory Method Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/abstract_factory" target="_blank" rel="noopener">Abstract Factory Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/singleton" target="_blank" rel="noopener">Singleton</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/builder" target="_blank" rel="noopener">Builder Pattern</a></p>
-</li>
-<li><p><a href>Prototype Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/adapter" target="_blank" rel="noopener">Adapter Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/bridge" target="_blank" rel="noopener">Bridge Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/filter" target="_blank" rel="noopener">Filter Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/composite" target="_blank" rel="noopener">Composite Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/decorator" target="_blank" rel="noopener">Decorator Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/facade" target="_blank" rel="noopener">Facade Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/flyweight" target="_blank" rel="noopener">Flyweight Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/proxy" target="_blank" rel="noopener">Proxy Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/chainofresponsility" target="_blank" rel="noopener">Chain of Responsility Pattern</a></p>
-</li>
-<li><p><a href="https://github.com/jimolonely/codes/tree/master/designpatternbyjava/src/main/java/jimo/command" target="_blank" rel="noopener">Command Pattern</a></p>
-</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>设计模式的类型</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/07/23/java/003-design-pattern-type/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/07/23/java/003-design-pattern-type/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/23/java/003-design-pattern-type/" data-id="cjysja7bk0069s3chzkafyf1o" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-js/001-npms" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/22/js/001-npms/" class="article-date">
-  <time datetime="2018-07-22T02:04:03.000Z" itemprop="datePublished">2018-07-22</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/22/js/001-npms/">npm&#39;s problem</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="How-to-Prevent-Permissions-Errors"><a href="#How-to-Prevent-Permissions-Errors" class="headerlink" title="How to Prevent Permissions Errors"></a>How to Prevent Permissions Errors</h1><p><a href="https://docs.npmjs.com/getting-started/fixing-npm-permissions" target="_blank" rel="noopener">How to Prevent Permissions Errors</a></p>
-<ol>
-<li><p>Back-up your computer before you start.</p>
-</li>
-<li><p>Make a directory for global installations:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/.npm-global</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Configure npm to use the new directory path:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm config set prefix &apos;~/.npm-global&apos;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Open or create a ~/.bashrc file and add this line:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=~/.npm-global/bin:$PATH</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Back on the command line, update your system variables:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source ~/.profile</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Test: Download a package globally without using sudo.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g jshint</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="How-to-Prevent-Permissions-Errors"><a href="#How-to-Prevent-Permissions-Errors" class="headerlink" title="How to Prevent Permissions Errors"></a>How to Prevent Permissions Errors</h1><p><a href="https://docs.npmjs.com/getting-started/fixing-npm-permissions" target="_blank" rel="noopener">How to Prevent Permissions Errors</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/07/22/js/001-npms/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/07/22/js/001-npms/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/22/js/001-npms/" data-id="cjysja7b5004vs3chhtfvecf1" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a><span class="article-tag-list-count">4</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/npm/">npm</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-elasticsearch/005-all-know" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/21/elasticsearch/005-all-know/" class="article-date">
-  <time datetime="2018-07-21T05:51:55.000Z" itemprop="datePublished">2018-07-21</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/21/elasticsearch/005-all-know/">ElasticSearch入门一文</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="一句话定义"><a href="#一句话定义" class="headerlink" title="一句话定义"></a>一句话定义</h1><p>使用lucene开源搜索引擎为基础，使用Ｊａｖａ编写并提供简单易用RESTful API，<br>并且能轻易横向扩展，支持ＰＢ级别大数据的应用．</p>
-<p>能作甚：　数据仓库，数据分析引擎，全文搜索引擎等．</p>
-<h1 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h1><p>1.X -&gt; 2.X -&gt; 5.X -&gt; 6.X</p>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html" target="_blank" rel="noopener">差异</a></p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><h3 id="单节点安装"><a href="#单节点安装" class="headerlink" title="单节点安装"></a>单节点安装</h3><p><a href="https://www.elastic.co/downloads/elasticsearch" target="_blank" rel="noopener">下载</a>,解压即可．</p>
-<p>打开127.0.0.1:9200得到：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span> : <span class="string">"JPM5EYQ"</span>,</span><br><span class="line">  <span class="attr">"cluster_name"</span> : <span class="string">"elasticsearch"</span>,</span><br><span class="line">  <span class="attr">"cluster_uuid"</span> : <span class="string">"JG6IvmbgTmicNDFFBDDMCQ"</span>,</span><br><span class="line">  <span class="attr">"version"</span> : &#123;</span><br><span class="line">    <span class="attr">"number"</span> : <span class="string">"6.3.1"</span>,</span><br><span class="line">    <span class="attr">"build_flavor"</span> : <span class="string">"default"</span>,</span><br><span class="line">    <span class="attr">"build_type"</span> : <span class="string">"tar"</span>,</span><br><span class="line">    <span class="attr">"build_hash"</span> : <span class="string">"eb782d0"</span>,</span><br><span class="line">    <span class="attr">"build_date"</span> : <span class="string">"2018-06-29T21:59:26.107521Z"</span>,</span><br><span class="line">    <span class="attr">"build_snapshot"</span> : <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"lucene_version"</span> : <span class="string">"7.3.1"</span>,</span><br><span class="line">    <span class="attr">"minimum_wire_compatibility_version"</span> : <span class="string">"5.6.0"</span>,</span><br><span class="line">    <span class="attr">"minimum_index_compatibility_version"</span> : <span class="string">"5.0.0"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"tagline"</span> : <span class="string">"You Know, for Search"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="安装HEAD插件"><a href="#安装HEAD插件" class="headerlink" title="安装HEAD插件"></a>安装HEAD插件</h3><p>可以提供ＷＥＢ界面进行查看结果和操作．<br><a href="https://github.com/mobz/elasticsearch-head" target="_blank" rel="noopener">head</a></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install</span><br><span class="line">npm run start</span><br><span class="line">open http://localhost:9100/</span><br></pre></td></tr></table></figure>
-<p>前提是打开了elasticsearch服务，并且修改下跨域问题．<br>config/elasticsearch.yml<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">http.cors.enabled:</span> <span class="literal">true</span></span><br><span class="line"><span class="string">http.cors.allow-origin:</span> <span class="string">"*"</span></span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/000.png">
-<h3 id="集群安装"><a href="#集群安装" class="headerlink" title="集群安装"></a>集群安装</h3><p>ｍａｓｔｅｒ节点配置：config/elasticsearch<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">cluster.name:</span> <span class="string">jimo</span></span><br><span class="line"><span class="string">node.name:</span> <span class="string">master</span></span><br><span class="line"><span class="string">node.master:</span> <span class="literal">true</span></span><br><span class="line"> </span><br><span class="line"><span class="string">network.host:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br></pre></td></tr></table></figure></p>
-<p>slave节点只需要打开新的terminal,使用新的文件夹．配置如下：改改端口<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">cluster.name:</span> <span class="string">jimo</span></span><br><span class="line"><span class="string">node.name:</span> <span class="string">slave1</span></span><br><span class="line"></span><br><span class="line"><span class="string">network.host:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line"></span><br><span class="line"><span class="string">http.port:</span> <span class="number">8200</span></span><br><span class="line"><span class="string">discovery.zen.ping.unicast.hosts:</span> <span class="string">["127.0.0.1"]</span> <span class="comment"># 用于发现master节点</span></span><br></pre></td></tr></table></figure></p>
-<p><strong>注意的就是：节点的elasticsearch目录不能相互ｃｏｐｙ</strong></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/001.png">
-<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><ol>
-<li><p>索引(Index)：还有相同属性的文档集合(图书索引，车辆索引等)</p>
-</li>
-<li><p>类型(Type)：索引可以定义一个或多个类型，文档必须属于一个类型（科普类文学类的书，卡车小轿车）</p>
-</li>
-<li><p>文档(Document)：文档是可以被索引的基本数据单位（每本书，每辆车）</p>
-</li>
-<li><p>分片(Shards)：每个索引都有多个分片，每个分片是一个lucene索引</p>
-</li>
-<li><p>备份(Replica)：拷贝一个分片就完成了分片的备份</p>
-</li>
-<li><p>集群(Cluster)：节点的集合，每个集群有一个名字，通过名字识别不同集群</p>
-</li>
-</ol>
-<h1 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h1><h2 id="RESTful-API格式"><a href="#RESTful-API格式" class="headerlink" title="RESTful API格式"></a>RESTful API格式</h2><p>http://<ip>:<port>/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;</port></ip></p>
-<p>操作：PUT/GET/POST/DELETE</p>
-<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3><ol>
-<li>使用elasticsearch-head创建<img src="/2018/07/21/elasticsearch/005-all-know/002.png">
-</li>
-</ol>
-<p>可以看到分片的分布，竖着看，细边框的是粗边框的备份<br><img src="/2018/07/21/elasticsearch/005-all-know/003.png"></p>
-<p>查看其信息，发现mappings这一项：如果是空（”mappings”: { }）的则代表是非结构化数据，否则可以自定义结构化结构．<br>下面给ｂｏｏｋ索引定义一个带有title字段的novel属性：<br><img src="/2018/07/21/elasticsearch/005-all-know/004.png"></p>
-<p>２. 使用HTTP请求创建,推荐使用Postman,便于编写json<br><img src="/2018/07/21/elasticsearch/005-all-know/005.png"><br><img src="/2018/07/21/elasticsearch/005-all-know/006.png"></p>
-<h3 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h3><p>文档插入：</p>
-<p>指定ｉｄ插入<br><img src="/2018/07/21/elasticsearch/005-all-know/007.png"></p>
-<p>或者自动生成ｉｄ插入．(注意POST方式和去掉id)<br><img src="/2018/07/21/elasticsearch/005-all-know/008.png"></p>
-<p>在head中查看结果：<br><img src="/2018/07/21/elasticsearch/005-all-know/009.png"></p>
-<h3 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h3><p>指定id通过URL修改<br><img src="/2018/07/21/elasticsearch/005-all-know/010.png"></p>
-<p>通过脚本修改，支持的脚本语言有：内置的，js,python.<br>下面使用内置的修改：(<strong>可看到，脚本可以灵活的使用参数</strong>)<br><img src="/2018/07/21/elasticsearch/005-all-know/011.png"></p>
-<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><ol>
-<li><p>删除文档</p>
-<img src="/2018/07/21/elasticsearch/005-all-know/012.png">
-</li>
-<li><p>删除索引</p>
-</li>
-</ol>
-<p>使用head<br><img src="/2018/07/21/elasticsearch/005-all-know/013.png"></p>
-<p>使用命令行：<br><img src="/2018/07/21/elasticsearch/005-all-know/014.png"></p>
-<h3 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h3><p>先插入一些数据：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"python之父"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"王麻子"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">1000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"2002-10-01"</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"java"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"王三"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">2000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"2017-08-20"</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"java入门"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"王四"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">5000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"2017-08-15"</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"C++入门"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"王五"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">10000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"2000-09-20"</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"java精通"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"李四"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">8000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"2010-09-20"</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"java大法好"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"张三"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">3000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"2017-08-01"</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"代码整洁之道"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"寂寞哥"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">5000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"1997-01-20"</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"title"</span>: <span class="string">"太极拳"</span>,</span><br><span class="line">	<span class="attr">"author"</span>: <span class="string">"赵牛"</span>,</span><br><span class="line">	<span class="attr">"word_count"</span>: <span class="number">1000</span>,</span><br><span class="line">	<span class="attr">"publish_date"</span>: <span class="string">"2005-08-20"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/015.png">
-<ol>
-<li>简单查询</li>
-</ol>
-<p>Get查询<br><img src="/2018/07/21/elasticsearch/005-all-know/016.png"></p>
-<p>POST查询所有数据：<br><img src="/2018/07/21/elasticsearch/005-all-know/017.png"></p>
-<ol start="2">
-<li>条件查询</li>
-</ol>
-<p>指定数据量：<br><img src="/2018/07/21/elasticsearch/005-all-know/018.png"></p>
-<p>按条件并按日期降序排序：<br><img src="/2018/07/21/elasticsearch/005-all-know/019.png"></p>
-<ol start="3">
-<li>聚合查询</li>
-</ol>
-<p>按日期和字数聚合：<br><img src="/2018/07/21/elasticsearch/005-all-know/020.png"></p>
-<p>统计：<br><img src="/2018/07/21/elasticsearch/005-all-know/021.png"><br><img src="/2018/07/21/elasticsearch/005-all-know/022.png"></p>
-<p>或直接指定函数：<br><img src="/2018/07/21/elasticsearch/005-all-know/023.png"><br><img src="/2018/07/21/elasticsearch/005-all-know/024.png"></p>
-<h2 id="高级查询"><a href="#高级查询" class="headerlink" title="高级查询"></a>高级查询</h2><h3 id="query"><a href="#query" class="headerlink" title="query"></a>query</h3><p>query context:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">查询时除了判断文档是否满足查询条件外，还会</span><br><span class="line">计算一个_score的字段来标识匹配程度，范围0-1</span><br><span class="line"></span><br><span class="line">常用查询：</span><br><span class="line">１．全文本查询：针对文本数据</span><br><span class="line">２．字段级别查询：针对结构化数据，如日期，数字等</span><br></pre></td></tr></table></figure></p>
-<p>１．全文本查询</p>
-<p>模糊查询<br><img src="/2018/07/21/elasticsearch/005-all-know/019.png"></p>
-<p>定向查询: 如果使用match，那么java入门会被分成java和入门２个词<br><img src="/2018/07/21/elasticsearch/005-all-know/025.png"></p>
-<p>多个关键字查询<br><img src="/2018/07/21/elasticsearch/005-all-know/026.png"></p>
-<p>语法查询:fields省略可查询所有字段<br><img src="/2018/07/21/elasticsearch/005-all-know/027.png"></p>
-<p>２．字段级别查询</p>
-<p>指定值<br><img src="/2018/07/21/elasticsearch/005-all-know/028.png"></p>
-<p>范围查询: 数字，日期呀<br><img src="/2018/07/21/elasticsearch/005-all-know/029.png"></p>
-<h3 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h3><p>filter context:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">查询时只判断yes或no，不进行匹配程度判断．</span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/030.png">
-<h3 id="复合查询"><a href="#复合查询" class="headerlink" title="复合查询"></a>复合查询</h3><p>结合查询和过滤．</p>
-<ol>
-<li><p>固定分数查询:通过boost指定分数，每个filter过滤出的结果都是这个分数</p>
-<img src="/2018/07/21/elasticsearch/005-all-know/031.png">
-</li>
-<li><p>布尔查询<br>must:</p>
-<img src="/2018/07/21/elasticsearch/005-all-know/032.png">
-</li>
-</ol>
-<p>must_not:<br><img src="/2018/07/21/elasticsearch/005-all-know/035.png"></p>
-<p>should:<br><img src="/2018/07/21/elasticsearch/005-all-know/033.png"></p>
-<p>同时加上过滤：<br><img src="/2018/07/21/elasticsearch/005-all-know/034.png"></p>
-<h1 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h1><p>集成spring-boot. <a href="https://github.com/jimolonely/codes/tree/master/spring-boot-elasticsearch-demo" target="_blank" rel="noopener">代码地址</a></p>
-<p>环境：Intellij IDE，JDK1.8</p>
-<img src="/2018/07/21/elasticsearch/005-all-know/043.png">
-<ol>
-<li>建一个spring-boot项目</li>
-<li><p>pom.xml</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;</span><br><span class="line">        &lt;scope&gt;runtime&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</span><br><span class="line">        &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- https://mvnrepository.com/artifact/org.elasticsearch.client/transport --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.elasticsearch.client&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;transport&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;6.3.1&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;log4j-api&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.7&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;log4j-core&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.7&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>ESConfig配置TransportClient:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ESConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TransportClient <span class="title">client</span><span class="params">()</span> <span class="keyword">throws</span> UnknownHostException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> InetSocketTransportAddress nodeAddress =</span><br><span class="line">                <span class="keyword">new</span> InetSocketTransportAddress(InetAddress.getByName(<span class="string">"localhost"</span>), <span class="number">9300</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> Settings settings = Settings.builder().put(<span class="string">"cluster.name"</span>, <span class="string">"jimo"</span>).build();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> PreBuiltTransportClient client = <span class="keyword">new</span> PreBuiltTransportClient(settings);</span><br><span class="line">        client.addTransportAddress(nodeAddress);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> client;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>增删改查操作</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/book/novel"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookNovelController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> TransportClient client;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BookNovelController</span><span class="params">(TransportClient client)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.client = client;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>查询:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/037.png">
-<p>增加：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(<span class="string">"/new"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">addBook</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        @RequestParam(<span class="string">"title"</span>)</span> String title,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(<span class="string">"author"</span>)</span> String author,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(<span class="string">"word_count"</span>)</span> <span class="keyword">int</span> wordCount,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(<span class="string">"publish_date"</span>)</span></span></span><br><span class="line"><span class="function">        @<span class="title">DateTimeFormat</span><span class="params">(pattern = <span class="string">"yyyy-MM-dd HH:mm:ss"</span>)</span></span></span><br><span class="line"><span class="function">                Date publishDate) </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> XContentBuilder content = XContentFactory.jsonBuilder()</span><br><span class="line">                .startObject()</span><br><span class="line">                .field(<span class="string">"title"</span>, title)</span><br><span class="line">                .field(<span class="string">"author"</span>, author)</span><br><span class="line">                .field(<span class="string">"word_count"</span>, wordCount)</span><br><span class="line">                <span class="comment">// .field("publish_date", publishDate.getTime())</span></span><br><span class="line">                .endObject();</span><br><span class="line">        <span class="keyword">final</span> IndexResponse result = client.prepareIndex(<span class="string">"book"</span>, <span class="string">"novel"</span>)</span><br><span class="line">                .setSource(content).get();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(result.getId(), HttpStatus.OK);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/040.png">
-<p>删除：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@DeleteMapping</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">deleteBook</span><span class="params">(@RequestParam(<span class="string">"id"</span>)</span> String id) </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> DeleteResponse response = client.prepareDelete(<span class="string">"book"</span>, <span class="string">"novel"</span>, id).get();</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(response.getResult(), HttpStatus.OK);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/039.png">
-<p>修改：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(<span class="string">"/update"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">updateBook</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        @RequestParam(<span class="string">"id"</span>)</span> String id,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(name = <span class="string">"title"</span>, required = <span class="keyword">false</span>)</span> String title,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(name = <span class="string">"author"</span>, required = <span class="keyword">false</span>)</span> String author) </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> UpdateRequest updateRequest = <span class="keyword">new</span> UpdateRequest(<span class="string">"book"</span>, <span class="string">"novel"</span>, id);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> XContentBuilder builder = XContentFactory.jsonBuilder().startObject();</span><br><span class="line">        <span class="keyword">if</span> (title != <span class="keyword">null</span>) &#123;</span><br><span class="line">            builder.field(<span class="string">"title"</span>, title);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (author != <span class="keyword">null</span>) &#123;</span><br><span class="line">            builder.field(<span class="string">"author"</span>, author);</span><br><span class="line">        &#125;</span><br><span class="line">        builder.endObject();</span><br><span class="line">        updateRequest.doc(builder);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> UpdateResponse updateResponse = client.update(updateRequest).get();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(updateResponse.getResult(), HttpStatus.OK);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException | ExecutionException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/041.png">
-<p>查询：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping</span>(<span class="string">"/query"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">queryBook</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        @RequestParam(name = <span class="string">"author"</span>, required = <span class="keyword">false</span>)</span> String author,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(name = <span class="string">"title"</span>, required = <span class="keyword">false</span>)</span> String title,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(name = <span class="string">"gt_word_count"</span>, defaultValue = <span class="string">"0"</span>)</span> Integer gtWordCount,</span></span><br><span class="line"><span class="function">        @<span class="title">RequestParam</span><span class="params">(name = <span class="string">"lt_word_count"</span>, required = <span class="keyword">false</span>)</span> Integer ltWordCount) </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();</span><br><span class="line">    <span class="keyword">if</span> (author != <span class="keyword">null</span>) &#123;</span><br><span class="line">        boolQuery.must(QueryBuilders.matchQuery(<span class="string">"author"</span>, author));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (title != <span class="keyword">null</span>) &#123;</span><br><span class="line">        boolQuery.must(QueryBuilders.matchQuery(<span class="string">"title"</span>, title));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(<span class="string">"word_count"</span>).from(gtWordCount);</span><br><span class="line">    <span class="keyword">if</span> (ltWordCount != <span class="keyword">null</span> &amp;&amp; ltWordCount &gt;= gtWordCount) &#123;</span><br><span class="line">        rangeQuery.to(ltWordCount);</span><br><span class="line">    &#125;</span><br><span class="line">    boolQuery.filter(rangeQuery);</span><br><span class="line">    <span class="keyword">final</span> SearchRequestBuilder builder = client.prepareSearch(<span class="string">"book"</span>)</span><br><span class="line">            .setTypes(<span class="string">"novel"</span>)</span><br><span class="line">            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)</span><br><span class="line">            .setQuery(boolQuery)</span><br><span class="line">            .setFrom(<span class="number">0</span>)</span><br><span class="line">            .setSize(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    System.out.println(builder);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> SearchResponse response = builder.get();</span><br><span class="line">    List&lt;Map&lt;String, Object&gt;&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (SearchHit hit : response.getHits()) &#123;</span><br><span class="line">        result.add(hit.getSource());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(result, HttpStatus.OK);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<img src="/2018/07/21/elasticsearch/005-all-know/042.png">
-<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><p>参考：<a href="https://blog.csdn.net/napoay/article/details/53581027" target="_blank" rel="noopener">blog</a></p>
-<ol>
-<li><p>java.lang.ClassNotFoundException: org.elasticsearch.transport.Netty3Plugin</p>
-<img src="/2018/07/21/elasticsearch/005-all-know/036.png">
-</li>
-<li><p>failed to parse [publish_date]</p>
-<img src="/2018/07/21/elasticsearch/005-all-know/038.png">
-<p>需要将date的fromat改为dateOptionalTime.<strong>注意：数据类型是不能修改的，所以建立索引时就要考虑清除.</strong></p>
-</li>
-</ol>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-overview.html" target="_blank" rel="noopener">官方的java客户端连接例子</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="一句话定义"><a href="#一句话定义" class="headerlink" title="一句话定义"></a>一句话定义</h1><p>使用lucene开源搜索引擎为基础，使用Ｊａｖａ编写并提供简单易用RESTful API，<br>并且能轻易横向扩展，支持ＰＢ级别大数据的应用．</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/07/21/elasticsearch/005-all-know/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/07/21/elasticsearch/005-all-know/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/21/elasticsearch/005-all-know/" data-id="cjysja7as0043s3chvw49djjb" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-cloudcompute/006-nova01" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/11/cloudcompute/006-nova01/" class="article-date">
-  <time datetime="2018-07-11T05:51:55.000Z" itemprop="datePublished">2018-07-11</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/11/cloudcompute/006-nova01/">openstack-nova-1</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>openstack步步为营.</p>
-<h1 id="nova前提"><a href="#nova前提" class="headerlink" title="nova前提"></a>nova前提</h1><p>nova作为计算服务,需要以下前提:</p>
-<ol>
-<li>Keystone: 认证</li>
-<li>Glance: 提供计算镜像</li>
-<li>Neutron: 网络</li>
-</ol>
-<h1 id="nova怎么用"><a href="#nova怎么用" class="headerlink" title="nova怎么用"></a>nova怎么用</h1><h3 id="最终用户"><a href="#最终用户" class="headerlink" title="最终用户"></a>最终用户</h3><ol>
-<li>使用Horizon界面操作</li>
-<li>使用Openstack Client</li>
-<li>使用Nova Client,主要是高级特性,但推荐用Openstack Client</li>
-</ol>
-<h3 id="调用API"><a href="#调用API" class="headerlink" title="调用API"></a>调用API</h3><p>主要是对openstack进行二次开发的程序员</p>
-<h3 id="安装人员"><a href="#安装人员" class="headerlink" title="安装人员"></a>安装人员</h3><ol>
-<li>当然要了解<a href="https://docs.openstack.org/nova/latest/user/architecture.html" target="_blank" rel="noopener">nova架构</a></li>
-<li>然后是安装</li>
-</ol>
-<h3 id="自定义开发"><a href="#自定义开发" class="headerlink" title="自定义开发"></a>自定义开发</h3><p>这个暂时不考虑,主要是开发自己的openstack,但是必须会.</p>
-<p>以上部分来自<a href="https://docs.openstack.org/nova/latest/" target="_blank" rel="noopener">nova</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>openstack步步为营.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/07/11/cloudcompute/006-nova01/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/07/11/cloudcompute/006-nova01/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/11/cloudcompute/006-nova01/" data-id="cjysja7af002ts3chkyua44jf" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/002-jconsole" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/01/java/002-jconsole/" class="article-date">
-  <time datetime="2018-07-01T05:51:55.000Z" itemprop="datePublished">2018-07-01</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/01/java/002-jconsole/">java调优工具jconsole</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>对java应用的监控必不可少．</p>
-<h1 id="位置"><a href="#位置" class="headerlink" title="位置"></a>位置</h1><p>windows位于　java/bin/jconsole.exe</p>
-<p>linux一般已加入环境变量．</p>
-<p>输入jconsole启动．</p>
-<img src="/2018/07/01/java/002-jconsole/000.png">
-<h1 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h1><p>有关内存，线程，类，ＶＭ等．</p>
-<p>内存的分区有显示，可清楚看到．</p>
-<img src="/2018/07/01/java/002-jconsole/001.png">
-<p>线程的数量和每个线程的堆栈跟踪以及死锁检测．</p>
-<img src="/2018/07/01/java/002-jconsole/002.png">
-<p>加载的类数量．</p>
-<img src="/2018/07/01/java/002-jconsole/003.png">
-<p>VM概要，重点是VM参数．</p>
-<img src="/2018/07/01/java/002-jconsole/004.png">
-<p>这只是一个开始，可以通过实践观察垃圾如何回收．</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>对java应用的监控必不可少．</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/07/01/java/002-jconsole/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/07/01/java/002-jconsole/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/01/java/002-jconsole/" data-id="cjysja7bi0061s3chxauyvf5g" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
 
       </footer>
       </div>
@@ -2450,7 +2410,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -2460,7 +2420,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 16.88px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2482,23 +2442,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/08/01/java/056-mybatis-generate-plugin/">mybatis生成插件</a>
+            <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
           </li>
         
           <li>
-            <a href="/2019/07/30/android/001-android-webdav-client/">android web-dav client</a>
+            <a href="/2019/08/12/linux/029-syslog/">认识syslog</a>
           </li>
         
           <li>
-            <a href="/2019/07/29/life/025-weekly-learn/">2019-31-周报</a>
+            <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
           </li>
         
           <li>
-            <a href="/2019/07/28/java/055-java-webdav-client/">java实现web-dav客户端</a>
+            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
           <li>
-            <a href="/2019/07/28/tools/017-pandoc/">强大的pandoc</a>
+            <a href="/2019/08/05/life/026-weekly-learn/">2019-32-周报</a>
           </li>
         
       </ul>
