@@ -86,6 +86,107 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/004-python-common-use" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/12/python/004-python-common-use/" class="article-date">
+  <time datetime="2018-03-12T02:36:29.000Z" itemprop="datePublished">2018-03-12</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/12/python/004-python-common-use/">python中的常用操作</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>真的很常用诶.</p>
+<h1 id="对dict排序"><a href="#对dict排序" class="headerlink" title="对dict排序"></a>对dict排序</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># regular unsorted dictionary</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = &#123;<span class="string">'banana'</span>: <span class="number">3</span>, <span class="string">'apple'</span>:<span class="number">4</span>, <span class="string">'pear'</span>: <span class="number">1</span>, <span class="string">'orange'</span>: <span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># dictionary sorted by key -- OrderedDict(sorted(d.items()) also works</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>OrderedDict(sorted(d.items(), key=<span class="keyword">lambda</span> t: t[<span class="number">0</span>]))</span><br><span class="line">OrderedDict([(<span class="string">'apple'</span>, <span class="number">4</span>), (<span class="string">'banana'</span>, <span class="number">3</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'pear'</span>, <span class="number">1</span>)])</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># dictionary sorted by value</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>OrderedDict(sorted(d.items(), key=<span class="keyword">lambda</span> t: t[<span class="number">1</span>]))</span><br><span class="line">OrderedDict([(<span class="string">'pear'</span>, <span class="number">1</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'banana'</span>, <span class="number">3</span>), (<span class="string">'apple'</span>, <span class="number">4</span>)])</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment"># dictionary sorted by length of the key string</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>OrderedDict(sorted(d.items(), key=<span class="keyword">lambda</span> t: len(t[<span class="number">0</span>])))</span><br><span class="line">OrderedDict([(<span class="string">'pear'</span>, <span class="number">1</span>), (<span class="string">'apple'</span>, <span class="number">4</span>), (<span class="string">'orange'</span>, <span class="number">2</span>), (<span class="string">'banana'</span>, <span class="number">3</span>)])</span><br></pre></td></tr></table></figure>
+<p>简单点:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">d = &#123;<span class="number">2</span>:<span class="number">3</span>, <span class="number">1</span>:<span class="number">89</span>, <span class="number">4</span>:<span class="number">5</span>, <span class="number">3</span>:<span class="number">0</span>&#125;</span><br><span class="line">sd = sorted(d.items())</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> sd:</span><br><span class="line">    <span class="keyword">print</span> k, v</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">1 89</span></span><br><span class="line"><span class="string">2 3</span></span><br><span class="line"><span class="string">3 0</span></span><br><span class="line"><span class="string">4 5</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="统计list中元素个数"><a href="#统计list中元素个数" class="headerlink" title="统计list中元素个数"></a>统计list中元素个数</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">34</span>,<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">1</span>,<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: Counter(a)</span><br><span class="line">Out[<span class="number">3</span>]: Counter(&#123;<span class="number">1</span>: <span class="number">3</span>, <span class="number">2</span>: <span class="number">2</span>, <span class="number">3</span>: <span class="number">1</span>, <span class="number">5</span>: <span class="number">1</span>, <span class="number">6</span>: <span class="number">1</span>, <span class="number">34</span>: <span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+<h1 id="那些解析"><a href="#那些解析" class="headerlink" title="那些解析"></a>那些解析</h1><p>解析json字符串<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">j = json.loads(<span class="string">'&#123;"one" : "1", "two" : "2", "three" : "3"&#125;'</span>)</span><br><span class="line"><span class="keyword">print</span> j[<span class="string">'two'</span>]</span><br></pre></td></tr></table></figure></p>
+<p>写入和读取python数据结构到文件:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Writing JSON data</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'data.json'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    json.dump(data, f)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Reading data back</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'data.json'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    data = json.load(f)</span><br></pre></td></tr></table></figure></p>
+<p>对于中文,如果想写入文件时不进行编码,可以指定ensure_ascii=False<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">json.dump(obj,f,ensure_ascii=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="python里计时"><a href="#python里计时" class="headerlink" title="python里计时"></a>python里计时</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">start = time.time()</span><br><span class="line">print(<span class="string">"hello"</span>)</span><br><span class="line">end = time.time()</span><br><span class="line">print(end - start)</span><br></pre></td></tr></table></figure>
+<h1 id="slice-dict"><a href="#slice-dict" class="headerlink" title="slice dict"></a>slice dict</h1><p>dict本来不能像list那样slice,但itertools可以:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">14</span>]: a = &#123;<span class="string">'a'</span>:<span class="number">1</span>,<span class="string">'b'</span>:<span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">15</span>]: a[:]</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">TypeError                                 Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-15</span><span class="number">-6</span>ced218e2c37&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 a[:]</span><br><span class="line"></span><br><span class="line">TypeError: unhashable type: <span class="string">'slice'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">16</span>]: <span class="keyword">import</span> itertools</span><br><span class="line"></span><br><span class="line">In [<span class="number">17</span>]: dict(itertools.islice(a.items(),<span class="number">1</span>))</span><br><span class="line">Out[<span class="number">17</span>]: &#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="检查NAN"><a href="#检查NAN" class="headerlink" title="检查NAN"></a>检查NAN</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> math</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x=float(<span class="string">'nan'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>math.isnan(x)</span><br><span class="line"><span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h1 id="快速清除文件内容"><a href="#快速清除文件内容" class="headerlink" title="快速清除文件内容"></a>快速清除文件内容</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open(<span class="string">'file.txt'</span>,<span class="string">'w).close()</span></span><br></pre></td></tr></table></figure>
+<h1 id="列出文件夹内容与正则过滤"><a href="#列出文件夹内容与正则过滤" class="headerlink" title="列出文件夹内容与正则过滤"></a>列出文件夹内容与正则过滤</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: os.listdir(<span class="string">'./'</span>)</span><br><span class="line">Out[<span class="number">2</span>]:</span><br><span class="line">[<span class="string">'0307_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0307_links.txt'</span>,</span><br><span class="line"> <span class="string">'0901_nodes.txt'</span>,</span><br><span class="line"> <span class="string">'0901_links.txt'</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>其实python提供有过滤的库函数fnmatch,glob等<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">path = <span class="string">"/home/relation-data-2015/"</span></span><br><span class="line">files = fnmatch.filter(os.listdir(path),<span class="string">'*_single_links.txt'</span>)</span><br><span class="line">files</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">['0101_single_links.txt',</span></span><br><span class="line"><span class="string"> '0901_single_links.txt',</span></span><br><span class="line"><span class="string"> '0201_single_links.txt',</span></span><br><span class="line"><span class="string"> '0307_single_links.txt',</span></span><br><span class="line"><span class="string"> '0402_single_links.txt',</span></span><br><span class="line"><span class="string"> '0215_single_links.txt',</span></span><br><span class="line"><span class="string"> '0408_single_links.txt',</span></span><br><span class="line"><span class="string"> '0501_single_links.txt']</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="sorted函数"><a href="#sorted函数" class="headerlink" title="sorted函数"></a>sorted函数</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">4</span>]: l = [&#123;<span class="string">'a'</span>:<span class="number">1</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">4</span>&#125;,&#123;<span class="string">'a'</span>:<span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line">Out[<span class="number">5</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure>
+<p>注意,这并不会改变原有列表:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">6</span>]: l</span><br><span class="line">Out[<span class="number">6</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;]</span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: l = sorted(l,key=<span class="keyword">lambda</span> d:d[<span class="string">'a'</span>])</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: l</span><br><span class="line">Out[<span class="number">8</span>]: [&#123;<span class="string">'a'</span>: <span class="number">1</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;, &#123;<span class="string">'a'</span>: <span class="number">4</span>&#125;]</span><br></pre></td></tr></table></figure></p>
+<h1 id="修改dict的key值"><a href="#修改dict的key值" class="headerlink" title="修改dict的key值"></a>修改dict的key值</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: d = &#123;<span class="string">'女'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: d[<span class="string">'female'</span>] = d.pop(<span class="string">'女'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: d</span><br><span class="line">Out[<span class="number">3</span>]: &#123;<span class="string">'female'</span>: <span class="number">176</span>, <span class="string">'男'</span>: <span class="number">517</span>&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="取得dict的第一个key"><a href="#取得dict的第一个key" class="headerlink" title="取得dict的第一个key"></a>取得dict的第一个key</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># way 1</span></span><br><span class="line">my_dict = &#123;<span class="string">'foo'</span>: <span class="string">'bar'</span>&#125;</span><br><span class="line">next(iter(my_dict)) <span class="comment"># outputs 'foo'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># way 2</span></span><br><span class="line">list(my_dict.keys())[<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
+<h1 id="取得list里最频繁项"><a href="#取得list里最频繁项" class="headerlink" title="取得list里最频繁项"></a>取得list里最频繁项</h1><p><a href="https://stackoverflow.com/questions/1518522/python-most-common-element-in-a-list" target="_blank" rel="noopener">stackoverflow-python-most-common-element-in-a-list</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># way 1</span></span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Most_Common</span><span class="params">(lst)</span>:</span></span><br><span class="line">    data = Counter(lst)</span><br><span class="line">    <span class="keyword">return</span> data.most_common(<span class="number">1</span>)[<span class="number">0</span>][<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 2</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">most_common</span><span class="params">(lst)</span>:</span></span><br><span class="line">    data = Counter(lst)</span><br><span class="line">    <span class="keyword">return</span> max(lst, key=data.get)</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> statistics <span class="keyword">import</span> mode</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>mode([<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">6</span>])</span><br><span class="line"><span class="number">3</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># way 4</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">most_common</span><span class="params">(lst)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> max(set(lst), key=lst.count)</span><br></pre></td></tr></table></figure></p>
+<h1 id="删除连续空格只保留一个"><a href="#删除连续空格只保留一个" class="headerlink" title="删除连续空格只保留一个"></a>删除连续空格只保留一个</h1><ol>
+<li><p>用2个空格替换成一个空格,需要循环替换</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'1    3   5'</span></span><br><span class="line"><span class="keyword">while</span> a.find(<span class="string">'  '</span>) != <span class="number">-1</span>:</span><br><span class="line">    a = a.replace(<span class="string">'  '</span>, <span class="string">' '</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>先分开再用join</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">' '</span>.join(s.split())</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="日期操作"><a href="#日期操作" class="headerlink" title="日期操作"></a>日期操作</h1><p>获得年月日<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line">today = datetime.today()</span><br><span class="line">today.day/month/year</span><br></pre></td></tr></table></figure></p>
+<p>计算日期之间的月份差<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime,date</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">month_delta</span><span class="params">(start_date, end_date=datetime.now<span class="params">()</span>.date<span class="params">()</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    返回 end_date  - start_date  的差值</span></span><br><span class="line"><span class="string">        :param start_date:</span></span><br><span class="line"><span class="string">        :param end_date:</span></span><br><span class="line"><span class="string">        :return:  month_delta   int</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    flag = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">if</span> start_date &gt; end_date:</span><br><span class="line">        start_date, end_date = end_date, start_date</span><br><span class="line">        flag = <span class="literal">False</span></span><br><span class="line">    year_diff = end_date.year - start_date.year</span><br><span class="line">    end_month = year_diff * <span class="number">12</span> + end_date.month</span><br><span class="line">    delta = end_month - start_date.month</span><br><span class="line">    <span class="comment"># return -delta if flag is False else delta</span></span><br><span class="line">    <span class="keyword">return</span> abs(delta)</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>真的很常用诶.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/12/python/004-python-common-use/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/12/python/004-python-common-use/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjzdwfle000p5hachzxwo0l3p" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-elasticsearch/001-cluster-explore" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/11/elasticsearch/001-cluster-explore/" class="article-date">
@@ -165,7 +266,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjzav3ps9003qgnch50l8it8l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjzdwfl8g003qhachpl1tqaph" class="article-share-link">
           Share
         </a>
         
@@ -250,7 +351,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjzav3ps8003ngnchug6vw8ch" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjzdwfl8h003uhachub670u1s" class="article-share-link">
           Share
         </a>
         
@@ -346,7 +447,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjzav3pu00099gnchgssdghte" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjzdwfla5009ghachm37w3llg" class="article-share-link">
           Share
         </a>
         
@@ -425,7 +526,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjzav3pr00008gnchatj4qxp2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjzdwfl74000lhachnjwkix9s" class="article-share-link">
           Share
         </a>
         
@@ -504,12 +605,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjzav3pu0009bgnch87zj8c9h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjzdwfla3009bhachzpsg9me2" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ant/">ant</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ant/">ant</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -588,12 +689,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjzav3pty0094gnch982nufa2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjzdwfla20096hachmb6dp7va" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groovy/">groovy</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groovy/">groovy</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -666,7 +767,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjzav3pwg00gtgnchvuqp107j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjzdwflho00rdhachmi49qu4u" class="article-share-link">
           Share
         </a>
         
@@ -749,12 +850,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjzav3pwf00grgnch0p0wr1t5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjzdwflhn00rahachvzg694mp" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -827,7 +928,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/01/linux/010-linux-background/" data-id="cjzav3pv200c9gnch11qb6tjs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/01/linux/010-linux-background/" data-id="cjzdwflb200cahachqq1mevxw" class="article-share-link">
           Share
         </a>
         
@@ -917,7 +1018,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/20/hexo/001-hexo-backup/" data-id="cjzav3pso004sgnch7t57nzrp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/20/hexo/001-hexo-backup/" data-id="cjzdwfl8s004vhachsru0np0q" class="article-share-link">
           Share
         </a>
         
@@ -1007,7 +1108,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjzav3pwd00glgnchf0xrgbe3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjzdwflhm00r8hacht570skul" class="article-share-link">
           Share
         </a>
         
@@ -1101,7 +1202,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/01/linux/012-linux-fun-tools/" data-id="cjzav3pv300cegnchrvpjwg7w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/02/01/linux/012-linux-fun-tools/" data-id="cjzdwflb600ckhach1ds46075" class="article-share-link">
           Share
         </a>
         
@@ -1195,7 +1296,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjzav3pvn00ejgnchaq6sx57z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/31/python/003-py-weibo/" data-id="cjzdwfldz00p3hachi96rdpwy" class="article-share-link">
           Share
         </a>
         
@@ -1276,7 +1377,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjzav3prm001vgnch800nec21" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" data-id="cjzdwfl7v0021hachu8v6s974" class="article-share-link">
           Share
         </a>
         
@@ -1366,7 +1467,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjzav3pv300ccgnchkdgcd5dq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/26/linux/007-ubuntu-static-ip/" data-id="cjzdwflb200cchach64wa6vid" class="article-share-link">
           Share
         </a>
         
@@ -1445,7 +1546,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjzav3pvv00f5gnchs09eyd8g" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/21/react/000-import-js-function/" data-id="cjzdwflg100pfhach2vlcf8j7" class="article-share-link">
           Share
         </a>
         
@@ -1534,7 +1635,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjzav3pqp0001gnch3zr9fd34" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/ai/001-fp_growth/" data-id="cjzdwfl6m0004hachcz7pi0s3" class="article-share-link">
           Share
         </a>
         
@@ -1616,7 +1717,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjzav3pvm00eggnch0qandmuy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/18/python/002-flask-wordcloud/" data-id="cjzdwfldy00p2hach92x3rvaj" class="article-share-link">
           Share
         </a>
         
@@ -1706,245 +1807,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjzav3pwe00gqgnchvdssoz77" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjzdwflhl00r5hachxeukdvos" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/003-resources" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/12/tools/003-resources/" class="article-date">
-  <time datetime="2018-01-12T06:02:26.000Z" itemprop="datePublished">2018-01-12</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/12/tools/003-resources/">学习资源汇总</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这里收集了各个学科优秀的学习资源.</p>
-<h1 id="在线学习的网站"><a href="#在线学习的网站" class="headerlink" title="在线学习的网站"></a>在线学习的网站</h1><p>国内:</p>
-<ol>
-<li><a href="http://www.imooc.com/" target="_blank" rel="noopener">慕课网</a></li>
-<li><a href="http://www.taikr.com/" target="_blank" rel="noopener">泰课在线</a></li>
-<li><a href="https://www.shiyanlou.com/" target="_blank" rel="noopener">实验楼</a></li>
-<li><a href="http://study.163.com/" target="_blank" rel="noopener">网易云课堂</a></li>
-<li><a href="http://www.doyoudo.com/" target="_blank" rel="noopener">doyoudo-学PS,视频制作和音乐的好去处</a></li>
-<li><a href="http://www.runoob.com/" target="_blank" rel="noopener">菜鸟教程-IT技术</a></li>
-<li><a href="http://www.52sumiao.com/index.html" target="_blank" rel="noopener">我爱素描网</a></li>
-<li><a href="http://www.jikexueyuan.com/" target="_blank" rel="noopener">极客学院</a></li>
-<li><a href="https://www.jisuanke.com/" target="_blank" rel="noopener">计蒜课</a></li>
-<li><a href="http://www.icourse163.org/" target="_blank" rel="noopener">中国慕课-高校公开视频</a></li>
-<li><a href="http://www.maiziedu.com/course/?sgss=pp_06892_zh" target="_blank" rel="noopener">麦子学院</a></li>
-<li><a href="http://www.miguxue.com/" target="_blank" rel="noopener">咪咕学院</a></li>
-<li><a href="http://www.duolingo.cn/" target="_blank" rel="noopener">多邻国-学外语</a></li>
-<li><a href="http://www.webshipin.com/" target="_blank" rel="noopener">Web视频网</a></li>
-<li><a href="http://www.yiibai.com/" target="_blank" rel="noopener">易百教程-文本类教程</a></li>
-<li><a href="http://www.w3cplus.com/" target="_blank" rel="noopener">w3cplus-前端技术</a></li>
-</ol>
-<p>国外:</p>
-<ol>
-<li><a href="https://www.codeschool.com/" target="_blank" rel="noopener">Code School</a></li>
-<li><a href="https://www.freecodecamp.com/" target="_blank" rel="noopener">freecodecamp</a></li>
-<li><a href="https://www.codecademy.com/learn" target="_blank" rel="noopener">codecademy</a> </li>
-<li><a href="http://www.sololearn.com/" target="_blank" rel="noopener">sololearn-APP也很丰富</a></li>
-<li><a href="http://www.tutorialspoint.com/assembly_programming/" target="_blank" rel="noopener">tutorialspoint-资源很全</a></li>
-<li><a href="https://www.edx.org/" target="_blank" rel="noopener">EDX</a></li>
-<li><a href="https://www.skillshare.com/" target="_blank" rel="noopener">skillshare</a></li>
-<li><a href="https://www.udemy.com/" target="_blank" rel="noopener">Udemy</a></li>
-<li><a href="https://www.khanacademy.org/" target="_blank" rel="noopener">可汗学院</a></li>
-<li><a href="https://www.coursera.org/" target="_blank" rel="noopener">coursera</a></li>
-<li><a href="https://www.lynda.com/" target="_blank" rel="noopener">lynda</a></li>
-<li><a href="https://quizlet.com/zh-cn" target="_blank" rel="noopener">quizlet-记单词</a></li>
-</ol>
-<h1 id="一些工具网站"><a href="#一些工具网站" class="headerlink" title="一些工具网站"></a>一些工具网站</h1><ol>
-<li><a href="http://www.bejson.com/jsoneditoronline/" target="_blank" rel="noopener">JSON在线解析</a></li>
-<li><a href="https://applypixels.com/" target="_blank" rel="noopener">IOS图标制作</a></li>
-<li><a href="http://makeappicon.com/" target="_blank" rel="noopener">APP图标制作</a></li>
-<li><a href="http://cli.im/" target="_blank" rel="noopener">草料二维码生成器</a></li>
-<li><a href="https://translate.google.cn/" target="_blank" rel="noopener">Google中国翻译</a></li>
-<li><a href="http://www.uupoop.com/ps/" target="_blank" rel="noopener">在线PS</a></li>
-<li><a href="http://www.wwei.cn/" target="_blank" rel="noopener">微微二维码生成</a></li>
-<li><a href="http://24mail.chacuo.net/" target="_blank" rel="noopener">临时邮箱</a></li>
-<li><a href="http://www.apowersoft.cn/free-online-screen-recorder" target="_blank" rel="noopener">web在线录屏-只支持windows</a></li>
-<li><a href="http://pmd5.com/#" target="_blank" rel="noopener">MD5在线解密</a></li>
-<li><a href="https://www.ngrok.cc" target="_blank" rel="noopener">ngrok-外网映射工具</a></li>
-<li><a href="http://www.mikecrm.com/" target="_blank" rel="noopener">麦客-在线表单收集</a></li>
-<li><a href="file:///home/SoftwareNormal/BaiduPCS1.html" target="_blank" rel="noopener">Baidupcs-命令行的百度云</a></li>
-<li><a href="https://www.processon.com/" target="_blank" rel="noopener">免费在线制图</a></li>
-<li><a href="http://www.yworks.com/downloads" target="_blank" rel="noopener">yworks-跨平台绘图工具</a></li>
-<li><a href="https://smallpdf.com/" target="_blank" rel="noopener">smallpdf-在线pdf转换</a></li>
-<li><a href="http://cn.office-converter.com/" target="_blank" rel="noopener">强大的在线文件转化</a></li>
-<li><a href="http://www.ilovepdf.com/zh_cn/" target="_blank" rel="noopener">ilovepdf-又一个在线pdf转换工具</a></li>
-<li><a href="http://www.ge.tt/" target="_blank" rel="noopener">在线文件分享工具</a></li>
-<li><a href="https://www.gliffy.com/products/online/" target="_blank" rel="noopener">国外的在线绘图工具</a></li>
-<li><a href="http://naotu.baidu.com/home" target="_blank" rel="noopener">百度脑图-思维导图绘制</a></li>
-<li><a href="https://tinypng.com/" target="_blank" rel="noopener">图片压缩</a></li>
-<li><a href="https://apps.evozi.com/apk-downloader/" target="_blank" rel="noopener">下载GoogleAPP</a><a href="http://apkleecher.com/" target="_blank" rel="noopener">2</a><a href="https://apkpure.com/" target="_blank" rel="noopener">3</a></li>
-<li><a href="https://etcher.io/" target="_blank" rel="noopener">制作ISO</a></li>
-<li><a href="http://www.ofoct.com/zh/audio-converter/convert-wav-or-mp3-ogg-aac-wma-to-midi.html" target="_blank" rel="noopener">在线文件格式转换</a></li>
-<li><a href="http://www.theonionrouter.com/projects/torbrowser.html.en" target="_blank" rel="noopener">Tor Browser</a></li>
-<li><a href="http://www.vpnbook.com/freevpn" target="_blank" rel="noopener">Free VPN</a></li>
-<li><a href="http://dbeaver.jkiss.org/download/" target="_blank" rel="noopener">DBEaver-数据库管理工具</a></li>
-<li><a href="http://www.zamzar.com/" target="_blank" rel="noopener">文件格式转换</a></li>
-<li><a href="https://products.office.com/zh-CN/office-online/documents-spreadsheets-presentations-office-online" target="_blank" rel="noopener">Office Obline</a></li>
-<li><a href="https://www.shucunwang.com/RunCode/shell/#contact" target="_blank" rel="noopener">Shell在线编程</a></li>
-<li><a href="http://www.dooccn.com/cpp/" target="_blank" rel="noopener">C++在线解释器</a></li>
-<li><a href="https://www.json-generator.com/" target="_blank" rel="noopener">JSON生成器</a></li>
-<li><a href="https://experiments.withgoogle.com/ai/ai-duet/view/" target="_blank" rel="noopener">AI-音乐</a></li>
-<li><a href="https://cn.sharelatex.com/project" target="_blank" rel="noopener">在线Latex编辑器</a></li>
-<li><a href="http://www.speedtest.net/" target="_blank" rel="noopener">在线网速测试</a></li>
-<li><a href="https://applypixels.com/" target="_blank" rel="noopener">APP-Pixel</a></li>
-<li><a href="https://github.com/GangZhuo/BaiduPCS" target="_blank" rel="noopener">命令行百度云</a></li>
-</ol>
-<h1 id="在线编程比赛-游戏"><a href="#在线编程比赛-游戏" class="headerlink" title="在线编程比赛(游戏)"></a>在线编程比赛(游戏)</h1><ol>
-<li><a href="http://www.hihocoder.com/" target="_blank" rel="noopener">http://www.hihocoder.com/</a></li>
-<li><a href="http://cn.codecombat.com/" target="_blank" rel="noopener">http://cn.codecombat.com/</a></li>
-<li><a href="https://www.codehunt.com/" target="_blank" rel="noopener">https://www.codehunt.com/</a></li>
-<li><a href="https://screeps.com/" target="_blank" rel="noopener">https://screeps.com/</a></li>
-<li><a href="http://www.fightcodegame.com/" target="_blank" rel="noopener">http://www.fightcodegame.com/</a></li>
-<li><a href="https://www.codingame.com/start" target="_blank" rel="noopener">https://www.codingame.com/start</a></li>
-<li><a href="http://play.elevatorsaga.com/" target="_blank" rel="noopener">http://play.elevatorsaga.com/</a></li>
-<li><a href="https://www.topcoder.com/" target="_blank" rel="noopener">https://www.topcoder.com/</a></li>
-<li><a href="https://codepen.io/jimo_lonely/" target="_blank" rel="noopener">https://codepen.io/jimo_lonely/</a></li>
-<li><a href="http://www.programcreek.com/" target="_blank" rel="noopener">http://www.programcreek.com/</a></li>
-</ol>
-<h1 id="程序员的信息网"><a href="#程序员的信息网" class="headerlink" title="程序员的信息网"></a>程序员的信息网</h1><ol>
-<li><a href="https://www.openhub.net/" target="_blank" rel="noopener">https://www.openhub.net/</a></li>
-<li><a href="http://www.oschina.net/" target="_blank" rel="noopener">http://www.oschina.net/</a></li>
-<li><a href="http://www.cnbeta.com/" target="_blank" rel="noopener">http://www.cnbeta.com/</a></li>
-<li><a href="http://www.open-open.com/news/category/4" target="_blank" rel="noopener">http://www.open-open.com/news/category/4</a></li>
-<li><a href="https://github.com/" target="_blank" rel="noopener">github</a></li>
-<li><a href="http://blog.csdn.net/?ref=toolbar" target="_blank" rel="noopener">CSDN</a></li>
-<li><a href="https://www.quora.com/#" target="_blank" rel="noopener">Quora</a></li>
-<li><a href="https://coding.net/user/projects" target="_blank" rel="noopener">https://coding.net/user/projects</a></li>
-<li><a href="http://www.importnew.com/" target="_blank" rel="noopener">ImportNew</a></li>
-<li><a href="https://www.gitbook.com" target="_blank" rel="noopener">https://www.gitbook.com</a></li>
-<li><a href="http://www.ituring.com.cn/" target="_blank" rel="noopener">http://www.ituring.com.cn/</a></li>
-<li><a href="http://www.epubit.com.cn/" target="_blank" rel="noopener">http://www.epubit.com.cn/</a></li>
-<li><a href="https://linux.cn/" target="_blank" rel="noopener">https://linux.cn/</a></li>
-<li><a href="https://minapp.com/miniapp/" target="_blank" rel="noopener">https://minapp.com/miniapp/</a></li>
-<li><a href="http://blog.jobbole.com/" target="_blank" rel="noopener">http://blog.jobbole.com/</a></li>
-<li><a href="http://www.freebuf.com/" target="_blank" rel="noopener">http://www.freebuf.com/</a></li>
-<li><a href="https://www.t00ls.net/" target="_blank" rel="noopener">https://www.t00ls.net/</a></li>
-</ol>
-<h1 id="Android开发必备网站"><a href="#Android开发必备网站" class="headerlink" title="Android开发必备网站"></a>Android开发必备网站</h1><ol>
-<li><a href="http://developer.android.com/index.html" target="_blank" rel="noopener">http://developer.android.com/index.html</a></li>
-<li><a href="http://www.android-studio.org/" target="_blank" rel="noopener">http://www.android-studio.org/</a></li>
-<li><a href="http://www.androiddevtools.cn/" target="_blank" rel="noopener">http://www.androiddevtools.cn/</a></li>
-<li><a href="http://www.vysor.io/" target="_blank" rel="noopener">http://www.vysor.io/</a></li>
-<li><a href="http://makeappicon.com/" target="_blank" rel="noopener">APP图标制作</a></li>
-</ol>
-<h1 id="前端框架"><a href="#前端框架" class="headerlink" title="前端框架"></a>前端框架</h1><ol>
-<li><a href="http://purecss.io/tables/" target="_blank" rel="noopener">http://purecss.io/tables/</a></li>
-<li><a href="http://www.miniui.com/" target="_blank" rel="noopener">http://www.miniui.com/</a></li>
-<li><a href="http://jui.org/" target="_blank" rel="noopener">http://jui.org/</a></li>
-<li><a href="https://guides.emberjs.com/v2.4.0/getting-started/quick-start/" target="_blank" rel="noopener">https://guides.emberjs.com/v2.4.0/getting-started/quick-start/</a></li>
-<li><a href="http://www.jeasyui.com/index.php" target="_blank" rel="noopener">http://www.jeasyui.com/index.php</a></li>
-<li><a href="http://amazeui.org/" target="_blank" rel="noopener">http://amazeui.org/</a></li>
-<li><a href="http://www.bootcss.com/" target="_blank" rel="noopener">http://www.bootcss.com/</a></li>
-<li><a href="http://one-div.com/" target="_blank" rel="noopener">http://one-div.com/</a></li>
-<li><a href="http://demo.pixelcave.com/oneui/base_comp_images.php" target="_blank" rel="noopener">http://demo.pixelcave.com/oneui/base_comp_images.php</a></li>
-<li><a href="http://www.css88.com" target="_blank" rel="noopener">http://www.css88.com/</a></li>
-<li><a href="http://alibaba.github.io/weex/" target="_blank" rel="noopener">http://alibaba.github.io/weex/</a></li>
-<li><a href="https://bulma.io/" target="_blank" rel="noopener">https://bulma.io/</a></li>
-<li><a href="https://reactjs.org/docs/hello-world.html" target="_blank" rel="noopener">https://reactjs.org/docs/hello-world.html</a></li>
-<li><a href="https://ant.design/docs/react/introduce-cn" target="_blank" rel="noopener">https://ant.design/docs/react/introduce-cn</a></li>
-<li><a href="http://www.redux.org.cn/" target="_blank" rel="noopener">http://www.redux.org.cn/</a></li>
-</ol>
-<h1 id="Python开发相关"><a href="#Python开发相关" class="headerlink" title="Python开发相关"></a>Python开发相关</h1><ol>
-<li><a href="https://www.python.org/" target="_blank" rel="noopener">https://www.python.org/</a></li>
-<li><a href="http://beautifulsoup.readthedocs.io/zh_CN/latest/" target="_blank" rel="noopener">http://beautifulsoup.readthedocs.io/zh_CN/latest/</a></li>
-<li><a href="http://www.pygame.org/docs/ref/" target="_blank" rel="noopener">http://www.pygame.org/docs/ref/</a></li>
-<li><a href="http://webpy.org/" target="_blank" rel="noopener">http://webpy.org/</a></li>
-<li><a href="http://www.pythonchallenge.com/" target="_blank" rel="noopener">http://www.pythonchallenge.com/</a></li>
-<li><a href="https://www.continuum.io/downloads/" target="_blank" rel="noopener">https://www.continuum.io/downloads/</a></li>
-<li><a href="http://aosabook.org/en/index.html" target="_blank" rel="noopener">http://aosabook.org/en/index.html</a></li>
-<li><a href="https://kivy.org/#download" target="_blank" rel="noopener">https://kivy.org/#download</a></li>
-<li><a href="http://www.pythontutor.com/" target="_blank" rel="noopener">http://www.pythontutor.com/</a></li>
-<li><a href="https://docs.python.org/3/library/tkinter.html" target="_blank" rel="noopener">https://docs.python.org/3/library/tkinter.html</a></li>
-<li><a href="http://pyqt.sourceforge.net/Docs/PyQt5/" target="_blank" rel="noopener">http://pyqt.sourceforge.net/Docs/PyQt5/</a></li>
-</ol>
-<p>可视化库:</p>
-<ol start="12">
-<li><a href="https://bokeh.pydata.org/en/latest/" target="_blank" rel="noopener">https://bokeh.pydata.org/en/latest/</a></li>
-<li><a href="https://d3js.org/" target="_blank" rel="noopener">https://d3js.org/</a></li>
-<li><a href="https://matplotlib.org/" target="_blank" rel="noopener">https://matplotlib.org/</a></li>
-</ol>
-<h1 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h1><ol>
-<li><a href="http://tinycorelinux.net/downloads.html" target="_blank" rel="noopener">http://tinycorelinux.net/downloads.html</a></li>
-<li><a href="http://www.codysafe.com/contact-us.html" target="_blank" rel="noopener">http://www.codysafe.com/contact-us.html</a></li>
-<li><a href="https://susestudio.com/" target="_blank" rel="noopener">https://susestudio.com/</a></li>
-<li><a href="http://www.mondorescue.org/" target="_blank" rel="noopener">http://www.mondorescue.org/</a></li>
-<li><a href="http://distrowatch.com/" target="_blank" rel="noopener">http://distrowatch.com/</a></li>
-</ol>
-<h1 id="云计算"><a href="#云计算" class="headerlink" title="云计算"></a>云计算</h1><ol>
-<li><a href="http://www.cnblogs.com/CloudMan6/" target="_blank" rel="noopener">http://www.cnblogs.com/CloudMan6/</a></li>
-<li><a href="https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f?lang=en" target="_blank" rel="noopener">https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f?lang=en</a><br>3.<a href="https://docs.openstack.org/liberty/zh_CN/install-guide-rdo/common/conventions.html" target="_blank" rel="noopener">https://docs.openstack.org/liberty/zh_CN/install-guide-rdo/common/conventions.html</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这里收集了各个学科优秀的学习资源.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/01/12/tools/003-resources/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/01/12/tools/003-resources/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjzav3pwe00gngnchrrfxf8j7" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/resource/">resource</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
 
       </footer>
       </div>
@@ -1981,7 +1849,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2003,6 +1871,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
           </li>
         
@@ -2016,10 +1888,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/05/life/026-weekly-learn/">2019-32-周报</a>
           </li>
         
       </ul>

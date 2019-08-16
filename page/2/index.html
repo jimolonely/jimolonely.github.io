@@ -86,6 +86,152 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/026-centos-firewalld" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/15/linux/026-centos-firewalld/" class="article-date">
+  <time datetime="2019-07-15T01:14:26.000Z" itemprop="datePublished">2019-07-15</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/15/linux/026-centos-firewalld/">重新认识centos防火墙</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文基于firewalld官方文档做一个学习笔记，涉及到大部分方面。</p>
+<h1 id="firewalld简介"><a href="#firewalld简介" class="headerlink" title="firewalld简介"></a>firewalld简介</h1><p>什么是firewalld：</p>
+<blockquote>
+<p>Firewalld提供动态管理的防火墙，支持网络/防火墙区域(zone)，用于定义网络连接或接口的信任级别。 它支持IPv4，IPv6防火墙设置，以太网桥和IP集。 运行时和永久配置选项分开。 它还为服务或应用程序提供了直接添加防火墙规则的接口。</p>
+</blockquote>
+<p>根据<a href="https://firewalld.org/" target="_blank" rel="noopener">官网</a>的介绍，firewalld有以下好处：</p>
+<ol>
+<li><p>可以在运行时环境中立即进行更改。 不需要重新启动服务或守护程序。</p>
+</li>
+<li><p>使用firewalld D-Bus接口，服务，应用程序和用户都可以轻松调整防火墙设置。 界面完整，用于防火墙配置工具有firewall-cmd，firewall-config和firewall-applet。</p>
+</li>
+<li><p>运行时和永久配置的分离使得可以在运行时进行评估和测试。 运行时配置仅在下次服务重新加载和重新启动或系统重新引导时有效。 然后将再次加载永久配置。 使用运行时环境，可以将运行时用于仅在有限时间内处于活动状态的设置。 如果运行时配置已用于评估，并且它已完成并正常工作，则可以将此配置保存到永久环境中。</p>
+</li>
+</ol>
+<p>哪些地方用了？</p>
+<ol>
+<li>RHEL 7, CentOS 7</li>
+<li>Fedora 18 and newer</li>
+<li>其他发布版</li>
+</ol>
+<h1 id="理解firewalld"><a href="#理解firewalld" class="headerlink" title="理解firewalld"></a>理解firewalld</h1><p>根据其<a href="https://github.com/firewalld/firewalld" target="_blank" rel="noopener">开源github</a>, 其采用python语言书写。</p>
+<h2 id="基本架构"><a href="#基本架构" class="headerlink" title="基本架构"></a>基本架构</h2><p>根据<a href="https://firewalld.org/documentation/concepts.html" target="_blank" rel="noopener">文档</a>放出的一张图，我们可以观摩一下。</p>
+<img src="/2019/07/15/linux/026-centos-firewalld/000.png">
+<p>这张图怎么看呢？英文好的同学可以直接看文档去，但是看完之后需要有一个自己的理解，我的理解如下：</p>
+<ol>
+<li><p>从上往下看，共有3个部分，最上面是4个提供给用户的操作接口（命令或界面），中间是firewalld的核心组件，下面是操作系统内核，很显然，我们应该关注中间和上面</p>
+</li>
+<li><p>中间可以分为2层：上面的D-Bus和下面的Core，核心层负责处理配置和后端，如iptables，ip6tables，ebtables，ipset和模块加载器； D-Bus接口是更改和创建防火墙配置的主要方式，而接口中firewall-offline-cmd是个例外，它不和firewalld打交道，而是直接使用带有IO处理程序的firewalld核心来更改和创建firewalld配置文件。</p>
+</li>
+<li><p>实际上我们不需要知道核心如何实现，只需要知道操作最上层的用户接口即可，但是，在这之前还需要了解一些基本概念。</p>
+</li>
+</ol>
+<h2 id="必备概念"><a href="#必备概念" class="headerlink" title="必备概念"></a>必备概念</h2><h3 id="Zone"><a href="#Zone" class="headerlink" title="Zone"></a>Zone</h3><p><strong><a href="https://firewalld.org/documentation/zone/" target="_blank" rel="noopener">Zone</a>是什么？</strong></p>
+<p>Zone定义了一个信任级别，什么的信任级别： 连接、接口或地址绑定。他们的关系是一对多，一个Zone可以有很多连接、接口和源地址。</p>
+<p>简单来说，一个Zone里的东西是同路人，遵循相同的规则，受到相同的管理；不同Zone里的东西规则是不一样的。</p>
+<p><strong>默认，已经有很多预定义的Zone：</strong></p>
+<ol>
+<li><p>drop：任何传入的网络数据包都被丢弃，没有回复。只能进行传出网络连接。</p>
+</li>
+<li><p>block：任何传入的网络连接都会被拒绝，其中包含用于IPv4的icmp-host-prohibited消息和用于IPv6的icmp6-adm-prohibited。只能在此系统中启动网络连接。</p>
+</li>
+<li><p>public：用于公共场所。您相信网络上的其他计算机会损害您的计算机。仅接受选定的传入连接。</p>
+</li>
+<li><p>external：用于特别为路由器启用伪装的外部网络。您相信网络上的其他计算机可能会损害您的计算机。仅接受选定的传入连接。</p>
+</li>
+<li><p>dmz：对于非军事区中的计算机，这些计算机可公开访问，并且对内部网络的访问权限有限。仅接受选定的传入连接。</p>
+</li>
+<li><p>work：用于工作区域。您非常信任网络上的其他计算机不会损害您的计算机。仅接受选定的传入连接。</p>
+</li>
+<li><p>home：适用于家庭领域。您信任网络上的其他计算机不会损害您的计算机。仅接受选定的传入连接。</p>
+</li>
+<li><p>internal：用于内部网络。您信任网络上的其他计算机不会损害您的计算机。仅接受选定的传入连接。</p>
+</li>
+<li><p>trusted：接受所有网络连接。</p>
+</li>
+</ol>
+<p>可以看到，其开放程度逐渐递增，到最后为所有人开放。</p>
+<p><strong>那你肯定会问默认的Zone是什么？</strong></p>
+<p>如果没有指定Zone，那么使用默认的，谁都知道，但是，默认的Zone并不确定，而是<a href="https://firewalld.org/documentation/zone/default-zone.html" target="_blank" rel="noopener">取决于NetworkManager</a>, 抱歉这让人失望，怎么理解呢？ <a href="https://firewalld.org/documentation/zone/connections-interfaces-and-sources.html" target="_blank" rel="noopener">这篇文档给出了解释</a></p>
+<p><strong>zone的配置文件什么样？</strong></p>
+<p>默认目录：<code>/usr/lib/firewalld/zones</code>, 用户配置目录：<code>/etc/firewalld/zones</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@jimo1 zones]# pwd</span><br><span class="line">/usr/lib/firewalld/zones</span><br><span class="line">[root@jimo1 zones]# ll</span><br><span class="line">总用量 36</span><br><span class="line">-rw-r--r--. 1 root root 299 11月 12 2016 block.xml</span><br><span class="line">-rw-r--r--. 1 root root 293 11月 12 2016 dmz.xml</span><br><span class="line">-rw-r--r--. 1 root root 291 11月 12 2016 drop.xml</span><br><span class="line">-rw-r--r--. 1 root root 304 11月 12 2016 external.xml</span><br><span class="line">-rw-r--r--. 1 root root 369 11月 12 2016 home.xml</span><br><span class="line">-rw-r--r--. 1 root root 384 11月 12 2016 internal.xml</span><br><span class="line">-rw-r--r--. 1 root root 315 11月 12 2016 public.xml</span><br><span class="line">-rw-r--r--. 1 root root 162 11月 12 2016 trusted.xml</span><br><span class="line">-rw-r--r--. 1 root root 311 11月 12 2016 work.xml</span><br><span class="line">[root@jimo1 zones]# cat public.xml </span><br><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;zone&gt;</span><br><span class="line">  &lt;short&gt;Public&lt;/short&gt;</span><br><span class="line">  &lt;description&gt;For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.&lt;/description&gt;</span><br><span class="line">  &lt;service name="ssh"/&gt;</span><br><span class="line">  &lt;service name="dhcpv6-client"/&gt;</span><br><span class="line">&lt;/zone&gt;</span><br></pre></td></tr></table></figure>
+<p>再看看当我在public Zone开放8081端口时的配置：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@jimo1 zones]# </span><br><span class="line">[root@jimo1 zones]# pwd</span><br><span class="line">/etc/firewalld/zones</span><br><span class="line">[root@jimo1 zones]# ll</span><br><span class="line">总用量 8</span><br><span class="line">-rw-r--r--. 1 root root 377 7月   9 10:34 public.xml</span><br><span class="line">-rw-r--r--. 1 root root 340 4月  17 10:07 public.xml.old</span><br><span class="line">[root@jimo1 zones]# cat public.xml</span><br><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;zone&gt;</span><br><span class="line">  &lt;short&gt;Public&lt;/short&gt;</span><br><span class="line">  &lt;description&gt;For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.&lt;/description&gt;</span><br><span class="line">  &lt;service name="dhcpv6-client"/&gt;</span><br><span class="line">  &lt;service name="http"/&gt;</span><br><span class="line">  &lt;service name="ssh"/&gt;</span><br><span class="line">  &lt;port protocol="tcp" port="8081"/&gt;</span><br><span class="line">&lt;/zone&gt;</span><br></pre></td></tr></table></figure></p>
+<p>关于配置的XML含义和具体配置，参考<a href="https://firewalld.org/documentation/zone/options.html" target="_blank" rel="noopener">文档</a></p>
+<h3 id="service"><a href="#service" class="headerlink" title="service"></a>service</h3><p>firewalld服务可以是本地端口和目标的列表，还可以是在启用服务时自动加载的防火墙帮助程序模块列表。</p>
+<p>在上面已经见过了，可以看更多<a href="https://firewalld.org/documentation/service/examples.html" target="_blank" rel="noopener">例子</a></p>
+<h3 id="IPSet"><a href="#IPSet" class="headerlink" title="IPSet"></a>IPSet</h3><p>ipset可用于将多个IP或MAC地址组合在一起。 IP地址的ipset可用于IPv4或IPv6。 这由ipset的系列设置定义。 它可以是inet（默认值）或inet6。</p>
+<p>通过使用ipsets，例如，黑名单或白名单的规则数量减少到ipset中的一长串地址的少数规则。 所需规则的数量取决于用例。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ipset</span> <span class="attr">type</span>=<span class="string">"hash:net"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">short</span>&gt;</span>white-list<span class="tag">&lt;/<span class="name">short</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">entry</span>&gt;</span>1.2.3.4<span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">entry</span>&gt;</span>1.2.3.5<span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">entry</span>&gt;</span>1.2.3.6<span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ipset</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="ICMP类型"><a href="#ICMP类型" class="headerlink" title="ICMP类型"></a>ICMP类型</h3><p>Internet控制消息协议（ICMP）用于在Internet协议（IP）中交换信息以及错误消息。 可以在firewalld中使用ICMP类型来限制这些消息的交换。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">icmptype</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">short</span>&gt;</span>Echo Reply (pong)<span class="tag">&lt;/<span class="name">short</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">description</span>&gt;</span>This message is the answer to an Echo Request.<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">icmptype</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="配置firewalld"><a href="#配置firewalld" class="headerlink" title="配置firewalld"></a>配置firewalld</h1><p><a href="https://firewalld.org/documentation/utilities/firewall-cmd.html" target="_blank" rel="noopener">使用firewalld</a></p>
+<p><a href="http://www.aboutyun.com/thread-17535-1-1.html" target="_blank" rel="noopener">http://www.aboutyun.com/thread-17535-1-1.html</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文基于firewalld官方文档做一个学习笔记，涉及到大部分方面。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/07/15/linux/026-centos-firewalld/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/07/15/linux/026-centos-firewalld/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/07/15/linux/026-centos-firewalld/" data-id="cjzdwflbf00djhachawujvh5r" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos/">centos</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-life/023-weekly-learn" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/07/15/life/023-weekly-learn/" class="article-date">
@@ -160,12 +306,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/15/life/023-weekly-learn/" data-id="cjzav3pur00bbgnchs9fkjj2h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/15/life/023-weekly-learn/" data-id="cjzdwflau00bhhachpy71kz7g" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -252,7 +398,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/14/linux/025-ubuntu-use-navidia-card/" data-id="cjzav3pve00dkgnch1oo3j8r0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/14/linux/025-ubuntu-use-navidia-card/" data-id="cjzdwflbg00dlhach8f45a5uv" class="article-share-link">
           Share
         </a>
         
@@ -329,7 +475,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/14/tools/016-vscode-config/" data-id="cjzav3pwm00hggnchfdn2ct76" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/14/tools/016-vscode-config/" data-id="cjzdwflhz00s1hachzzalgrzo" class="article-share-link">
           Share
         </a>
         
@@ -431,7 +577,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/10/git/006-git-revert-deleted-files/" data-id="cjzav3psk004egnchbt11aa4x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/10/git/006-git-revert-deleted-files/" data-id="cjzdwfl8o004ghachw4tken4k" class="article-share-link">
           Share
         </a>
         
@@ -505,7 +651,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/09/basic/019-cs-basic-concept/" data-id="cjzav3prl001rgnchmeh791aw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/09/basic/019-cs-basic-concept/" data-id="cjzdwfl7q001hhachmwwm0za3" class="article-share-link">
           Share
         </a>
         
@@ -598,7 +744,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/08/life/022-weekly-learn/" data-id="cjzav3puu00blgnchngjvgegy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/08/life/022-weekly-learn/" data-id="cjzdwflat00bdhachf8q77o27" class="article-share-link">
           Share
         </a>
         
@@ -855,7 +1001,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/01/cloudcompute/018-docker-conclude-to-graph/" data-id="cjzav3ps00031gnchgc9h5ftx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/01/cloudcompute/018-docker-conclude-to-graph/" data-id="cjzdwfl870032hach5l3szopg" class="article-share-link">
           Share
         </a>
         
@@ -934,7 +1080,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/01/elasticsearch/007-lucene-es/" data-id="cjzav3psf0042gnchkbmzhn6d" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/01/elasticsearch/007-lucene-es/" data-id="cjzdwfl8j0040hachx34fkzpd" class="article-share-link">
           Share
         </a>
         
@@ -1020,7 +1166,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/01/life/021-weekly-learn/" data-id="cjzav3puq00b6gnch1bn45w83" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/01/life/021-weekly-learn/" data-id="cjzdwflat00bfhach1b5j7zy4" class="article-share-link">
           Share
         </a>
         
@@ -1103,7 +1249,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/27/linux/024-linux-hostname/" data-id="cjzav3pvb00dagnchrhce9kww" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/27/linux/024-linux-hostname/" data-id="cjzdwflbd00dbhachqfxaz789" class="article-share-link">
           Share
         </a>
         
@@ -1197,7 +1343,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/24/life/020-weekly-learn/" data-id="cjzav3puo00b5gnchax32f9al" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/24/life/020-weekly-learn/" data-id="cjzdwflar00b8hachunl7p6fs" class="article-share-link">
           Share
         </a>
         
@@ -1281,7 +1427,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/19/life/019-weekly-learn/" data-id="cjzav3puo00b2gnch8eeraz1t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/19/life/019-weekly-learn/" data-id="cjzdwflas00bahachfieks2d7" class="article-share-link">
           Share
         </a>
         
@@ -1356,7 +1502,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/19/basic/018-float-double-format-in-binary/" data-id="cjzav3prk001ngnchfwuqeylf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/19/basic/018-float-double-format-in-binary/" data-id="cjzdwfl7s001nhachty7yc4eg" class="article-share-link">
           Share
         </a>
         
@@ -1467,7 +1613,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/17/cloudcompute/017-docker-spring-cloud-build/" data-id="cjzav3prz002zgnchlfggtsce" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/17/cloudcompute/017-docker-spring-cloud-build/" data-id="cjzdwfl880037hach60740oop" class="article-share-link">
           Share
         </a>
         
@@ -1548,12 +1694,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/14/java/048-spring-boot-multi-netcard/" data-id="cjzav3ptt008lgnchmkdaj6f9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/14/java/048-spring-boot-multi-netcard/" data-id="cjzdwfl9v008jhachpp8cv6wp" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-cloud/">spring cloud</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-cloud/">spring cloud</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -1644,7 +1790,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/12/git/005-gitlab-backup-config/" data-id="cjzav3psj004cgnchtptr6kz5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/12/git/005-gitlab-backup-config/" data-id="cjzdwfl8o004ihachwpq5ega1" class="article-share-link">
           Share
         </a>
         
@@ -1742,7 +1888,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/10/life/018-weekly-learn/" data-id="cjzav3pum00axgnchqsxzozd1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/10/life/018-weekly-learn/" data-id="cjzdwflaq00b5hachbfr64y9s" class="article-share-link">
           Share
         </a>
         
@@ -1820,12 +1966,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/10/java/047-springboot-boot-failed/" data-id="cjzav3ptt008ngnchvo2on6b0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/10/java/047-springboot-boot-failed/" data-id="cjzdwfl9x008ohachemdkno30" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springboot/">springboot</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springboot/">springboot</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -1920,94 +2066,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/09/java/046-springcloud-zipkin-service-not-found/" data-id="cjzav3pts008ignchiddsztc2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/09/java/046-springcloud-zipkin-service-not-found/" data-id="cjzdwfl9w008mhachdxemkqwj" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-cloud/">spring cloud</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin/">zipkin</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/045-feign-pass-params" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/06/java/045-feign-pass-params/" class="article-date">
-  <time datetime="2019-06-06T00:16:25.000Z" itemprop="datePublished">2019-06-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/06/java/045-feign-pass-params/">feignclient传参</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文说明FeignClient传参的几种方式。</p>
-<p><a href="https://yejg.top/2018/07/09/feign-client-parameter-transfer/#%E4%BC%A0%E5%AF%B9%E8%B1%A1--requestinteceptor" target="_blank" rel="noopener">引用文章</a></p>
-<h1 id="传基本类型参数"><a href="#传基本类型参数" class="headerlink" title="传基本类型参数"></a>传基本类型参数</h1><p>使用@RequestParam，注意注解的value参数不可少，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient</span>(value = <span class="string">"demo-service"</span>, fallback = DemoServiceFallback.class) </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@RequestMapping</span>(<span class="string">"/demo-service/test1"</span>)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">test1</span><span class="params">(@RequestParam(value = <span class="string">"userName"</span>)</span> String userName, @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"age"</span>)</span> <span class="keyword">int</span> age)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="传Map传参数"><a href="#传Map传参数" class="headerlink" title="传Map传参数"></a>传Map传参数</h1><p>参数太多的时候，上面的方式就要写一堆，可以直接上map<br>注意，需要加@RequestParam注解，但不需要加注解的value参数<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/demo-service/test4"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">test4</span><span class="params">(@RequestParam Map&lt;String,Object&gt; userMap)</span></span>;</span><br></pre></td></tr></table></figure></p>
-<h1 id="传对象"><a href="#传对象" class="headerlink" title="传对象"></a>传对象</h1><p>Fegin传对象的时候，需要加@RequestBody注解，如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/demo-service/test3"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">test3</span><span class="params">(@RequestBody DemoServiceUser user)</span></span>;</span><br></pre></td></tr></table></figure></p>
-<p>注意，服务提供者的Controller的接收参数前也需要加@RequestBody注解<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/test3"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">test3</span><span class="params">(@RequestBody(required = <span class="keyword">false</span>)</span> User user, HttpServletRequest request) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">"[test3]userName="</span> + user.getUserName() + <span class="string">", age="</span> + user.getAge();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>@RequestBody接收的是一个Json对象的字符串，而不是一个Json对象<br>如果这时候要使用postman直接请求上面的test3接口，那么需要将Content-Type修改为application/json </p>
-<p>这样做虽然解决了feign传对象的问题，但是直接请求/test3接口就麻烦了，不能直接使用form-data的形式了。 这里使用RequestInteceptor来解决。</p>
-<h1 id="传对象-RequestInteceptor"><a href="#传对象-RequestInteceptor" class="headerlink" title="传对象 + RequestInteceptor"></a>传对象 + RequestInteceptor</h1><p>处理思路：feign发请求的时候，将json body转成query。<br>服务提供者的Controller的接收参数前==不需要@RequestBody注解==<br>在上例DemoService所在的项目中增加如下代码即可：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">YryzRequestInterceptor</span> <span class="keyword">implements</span> <span class="title">RequestInterceptor</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Autowired</span></span><br><span class="line">  <span class="keyword">private</span> ObjectMapper objectMapper;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(RequestTemplate template)</span> </span>&#123;</span><br><span class="line">      <span class="comment">// feign 不支持 GET 方法传 POJO, json body转query</span></span><br><span class="line">      <span class="keyword">if</span> (template.method().equals(<span class="string">"GET"</span>) &amp;&amp; template.body() != <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">try</span> &#123;</span><br><span class="line">              JsonNode jsonNode = objectMapper.readTree(template.body());</span><br><span class="line">              template.body(<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">              Map&lt;String, Collection&lt;String&gt;&gt; queries = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">              buildQuery(jsonNode, <span class="string">""</span>, queries);</span><br><span class="line">              template.queries(queries);</span><br><span class="line">          &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">              e.printStackTrace();</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">buildQuery</span><span class="params">(JsonNode jsonNode, String path, Map&lt;String, Collection&lt;String&gt;&gt; queries)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (!jsonNode.isContainerNode()) &#123; <span class="comment">// 叶子节点</span></span><br><span class="line">          <span class="keyword">if</span> (jsonNode.isNull()) &#123;</span><br><span class="line">              <span class="keyword">return</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          Collection&lt;String&gt; values = queries.get(path);</span><br><span class="line">          <span class="keyword">if</span> (<span class="keyword">null</span> == values) &#123;</span><br><span class="line">              values = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">              queries.put(path, values);</span><br><span class="line">          &#125;</span><br><span class="line">          values.add(jsonNode.asText());</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (jsonNode.isArray()) &#123; <span class="comment">// 数组节点</span></span><br><span class="line">          Iterator&lt;JsonNode&gt; it = jsonNode.elements();</span><br><span class="line">          <span class="keyword">while</span> (it.hasNext()) &#123;</span><br><span class="line">              buildQuery(it.next(), path, queries);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          Iterator&lt;Map.Entry&lt;String, JsonNode&gt;&gt; it = jsonNode.fields();</span><br><span class="line">          <span class="keyword">while</span> (it.hasNext()) &#123;</span><br><span class="line">              Map.Entry&lt;String, JsonNode&gt; entry = it.next();</span><br><span class="line">              <span class="keyword">if</span> (StringUtils.hasText(path)) &#123;</span><br><span class="line">                  buildQuery(entry.getValue(), path + <span class="string">"."</span> + entry.getKey(), queries);</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123; <span class="comment">// 根节点</span></span><br><span class="line">                  buildQuery(entry.getValue(), entry.getKey(), queries);</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文说明FeignClient传参的几种方式。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/06/06/java/045-feign-pass-params/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/06/06/java/045-feign-pass-params/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/06/java/045-feign-pass-params/" data-id="cjzav3ptr008ggnchqj14jvcm" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-cloud/">spring cloud</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-cloud/">spring cloud</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin/">zipkin</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -2044,7 +2108,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2066,6 +2130,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
           </li>
         
@@ -2079,10 +2147,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/05/life/026-weekly-learn/">2019-32-周报</a>
           </li>
         
       </ul>

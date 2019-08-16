@@ -86,6 +86,156 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-lang/008-redis-lru-cache" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/03/lang/008-redis-lru-cache/" class="article-date">
+  <time datetime="2018-09-03T02:24:33.000Z" itemprop="datePublished">2018-09-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/03/lang/008-redis-lru-cache/">redis做LRU缓存</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>当Redis用作缓存时，通常可以让它在添加新数据时自动逐出旧数据。 这种行为在开发人员社区中非常有名，因为它是流行的memcached系统的默认行为。</p>
+<p>LRU实际上只是支持的驱逐方法之一。 本页介绍了Redis maxmemory指令的更一般主题，该指令用于将内存使用限制为固定数量，并且它还深入介绍了Redis使用的LRU算法，实际上是精确LRU的近似值。</p>
+<p>从Redis 4.0版开始，引入了新的LFU（最不常用,Least Frequently Used）驱逐策略。 本文档的单独部分对此进行了介绍。</p>
+<img src="/2018/09/03/lang/008-redis-lru-cache/001.png">
+<h1 id="Maxmemory配置指令"><a href="#Maxmemory配置指令" class="headerlink" title="Maxmemory配置指令"></a>Maxmemory配置指令</h1><p>maxmemory配置指令用于配置Redis为数据集使用指定数量的内存。 可以使用redis.conf文件设置配置指令，或者稍后在运行时使用CONFIG SET命令设置配置指令。</p>
+<p>例如，为了配置100兆字节的内存限制，可以在redis.conf文件中使用以下指令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">maxmemory 100mb</span><br></pre></td></tr></table></figure></p>
+<p>将maxmemory设置为零会导致无内存限制。 这是64位系统的默认行为，而32位系统使用3GB的隐式内存限制。</p>
+<p>达到指定的内存量时，可以在不同的行为中进行选择，称为 <strong>策略</strong>。 Redis可以只返回可能导致使用更多内存的命令的错误，或者它可以逐出旧数据以便每次添加新数据时返回到指定的限制。</p>
+<h1 id="驱逐策略"><a href="#驱逐策略" class="headerlink" title="驱逐策略"></a>驱逐策略</h1><p>使用maxmemory-policy配置指令配置达到maxmemory限制时Redis遵循的确切行为。</p>
+<p>可以使用以下策略：</p>
+<ul>
+<li>noeviction：当达到内存限制并且客户端尝试执行可能导致使用更多内存的命令时返回错误（大多数写命令，但DEL和一些例外）。</li>
+<li>allkeys-lru：首先尝试删除最近使用较少的（LRU）key，以便为添加的新数据腾出空间。</li>
+<li>volatile-lru：首先尝试删除最近使用较少的（LRU）key，但仅在具有过期设置的key中删除，以便为添加的新数据腾出空间。</li>
+<li>allkeys-random：随机逐出key，以便为添加的新数据腾出空间。</li>
+<li>volatile-random：随机逐出key以便为添加的新数据腾出空间，但只驱逐带有过期集的key。</li>
+<li>volatile-ttl：用过期集驱逐key，并尝试先用较短的生存时间（TTL）驱逐key，以便为添加的新数据腾出空间。</li>
+</ul>
+<p>如果没有用于驱逐匹配先决条件的key，则volatile-lru，volatile-random和volatile-ttl策略的行为类似于noeviction。</p>
+<p>根据应用程序的访问模式选择正确的驱逐策略很重要，但是您可以在应用程序运行时在运行时重新配置策略，并使用Redis INFO输出监视缓存未命中和命中的数量，以便调整。</p>
+<p>一般来说，作为经验法则：</p>
+<ul>
+<li>当您期望在请求的流行度中使用幂律分布时，使用allkeys-lru策略，也就是说，您希望访问元素的子集的频率远远高于其他元素。 如果您不确定，这是一个很好的选择。</li>
+<li>如果您有连续扫描所有键的循环访问，或者您希望分布均匀（所有元素可能以相同的概率访问），请使用allkeys-random。</li>
+<li>如果您希望能够在创建缓存对象时通过使用不同的TTL值向Redis提供有关到期的最佳候选者的提示，请使用volatile-ttl。</li>
+</ul>
+<p>当您希望使用单个实例进行缓存并拥有一组持久key时，volatile-lru和volatile-random策略非常有用。 但是，运行两个Redis实例来解决此类问题通常更好。</p>
+<p>还值得注意的是，为key设置过期时间也有内存成本，因此使用像allkeys-lru这样的策略可以提高内存效率，因为在内存压力下不需要为key设置过期。</p>
+<h1 id="驱逐进程如何运作"><a href="#驱逐进程如何运作" class="headerlink" title="驱逐进程如何运作"></a>驱逐进程如何运作</h1><p>重要的是要理解驱逐过程的工作方式如下：</p>
+<ul>
+<li>客户端运行新命令，导致添加更多数据。</li>
+<li>Redis检查内存使用情况，如果它大于maxmemory限制，它会根据策略驱逐key。</li>
+<li>执行新命令，依此类推。</li>
+</ul>
+<p>因此，我们不断跨越内存限制的边界，通过检查，然后通过驱逐key返回限制之下。</p>
+<p>如果命令导致使用大量内存（如大集合交集然后存储在新key中的）一段时间内，内存限制可以被明显超过。</p>
+<h1 id="近似LRU算法"><a href="#近似LRU算法" class="headerlink" title="近似LRU算法"></a>近似LRU算法</h1><p>Redis LRU算法不是一个精确的实现。 这意味着Redis无法选择最佳的驱逐候选者，即过去访问次数最多的访问。 相反，它将尝试运行近似的LRU算法，通过采样少量key，并逐出采样key中最好的（具有最早的访问时间）。</p>
+<p>然而，自Redis 3.0以来，该算法得到了改进，同时也为一些好的候选人提供了驱逐。 这改善了算法的性能，使其能够更接近地逼近真实LRU算法的行为。</p>
+<p>Redis LRU算法的重要之处在于，您可以通过更改样本数来调整算法的精度，以检查每次驱逐。 此参数由以下配置指令控制：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">maxmemory-samples 5</span><br></pre></td></tr></table></figure></p>
+<p>Redis之所以不使用真正的LRU实现，是因为它需要更多的内存。 但是，对于使用Redis的应用程序，近似值几乎相同。 以下是Redis使用的LRU近似与真实LRU的比较的图形比较。</p>
+<img src="/2018/09/03/lang/008-redis-lru-cache/000.png">
+<p>生成上述图表的测试填充了具有给定数量键的Redis服务器。 从第一个到最后一个访问key，因此第一个key是使用LRU算法进行驱逐的最佳候选者。 后来增加了50％的key，以迫使一半的旧key被驱逐。</p>
+<p>你可以在图中看到三种点，形成三个不同的带。</p>
+<ul>
+<li>浅灰色带是被驱逐的对象。</li>
+<li>灰色带是未被驱逐的对象。</li>
+<li>绿色条带是添加的对象。</li>
+</ul>
+<p>在理论上的LRU实现中，我们期望在旧key中，前半部分将过期。 Redis LRU算法将仅在概率上使旧key失效。</p>
+<p>正如您所看到的，与Redis 2.8相比，Redis 3.0在5个样本上做得更好，但是最新访问的大多数对象仍然由Redis 2.8保留。 在Redis 3.0中使用10的样本大小，近似值非常接近Redis 3.0的理论性能。</p>
+<p>请注意，LRU只是一种模型，用于预测将来访问给定key的可能性。 此外，如果您的数据访问模式与幂律非常相似，那么大多数访问将在LRU近似算法能够很好地处理的key集中。</p>
+<p>在模拟中，我们发现使用幂律访问模式，真实LRU和Redis近似之间的差异很小或根本不存在。</p>
+<p>但是，您可以以一些额外的CPU使用量为代价将样本大小提高到10，以便接近真实的LRU，并检查这是否会影响您的缓存未命中率。</p>
+<p>要使用 <code>CONFIG SET maxmemory-samples &lt;count&gt;</code> 命令对不同的样本量值进行生产实验，非常简单。</p>
+<h1 id="新的LFU模式"><a href="#新的LFU模式" class="headerlink" title="新的LFU模式"></a>新的LFU模式</h1><p>从Redis 4.0开始，可以使用新的最少使用的逐出模式。 在某些情况下，此模式可能更好（提供更好的命中/未命中率），因为使用LFU Redis将尝试跟踪item的访问频率，以便很少使用的item被驱逐，而使用的item通常具有更高的机会留在内存中。</p>
+<p>如果您在LRU中考虑，最近访问但实际上几乎从未请求的item将不会过期，因此风险是驱逐将来有更高机会被请求的key。 LFU没有这个问题，并且通常应该更好地适应不同的访问模式。</p>
+<p>要配置LFU模式，可以使用以下策略：</p>
+<ul>
+<li>volatile-lfu在具有过期集的key中使用近似LFU来驱逐。</li>
+<li>allkeys-lfu使用近似的LFU驱逐任何key。</li>
+</ul>
+<p>LFU近似于LRU：它使用概率计数器，称为Morris计数器，以便仅使用每个对象的几个位来估计对象访问频率，并结合衰减周期，以便计数器随时间减少：在某些时候我们 不再需要考虑频繁访问的key，即使它们是过去的，因此算法可以适应访问模式的转变。</p>
+<p>这些信息的采样与LRU的情况类似（如本文档上一节所述），以便选择驱逐候选者。</p>
+<p>然而，与LRU不同，LFU具有某些可调参数：例如，如果频率项不再被访问，它的排名应该有多快？ 还可以调整Morris计数器范围，以便更好地使算法适应特定用例。</p>
+<p>默认情况下，Redis 4.0配置为：</p>
+<ul>
+<li>使计数器饱和，大约有一百万个请求。</li>
+<li>每隔一分钟腐烂柜台。</li>
+</ul>
+<p>这些应该是合理的值并且经过实验测试，但是用户可能想要使用这些配置设置以便选择最佳值。</p>
+<p>有关如何调整这些参数的说明可以在源代码发布中的示例redis.conf文件中找到，但简单地说，它们是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lfu-log-factor 10</span><br><span class="line">lfu-decay-time 1</span><br></pre></td></tr></table></figure>
+<p>衰减时间是显而易见的，它是计数器应该被衰减的分钟数，当被采样并且发现比该值更旧时。 特殊值0表示：每次扫描时总是衰减计数器，并且很少有用。</p>
+<p>计数器对数因子改变了为了使频率计数器饱和所需的命中数，该频率计数器仅在0-255的范围内。 因子越高，需要越多的访问才能达到最大值。 根据下表，因子越低，低访问计数器的分辨率越高：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">+--------+------------+------------+------------+------------+------------+</span><br><span class="line">| factor | 100 hits   | 1000 hits  | 100K hits  | 1M hits    | 10M hits   |</span><br><span class="line">+--------+------------+------------+------------+------------+------------+</span><br><span class="line">| 0      | 104        | 255        | 255        | 255        | 255        |</span><br><span class="line">+--------+------------+------------+------------+------------+------------+</span><br><span class="line">| 1      | 18         | 49         | 255        | 255        | 255        |</span><br><span class="line">+--------+------------+------------+------------+------------+------------+</span><br><span class="line">| 10     | 10         | 18         | 142        | 255        | 255        |</span><br><span class="line">+--------+------------+------------+------------+------------+------------+</span><br><span class="line">| 100    | 8          | 11         | 49         | 143        | 255        |</span><br><span class="line">+--------+------------+------------+------------+------------+------------+</span><br></pre></td></tr></table></figure>
+<p>因此，基本上这个因素是在具有低访问权限和具有高访问权限的区分项目的较好区分项目之间的权衡。 示例redis.conf文件中提供了更多信息自我记录注释。</p>
+<p>由于LFU是一项新功能，我们将非常感谢您在使用案例中与LRU相比的任何反馈。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>当Redis用作缓存时，通常可以让它在添加新数据时自动逐出旧数据。 这种行为在开发人员社区中非常有名，因为它是流行的memcached系统的默认行为。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/03/lang/008-redis-lru-cache/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/03/lang/008-redis-lru-cache/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/008-redis-lru-cache/" data-id="cjzdwfla9009uhachaz5mmscg" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-lang/007-redis-mass-insertion" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/03/lang/007-redis-mass-insertion/" class="article-date">
@@ -177,7 +327,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjzav3pu4009mgnchzp21ctix" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjzdwfla6009lhach4cnifsy4" class="article-share-link">
           Share
         </a>
         
@@ -304,7 +454,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjzav3pu3009kgnch41oo62d6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjzdwfla5009ihachsykpwahd" class="article-share-link">
           Share
         </a>
         
@@ -379,7 +529,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjzav3pv500clgnch1j0xna90" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjzdwflb800crhachj3c65kx6" class="article-share-link">
           Share
         </a>
         
@@ -489,7 +639,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjzav3pu2009ggnch04her35y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjzdwfla7009phachp8l3m8le" class="article-share-link">
           Share
         </a>
         
@@ -616,7 +766,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjzav3pu1009dgnch3r2vmohm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjzdwfla4009dhachy6riy88b" class="article-share-link">
           Share
         </a>
         
@@ -913,7 +1063,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjzav3pu2009ignchl3mllfl9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjzdwfla7009rhachlz5w7qr5" class="article-share-link">
           Share
         </a>
         
@@ -1075,7 +1225,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjzav3pvy00fhgnchhxb1r3uf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjzdwflh300pwhachid6ubzbo" class="article-share-link">
           Share
         </a>
         
@@ -1214,7 +1364,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjzav3pvx00fdgnchglt6pn71" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjzdwflh000pphachyaw33n20" class="article-share-link">
           Share
         </a>
         
@@ -1299,7 +1449,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjzav3prx002qgnchgewcyl36" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjzdwfl85002uhachyc2wtqca" class="article-share-link">
           Share
         </a>
         
@@ -1409,7 +1559,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjzav3pry002tgnch4mb4wtkv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjzdwfl83002phachrndfjt2u" class="article-share-link">
           Share
         </a>
         
@@ -1493,7 +1643,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjzav3prw002pgnchdj3900ly" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjzdwfl84002rhach92dt5vo1" class="article-share-link">
           Share
         </a>
         
@@ -1597,7 +1747,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjzav3prw002ngnch1xfwcmn4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjzdwfl82002nhachzs4nfrug" class="article-share-link">
           Share
         </a>
         
@@ -1683,12 +1833,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjzav3pwh00gzgnchivz759vy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjzdwflhu00rrhachxgl4j7jc" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -1783,7 +1933,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjzav3prv002lgnch85bb1x96" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjzdwfl82002mhachmu9xca4w" class="article-share-link">
           Share
         </a>
         
@@ -1873,7 +2023,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjzav3pru002ignchh78m066t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjzdwfl80002fhachle6er1rv" class="article-share-link">
           Share
         </a>
         
@@ -1996,12 +2146,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjzav3psx005mgnch1nih8kfq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjzdwfl90005lhacheptt8usa" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -2113,7 +2263,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjzav3prt002hgnchvcj1peuk" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjzdwfl81002khach07hagal2" class="article-share-link">
           Share
         </a>
         
@@ -2222,7 +2372,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjzav3prs002dgnchmednqg7r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjzdwfl81002ihachu0q49hg8" class="article-share-link">
           Share
         </a>
         
@@ -2302,88 +2452,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjzav3pua00a2gnchhus8u4bh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjzdwflad00a5hachkhh216ic" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/014-linux-use-error" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/28/linux/014-linux-use-error/" class="article-date">
-  <time datetime="2018-07-28T00:04:39.000Z" itemprop="datePublished">2018-07-28</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/28/linux/014-linux-use-error/">linux-use-error</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>those errors when using linux system.</p>
-<h1 id="This-partition-cannot-be-modified-because-it-contains-a-partition-table-gt-please-reinitialize-layout-of-the-whole-device-udisks-error-quark-11"><a href="#This-partition-cannot-be-modified-because-it-contains-a-partition-table-gt-please-reinitialize-layout-of-the-whole-device-udisks-error-quark-11" class="headerlink" title="This partition cannot be modified because it contains a partition table; &gt;please reinitialize layout of the whole device. (udisks-error-quark, 11)"></a>This partition cannot be modified because it contains a partition table; &gt;please reinitialize layout of the whole device. (udisks-error-quark, 11)</h1><p>已安装linux的U盘无法格式化，要求reinitialize layout</p>
-<p><strong>Done:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">使用GParted</span><br><span class="line"></span><br><span class="line">安装：sudo apt install gparted</span><br><span class="line">安装完启动：sudo gparted</span><br><span class="line"></span><br><span class="line">此时弹出软件的图形界面，在软件右上角选择自己的U盘设备（默认选中电脑硬盘）</span><br><span class="line"></span><br><span class="line">然后选中Device - Create Partition Table</span><br><span class="line">完成后选择Partition - New创建新分区表，选择磁盘格式为ntfs</span><br><span class="line"></span><br><span class="line">确定后，点击工具栏中的勾，apply所有更改，完成后就OK了</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>those errors when using linux system.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/07/28/linux/014-linux-use-error/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/07/28/linux/014-linux-use-error/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/28/linux/014-linux-use-error/" data-id="cjzav3pv500cognchqaq78kv3" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
 
       </footer>
       </div>
@@ -2420,7 +2494,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2442,6 +2516,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
           </li>
         
@@ -2455,10 +2533,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/05/life/026-weekly-learn/">2019-32-周报</a>
           </li>
         
       </ul>

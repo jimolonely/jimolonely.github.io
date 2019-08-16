@@ -86,6 +86,94 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/022-su-in-script" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/04/15/linux/022-su-in-script/" class="article-date">
+  <time datetime="2019-04-15T06:42:54.000Z" itemprop="datePublished">2019-04-15</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/04/15/linux/022-su-in-script/">带密码的sudo和su命令</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>有时，迫不得已，我们需要在脚本中执行sudo或su命令，虽然这不安全，但切实可行。</p>
+<h1 id="sudo"><a href="#sudo" class="headerlink" title="sudo"></a>sudo</h1><p>sudo非常简单，因为其自己就可以：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> echo rootPass | sudo -S cmd</span><br></pre></td></tr></table></figure></p>
+<p><code>-S</code> 代表从标准输入读取密码。</p>
+<h1 id="su"><a href="#su" class="headerlink" title="su"></a>su</h1><p>我们常用做法是<code>su - root</code>,这时需要输入密码。要怎么在脚本中指定呢？稍微复杂一点。</p>
+<h2 id="方式1"><a href="#方式1" class="headerlink" title="方式1"></a>方式1</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">su - username &lt;&lt;!</span><br><span class="line">enterpasswordhere</span><br><span class="line">enter commands to run as the new user</span><br><span class="line">!</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>######例子#######</span><br><span class="line"></span><br><span class="line">su - root &lt;&lt;! &gt;/dev/null 2&gt;&amp;1</span><br><span class="line">root-password</span><br><span class="line">whoami &gt; /dev/tty</span><br><span class="line">ls &gt; /dev/tty</span><br><span class="line">!</span><br></pre></td></tr></table></figure>
+<p>他是把结果输入到tty，也就是终端，如果我想获取结果呢？</p>
+<p>可以写入临时文件：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">su - root &lt;&lt;! &gt;/dev/null 2&gt;&amp;1</span><br><span class="line">root-password</span><br><span class="line">whoami &gt; /tmp/result</span><br><span class="line">ls &gt; /tmp/result</span><br><span class="line">!</span><br></pre></td></tr></table></figure></p>
+<p>加入我采用的java程序链接ssh获取输出，这种方式可行：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ShellExecutor executor = <span class="keyword">new</span> ShellExecutor(ssh);</span><br><span class="line">String s = executor.execute(<span class="string">"cd ~ &amp;&amp; echo 'su - root &lt;&lt;! &gt;/dev/null 2&gt;&amp;1' &gt; su_temp.sh"</span> +</span><br><span class="line">        <span class="string">" &amp;&amp; echo '$1' &gt;&gt; su_temp.sh"</span> +</span><br><span class="line">        <span class="string">" &amp;&amp; echo 'cd $2' &gt;&gt; su_temp.sh"</span> +</span><br><span class="line">        <span class="string">" &amp;&amp; echo '$3 &gt; /tmp/result' &gt;&gt; su_temp.sh"</span> +</span><br><span class="line">        <span class="string">" &amp;&amp; echo ! &gt;&gt; su_temp.sh"</span> +</span><br><span class="line">        <span class="string">" &amp;&amp; sh su_temp.sh develop@2wsx#EDC@2019 /etc 'ls'"</span> +</span><br><span class="line">        <span class="string">" &amp;&amp; rm -f su_temp.sh "</span> +</span><br><span class="line">        <span class="string">" &amp;&amp; cat /tmp/result"</span>);</span><br><span class="line">System.out.println(s);</span><br></pre></td></tr></table></figure>
+<h2 id="方式2"><a href="#方式2" class="headerlink" title="方式2"></a>方式2</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/usr/bin/expect -f</span><br><span class="line"><span class="meta">#</span>Usage: script.sh cmd user pass</span><br><span class="line"></span><br><span class="line">set cmd [lindex $argv 0];</span><br><span class="line">set user [lindex $argv 1];</span><br><span class="line">set pass [lindex $argv 2];</span><br><span class="line"></span><br><span class="line">log_user 0</span><br><span class="line">spawn su -c $cmd - $user</span><br><span class="line">expect "Password: "</span><br><span class="line">log_user 1</span><br><span class="line">send "$pass\r"</span><br><span class="line">expect "$ "</span><br></pre></td></tr></table></figure>
+<p>运行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./runas.sh "ls -l" bob 1234</span><br></pre></td></tr></table></figure></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li><a href="https://askubuntu.com/questions/354838/is-there-a-single-line-command-to-do-su" target="_blank" rel="noopener">Is there a single line command to do <code>su</code>?</a></li>
+<li><a href="https://coderwall.com/p/0wgrwq/run-su-with-password-command-line-argument" target="_blank" rel="noopener">Run SU with password command line argument</a></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>有时，迫不得已，我们需要在脚本中执行sudo或su命令，虽然这不安全，但切实可行。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/04/15/linux/022-su-in-script/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/04/15/linux/022-su-in-script/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/04/15/linux/022-su-in-script/" data-id="cjzdwflbc00d9hachj9v984tt" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-life/013-weekly-learn" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/04/15/life/013-weekly-learn/" class="article-date">
@@ -158,7 +246,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/15/life/013-weekly-learn/" data-id="cjzav3puk00aqgnch31bx2z9n" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/15/life/013-weekly-learn/" data-id="cjzdwflao00ayhach9abbrhjw" class="article-share-link">
           Share
         </a>
         
@@ -244,12 +332,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/11/java/043-java-annotations/" data-id="cjzav3ptp0088gnchhtlky11r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/11/java/043-java-annotations/" data-id="cjzdwfl9t0089hach5llbd3p7" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/annotation/">annotation</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/annotation/">annotation</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -331,7 +419,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/10/db/008-pgsql-common-sqls/" data-id="cjzav3ps6003jgnchaap73wsb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/10/db/008-pgsql-common-sqls/" data-id="cjzdwfl8d003ghachce7v7m48" class="article-share-link">
           Share
         </a>
         
@@ -424,12 +512,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/09/java/042-java-command-line-args/" data-id="cjzav3ptp008bgnchfjp5v1t7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/09/java/042-java-command-line-args/" data-id="cjzdwfl9t008chacho0uzw4x6" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -516,7 +604,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/09/life/012-weekly-learn/" data-id="cjzav3puj00apgnchspwxptvb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/09/life/012-weekly-learn/" data-id="cjzdwflak00aohachm3uvxbjq" class="article-share-link">
           Share
         </a>
         
@@ -597,7 +685,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/08/linux/021-ssh-login-too-slow/" data-id="cjzav3pv800d0gnchsb86vr6o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/08/linux/021-ssh-login-too-slow/" data-id="cjzdwflbb00d6hachnfikw9nz" class="article-share-link">
           Share
         </a>
         
@@ -709,12 +797,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/03/java/041-quartz-problems/" data-id="cjzav3ptn0081gnchosnrdpc6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/03/java/041-quartz-problems/" data-id="cjzdwfl9s0087hachlylnwvl3" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/quartz/">quartz</a><span class="article-tag-list-count">2</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/quartz/">quartz</a><span class="article-tag-list-count">2</span></li></ul>
 
       </footer>
       </div>
@@ -807,7 +895,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/02/test/000-katalon/" data-id="cjzav3pwn00hignchlnxub202" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/02/test/000-katalon/" data-id="cjzdwflhe00qrhachyis1t1ro" class="article-share-link">
           Share
         </a>
         
@@ -889,7 +977,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/01/life/011-weekly-learn/" data-id="cjzav3pui00algnchztx10kn2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/01/life/011-weekly-learn/" data-id="cjzdwflaj00amhachiefu5blr" class="article-share-link">
           Share
         </a>
         
@@ -969,7 +1057,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/27/ansible/006-ansible-install-keepalived/" data-id="cjzav3pra000pgnchc3uc3jn9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/27/ansible/006-ansible-install-keepalived/" data-id="cjzdwfl72000jhachuxbjdfah" class="article-share-link">
           Share
         </a>
         
@@ -1047,12 +1135,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/040-spring-boot-load-properties-order-by-source-code/" data-id="cjzav3ptn0083gnchsytltsm9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/040-spring-boot-load-properties-order-by-source-code/" data-id="cjzdwfl9p007zhachcbum3bt8" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">7</span></li></ul>
 
       </footer>
       </div>
@@ -1136,12 +1224,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/039-java-headless/" data-id="cjzav3pto0086gnchwygs7uw8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/26/java/039-java-headless/" data-id="cjzdwfl9r0082hachyzdt502i" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -1215,7 +1303,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/25/basic/017-microservice-resource/" data-id="cjzav3prj001lgnchg9wxuvph" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/25/basic/017-microservice-resource/" data-id="cjzdwfl7v001yhach0k2hl815" class="article-share-link">
           Share
         </a>
         
@@ -1296,12 +1384,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/25/java/038-springmvc-handle-content-type/" data-id="cjzav3ptk007wgnchw6v5mptl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/25/java/038-springmvc-handle-content-type/" data-id="cjzdwfl9o007xhach7jwbufk2" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a><span class="article-tag-list-count">6</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -1394,7 +1482,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/25/life/010-weekly-learn/" data-id="cjzav3pui00amgnchctvq3xgy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/25/life/010-weekly-learn/" data-id="cjzdwflan00ashach78e34x8s" class="article-share-link">
           Share
         </a>
         
@@ -1502,7 +1590,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/22/maven/003-maven-reknown/" data-id="cjzav3pvj00e7gnchnu6r1e27" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/22/maven/003-maven-reknown/" data-id="cjzdwflbl00e5hachl7nvfcsh" class="article-share-link">
           Share
         </a>
         
@@ -1597,12 +1685,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/20/java/037-jar-java-cmdline/" data-id="cjzav3ptm007ygnchuhh728n3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/20/java/037-jar-java-cmdline/" data-id="cjzdwfl9r0084hach9s9n2fb0" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -1677,7 +1765,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/19/db/007-pgsql-updateset-ambiguous-column/" data-id="cjzav3ps5003hgnchqohhn6vr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/19/db/007-pgsql-updateset-ambiguous-column/" data-id="cjzdwfl8d003hhachlse8h28w" class="article-share-link">
           Share
         </a>
         
@@ -1767,101 +1855,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/19/java/036-springboot-kafkatemplate/" data-id="cjzav3pth007ognch2twykue6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/19/java/036-springboot-kafkatemplate/" data-id="cjzdwfl9n007uhachne8of2by" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">79</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">6</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/020-ubuntu-install-extensions" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/03/19/linux/020-ubuntu-install-extensions/" class="article-date">
-  <time datetime="2019-03-19T00:19:47.000Z" itemprop="datePublished">2019-03-19</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/03/19/linux/020-ubuntu-install-extensions/">ubuntu安装扩展/插件</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文翻译自<a href="https://linuxconfig.org/how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux</a></p>
-<p>本文将介绍3种方式安装ubuntu下gnome的extentions。</p>
-<h1 id="1-从ubuntu仓库安装"><a href="#1-从ubuntu仓库安装" class="headerlink" title="1.从ubuntu仓库安装"></a>1.从ubuntu仓库安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install gnome-shell-extensions</span><br></pre></td></tr></table></figure>
-<p>不过需要tweak-tool，18.x没有默认安装，需要手动：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo add-apt-repository universe</span><br><span class="line"><span class="meta">$</span> sudo apt install gnome-tweak-tool</span><br></pre></td></tr></table></figure></p>
-<img src="/2019/03/19/linux/020-ubuntu-install-extensions/000.png">
-<h1 id="2-使用firefox安装"><a href="#2-使用firefox安装" class="headerlink" title="2.使用firefox安装"></a>2.使用firefox安装</h1><ol>
-<li><p><a href="https://addons.mozilla.org/en-US/firefox/addon/gnome-shell-integration/" target="_blank" rel="noopener">安装firefox-gnome-shell扩展</a></p>
-</li>
-<li><p>安装chrome-gnome-shell: <code>$ sudo apt install chrome-gnome-shell</code></p>
-</li>
-<li><p>访问<a href="https://extensions.gnome.org" target="_blank" rel="noopener">gnome.org</a>选择需要的扩展，然后勾选为on即可：</p>
- <img src="/2019/03/19/linux/020-ubuntu-install-extensions/001.png">
-</li>
-</ol>
-<h1 id="3-从源码安装"><a href="#3-从源码安装" class="headerlink" title="3.从源码安装"></a>3.从源码安装</h1><p>当然，在能获取到源码的前提下。</p>
-<p>// TODO</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文翻译自<a href="https://linuxconfig.org/how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">how-to-install-gnome-shell-extensions-on-ubuntu-18-04-bionic-beaver-linux</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/03/19/linux/020-ubuntu-install-extensions/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/03/19/linux/020-ubuntu-install-extensions/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/19/linux/020-ubuntu-install-extensions/" data-id="cjzav3pv900d3gnch9k2uu1fv" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/firefox/">firefox</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">8</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">7</span></li></ul>
 
       </footer>
       </div>
@@ -1898,7 +1897,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.13px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1920,6 +1919,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
           </li>
         
@@ -1933,10 +1936,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/05/life/026-weekly-learn/">2019-32-周报</a>
           </li>
         
       </ul>
