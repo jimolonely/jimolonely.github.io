@@ -86,6 +86,142 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-lang/009-redis-partition" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/03/lang/009-redis-partition/" class="article-date">
+  <time datetime="2018-09-03T07:43:19.000Z" itemprop="datePublished">2018-09-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/03/lang/009-redis-partition/">redis分区：如何在多个Redis实例之间拆分数据</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>分区是将数据拆分为多个Redis实例的过程，因此每个实例只包含key的子集。 本文档的第一部分将向您介绍分区的概念，第二部分将向您展示Redis分区的替代方案。</p>
+<img src="/2018/09/03/lang/009-redis-partition/000.png">
+<h1 id="为什么分区很有用"><a href="#为什么分区很有用" class="headerlink" title="为什么分区很有用"></a>为什么分区很有用</h1><p>Redis中的分区有两个主要目标：</p>
+<ol>
+<li>它允许更大的数据库，使用许多计算机的内存总和。 如果不进行分区，则限制为单台计算机可以支持的内存量。</li>
+<li>它允许将计算能力扩展到多个核心和多台计算机，并将网络带宽扩展到多台计算机和网络适配器。</li>
+</ol>
+<h1 id="分区基础知识"><a href="#分区基础知识" class="headerlink" title="分区基础知识"></a>分区基础知识</h1><p>有不同的分区标准。 想象一下，我们有四个Redis实例R0，R1，R2，R3和许多代表用户的key：user:1，user:2，…等等，我们可以找到不同的方法来选择我们存储给定key的实例。 换句话说，有不同的系统将给定的key映射到给定的Redis服务器。</p>
+<p>执行分区的最简单方法之一是使用范围分区，并通过将对象范围映射到特定的Redis实例来完成。 例如，我可以说从ID 0到ID 10000的用户将进入实例R0，而用户表单ID 10001到ID 20000将进入实例R1，依此类推。</p>
+<p>那样可以工作并且实际上在实践中使用，但是，它具有需要将范围映射到实例的表的缺点。 需要管理此表，并且每种对象都需要一个表，因此Redis中的范围分区通常是不合需要的，因为它比其他替代分区方法效率低得多。</p>
+<p>范围分区的替代方法是 <strong>散列分区</strong> 。 此方案适用于任何键，无需表格<code>object_name：&lt;id&gt;</code>中的键，并且简单如下：</p>
+<ul>
+<li>获取key名称并使用散列函数（例如，crc32散列函数）将其转换为数字。 例如，如果键是foobar，crc32（foobar）将输出类似93024922的内容。</li>
+<li>使用带有此数字的模运算，以便将其转换为0到3之间的数字，以便可以将此数字映射到我的四个Redis实例之一。 93024922 modulo 4等于2，所以我知道我的密钥foobar应该存储在R2实例中。 注意：模运算返回除法运算的余数，并在许多编程语言中使用％运算符实现。</li>
+</ul>
+<p>还有许多其他方法可以执行分区，但是有了这两个例子，你应该明白这个想法。 一种高级的散列分区称为一致散列，由一些Redis客户端和代理实现。</p>
+<h1 id="不同的分区实现"><a href="#不同的分区实现" class="headerlink" title="不同的分区实现"></a>不同的分区实现</h1><p>分区可能负责软件栈的不同部分。</p>
+<ul>
+<li><strong>客户端分区</strong> 意味着客户端直接选择正确的节点在哪里写或读取给定的key。许多Redis客户端实现客户端分区。</li>
+<li><strong>代理辅助分区</strong> 意味着我们的客户端将请求发送到能懂Redis协议的代理，而不是直接向正确的Redis实例发送请求。代理将确保根据配置的分区架构将我们的请求转发到正确的Redis实例，并将回复发送回客户端。 Redis和Memcached代理Twemproxy实现代理辅助分区。</li>
+<li><strong>查询路由</strong> 意味着您可以将查询发送到随机实例，实例将确保将查询转发到正确的节点。 Redis Cluster在客户端的帮助下实现了混合形式的查询路由（请求不是直接从Redis实例转发到另一个实例，而是将客户端重定向到正确的节点）。</li>
+</ul>
+<h1 id="分区的缺点"><a href="#分区的缺点" class="headerlink" title="分区的缺点"></a>分区的缺点</h1><p>Redis的某些功能在分区方面效果不佳：</p>
+<ul>
+<li>通常不支持涉及多个键的操作。例如，如果它们存储在映射到不同Redis实例的键中，则无法执行两个集合之间的交集（实际上有方法可以执行此操作，但不能直接执行此操作）。</li>
+<li>无法使用涉及多个key的Redis事务。</li>
+<li>分区粒度是关键，因此无法使用单个巨大的key（如非常大的有序集）对数据集进行分片。</li>
+<li>使用分区时，数据处理更复杂，例如，您必须处理多个RDB / AOF文件，并且需要从多个实例和主机聚合持久性文件来备份数据。</li>
+<li>添加和删​​除容量可能很复杂。例如，Redis Cluster支持大多数透明的数据重新平衡，能够在运行时添加和删除节点，但其他系统（如客户端分区和代理）不支持此功能。然而，一种称为预分片的技术在这方面有所帮助。</li>
+</ul>
+<h1 id="数据存储还是缓存"><a href="#数据存储还是缓存" class="headerlink" title="数据存储还是缓存"></a>数据存储还是缓存</h1><p>虽然无论使用Redis作为数据存储还是作为缓存，Redis中的分区在概念上都是相同的，但在将其用作数据存储时存在很大的局限性。 当Redis用作数据存储时，给定的键必须始终映射到同一个Redis实例。 当Redis用作缓存时，如果给定节点不可用，然后使用不同的节点，则不会出现大问题，因为我们希望改善系统的可用性（即， 系统回复我们的查询）。</p>
+<p>如果给定key的首选节点不可用，则一致的散列实现通常能够切换到其他节点。 同样，如果添加新节点，则新键的一部分将开始存储在新节点上。</p>
+<p>这里的主要概念如下：</p>
+<ul>
+<li>如果使用Redis作为缓存，则使用一致性散列可以轻松扩展和缩小。</li>
+<li>如果将Redis用作存储，则使用固定的键到节点映射，<strong>因此节点数必须固定且不能变化</strong>。 否则，需要一个能够在添加或删除节点时在节点之间重新平衡密钥的系统，并且目前只有Redis Cluster能够执行此操作 - 从2015年4月1日起，Redis Cluster通常可用并且可以投入生产。</li>
+</ul>
+<h1 id="Presharding-预分片"><a href="#Presharding-预分片" class="headerlink" title="Presharding(预分片)"></a>Presharding(预分片)</h1><p>我们了解到分区的问题在于，除非我们使用Redis作为缓存，否则添加和删除节点可能会非常棘手，并且使用固定的键实例映射会更加简单。</p>
+<p>但是，数据存储需求可能随时间而变化。 今天我可以使用10个Redis节点（实例），但明天我可能需要50个节点。</p>
+<p>由于Redis的占用空间非常小且轻量级（备用实例使用1 MB内存），因此从一开始就有很多实例可以解决这个问题。 即使您只使用一台服务器，您也可以决定从第一天开始就在分布式环境中生活，并使用分区在单个服务器中运行多个Redis实例。</p>
+<p>并且您可以从一开始就选择此数量的实例。 例如，32或64个实例可以为大多数用户提供技巧，并将提供足够的增长空间。</p>
+<p>这样，当您的数据存储需求增加并且需要更多Redis服务器时，只需将实例从一个服务器移动到另一个服务器即可。 添加第一个附加服务器后，您需要将一半的Redis实例从第一个服务器移动到第二个服务器，依此类推。</p>
+<p>使用Redis复制，您可能可以在用户停机时间最短或无停机的情况下进行移动：</p>
+<ul>
+<li>在新服务器中启动空实例。</li>
+<li>将配置这些新实例的数据作为源实例的从属数据移动。</li>
+<li>阻止你的客户端。</li>
+<li>使用新服务器IP地址更新已移动实例的配置。</li>
+<li>将 <code>SLAVEOF NO ONE</code> 命令发送到新服务器中的从站。</li>
+<li>使用新的更新配置重新启动客户端。</li>
+<li>最后关闭旧服务器中不再使用的实例。</li>
+</ul>
+<h1 id="Redis分区的实现"><a href="#Redis分区的实现" class="headerlink" title="Redis分区的实现"></a>Redis分区的实现</h1><p>到目前为止，我们在理论上涵盖了Redis分区，但实践呢？ 你应该使用什么系统？</p>
+<h2 id="Redis集群"><a href="#Redis集群" class="headerlink" title="Redis集群"></a>Redis集群</h2><p>Redis Cluster是获得自动分片和高可用性的首选方式。 从2015年4月1日起，它通常可用并且可以投入生产。您可以在群集教程中获得有关Redis群集的更多信息。</p>
+<p>一旦Redis Cluster可用，并且符合Redis Cluster的客户端可用于您的语言，Redis Cluster将成为Redis分区的事实标准。</p>
+<p>Redis Cluster是查询路由和客户端分区之间的混合。</p>
+<h2 id="Twemproxy"><a href="#Twemproxy" class="headerlink" title="Twemproxy"></a>Twemproxy</h2><p>Twemproxy是Twitter在Memcached ASCII和Redis协议上开发的代理。 它是单线程的，用C语言编写，速度极快。 它是根据Apache 2.0许可条款发布的开源软件。</p>
+<p>Twemproxy支持多个Redis实例之间的自动分区，如果节点不可用，则可选节点弹出（这将更改keys-instances映射，因此只有在使用Redis作为缓存时才应使用此功能）。</p>
+<p>这不是单点故障，因为您可以启动多个代理并指示您的客户端连接到接受连接的第一个代理。</p>
+<p>基本上，Twemproxy是客户端和Redis实例之间的中间层，它将以最小的额外复杂性可靠地处理分区。</p>
+<p>您可以在此antirez博客文章中阅读有关Twemproxy的更多信息。</p>
+<h2 id="支持一致哈希的客户端"><a href="#支持一致哈希的客户端" class="headerlink" title="支持一致哈希的客户端"></a>支持一致哈希的客户端</h2><p>Twemproxy的替代方法是使用通过一致散列或其他类似算法实现客户端分区的客户端。 有多个Redis客户端支持一致性哈希，尤其是<a href="https://github.com/redis/redis-rb" target="_blank" rel="noopener">Redis-rb</a>和<a href="https://github.com/nrk/predis" target="_blank" rel="noopener">Predis</a>。</p>
+<p>请检查Redis客户端的完整列表，以检查是否存在具有针对您的语言的一致哈希实现的成熟客户端。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>分区是将数据拆分为多个Redis实例的过程，因此每个实例只包含key的子集。 本文档的第一部分将向您介绍分区的概念，第二部分将向您展示Redis分区的替代方案。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/09/03/lang/009-redis-partition/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/09/03/lang/009-redis-partition/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/009-redis-partition/" data-id="cjzi967kp00fay6chc8xtr8a1" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a><span class="article-tag-list-count">11</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-lang/008-redis-lru-cache" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/03/lang/008-redis-lru-cache/" class="article-date">
@@ -222,7 +358,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/008-redis-lru-cache/" data-id="cjzdwfla9009uhachaz5mmscg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/008-redis-lru-cache/" data-id="cjzi967ko00f8y6ch48wocopc" class="article-share-link">
           Share
         </a>
         
@@ -327,7 +463,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjzdwfla6009lhach4cnifsy4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/007-redis-mass-insertion/" data-id="cjzi967kn00f6y6chdd9k1dcb" class="article-share-link">
           Share
         </a>
         
@@ -454,7 +590,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjzdwfla5009ihachsykpwahd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/03/lang/006-redis-transaction/" data-id="cjzi967kn00f3y6ch9l6cyftf" class="article-share-link">
           Share
         </a>
         
@@ -529,7 +665,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjzdwflb800crhachj3c65kx6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/linux/015-vim-command/" data-id="cjzi967lt00ivy6ch1s20p8yb" class="article-share-link">
           Share
         </a>
         
@@ -639,7 +775,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjzdwfla7009phachp8l3m8le" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/02/lang/005-redis-pubsub/" data-id="cjzi967km00f1y6chg6dlsfnm" class="article-share-link">
           Share
         </a>
         
@@ -766,7 +902,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjzdwfla4009dhachy6riy88b" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/09/01/lang/004-redis-pipelining/" data-id="cjzi967kl00ewy6chxnty7n1w" class="article-share-link">
           Share
         </a>
         
@@ -1063,7 +1199,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjzdwfla7009rhachlz5w7qr5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/31/lang/003-redis-datatype/" data-id="cjzi967km00eyy6chig3vbehg" class="article-share-link">
           Share
         </a>
         
@@ -1225,7 +1361,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjzdwflh300pwhachid6ubzbo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/30/server/001-nginx-http-load-balance/" data-id="cjzi967mn00lcy6ch2shrue1g" class="article-share-link">
           Share
         </a>
         
@@ -1364,7 +1500,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjzdwflh000pphachyaw33n20" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/29/server/000-nginx-begin/" data-id="cjzi967mm00lay6chjmcdnfni" class="article-share-link">
           Share
         </a>
         
@@ -1449,7 +1585,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjzdwfl85002uhachyc2wtqca" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/07/cloudcompute/014-docker-network/" data-id="cjzi967fh002sy6ch6cxcbvnq" class="article-share-link">
           Share
         </a>
         
@@ -1559,7 +1695,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjzdwfl83002phachrndfjt2u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/06/cloudcompute/013-docker-container-limit/" data-id="cjzi967fg002py6chmhqogu9s" class="article-share-link">
           Share
         </a>
         
@@ -1643,7 +1779,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjzdwfl84002rhach92dt5vo1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/05/cloudcompute/012-docker-container/" data-id="cjzi967ff002ny6chh6y6emy7" class="article-share-link">
           Share
         </a>
         
@@ -1747,7 +1883,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjzdwfl82002nhachzs4nfrug" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/cloudcompute/011-docker-container/" data-id="cjzi967ff002ky6chy8689kua" class="article-share-link">
           Share
         </a>
         
@@ -1833,7 +1969,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjzdwflhu00rrhachxgl4j7jc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/04/tools/011-win10-linux-subsystem/" data-id="cjzi967n800n7y6chru5atgat" class="article-share-link">
           Share
         </a>
         
@@ -1933,7 +2069,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjzdwfl82002mhachmu9xca4w" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/03/cloudcompute/010-docker-registry/" data-id="cjzi967fe002jy6che8yar064" class="article-share-link">
           Share
         </a>
         
@@ -2023,7 +2159,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjzdwfl80002fhachle6er1rv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/cloudcompute/009-docker-dockerfile/" data-id="cjzi967fd002hy6chwec106s4" class="article-share-link">
           Share
         </a>
         
@@ -2146,7 +2282,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjzdwfl90005lhacheptt8usa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/02/java/004-big-data-fresh/" data-id="cjzi967hy00bay6ch96jodzwj" class="article-share-link">
           Share
         </a>
         
@@ -2263,7 +2399,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjzdwfl81002khach07hagal2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/08/01/cloudcompute/008-docker-image/" data-id="cjzi967fd002fy6chiyosp668" class="article-share-link">
           Share
         </a>
         
@@ -2372,92 +2508,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjzdwfl81002ihachu0q49hg8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/07/31/cloudcompute/007-docker-basic/" data-id="cjzi967fc002cy6ch9jyg3bvj" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a><span class="article-tag-list-count">13</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-life/001-programmer-love" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/07/30/life/001-programmer-love/" class="article-date">
-  <time datetime="2018-07-30T14:13:48.000Z" itemprop="datePublished">2018-07-30</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/30/life/001-programmer-love/">论爱情</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天下午看完了村上村树的处女作《且听风吟》，<br>没想到是关于爱情的，<br>我查了他的人生历程，<br>同样如此平常，<br>29年的经历足够了。</p>
-<p>有一类人，<br>他们热爱工作，乐此不疲，<br>赚得很多，花得很少，<br>不怎么说话，却十分微妙，<br>虽然面对着一台电脑，却拥有了整个世界，<br>他们就是程序员。</p>
-<p>程序员也是人，甚至超于常人，<br>所以也会受到社会伦理道德的影响，比如谈情说爱，谈婚论稼，<br>很多人都会吐槽异性人少的专业，同时也在物色着自己的另一半，<br>这并不是某个行业可以背锅的。</p>
-<p>只是如今这个时代变了，变得太物质与功利化，<br>也许只是我们的父母这样想的，<br>至少在我看来，没车没房也是可以在一起的，<br>我不知道这和受教育的程度有没有关系，如果我是心理社会学家，一定会做个实验，<br>我也认为工作是愉快度过人生的其中一种方式，<br>工作应该是快乐的，而不是挣钱的工具，<br>为了实现自我满足，工作也只是一种方式，<br>那还有所谓的爱情吗？</p>
-<p>我也经历过几次相亲了，每次都和平分手，<br>但从来没有动情过。</p>
-<p>在这里，不仅钱是一种炫耀的财富，人也是，自己的男女朋友很厉害，自己脸上也有光，<br>如果抛开这些，那两情相悦的概率还有多大？</p>
-<p>好像社会处处存在着歧视，总会有眼睛在看着你，也许是你自作多情了。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>今天下午看完了村上村树的处女作《且听风吟》，<br>没想到是关于爱情的，<br>我查了他的人生历程，<br>同样如此平常，<br>29年的经历足够了。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/07/30/life/001-programmer-love/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/07/30/life/001-programmer-love/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/07/30/life/001-programmer-love/" data-id="cjzdwflad00a5hachkhh216ic" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li></ul>
 
       </footer>
       </div>
@@ -2516,6 +2572,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
           </li>
         
@@ -2529,10 +2589,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
       </ul>

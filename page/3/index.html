@@ -86,6 +86,106 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/046-springcloud-zipkin-service-not-found" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/09/java/046-springcloud-zipkin-service-not-found/" class="article-date">
+  <time datetime="2019-06-09T06:00:33.000Z" itemprop="datePublished">2019-06-09</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/09/java/046-springcloud-zipkin-service-not-found/">spring cloud zipkin 找不到服务</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>当使用sleuth+zipkin对spring cloud进行链路跟踪时，发现始终只有eureka一个服务能被zipkin server发现，<br>其他都不行，纠结了很久，最后终于发现了原因： zipkin的发送方式问题。</p>
+<h1 id="问题重现"><a href="#问题重现" class="headerlink" title="问题重现"></a>问题重现</h1><p>我们知道，最新的zipkin server已经不建议自己写服务端，所以运行完服务端一切正常，界面也可以访问：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar zipkin.jar</span><br></pre></td></tr></table></figure></p>
+<p>在spring cloud里的配置如下：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  application:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">ccb</span></span><br><span class="line">  <span class="comment"># 用于bus批量刷新的mq</span></span><br><span class="line"><span class="attr">  rabbitmq:</span></span><br><span class="line"><span class="attr">    host:</span> <span class="string">localhost</span></span><br><span class="line"><span class="attr">    port:</span> <span class="number">5672</span></span><br><span class="line"><span class="attr">    username:</span> <span class="string">guest</span></span><br><span class="line"><span class="attr">    password:</span> <span class="string">guest</span></span><br><span class="line"><span class="attr">  zipkin:</span></span><br><span class="line"><span class="attr">    base-url:</span> <span class="attr">http://localhost:9411</span></span><br><span class="line"><span class="attr">  sleuth:</span></span><br><span class="line"><span class="attr">    web:</span></span><br><span class="line"><span class="attr">      client:</span></span><br><span class="line"><span class="attr">        enabled:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    sampler:</span></span><br><span class="line"><span class="attr">      probability:</span> <span class="number">1.0</span> <span class="comment"># 全采样</span></span><br></pre></td></tr></table></figure></p>
+<p>maven依赖如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-zipkin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--config 的mq通信使用--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-bus-amqp<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-config-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-hystrix<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>主要就是zipkin的依赖，zipkin包含了sleuth的依赖，所以不用重复引入。</p>
+<p>如果你现在看出哪里有问题，那么就可以不往下读了。</p>
+<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><p>这样写，zipkin永远不能发现ccb这个服务，也就不存在监控了。</p>
+<p>经过查找资料，发现了<a href="https://cloud.spring.io/spring-cloud-sleuth/1.3.x/multi/multi__sending_spans_to_zipkin.html" target="_blank" rel="noopener">spring sleuth官方解释</a>:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Important</span><br><span class="line">spring-cloud-sleuth-stream is deprecated and should no longer be used. If spring-cloud-sleuth-zipkin is on the classpath then the app will generate and collect Zipkin-compatible traces. <span class="function">By <span class="keyword">default</span> it sends them via HTTP to a Zipkin server on <span class="title">localhost</span> <span class="params">(port <span class="number">9411</span>)</span>. If you depend on spring-rabbit or spring-kafka your app will send traces to a broker instead of http.</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">翻译：</span></span><br><span class="line"><span class="function">默认，发送span给zipkin server是通过HTTP， 但是如果有rabbit或者kafka的依赖，则优先使用。</span></span><br></pre></td></tr></table></figure></p>
+<p>于是豁然开朗，为了支持config的批量刷新，我引入了rabbitmq，但是eureka没有引入，所以监控信息是发给消息队列了，所以本地zipkin server收不到。</p>
+<p>然后进一步，解决办法也很简单： 修改发送方式：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">zipkin:</span></span><br><span class="line"><span class="attr">  base-url:</span> <span class="attr">http://localhost:9411</span></span><br><span class="line"><span class="attr">  sender:</span></span><br><span class="line"><span class="attr">    type:</span> <span class="string">web</span> <span class="comment"># 另外2个是 rabbit和kafka</span></span><br></pre></td></tr></table></figure></p>
+<p>重启后，记得要发送完第一条调用后才能看到服务。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这个问题很简单，重要的是能从中总结出什么经验？</p>
+<ol>
+<li><p>确定这个问题涉及的范围： 用到了spring cloud的sluth和zipkin两个东西</p>
+</li>
+<li><p>借助于搜索引擎： 能google到当然最好，但是这个问题并没有搜到；</p>
+</li>
+<li><p>分别查找各自可能的原因： 既然别人没有分享这个问题，那只有我来了；</p>
+<ol>
+<li>我先到zipkin的issue去看有没有可能的原因，开始还以为是依赖问题；</li>
+<li>然后看了spring cloud的官方文档，才明白过来；</li>
+</ol>
+</li>
+<li><p>总结分享： 解决一个问题不算什么，解决一类问题说明触类旁通， 但不害怕一切问题才是制胜关键；</p>
+</li>
+</ol>
+<p>祝我失败得痛苦，成功得快乐。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>当使用sleuth+zipkin对spring cloud进行链路跟踪时，发现始终只有eureka一个服务能被zipkin server发现，<br>其他都不行，纠结了很久，最后终于发现了原因： zipkin的发送方式问题。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/06/09/java/046-springcloud-zipkin-service-not-found/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/06/09/java/046-springcloud-zipkin-service-not-found/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/06/09/java/046-springcloud-zipkin-service-not-found/" data-id="cjzi967k900dry6chpso4f901" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-cloud/">spring cloud</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/zipkin/">zipkin</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/045-feign-pass-params" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/06/06/java/045-feign-pass-params/" class="article-date">
@@ -154,7 +254,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/06/java/045-feign-pass-params/" data-id="cjzdwfl9v008hhachwv4oyz6u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/06/java/045-feign-pass-params/" data-id="cjzi967ka00dvy6ch7hm7ighh" class="article-share-link">
           Share
         </a>
         
@@ -239,7 +339,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/03/life/017-weekly-learn/" data-id="cjzdwflap00b0hachyukrutla" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/03/life/017-weekly-learn/" data-id="cjzi967l600gyy6chtcopsit1" class="article-share-link">
           Share
         </a>
         
@@ -318,7 +418,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/31/algorithm/003-lru-java/" data-id="cjzdwfl6p0006hachjy94fzj6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/31/algorithm/003-lru-java/" data-id="cjzi967e40009y6chdr48fzu0" class="article-share-link">
           Share
         </a>
         
@@ -407,7 +507,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/30/elasticsearch/006-check-error/" data-id="cjzdwfl8k0042hachgov9h5bi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/30/elasticsearch/006-check-error/" data-id="cjzi967fu003xy6ch8utwsbyz" class="article-share-link">
           Share
         </a>
         
@@ -487,7 +587,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/29/db/009-centos-uninstall-mysql/" data-id="cjzdwfl8e003khachpcbuu2rd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/29/db/009-centos-uninstall-mysql/" data-id="cjzi967fq003jy6cht7ckax76" class="article-share-link">
           Share
         </a>
         
@@ -590,7 +690,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/28/git/004-gitlab-review-way/" data-id="cjzdwfl8m004chach6cg70y0g" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/28/git/004-gitlab-review-way/" data-id="cjzi967g1004ky6chk5k40njn" class="article-share-link">
           Share
         </a>
         
@@ -676,12 +776,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/27/life/016-weekly-learn/" data-id="cjzdwflao00avhachb7pvz891" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/27/life/016-weekly-learn/" data-id="cjzi967l300goy6chpdi8ez6t" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">20</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -763,7 +863,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/24/maven/005-maven-install-3dparty-jar/" data-id="cjzdwflbn00eahach902fc73e" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/24/maven/005-maven-install-3dparty-jar/" data-id="cjzi967me00kjy6chqvsui7wa" class="article-share-link">
           Share
         </a>
         
@@ -837,7 +937,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/23/cloudcompute/016-docker-install-common/" data-id="cjzdwfl85002whachvuq8nb2t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/23/cloudcompute/016-docker-install-common/" data-id="cjzi967fh002ry6chchr1fsfx" class="article-share-link">
           Share
         </a>
         
@@ -927,7 +1027,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/23/tools/015-idea-plugins/" data-id="cjzdwflhx00rwhach91685ayu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/23/tools/015-idea-plugins/" data-id="cjzi967nb00ney6chp709qne0" class="article-share-link">
           Share
         </a>
         
@@ -1019,7 +1119,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/22/maven/004-build-private-maven-repo-by-archiva/" data-id="cjzdwflbm00e7hachkzjlx1mu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/22/maven/004-build-private-maven-repo-by-archiva/" data-id="cjzi967m700k1y6chmjw9z8aj" class="article-share-link">
           Share
         </a>
         
@@ -1101,7 +1201,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/19/js/008-webpack-hot-swap-failed-not-feel-change/" data-id="cjzdwfl8y005dhachjr6q69ue" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/19/js/008-webpack-hot-swap-failed-not-feel-change/" data-id="cjzi967g9005by6chhv8ddlac" class="article-share-link">
           Share
         </a>
         
@@ -1187,12 +1287,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/05/05/life/015-weekly-learn/" data-id="cjzdwflaq00b3hachskb2ljo3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/05/05/life/015-weekly-learn/" data-id="cjzi967l200gmy6chxgf65koa" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">20</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -1268,7 +1368,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/30/js/007-axios-vue/" data-id="cjzdwfl8y005ghach8kmm82f8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/30/js/007-axios-vue/" data-id="cjzi967g80056y6chslk9i318" class="article-share-link">
           Share
         </a>
         
@@ -1361,7 +1461,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/26/js/006-webpack-first-view/" data-id="cjzdwfl8z005khach1fl5h41z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/26/js/006-webpack-first-view/" data-id="cjzi967g70052y6chlxh4cd8x" class="article-share-link">
           Share
         </a>
         
@@ -1447,7 +1547,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/24/js/005-build-vue-env/" data-id="cjzdwfl8x005bhachu71heo81" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/24/js/005-build-vue-env/" data-id="cjzi967g60051y6ch8wwaqxfo" class="article-share-link">
           Share
         </a>
         
@@ -1546,12 +1646,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/22/life/014-weekly-learn/" data-id="cjzdwflan00auhache5ewy0r6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/22/life/014-weekly-learn/" data-id="cjzi967l400gry6chyw4hdj4q" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">20</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -1673,7 +1773,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/18/linux/023-create-local-repo-in-centos/" data-id="cjzdwflbe00dghach6e5txsmz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/18/linux/023-create-local-repo-in-centos/" data-id="cjzi967lx00j8y6chnbi5rucn" class="article-share-link">
           Share
         </a>
         
@@ -1778,100 +1878,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/18/java/044-java-terms/" data-id="cjzdwfl9u008ehachhioxdb2n" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/04/18/java/044-java-terms/" data-id="cjzi967k900dty6chs2q8zjej" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/term/">term</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-git/003-install-gitlab-server" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/04/17/git/003-install-gitlab-server/" class="article-date">
-  <time datetime="2019-04-17T01:21:37.000Z" itemprop="datePublished">2019-04-17</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/04/17/git/003-install-gitlab-server/">安装gitlab服务器</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>只是记录下曾经装过git服务器。</p>
-<p>采用了gitlab。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://about.gitlab.com/install/#centos-7" target="_blank" rel="noopener">官方文档</a>已经写得很仔细了。</p>
-<p>然后：注册用户，分配权限，建group，建项目，提交代码。</p>
-<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><ol>
-<li><p>创建完项目后，默认只有所有者才有提交权限，在<code>settings/members</code>下加入开发者后，还需要修改<code>settings/repository</code>下的<code>Protected Branches</code>设置为开发者和所有者都有权merge。</p>
-</li>
-<li><p>修改数据存储位置，位于：<code>/etc/gitlab/gitlab.rb</code>,<br> 找到：</p>
- <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 默认</span><br><span class="line"># git_data_dirs(&#123;</span><br><span class="line">#   "default" =&gt; &#123;</span><br><span class="line">#     "path" =&gt; "/mnt/nfs-01/git-data"</span><br><span class="line">#    &#125;</span><br><span class="line"># &#125;)</span><br><span class="line"></span><br><span class="line"># 自己修改</span><br><span class="line">git_data_dirs(&#123;</span><br><span class="line">  <span class="string">"default"</span> =&gt; &#123; <span class="string">"path"</span> =&gt; <span class="string">"/var/opt/gitlab/git-data"</span> &#125;,</span><br><span class="line">  <span class="string">"nfs"</span> =&gt; &#123; <span class="string">"path"</span> =&gt; <span class="string">"/mnt/nfs/git-data"</span> &#125;,</span><br><span class="line">  <span class="string">"cephfs"</span> =&gt; &#123; <span class="string">"path"</span> =&gt; <span class="string">"/mnt/cephfs/git-data"</span> &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p> 然后使用命令：<code>sudo gitlab-ctl reconfigure</code> 重新加载配置.</p>
-</li>
-</ol>
-<ol start="3">
-<li>对于已经存在的git仓库，<a href="https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/raketasks/import.md" target="_blank" rel="noopener">导入参考文档</a>.<br> 注意：需要把仓库的所有权改为git用户：<code>sudo chown -R git:git /var/opt/gitlab/git-data/repository-import-&lt;date&gt;</code></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>只是记录下曾经装过git服务器。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/04/17/git/003-install-gitlab-server/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/04/17/git/003-install-gitlab-server/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/04/17/git/003-install-gitlab-server/" data-id="cjzdwfl8n004ehach661i8658" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gitlab/">gitlab</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
 
       </footer>
       </div>
@@ -1930,6 +1942,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
           </li>
         
@@ -1943,10 +1959,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
       </ul>

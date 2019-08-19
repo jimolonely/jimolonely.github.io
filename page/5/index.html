@@ -86,6 +86,96 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/036-springboot-kafkatemplate" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/19/java/036-springboot-kafkatemplate/" class="article-date">
+  <time datetime="2019-03-19T06:56:41.000Z" itemprop="datePublished">2019-03-19</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/19/java/036-springboot-kafkatemplate/">springboot kafkaTemplate使用</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果能用spring-boot集成的组件当然是最好的。</p>
+<p><a href>项目地址</a></p>
+<h1 id="maven"><a href="#maven" class="headerlink" title="maven"></a>maven</h1><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.3.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">relativePath</span>/&gt;</span> <span class="comment">&lt;!-- lookup parent from repository --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.kafka<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-kafka<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html" target="_blank" rel="noopener">完整配置请点我</a></p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">8088</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  kafka:</span></span><br><span class="line"><span class="attr">    consumer:</span></span><br><span class="line"><span class="attr">      auto-commit-interval:</span> <span class="number">1000</span></span><br><span class="line"><span class="attr">      group-id:</span> <span class="string">logdowngroup1</span></span><br><span class="line"><span class="attr">      bootstrap-servers:</span> <span class="attr">h1:9092,h2:9092,h3:9092</span></span><br><span class="line"><span class="attr">      auto-offset-reset:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">      key-deserializer:</span> <span class="string">org.apache.kafka.common.serialization.StringDeserializer</span></span><br><span class="line"><span class="attr">      value-deserializer:</span> <span class="string">org.apache.kafka.common.serialization.StringDeserializer</span></span><br><span class="line"><span class="attr">      properties:</span></span><br><span class="line"><span class="attr">        rebalance:</span></span><br><span class="line"><span class="attr">          backoff:</span></span><br><span class="line"><span class="attr">            ms:</span> <span class="number">2000</span></span><br><span class="line"><span class="attr">          max:</span></span><br><span class="line"><span class="attr">            retries:</span> <span class="number">10</span></span><br><span class="line"><span class="attr">    producer:</span></span><br><span class="line"><span class="attr">      bootstrap-servers:</span> <span class="attr">h1:9092,h2:9092,h3:9092</span></span><br><span class="line"><span class="attr">      key-serializer:</span> <span class="string">org.apache.kafka.common.serialization.StringSerializer</span></span><br><span class="line"><span class="attr">      value-serializer:</span> <span class="string">org.apache.kafka.common.serialization.StringSerializer</span></span><br><span class="line"><span class="attr">      acks:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">      retries:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">      batch-size:</span> <span class="number">16384</span></span><br><span class="line"><span class="attr">      buffer-memory:</span> <span class="number">33554432</span></span><br><span class="line"><span class="attr">      properties:</span></span><br><span class="line"><span class="attr">        metadata:</span></span><br><span class="line"><span class="attr">          broker:</span></span><br><span class="line"><span class="attr">            list:</span> <span class="attr">h1:9092,h2:9092,h3:9092</span></span><br><span class="line"><span class="attr">        message:</span></span><br><span class="line"><span class="attr">          send:</span></span><br><span class="line"><span class="attr">            max:</span></span><br><span class="line"><span class="attr">              retries:</span> <span class="number">3</span></span><br><span class="line"><span class="attr">        linger:</span></span><br><span class="line"><span class="attr">          ms:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">        ssl:</span></span><br><span class="line"><span class="attr">          client:</span></span><br><span class="line"><span class="attr">            auth:</span> <span class="string">required</span></span><br></pre></td></tr></table></figure>
+<p>注意，里面properties是其他配置，如果对应的kafka没有这些配置，则不起作用，会打印警告日志：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">14</span>:<span class="number">51</span>:<span class="number">55.616</span>  WARN <span class="number">20894</span> --- [nio-<span class="number">8088</span>-exec-<span class="number">3</span>] o.a.k.clients.producer.ProducerConfig    :</span><br><span class="line"> The configuration <span class="string">'message.send.max.retries'</span> was supplied but isn<span class="string">'t a known config.</span></span><br><span class="line"><span class="string">2019-03-19 14:51:55.617  WARN 20894 --- [nio-8088-exec-3] o.a.k.clients.producer.ProducerConfig    : </span></span><br><span class="line"><span class="string">The configuration '</span>ssl.client.auth<span class="string">' was supplied but isn'</span>t a known config.</span><br><span class="line"><span class="number">2019</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">14</span>:<span class="number">51</span>:<span class="number">55.617</span>  WARN <span class="number">20894</span> --- [nio-<span class="number">8088</span>-exec-<span class="number">3</span>] o.a.k.clients.producer.ProducerConfig    :</span><br><span class="line"> The configuration <span class="string">'metadata.broker.list'</span> was supplied but isn<span class="string">'t a known config.</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>生产者：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.kafka.core.KafkaTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Producer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(Producer.class);</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String TOPIC = <span class="string">"users"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> KafkaTemplate&lt;String, String&gt; kafkaTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        logger.info(<span class="string">"&gt;&gt;&gt;&gt;&gt;------producer msg: [&#123;&#125;]"</span>, msg);</span><br><span class="line">        kafkaTemplate.send(TOPIC, msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>消费者：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.kafka.annotation.KafkaListener;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(Consumer.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@KafkaListener</span>(topics = Producer.TOPIC)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">consumes</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        logger.info(<span class="string">"&lt;&lt;&lt;&lt;&lt;------consumer msg:[&#123;&#125;]"</span>, msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>controller:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/kafka"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KafkaController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> Producer producer;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/publish"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sendMsg</span><span class="params">(@RequestParam(<span class="string">"msg"</span>)</span> String msg) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.producer.sendMessage(msg);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"send msg["</span> + msg + <span class="string">"] success!"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>访问：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl http://localhost:8088/kafka/publish?msg=hahah</span><br><span class="line">send msg[hahah] success!</span><br></pre></td></tr></table></figure></p>
+<p>log:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span>-<span class="number">03</span>-<span class="number">19</span> <span class="number">15</span>:<span class="number">08</span>:<span class="number">05.959</span>  INFO <span class="number">20894</span> --- [nio-<span class="number">8088</span>-exec-<span class="number">7</span>] com.jimo.kafka.Producer                  </span><br><span class="line">: &gt;&gt;&gt;&gt;&gt;------producer msg: [hahah]</span><br><span class="line">2019-03-19 15:08:06.027  INFO 20894 --- [ntainer#0-0-C-1] com.jimo.kafka.Consumer                  </span><br><span class="line">: &lt;&lt;&lt;&lt;&lt;------consumer msg:[hahah]</span><br></pre></td></tr></table></figure></p>
+<h1 id="可配置"><a href="#可配置" class="headerlink" title="可配置"></a>可配置</h1><p>如果我们想让topic字段可配置，就需要做一点小改变：</p>
+<p><a href="https://github.com/spring-projects/spring-kafka/issues/132" target="_blank" rel="noopener">@KafkaListener的topic可以是SpEL表达式</a>,<br><a href="https://github.com/spring-projects/spring-kafka/issues/361" target="_blank" rel="noopener">或这个</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@KafkaListener</span>(topics = <span class="string">"$&#123;kafka.topic&#125;"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">consumes2</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">"&lt;&lt;&lt;&lt;&lt;------consumer2 msg:[&#123;&#125;]"</span>, msg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>producer同步发送：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;kafka.topic&#125;"</span>)</span><br><span class="line"><span class="keyword">private</span> String topic;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">sendMsgSync</span><span class="params">(String key, String msg)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">"&gt;&gt;&gt;&gt;&gt;------producer msg: [&#123;&#125;]"</span>, msg);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span>[] ok = &#123;<span class="keyword">true</span>&#125;;</span><br><span class="line">    ProducerRecord&lt;String, String&gt; record = <span class="keyword">new</span> ProducerRecord&lt;&gt;(topic, key, msg);</span><br><span class="line">    ListenableFuture&lt;SendResult&lt;String, String&gt;&gt; future = kafkaTemplate.send(record);</span><br><span class="line">    future.addCallback(<span class="keyword">new</span> ListenableFutureCallback&lt;SendResult&lt;String, String&gt;&gt;() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(@NonNull Throwable throwable)</span> </span>&#123;</span><br><span class="line">            logger.error(<span class="string">"sent message=[&#123;&#125;] failed!"</span>, msg, throwable);</span><br><span class="line">            ok[<span class="number">0</span>] = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(SendResult&lt;String, String&gt; result)</span> </span>&#123;</span><br><span class="line">            logger.info(<span class="string">"sent message=[&#123;&#125;] with offset=[&#123;&#125;] success!"</span>, msg, result.getRecordMetadata().offset());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 因为是异步发送，所以我们等待，最多10s</span></span><br><span class="line">        future.get(<span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException | ExecutionException | TimeoutException e) &#123;</span><br><span class="line">        logger.error(<span class="string">"waiting for kafka send finish failed!"</span>, e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ok[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>记得配置：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kafka:</span></span><br><span class="line"><span class="attr">  topic:</span> <span class="string">test</span></span><br></pre></td></tr></table></figure></p>
+<p><a href="https://www.programcreek.com/java-api-examples/index.php?api=org.springframework.kafka.support.SendResult" target="_blank" rel="noopener">参考文章</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>如果能用spring-boot集成的组件当然是最好的。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/03/19/java/036-springboot-kafkatemplate/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/03/19/java/036-springboot-kafkatemplate/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/03/19/java/036-springboot-kafkatemplate/" data-id="cjzi967k000d2y6chokwk42vo" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/">spring-boot</a><span class="article-tag-list-count">7</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-linux/020-ubuntu-install-extensions" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/03/19/linux/020-ubuntu-install-extensions/" class="article-date">
@@ -161,7 +251,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/19/linux/020-ubuntu-install-extensions/" data-id="cjzdwflbb00d4hachob2lx7c5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/19/linux/020-ubuntu-install-extensions/" data-id="cjzi967lw00j3y6ch70l27v93" class="article-share-link">
           Share
         </a>
         
@@ -296,12 +386,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/18/life/009-weekly-learn/" data-id="cjzdwflam00arhachezz9hl57" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/18/life/009-weekly-learn/" data-id="cjzi967ky00g9y6ch0hb244s4" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">20</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -373,7 +463,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/17/tools/014-chrome-flags/" data-id="cjzdwflhw00ruhachxf7un910" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/17/tools/014-chrome-flags/" data-id="cjzi967na00ncy6ch8nlgp6z6" class="article-share-link">
           Share
         </a>
         
@@ -455,7 +545,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/15/java/035-mybatis-mapkey/" data-id="cjzdwfl9l007phach7c317xvq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/15/java/035-mybatis-mapkey/" data-id="cjzi967k400day6chnn20veod" class="article-share-link">
           Share
         </a>
         
@@ -548,7 +638,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/14/java/034-jsch-interactive-shell-stream-redirect/" data-id="cjzdwfl9m007shach0ttgnnx6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/14/java/034-jsch-interactive-shell-stream-redirect/" data-id="cjzi967k100d5y6chspf3rvfa" class="article-share-link">
           Share
         </a>
         
@@ -632,7 +722,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/12/basic/016-java-interview/" data-id="cjzdwfl7t001shachvahclb8u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/12/basic/016-java-interview/" data-id="cjzi967f5001oy6chvqqmka2d" class="article-share-link">
           Share
         </a>
         
@@ -768,12 +858,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/11/life/008-weekly-learn/" data-id="cjzdwflai00aihachmkclr4jt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/11/life/008-weekly-learn/" data-id="cjzi967ky00g7y6ch97pkoarb" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">20</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -860,7 +950,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/033-spring-boot-overview/" data-id="cjzdwfl9j007khach310fm98h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/033-spring-boot-overview/" data-id="cjzi967k000d0y6ch266z1ssh" class="article-share-link">
           Share
         </a>
         
@@ -944,7 +1034,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/032-springboot-quartz/" data-id="cjzdwfl9h007dhach5sof1y5u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/07/java/032-springboot-quartz/" data-id="cjzi967jz00cxy6ch577zrtg0" class="article-share-link">
           Share
         </a>
         
@@ -1058,7 +1148,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/031-java-process-memory-usage/" data-id="cjzdwfl9k007nhachnttl0dx5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/031-java-process-memory-usage/" data-id="cjzi967jy00cvy6ch3qlgn933" class="article-share-link">
           Share
         </a>
         
@@ -1145,7 +1235,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/030-spring-boot-build-source/" data-id="cjzdwfl9i007fhach1z4ziqwt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/06/java/030-spring-boot-build-source/" data-id="cjzi967jx00csy6ch6ug0qja1" class="article-share-link">
           Share
         </a>
         
@@ -1258,12 +1348,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/04/life/007-weekly-learn/" data-id="cjzdwflaj00ajhach4ye66skf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/04/life/007-weekly-learn/" data-id="cjzi967kx00g4y6chov7p9j9h" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">20</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -1336,12 +1426,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/03/01/life/006-chrome-theme/" data-id="cjzdwflag00afhachxzxuf1az" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/03/01/life/006-chrome-theme/" data-id="cjzi967kw00fzy6chod1qsjri" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chrome/">chrome</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chrome/">chrome</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li></ul>
 
       </footer>
       </div>
@@ -1418,7 +1508,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/029-eureka-record/" data-id="cjzdwfl9g0078hachaedzejta" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/029-eureka-record/" data-id="cjzi967jv00cly6chowg0kfnr" class="article-share-link">
           Share
         </a>
         
@@ -1498,7 +1588,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/028-equals-hashcode/" data-id="cjzdwfl9g0075hachd6zm1tvq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/java/028-equals-hashcode/" data-id="cjzi967jw00cqy6ch3mf7kbfr" class="article-share-link">
           Share
         </a>
         
@@ -1611,7 +1701,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/basic/015-xml/" data-id="cjzdwfl7q001khachfvmlibzl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/basic/015-xml/" data-id="cjzi967f4001my6chn2qkecjm" class="article-share-link">
           Share
         </a>
         
@@ -1713,12 +1803,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/27/life/005-weekly-learn/" data-id="cjzdwflah00aghachcfeue5kv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/life/005-weekly-learn/" data-id="cjzi967ku00fsy6ch0oc3kwdd" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">20</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
 
       </footer>
       </div>
@@ -1799,7 +1889,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/26/algorithm/002-skip-list/" data-id="cjzdwfl6s0008hachxbzvytz2" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/26/algorithm/002-skip-list/" data-id="cjzi967dy0005y6chhgs72pzj" class="article-share-link">
           Share
         </a>
         
@@ -1878,95 +1968,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/25/java/027-cglib/" data-id="cjzdwfl9h007ahachgi0vyryc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/25/java/027-cglib/" data-id="cjzi967jv00cjy6ch8ukpps49" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cglib/">cglib</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/026-java-create-instance" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/02/22/java/026-java-create-instance/" class="article-date">
-  <time datetime="2019-02-22T08:49:53.000Z" itemprop="datePublished">2019-02-22</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/22/java/026-java-create-instance/">java创建对象的方式和差别</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文已例子和原理解释4种java创建对象的方式和原理。</p>
-<p>在此之前，我们以User类为例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"user default constructor..."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">		System.out.println(<span class="string">"constructor with name..."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> name;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="1-new"><a href="#1-new" class="headerlink" title="1.new"></a>1.new</h1><p>这种方式没什么好说的，主要从JVM的角度来看类的加载机制。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. new</span></span><br><span class="line">User user1 = <span class="keyword">new</span> User();</span><br></pre></td></tr></table></figure></p>
-<h1 id="2-反射"><a href="#2-反射" class="headerlink" title="2.反射"></a>2.反射</h1><p>下面是2种方式，区别在于第一种（<code>Class.forName().newInstance()</code>）只能调用无参构造方法。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">		<span class="comment">// 2. reflect</span></span><br><span class="line">		Class&lt;?&gt; cls = Class.forName(<span class="string">"com.jimo.ioc.User"</span>);</span><br><span class="line">		User user2 = (User) cls.newInstance();</span><br><span class="line"><span class="comment">///		User user3 = User.class.newInstance();</span></span><br><span class="line"></span><br><span class="line">		Constructor&lt;?&gt; c1 = cls.getDeclaredConstructor(String.class);</span><br><span class="line">		c1.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">		User user4 = (User) c1.newInstance(<span class="string">"jimo"</span>);</span><br></pre></td></tr></table></figure></p>
-<h1 id="3-clone"><a href="#3-clone" class="headerlink" title="3.clone()"></a>3.clone()</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h1 id="4-反序列化"><a href="#4-反序列化" class="headerlink" title="4.反序列化"></a>4.反序列化</h1><p>注意，我们采用的实现Serializable接口的方式：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 4. 序列化/反序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// write</span></span><br><span class="line">ObjectOutputStream out = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> FileOutputStream(<span class="string">"User.file"</span>));</span><br><span class="line">out.writeObject(user4);</span><br><span class="line">out.close();</span><br><span class="line"></span><br><span class="line"><span class="comment">// read</span></span><br><span class="line">ObjectInputStream in = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"User.file"</span>));</span><br><span class="line">User user5 = (User) in.readObject();</span><br><span class="line">System.out.println(user5.getName());</span><br></pre></td></tr></table></figure></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
-<li><a href="http://www.importnew.com/17964.html" target="_blank" rel="noopener">Java对象的序列化与反序列化</a></li>
-<li><a href="https://www.jianshu.com/p/4cc036dbef8d" target="_blank" rel="noopener">Java中创建对象的方式</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文已例子和原理解释4种java创建对象的方式和原理。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/02/22/java/026-java-create-instance/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/02/22/java/026-java-create-instance/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/22/java/026-java-create-instance/" data-id="cjzdwfl9f0073hach8akofvc9" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -2025,6 +2032,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
           </li>
         
@@ -2038,10 +2049,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
       </ul>

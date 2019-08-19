@@ -86,6 +86,89 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/026-java-create-instance" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/22/java/026-java-create-instance/" class="article-date">
+  <time datetime="2019-02-22T08:49:53.000Z" itemprop="datePublished">2019-02-22</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/22/java/026-java-create-instance/">java创建对象的方式和差别</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文已例子和原理解释4种java创建对象的方式和原理。</p>
+<p>在此之前，我们以User类为例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"user default constructor..."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">		System.out.println(<span class="string">"constructor with name..."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> name;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="1-new"><a href="#1-new" class="headerlink" title="1.new"></a>1.new</h1><p>这种方式没什么好说的，主要从JVM的角度来看类的加载机制。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. new</span></span><br><span class="line">User user1 = <span class="keyword">new</span> User();</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-反射"><a href="#2-反射" class="headerlink" title="2.反射"></a>2.反射</h1><p>下面是2种方式，区别在于第一种（<code>Class.forName().newInstance()</code>）只能调用无参构造方法。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">		<span class="comment">// 2. reflect</span></span><br><span class="line">		Class&lt;?&gt; cls = Class.forName(<span class="string">"com.jimo.ioc.User"</span>);</span><br><span class="line">		User user2 = (User) cls.newInstance();</span><br><span class="line"><span class="comment">///		User user3 = User.class.newInstance();</span></span><br><span class="line"></span><br><span class="line">		Constructor&lt;?&gt; c1 = cls.getDeclaredConstructor(String.class);</span><br><span class="line">		c1.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">		User user4 = (User) c1.newInstance(<span class="string">"jimo"</span>);</span><br></pre></td></tr></table></figure></p>
+<h1 id="3-clone"><a href="#3-clone" class="headerlink" title="3.clone()"></a>3.clone()</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="4-反序列化"><a href="#4-反序列化" class="headerlink" title="4.反序列化"></a>4.反序列化</h1><p>注意，我们采用的实现Serializable接口的方式：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 4. 序列化/反序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// write</span></span><br><span class="line">ObjectOutputStream out = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> FileOutputStream(<span class="string">"User.file"</span>));</span><br><span class="line">out.writeObject(user4);</span><br><span class="line">out.close();</span><br><span class="line"></span><br><span class="line"><span class="comment">// read</span></span><br><span class="line">ObjectInputStream in = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"User.file"</span>));</span><br><span class="line">User user5 = (User) in.readObject();</span><br><span class="line">System.out.println(user5.getName());</span><br></pre></td></tr></table></figure></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li><a href="http://www.importnew.com/17964.html" target="_blank" rel="noopener">Java对象的序列化与反序列化</a></li>
+<li><a href="https://www.jianshu.com/p/4cc036dbef8d" target="_blank" rel="noopener">Java中创建对象的方式</a></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文已例子和原理解释4种java创建对象的方式和原理。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/22/java/026-java-create-instance/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/22/java/026-java-create-instance/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/22/java/026-java-create-instance/" data-id="cjzi967ju00cgy6chws9h3fnk" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-lang/013-redis-design-principle" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/21/lang/013-redis-design-principle/" class="article-date">
@@ -240,7 +323,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/lang/013-redis-design-principle/" data-id="cjzdwflae00a7hachdjsnik1y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/21/lang/013-redis-design-principle/" data-id="cjzi967kr00fky6ch3kps5r42" class="article-share-link">
           Share
         </a>
         
@@ -367,7 +450,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/java/025-spring-source/" data-id="cjzdwfl9e0070hachvjfz0grv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/21/java/025-spring-source/" data-id="cjzi967jw00coy6ch91apmvam" class="article-share-link">
           Share
         </a>
         
@@ -442,7 +525,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/20/maven/002-maven-install-linux/" data-id="cjzdwflbl00e2hach1jgaxycv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/20/maven/002-maven-install-linux/" data-id="cjzi967m900k4y6ch8cidtoui" class="article-share-link">
           Share
         </a>
         
@@ -516,7 +599,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/19/basic/014-code-optimization-way/" data-id="cjzdwfl7p001fhachp364d0ua" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/19/basic/014-code-optimization-way/" data-id="cjzi967f4001ly6cha06tr29p" class="article-share-link">
           Share
         </a>
         
@@ -600,7 +683,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/19/db/006-mysql-error-1133/" data-id="cjzdwfl8b003ehachwq90be1m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/19/db/006-mysql-error-1133/" data-id="cjzi967fo003cy6chvr9h09nt" class="article-share-link">
           Share
         </a>
         
@@ -710,7 +793,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/15/linux/019-keepalived-learn/" data-id="cjzdwflba00czhachypsid33q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/15/linux/019-keepalived-learn/" data-id="cjzi967lx00j5y6chu8vy9lif" class="article-share-link">
           Share
         </a>
         
@@ -847,7 +930,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/04/scala/004-scala-style/" data-id="cjzdwflh100prhachsn2rfdxs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/04/scala/004-scala-style/" data-id="cjzi967mp00lky6chxhi2pstx" class="article-share-link">
           Share
         </a>
         
@@ -961,7 +1044,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/03/spark/005-big-data-tutorial/" data-id="cjzdwflh900qfhachwiksr7o0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/03/spark/005-big-data-tutorial/" data-id="cjzi967mu00lzy6chvt3pxtks" class="article-share-link">
           Share
         </a>
         
@@ -1039,12 +1122,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/29/life/004-new-year/" data-id="cjzdwflaf00achachv3idtksa" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/29/life/004-new-year/" data-id="cjzi967ku00fuy6chbzdbsbvc" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">26</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li></ul>
 
       </footer>
       </div>
@@ -1120,7 +1203,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/28/java/024-java-fix-problem/" data-id="cjzdwfl9d006thachaxdirlh5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/28/java/024-java-fix-problem/" data-id="cjzi967jt00ccy6chvoina2s0" class="article-share-link">
           Share
         </a>
         
@@ -1198,7 +1281,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/27/linux/018-ubuntu-java/" data-id="cjzdwflba00d1hachhkf3gys3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/27/linux/018-ubuntu-java/" data-id="cjzi967ly00jay6chfumpm8oh" class="article-share-link">
           Share
         </a>
         
@@ -1277,7 +1360,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/18/java/023-springboot-logback-config/" data-id="cjzdwfl9e006yhachmej9pwgo" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/18/java/023-springboot-logback-config/" data-id="cjzi967js00cby6ch8qza0dj2" class="article-share-link">
           Share
         </a>
         
@@ -1388,7 +1471,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/16/ansible/005-ansible-demo1/" data-id="cjzdwfl71000hhachnkvw8oov" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/16/ansible/005-ansible-demo1/" data-id="cjzi967ek000oy6chz0kscqak" class="article-share-link">
           Share
         </a>
         
@@ -1497,7 +1580,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/12/ansible/004-ansible-playbook-variables/" data-id="cjzdwfl7e000rhachcje1viur" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/12/ansible/004-ansible-playbook-variables/" data-id="cjzi967eh000ly6chkrp1w4k7" class="article-share-link">
           Share
         </a>
         
@@ -1648,7 +1731,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/10/ansible/003-ansible-roles/" data-id="cjzdwfl6z000ghach92gwsh26" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/10/ansible/003-ansible-roles/" data-id="cjzi967ef000jy6chtvp1csle" class="article-share-link">
           Share
         </a>
         
@@ -1724,7 +1807,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" data-id="cjzdwfl8q004nhachm1z4tkcl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" data-id="cjzi967fx0048y6chaxxw7hzb" class="article-share-link">
           Share
         </a>
         
@@ -1839,7 +1922,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/04/ansible/002-reusable-playbook/" data-id="cjzdwfl6w000bhachlthtv6fc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/04/ansible/002-reusable-playbook/" data-id="cjzi967eb000gy6chhseaqb0p" class="article-share-link">
           Share
         </a>
         
@@ -1953,7 +2036,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/03/ansible/001-playbook/" data-id="cjzdwfl6x000dhachr8i2qpvs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/03/ansible/001-playbook/" data-id="cjzi967ed000hy6chp8ql1wz1" class="article-share-link">
           Share
         </a>
         
@@ -2065,92 +2148,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/02/ansible/000-ansible-fresh/" data-id="cjzdwfl6t0009hachjnyr3xqe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/02/ansible/000-ansible-fresh/" data-id="cjzi967e7000by6chfvl45aex" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/013-ssh" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/02/tools/013-ssh/" class="article-date">
-  <time datetime="2019-01-02T06:55:48.000Z" itemprop="datePublished">2019-01-02</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/02/tools/013-ssh/">SSH那些事</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>ssh已经无处不在，尤其是ansible完全依赖于ssh实现了无agent管理机器。</p>
-<h1 id="发布自己的public-key"><a href="#发布自己的public-key" class="headerlink" title="发布自己的public key"></a>发布自己的public key</h1><p>自己电脑 —访问—》 远程电脑</p>
-<p>自己电脑的public key —放到—&gt; 远程电脑的<code>.ssh/authorized_keys</code> .</p>
-<p>自己的public key：<br>自己生成：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh-keygen -t rsa</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/home/jack/.ssh/id_rsa): </span><br><span class="line">Enter passphrase (empty for no passphrase): </span><br><span class="line">Enter same passphrase again: </span><br><span class="line">Your identification has been saved in /home/jack/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved in /home/jack/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:XNTbM9mTiyFhjgsMG0R/5+Ou6LrBprvlRcxzIfY7dWE jack@jack</span><br><span class="line">The key's randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|    oo    ..     |</span><br><span class="line">|     o.  . o.    |</span><br><span class="line">|      =+ o=..E o.|</span><br><span class="line">|     .+++o+oo.*o.|</span><br><span class="line">|       =So.+..ooo|</span><br><span class="line">|    . . o.+ o. . |</span><br><span class="line">|     = . o .     |</span><br><span class="line">|    = o . o      |</span><br><span class="line">|   +o++o ...     |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> cat ~/.ssh/id_rsa.pub </span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDsP6P3B6JNmkI2xFMXfNUe8LSQC+fWgB7ifNU7uS2iv55dPiU5uWo0LMLW9SQhVHQeFl9V5ur8t19rCY1IoMvQNoSfEnWjN2PTO2rhbugqBBwVQzZLkyqfLtiMGdSIzQ1CFvoHQbX3fb2A70GXpoX8pa2P5TP4WJufsLKEamcnIXhdW8GVQif9Gf24VCYyUn+Omi3RdWHOdn1gQsLB7qfapO/t4vSURHYvdgy0AJ2bmJRBqCKseIEBXsdNy3VbL1DxSTU8kww20nSV4wa9OPxPMApdzPIiXxx+ow70KvgwrfBnc8gQ6yxzdBnyGHizU0TLWv3FLO5ZtDz+6v77zeZX jack@jack</span><br></pre></td></tr></table></figure></p>
-<p>然后复制到远程主机的<code>.ssh/authorized_keys</code>文件里。</p>
-<p>当然，也可以一句命令搞定：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub | ssh USER@HOST "mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys"</span><br></pre></td></tr></table></figure></p>
-<p>当然，还有个软件叫<a href="http://linux.die.net/man/1/ssh-copy-id" target="_blank" rel="noopener">ssh-copy-id</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>ssh已经无处不在，尤其是ansible完全依赖于ssh实现了无agent管理机器。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/01/02/tools/013-ssh/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/01/02/tools/013-ssh/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/02/tools/013-ssh/" data-id="cjzdwflhu00rphach30307adp" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -2209,6 +2212,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
           </li>
         
@@ -2222,10 +2229,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
       </ul>

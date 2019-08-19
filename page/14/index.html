@@ -86,6 +86,96 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-tools/004-install-texlive" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/12/tools/004-install-texlive/" class="article-date">
+  <time datetime="2018-01-12T07:46:23.000Z" itemprop="datePublished">2018-01-12</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/12/tools/004-install-texlive/">手动安装texlive</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将手动安装texlive环境,从下载到配置.</p>
+<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><p>CTAN有各个安装源<a href="https://ctan.org/mirrors" target="_blank" rel="noopener">https://ctan.org/mirrors</a></p>
+<p>我使用清华的:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> wget -c http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/Images/texlive2017-20170524.iso</span><br></pre></td></tr></table></figure></p>
+<p>下载有3个多GB.</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>在安装前清除遗留程序,解压或挂载后在root下执行安装程序:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> locate texlive | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> sudo ./install-tl</span><br></pre></td></tr></table></figure></p>
+<p>这是个漫长的过程,大概要12分钟.</p>
+<p>安装完后会提示各个路径:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Welcome to TeX Live!</span><br><span class="line"></span><br><span class="line">Documentation links: /usr/local/texlive/2017/index.html</span><br><span class="line">The TeX Live web site (https://tug.org/texlive/)</span><br><span class="line">contains updates and corrections.</span><br><span class="line"></span><br><span class="line">TeX Live is a joint project of the TeX user groups around the world;</span><br><span class="line">please consider supporting it by joining the group best for you.</span><br><span class="line">The list of groups is on the web at https://tug.org/usergroups.html.</span><br><span class="line"></span><br><span class="line">Add /usr/local/texlive/2017/texmf-dist/doc/man to MANPATH.</span><br><span class="line">Add /usr/local/texlive/2017/texmf-dist/doc/info to INFOPATH.</span><br><span class="line">Most importantly, add /usr/local/texlive/2017/bin/x86_64-linux</span><br><span class="line">to your PATH for current and future sessions.</span><br><span class="line"></span><br><span class="line">Logfile: /usr/local/texlive/2017/install-tl.log</span><br></pre></td></tr></table></figure></p>
+<p>比如文档路径:/usr/local/texlive/2017/index.html</p>
+<p>更重要的是环境变量:/usr/local/texlive/2017/bin/x86_64-linux</p>
+<h1 id="配置与测试"><a href="#配置与测试" class="headerlink" title="配置与测试"></a>配置与测试</h1><p>配置环境变量:追加.bashrc<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export TEXLIVE=/usr/local/texlive/2017/bin/x86_64-linux</span><br><span class="line">export PATH=$TEXLIVE:$PATH</span><br></pre></td></tr></table></figure></p>
+<p>测试:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> tex --version</span><br><span class="line">TeX 3.14159265 (TeX Live 2017)</span><br><span class="line">kpathsea version 6.2.3</span><br><span class="line">Copyright 2017 D.E. Knuth.</span><br><span class="line">There is NO warranty.  Redistribution of this software is</span><br><span class="line">covered by the terms of both the TeX copyright and</span><br><span class="line">the Lesser GNU General Public License.</span><br><span class="line">For more information about these matters, see the file</span><br><span class="line">named COPYING and the TeX source.</span><br><span class="line">Primary author of TeX: D.E. Knuth.</span><br></pre></td></tr></table></figure></p>
+<p>编辑个简单的文档保存为sample.tex:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">\documentclass[12pt,a4paper]&#123;report&#125;</span><br><span class="line"></span><br><span class="line">\title&#123;Title&#125;</span><br><span class="line">\author&#123;jackpler&#125;</span><br><span class="line">\date&#123;\today&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line">hello world!</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后测试:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> latex sample.tex  # 编译一个测试文件</span><br><span class="line"><span class="meta">$</span> pdftex sample.tex # 生成测试文档的pdf文件</span><br></pre></td></tr></table></figure></p>
+<h1 id="tlmgr使用"><a href="#tlmgr使用" class="headerlink" title="tlmgr使用"></a>tlmgr使用</h1><p>现在texlive自带tlmgr包管理工具进行管理,方便了.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 自动选择最近的仓库更新</span><br><span class="line"><span class="meta">$</span> sudo tlmgr option repository http://mirror.ctan.org/systems/texlive/tlnet    </span><br><span class="line"><span class="meta">#</span> 更新宏包管理器</span><br><span class="line"><span class="meta">$</span> sudo tlmgr update --self  </span><br><span class="line"><span class="meta">#</span> 更新所有已安装的宏包</span><br><span class="line"><span class="meta">$</span> sudo tlmgr update --all   </span><br><span class="line"><span class="meta">#</span> 安装新包</span><br><span class="line"><span class="meta">$</span> sudo tlmgr install 包名</span><br></pre></td></tr></table></figure></p>
+<p>更多包在<a href="https://ctan.org" target="_blank" rel="noopener">CTAN</a>上去找.</p>
+<h1 id="更多学习"><a href="#更多学习" class="headerlink" title="更多学习"></a>更多学习</h1><p>使用官方文档:<a href="https://www.tug.org/texlive/doc/texlive-zh-cn/texlive-zh-cn.pdf" target="_blank" rel="noopener">https://www.tug.org/texlive/doc/texlive-zh-cn/texlive-zh-cn.pdf</a></p>
+<p>完整的tlmgr命令文档<a href="http://tug.org/texlive/doc/tlmgr.html" target="_blank" rel="noopener">tlmgr</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文将手动安装texlive环境,从下载到配置.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/12/tools/004-install-texlive/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/12/tools/004-install-texlive/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/004-install-texlive/" data-id="cjzi967n200mqy6chnvw65jh8" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/texlive/">texlive</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/003-resources" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/12/tools/003-resources/" class="article-date">
@@ -305,7 +395,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjzdwflhi00r3hachdvo6qy5z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/12/tools/003-resources/" data-id="cjzi967n000mly6chc9efbzy4" class="article-share-link">
           Share
         </a>
         
@@ -385,7 +475,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjzdwfl6k0002hachr7li3f00" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/ai/000-perceptron/" data-id="cjzi967ds0001y6ch55ct306w" class="article-share-link">
           Share
         </a>
         
@@ -471,7 +561,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjzdwflhh00r0hach6qfjq978" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/11/tools/002-speed-test/" data-id="cjzi967n100mny6ch0o6hd61q" class="article-share-link">
           Share
         </a>
         
@@ -550,7 +640,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjzdwfl8p004jhachcb1i2k4z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/10/hadoop/000-config-environment/" data-id="cjzi967fw0044y6chwq38cjva" class="article-share-link">
           Share
         </a>
         
@@ -631,7 +721,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjzdwflhg00qwhachkfmtsvbh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/07/tools/001-asciidoc/" data-id="cjzi967my00mdy6chmuxio2sx" class="article-share-link">
           Share
         </a>
         
@@ -720,7 +810,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjzdwflbo00ehhachic659ka4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="cjzi967mb00kby6cha22dp79y" class="article-share-link">
           Share
         </a>
         
@@ -818,7 +908,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjzdwflhf00qthach7b96v3b8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="cjzi967mx00m8y6chuzr9bpgc" class="article-share-link">
           Share
         </a>
         
@@ -898,7 +988,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjzdwflbi00dvhach89zguu5j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="cjzi967m400jsy6chv342kulo" class="article-share-link">
           Share
         </a>
         
@@ -991,7 +1081,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjzdwflhc00qnhachbqhc8it5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="cjzi967mx00mby6chddvyymc6" class="article-share-link">
           Share
         </a>
         
@@ -1074,7 +1164,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjzdwflhd00qphachtfd4a3ez" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="cjzi967mw00m6y6chgj1wir1t" class="article-share-link">
           Share
         </a>
         
@@ -1161,7 +1251,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjzdwflbn00echachltf3suvz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="cjzi967mb00k9y6chx4a1avyb" class="article-share-link">
           Share
         </a>
         
@@ -1257,7 +1347,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjzdwflhb00qkhach0uqvuvvh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="cjzi967mv00m3y6ch5kzx7cas" class="article-share-link">
           Share
         </a>
         
@@ -1331,7 +1421,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjzdwflgh00phhach2y8hvkze" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="cjzi967mj00l0y6chiiap468v" class="article-share-link">
           Share
         </a>
         
@@ -1440,7 +1530,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjzdwflhh00qyhachgi64qscx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="cjzi967n000miy6ch97nt762i" class="article-share-link">
           Share
         </a>
         
@@ -1563,7 +1653,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjzdwfl8k0044hachm1shs14m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="cjzi967fz004ey6ch07widord" class="article-share-link">
           Share
         </a>
         
@@ -1644,7 +1734,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjzdwflb000c2hachasfbx8vv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="cjzi967ln00icy6ch3fo30txv" class="article-share-link">
           Share
         </a>
         
@@ -1727,7 +1817,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjzdwflgy00pkhachxxx1usa8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="cjzi967ml00l7y6chtang3oqp" class="article-share-link">
           Share
         </a>
         
@@ -1808,7 +1898,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjzdwflh700q8hach9e4ule3z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="cjzi967mv00m1y6chetp077hb" class="article-share-link">
           Share
         </a>
         
@@ -1944,93 +2034,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjzdwflha00qihachm6dclsqh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="cjzi967mr00lry6chjw4w9vz6" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/005-ssh-and-remote" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/28/linux/005-ssh-and-remote/" class="article-date">
-  <time datetime="2017-12-28T07:51:00.000Z" itemprop="datePublished">2017-12-28</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/28/linux/005-ssh-and-remote/">linux远程连接</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>讲ssh和远程桌面相关.</p>
-<h2 id="1-远程桌面"><a href="#1-远程桌面" class="headerlink" title="1.远程桌面"></a>1.远程桌面</h2><p>可以采用rdesktop命令，连linux，windows都没问题。</p>
-<p>就windows而言，通常可以挂载本地文件夹：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> -r disk:Jimo=/home/jimo/xxx:挂载本地文件夹</span><br><span class="line"><span class="meta">#</span> sound:local 写上比较好</span><br><span class="line"><span class="meta">$</span> rdesktop -u xxx ip:port -p xxxx -r sound:local -r disk:Jimo=/home/jimo/xxx</span><br></pre></td></tr></table></figure></p>
-<p>还需要注意的就是密码，当然可以不指定，等到出现界面时才输，在命令行上输密码需要转义，比如!,需要写成：!,<br>否则会被当成shell命令执行</p>
-<p>默认会有分辨率问题，可以通过参数<code>-g 1908x1080</code> 或者<code>-f</code>设置全屏调整.</p>
-<h2 id="2-ssh"><a href="#2-ssh" class="headerlink" title="2.ssh"></a>2.ssh</h2><p>对于远程的云服务器,需要ssh链接.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ssh username@ip</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-1上传文件"><a href="#2-1上传文件" class="headerlink" title="2.1上传文件"></a>2.1上传文件</h3><p>通过ssh传文件到远程linux服务器:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ scp localfile username<span class="meta">@ip</span>:/remote_path</span><br><span class="line"># 例如</span><br><span class="line">$ scp apache8.0.tar root@<span class="number">119.1</span>.1.1:/root/webapp</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-2下载文件"><a href="#2-2下载文件" class="headerlink" title="2.2下载文件"></a>2.2下载文件</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp username<span class="meta">@host</span>:/remote_path/filename ~/local_destination</span><br></pre></td></tr></table></figure>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>讲ssh和远程桌面相关.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/28/linux/005-ssh-and-remote/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/28/linux/005-ssh-and-remote/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="cjzdwflb000c5hach3308byda" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -2089,6 +2098,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
           </li>
         
@@ -2102,10 +2115,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
       </ul>

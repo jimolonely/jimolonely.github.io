@@ -86,6 +86,91 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/008-python-error" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/17/python/008-python-error/" class="article-date">
+  <time datetime="2018-04-17T02:13:30.000Z" itemprop="datePublished">2018-04-17</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/17/python/008-python-error/">python中的常见错误</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>python中的常见错误.</p>
+<h1 id="TypeError-Object-of-type-‘int64’-is-not-JSON-serializable"><a href="#TypeError-Object-of-type-‘int64’-is-not-JSON-serializable" class="headerlink" title="TypeError: Object of type ‘int64’ is not JSON serializable"></a>TypeError: Object of type ‘int64’ is not JSON serializable</h1><p>一般这是numpy的int类型无法被json化,所以需要将numpy的int转为原生类型.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># pandas返回的</span></span><br><span class="line">sex_cnt = marks[<span class="string">'sex'</span>].value_counts()</span><br><span class="line">type(sex_cnt[<span class="string">'男'</span>]) <span class="comment"># numpy.int64</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3种转化方法</span></span><br><span class="line"><span class="comment"># examples using a.item()</span></span><br><span class="line">type(np.float32(<span class="number">0</span>).item()) <span class="comment"># &lt;type 'float'&gt;</span></span><br><span class="line">type(np.float64(<span class="number">0</span>).item()) <span class="comment"># &lt;type 'float'&gt;</span></span><br><span class="line">type(np.uint32(<span class="number">0</span>).item())  <span class="comment"># &lt;type 'long'&gt;</span></span><br><span class="line"><span class="comment"># examples using np.asscalar(a)</span></span><br><span class="line">type(np.asscalar(np.int16(<span class="number">0</span>)))   <span class="comment"># &lt;type 'int'&gt;</span></span><br><span class="line">type(np.asscalar(np.cfloat(<span class="number">0</span>)))  <span class="comment"># &lt;type 'complex'&gt;</span></span><br><span class="line">type(np.asscalar(np.datetime64(<span class="number">0</span>, <span class="string">'D'</span>)))  <span class="comment"># &lt;type 'datetime.datetime'&gt;</span></span><br><span class="line">type(np.asscalar(np.timedelta64(<span class="number">0</span>, <span class="string">'D'</span>))) <span class="comment"># &lt;type 'datetime.timedelta'&gt;</span></span><br><span class="line"><span class="comment"># 强制转化</span></span><br><span class="line">int(np.int64(<span class="number">0</span>))</span><br></pre></td></tr></table></figure></p>
+<h1 id="ValueError-unsupported-format-character-‘xx’-at-index"><a href="#ValueError-unsupported-format-character-‘xx’-at-index" class="headerlink" title="ValueError: unsupported format character ‘xx’ at index"></a>ValueError: unsupported format character ‘xx’ at index</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">13</span>]: s = <span class="string">"%jimo %s"</span> % (<span class="string">'hehe'</span>)</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">ValueError                                Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-13</span>-f5b56b452ab7&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 s = "%jimo %s" % ('hehe')</span><br><span class="line"></span><br><span class="line">ValueError: unsupported format character <span class="string">'j'</span> (<span class="number">0x6a</span>) at index <span class="number">1</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">14</span>]: s = <span class="string">"%%jimo %s"</span> % (<span class="string">'hehe'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">15</span>]: s</span><br><span class="line">Out[<span class="number">15</span>]: <span class="string">'%jimo hehe'</span></span><br></pre></td></tr></table></figure>
+<h1 id="TypeError-‘dict-items’-object-is-not-subscriptable"><a href="#TypeError-‘dict-items’-object-is-not-subscriptable" class="headerlink" title="TypeError: ‘dict_items’ object is not subscriptable"></a>TypeError: ‘dict_items’ object is not subscriptable</h1><p>在python3中dict.keys()或items()返回的是个迭代器,所以不能slice.但可以转成list再迭代:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list(d.keys())[<span class="number">2</span>:<span class="number">4</span>]</span><br></pre></td></tr></table></figure></p>
+<h1 id="tuple-parameter-unpacking-is-not-supported-in-python-3"><a href="#tuple-parameter-unpacking-is-not-supported-in-python-3" class="headerlink" title="tuple parameter unpacking is not supported in python 3"></a>tuple parameter unpacking is not supported in python 3</h1><p>python3中tuple不能当做lambda参数.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">points = [ (<span class="number">1</span>,<span class="number">2</span>), (<span class="number">2</span>,<span class="number">3</span>)]</span><br><span class="line">min(points, key=<span class="keyword">lambda</span> (x, y): (x*x + y*y))</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 1</span></span><br><span class="line">min(points, key=<span class="keyword">lambda</span> p: (<span class="keyword">lambda</span> x,y: (x*x + y*y))(*p))</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 2</span></span><br><span class="line">min(points, key=<span class="keyword">lambda</span> x_y: x_y[<span class="number">0</span>] + x_y[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># way 3</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">key</span><span class="params">(p)</span>:</span> <span class="comment"># more specific name would be better</span></span><br><span class="line">    x, y = p</span><br><span class="line">    <span class="keyword">return</span> x**<span class="number">2</span> + y**<span class="number">3</span></span><br><span class="line"></span><br><span class="line">result = min(points, key=key)</span><br></pre></td></tr></table></figure></p>
+<h1 id="‘str’-object-has-no-attribute-‘decode’"><a href="#‘str’-object-has-no-attribute-‘decode’" class="headerlink" title="‘str’ object has no attribute ‘decode’"></a>‘str’ object has no attribute ‘decode’</h1><p>这又是个版本问题,在python2.x中字符串有decode方法,而python3没有,因为<br>python3默认把字符串当成unicode处理,而python2不是.<br>因此当视图在python2环境下比较中文字符串时:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s == <span class="string">'寂寞'</span></span><br></pre></td></tr></table></figure></p>
+<p>会出现警告:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UnicodeWarning: Unicode equal comparison failed to convert both arguments to Unicode</span><br></pre></td></tr></table></figure></p>
+<p>解决办法也很简单,只要s是utf8的话,将’寂寞’进行解码即可:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s == <span class="string">'寂寞'</span>.decode(<span class="string">'utf-8'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>而python3下则不需要.</p>
+<h1 id="Cannot-uninstall-‘pyzmq’"><a href="#Cannot-uninstall-‘pyzmq’" class="headerlink" title="Cannot uninstall ‘pyzmq’."></a>Cannot uninstall ‘pyzmq’.</h1><p> Cannot uninstall ‘pyzmq’. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.</p>
+<p> 这个是在使用pip安装jupyter时出现的错误,无法卸载,因为是作为系统项目进行安装的.</p>
+<p> 所以解决办法很简单,只需要在系统里把pyzmq模块卸载了先.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>python中的常见错误.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/17/python/008-python-error/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/17/python/008-python-error/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/17/python/008-python-error/" data-id="cjzi967mh00kvy6chrit79k2l" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-python/007-use-pandas" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/15/python/007-use-pandas/" class="article-date">
@@ -161,7 +246,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjzdwflez00pbhachwfdv323h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjzi967mf00koy6chyzwu7k53" class="article-share-link">
           Share
         </a>
         
@@ -238,7 +323,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjzdwfl880034hachs4ntbj2g" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjzi967fl0035y6ch8nypusm3" class="article-share-link">
           Share
         </a>
         
@@ -316,7 +401,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjzdwfl8a003bhach3ncefb0t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjzi967fl0034y6chtrj6i5up" class="article-share-link">
           Share
         </a>
         
@@ -406,7 +491,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjzdwfl80002ehachpvj12me7" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjzi967fb0029y6ch1vdtraev" class="article-share-link">
           Share
         </a>
         
@@ -483,7 +568,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjzdwflej00p8hach9qbrajae" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjzi967mf00kly6chtwigs90y" class="article-share-link">
           Share
         </a>
         
@@ -566,7 +651,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjzdwfl7z002bhach1k1ec7o0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjzi967fa0027y6chjm1446l8" class="article-share-link">
           Share
         </a>
         
@@ -662,7 +747,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjzdwflb300cfhachlgwioi5l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjzi967lp00ihy6chk90ympcy" class="article-share-link">
           Share
         </a>
         
@@ -750,7 +835,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/01/shell/001-shell-common-use/" data-id="cjzdwflh900qdhachb59qnlod" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/01/shell/001-shell-common-use/" data-id="cjzi967ms00luy6choon6i95t" class="article-share-link">
           Share
         </a>
         
@@ -835,7 +920,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjzdwfl7y0029hachkukqg9ks" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjzi967fa0024y6ch7mq20jtn" class="article-share-link">
           Share
         </a>
         
@@ -919,7 +1004,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjzdwfl7x0026hach78rcat1q" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjzi967f90023y6chkd8k5lhg" class="article-share-link">
           Share
         </a>
         
@@ -996,7 +1081,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjzdwfl860030hachwh9pkacy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjzi967fk0031y6chx6b483jr" class="article-share-link">
           Share
         </a>
         
@@ -1122,7 +1207,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjzdwflhp00rfhachg89sju6l" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjzi967n400mxy6ch4wrzke9l" class="article-share-link">
           Share
         </a>
         
@@ -1227,7 +1312,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjzdwfl7x0024hachcqpuw9qy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjzi967f80021y6chgo7x4sie" class="article-share-link">
           Share
         </a>
         
@@ -1313,7 +1398,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjzdwflei00p6hach6zc3nc48" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjzi967mh00kty6chxwh8wt3d" class="article-share-link">
           Share
         </a>
         
@@ -1391,7 +1476,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjzdwfl8w0055hachttfgrofn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjzi967g90059y6chstb00gbx" class="article-share-link">
           Share
         </a>
         
@@ -1475,7 +1560,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/001-junit-design-pattern/" data-id="cjzdwfl8w0056hach9k313b09" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/001-junit-design-pattern/" data-id="cjzi967gb005jy6ch2hq7cz72" class="article-share-link">
           Share
         </a>
         
@@ -1550,7 +1635,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjzdwfl8h003shachocutng8t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjzi967ft003uy6chh54slgcw" class="article-share-link">
           Share
         </a>
         
@@ -1644,7 +1729,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjzdwfl8i003yhachc7xdi4z5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjzi967fs003qy6chg0qqo1w6" class="article-share-link">
           Share
         </a>
         
@@ -1728,88 +1813,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjzdwfl8i003whach8yolcy6s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjzi967ft003ty6chulj613g2" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="article-tag-list-count">7</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-js/000-echarts-graph" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/13/js/000-echarts-graph/" class="article-date">
-  <time datetime="2018-03-13T00:38:44.000Z" itemprop="datePublished">2018-03-13</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/13/js/000-echarts-graph/">echarts中的graph demo</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>关于echart-graph,一个乔布斯关系图demo.</p>
-<h1 id="上代码"><a href="#上代码" class="headerlink" title="上代码"></a>上代码</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=<span class="string">"utf-8"</span>&gt;</span><br><span class="line">    &lt;!-- 引入 ECharts 文件 --&gt;</span><br><span class="line">    &lt;script src=<span class="string">"echarts.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;<span class="regexp">/head&gt;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">&lt;body&gt;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">    &lt;!-- 为 ECharts 准备一个具备大小（宽高）的 DOM --&gt;</span></span><br><span class="line"><span class="regexp">    &lt;div id="main" style="width: 1000px;height:600px;"&gt;&lt;/</span>div&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="comment">// 基于准备好的dom，初始化echarts实例</span></span><br><span class="line">        <span class="keyword">var</span> myChart = echarts.init(<span class="built_in">document</span>.getElementById(<span class="string">'main'</span>));</span><br><span class="line"></span><br><span class="line">        option1 = &#123;</span><br><span class="line">            title: &#123;</span><br><span class="line">                text: <span class="string">'人物关系：乔布斯'</span>,</span><br><span class="line">                subtext: <span class="string">'数据来自人立方'</span>,</span><br><span class="line">                top: <span class="string">'top'</span>,</span><br><span class="line">                left: <span class="string">'middle'</span></span><br><span class="line">            &#125;,</span><br><span class="line">            animationDuration: <span class="number">1500</span>,</span><br><span class="line">            animationEasingUpdate: <span class="string">'quinticInOut'</span>,</span><br><span class="line">            tooltip: &#123;</span><br><span class="line">                trigger: <span class="string">'item'</span>,</span><br><span class="line">                formatter: <span class="string">'&#123;a&#125; : &#123;b&#125;'</span></span><br><span class="line">            &#125;,</span><br><span class="line">            toolbox: &#123;</span><br><span class="line">                show: <span class="literal">true</span>,</span><br><span class="line">                feature: &#123;</span><br><span class="line">                    restore: &#123; <span class="attr">show</span>: <span class="literal">true</span> &#125;,</span><br><span class="line">                    magicType: &#123; <span class="attr">show</span>: <span class="literal">true</span>, <span class="attr">type</span>: [<span class="string">'force'</span>, <span class="string">'chord'</span>] &#125;,</span><br><span class="line">                    saveAsImage: &#123; <span class="attr">show</span>: <span class="literal">true</span> &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            legend: &#123;</span><br><span class="line">                x: <span class="string">'left'</span>,</span><br><span class="line">                data: [<span class="string">'家人'</span>, <span class="string">'朋友'</span>]</span><br><span class="line">            &#125;,</span><br><span class="line">            series: [</span><br><span class="line">                &#123;</span><br><span class="line">                    type: <span class="string">'graph'</span>,</span><br><span class="line">                    name: <span class="string">"人物关系"</span>,</span><br><span class="line">                    layout: <span class="string">'force'</span>,</span><br><span class="line">                    categories: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            name: <span class="string">'人物'</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            name: <span class="string">'家人'</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            name: <span class="string">'朋友'</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    ],</span><br><span class="line">                    label: &#123;</span><br><span class="line">                        show: <span class="literal">true</span>,</span><br><span class="line">                        position: <span class="string">'inside'</span>,</span><br><span class="line">                    &#125;,</span><br><span class="line">                    lineStyle: &#123;</span><br><span class="line">                        normal: &#123;</span><br><span class="line">                            color: <span class="string">'source'</span>,</span><br><span class="line">                            curveness: <span class="number">0.3</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    ,</span><br><span class="line">                    <span class="comment">// minRadius: 15,</span></span><br><span class="line">                    <span class="comment">// maxRadius: 25,</span></span><br><span class="line">                    roam: <span class="literal">true</span>,</span><br><span class="line">                    nodes: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            category: <span class="number">0</span>,</span><br><span class="line">                            name: <span class="string">'乔布斯'</span>,</span><br><span class="line">                            value: <span class="number">10</span>,</span><br><span class="line">                            symbolSize: <span class="number">50</span>,<span class="comment">//[60, 35],</span></span><br><span class="line">                            draggable: <span class="literal">true</span>,</span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'丽萨-乔布斯'</span>, <span class="attr">value</span>: <span class="number">2</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'保罗-乔布斯'</span>, <span class="attr">value</span>: <span class="number">3</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'克拉拉-乔布斯'</span>, <span class="attr">value</span>: <span class="number">3</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'劳伦-鲍威尔'</span>, <span class="attr">value</span>: <span class="number">7</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'史蒂夫-沃兹尼艾克'</span>, <span class="attr">value</span>: <span class="number">5</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'奥巴马'</span>, <span class="attr">value</span>: <span class="number">8</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'比尔-盖茨'</span>, <span class="attr">value</span>: <span class="number">9</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'乔纳森-艾夫'</span>, <span class="attr">value</span>: <span class="number">4</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'蒂姆-库克'</span>, <span class="attr">value</span>: <span class="number">4</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">category</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'龙-韦恩'</span>, <span class="attr">value</span>: <span class="number">1</span> &#125;,</span><br><span class="line">                    ],</span><br><span class="line">                    links: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            source: <span class="string">'丽萨-乔布斯'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, <span class="attr">name</span>: <span class="string">'女儿'</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            source: <span class="string">'乔布斯'</span>, <span class="attr">target</span>: <span class="string">'丽萨-乔布斯'</span>, <span class="attr">name</span>: <span class="string">'父亲'</span>, <span class="attr">itemStyle</span>: &#123;</span><br><span class="line">                                normal: &#123; <span class="attr">color</span>: <span class="string">'red'</span> &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'保罗-乔布斯'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, <span class="attr">name</span>: <span class="string">'父亲'</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'克拉拉-乔布斯'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, <span class="attr">name</span>: <span class="string">'母亲'</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'劳伦-鲍威尔'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'史蒂夫-沃兹尼艾克'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, <span class="attr">name</span>: <span class="string">'合伙人'</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'奥巴马'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'比尔-盖茨'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, <span class="attr">name</span>: <span class="string">'竞争对手'</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'乔纳森-艾夫'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, <span class="attr">name</span>: <span class="string">'爱将'</span> &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'蒂姆-库克'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'龙-韦恩'</span>, <span class="attr">target</span>: <span class="string">'乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'龙-韦恩'</span>, <span class="attr">target</span>: <span class="string">'乔纳森-艾夫'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'克拉拉-乔布斯'</span>, <span class="attr">target</span>: <span class="string">'保罗-乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'奥巴马'</span>, <span class="attr">target</span>: <span class="string">'保罗-乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'奥巴马'</span>, <span class="attr">target</span>: <span class="string">'克拉拉-乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'奥巴马'</span>, <span class="attr">target</span>: <span class="string">'劳伦-鲍威尔'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'奥巴马'</span>, <span class="attr">target</span>: <span class="string">'史蒂夫-沃兹尼艾克'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'比尔-盖茨'</span>, <span class="attr">target</span>: <span class="string">'奥巴马'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'比尔-盖茨'</span>, <span class="attr">target</span>: <span class="string">'克拉拉-乔布斯'</span>, &#125;,</span><br><span class="line">                        &#123; <span class="attr">source</span>: <span class="string">'蒂姆-库克'</span>, <span class="attr">target</span>: <span class="string">'奥巴马'</span>, &#125;</span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用刚指定的配置项和数据显示图表。</span></span><br><span class="line">        myChart.setOption(option1);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line"></span><br><span class="line">&lt;<span class="regexp">/html&gt;</span></span><br></pre></td></tr></table></figure>
-<p>效果:</p>
-<img src="/2018/03/13/js/000-echarts-graph/000.png" title="demo-graph">
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>关于echart-graph,一个乔布斯关系图demo.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/13/js/000-echarts-graph/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/13/js/000-echarts-graph/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjzdwfl8v0052hachmmszo5vj" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/html/">html</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a><span class="article-tag-list-count">4</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/web/">web</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -1868,6 +1877,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
           </li>
         
@@ -1881,10 +1894,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/10/basic/020-urban-computing/">关于城市计算的认识</a>
           </li>
         
       </ul>
