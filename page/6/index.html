@@ -86,6 +86,386 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-basic/015-xml" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/27/basic/015-xml/" class="article-date">
+  <time datetime="2019-02-27T02:06:05.000Z" itemprop="datePublished">2019-02-27</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/27/basic/015-xml/">xml再认识</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>虽然已经用了这么多年的xml了，因为很简单，所以从来没有系统学习过，有一些关键点不需要知道也可以使用，<br>因此一直没有重视，好吧，前面的是废话。重点是求知欲不够强。面试也基本不会问这个，所以就逃避了，但内心是拒绝的。<br>本文不会从0开始认识xml，而是在使用了n年后再完整学习后发现的知识盲区。</p>
+<p>学习地址：</p>
+<ol>
+<li><a href="http://www.runoob.com/xml/xml-tutorial.html" target="_blank" rel="noopener">xml-runoob</a></li>
+<li><a href="http://www.w3school.com.cn/x.asp" target="_blank" rel="noopener">xml-w3c</a></li>
+</ol>
+<p>下面是再学习到的知识点：</p>
+<ol>
+<li>xml必须有一个根结点，结构是树；</li>
+<li>大小写敏感，标签必须关闭</li>
+<li>特殊实体引用(特殊符号)： <code>&gt;(&amp;gt;),&lt;(&amp;lt;),&amp;(&amp;amp;),&#39;(&amp;apos;),&quot;(&amp;quot;)</code></li>
+<li>对扩展开放： 就是增加标签不影响解析</li>
+<li>什么时候使用属性： 属性不是数据，而是元数据，可以对比HTML标签的属性</li>
+</ol>
+<p>上面的是只关乎XML的知识，下面的涉及更广，更难一点：</p>
+<p>首先明确一点： 形式良好和合法。<br>拥有正确语法的 XML 被称为”形式良好”的 XML。<br>通过 DTD 验证的XML是”合法”的 XML。</p>
+<ol>
+<li><p>什么是DTD？<br>DTD(Document Type Define),作用是定义 XML 文档的合法构建模块，可以验证xml是否合法。具体参考<a href="http://www.runoob.com/dtd/dtd-tutorial.html" target="_blank" rel="noopener">DTD教程</a>。<br>DTD语法很简单，表示2个东西： 有哪些标签(ELEMENT，ATTLIST，ENTITY)，标签的类型(#PCDATA, CDATA等)和结构：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- Edited by XMLSpy® --&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE note [</span></span><br><span class="line"><span class="meta">  &lt;!ELEMENT note    (to,from,heading,body)&gt;</span></span><br><span class="line"><span class="meta">  &lt;!ELEMENT to      (#PCDATA)&gt;</span></span><br><span class="line"><span class="meta">  &lt;!ELEMENT from    (#PCDATA)&gt;</span></span><br><span class="line"><span class="meta">  &lt;!ELEMENT heading (#PCDATA)&gt;</span></span><br><span class="line"><span class="meta">  &lt;!ELEMENT body    (#PCDATA)&gt;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">to</span>&gt;</span>Tove<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">from</span>&gt;</span>Jani<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">heading</span>&gt;</span>Reminder<span class="tag">&lt;/<span class="name">heading</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span>Don't forget me this weekend!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当然，验证合法性不只一种，Schema被开发出来代替DTD：</p>
+<ol>
+<li>Schema： 描述了XML文档的结构，比DTD更强大，所以复杂一点。<a href="http://www.runoob.com/schema/schema-tutorial.html" target="_blank" rel="noopener">具体教程</a></li>
+<li>我只希望花5分钟学习schema，没啥，因为我时间宝贵，那么我只会用一个例子+几句话。<ol>
+<li>schema基本上已经取代DTD，2001年发布, 文件格式： *.xsd</li>
+<li>schema是由XML来书写的，好处很多, 比DTD强大的地方就在于丰富的数据类型（boolean,string,decimal,integer,date,time）</li>
+<li>下面是如何引用schema：<ol>
+<li>声明当前域名空间： <code>xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</code></li>
+<li>声明XML Schema 命名空间实例： <code>xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</code></li>
+<li>使用<code>schemaLocation</code>引用xsd文件： <code>xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;</code></li>
+<li>这个例子就是 <code>web.xml</code>:<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">web-app</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns</span>=<span class="string">"http://java.sun.com/xml/ns/javaee"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">version</span>=<span class="string">"3.0"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>JimoMvc<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>com.jimo.mvc.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>application.properties<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>JimoMvc<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p>当然，现在我心里不慌了，后面还有一些更高级的东西，直到需要的时候再研究把，为啥？ 因为我时间宝贵呀！</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>虽然已经用了这么多年的xml了，因为很简单，所以从来没有系统学习过，有一些关键点不需要知道也可以使用，<br>因此一直没有重视，好吧，前面的是废话。重点是求知欲不够强。面试也基本不会问这个，所以就逃避了，但内心是拒绝的。<br>本文不会从0开始认识xml，而是在使用了n年后再完整学习后发现的知识盲区。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/27/basic/015-xml/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/27/basic/015-xml/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/basic/015-xml/" data-id="cjzjeukg5001lsjch9o43er9x" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/xml/">xml</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-life/005-weekly-learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/27/life/005-weekly-learn/" class="article-date">
+  <time datetime="2019-02-27T01:21:37.000Z" itemprop="datePublished">2019-02-27</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/27/life/005-weekly-learn/">2019-9-周报</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>因为学的东西有点多，又有点杂，所以从这周开始，记录下自己的学习轨迹和内容，方便复习。</p>
+<ol>
+<li><p>spring的学习，深入到源码： <a href="/2019/02/21/java/025-spring-source/" title="spring source">spring source</a>， 关于我自己练习的代码：<a href></a></p>
+</li>
+<li><p>redis底层设计： <a href="/2019/02/21/lang/013-redis-design-principle/" title="redis design">redis design</a></p>
+</li>
+<li><p>把java创建对象复习了下： <a href="/2019/02/22/java/026-java-create-instance/" title="java create instance">java create instance</a></p>
+</li>
+<li><p>CGLib学习： <a href="/2019/02/25/java/027-cglib/" title="cglib">cglib</a></p>
+</li>
+<li><p>skip list,因为redis里用到，而我又是第一次见到： <a href="/2019/02/26/algorithm/002-skip-list/" title="skipList">skipList</a></p>
+</li>
+<li><p>事务和其隔离级别的复习, 理论不复习就会忘： <a href="https://juejin.im/post/5b00c52ef265da0b95276091" target="_blank" rel="noopener">事务</a></p>
+</li>
+<li><p>一个不错的博客作者：<a href="https://juejin.im/user/59fbb2daf265da4319559f3a/posts" target="_blank" rel="noopener">主页</a>, java学习面试地址，感觉作者能力也不是很强，单也有值得学习的地方： <a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">github</a></p>
+<ol>
+<li>先看了<a href="https://github.com/Snailclimb/JavaGuide#java-%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6" target="_blank" rel="noopener">集合</a></li>
+</ol>
+</li>
+<li><p>复习了几个设计模式： 观察者、代理、责任链、策略模式</p>
+</li>
+<li><p>再学习XML： <a href="/2019/02/27/basic/015-xml/" title="xml again">xml again</a></p>
+</li>
+<li><p>关于java问题的再认识： <a href="/2019/02/27/java/028-equals-hashcode/" title="equals-hashcode">equals-hashcode</a></p>
+</li>
+<li><a href="/2019/02/27/java/029-eureka-record/" title="[eureka学习]">[eureka学习]</a>
+</li>
+</ol>
+<p>最后在周末复习一下，准备迎接下周的架构师学习。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>因为学的东西有点多，又有点杂，所以从这周开始，记录下自己的学习轨迹和内容，方便复习。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/27/life/005-weekly-learn/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/27/life/005-weekly-learn/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/27/life/005-weekly-learn/" data-id="cjzjeukly00gjsjchpw0w6lyd" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-algorithm/002-skip-list" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/26/algorithm/002-skip-list/" class="article-date">
+  <time datetime="2019-02-26T05:49:14.000Z" itemprop="datePublished">2019-02-26</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/26/algorithm/002-skip-list/">skip list理解与java实现</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文学习跳跃表及其java代码实现。</p>
+<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p><a href="http://www.cl.cam.ac.uk/teaching/0506/Algorithms/skiplists.pdf" target="_blank" rel="noopener">论文来源</a></p>
+<p>学习其概念，看下面的文章：</p>
+<p><a href="http://blog.jobbole.com/111731/" target="_blank" rel="noopener">漫画算法：什么是跳跃表？</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Skip_list" target="_blank" rel="noopener">wiki</a></p>
+<p><a href="https://redisbook.readthedocs.io/en/latest/internal-datastruct/skiplist.html" target="_blank" rel="noopener">redis里跳跃表的应用</a></p>
+<p>插入的动态图：</p>
+<img src="/2019/02/26/algorithm/002-skip-list/000.gif">
+<h1 id="实现跳跃表"><a href="#实现跳跃表" class="headerlink" title="实现跳跃表"></a>实现跳跃表</h1><p>参考：<a href="https://blog.csdn.net/brillianteagle/article/details/52206261" target="_blank" rel="noopener">算法导论33】跳跃表（Skip list）原理与java实现</a></p>
+<p>SkipListNode<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Objects;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> jimo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 19-2-26 下午4:03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SkipListNode</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> key;</span><br><span class="line">	<span class="keyword">public</span> T value;</span><br><span class="line">	<span class="keyword">public</span> SkipListNode&lt;T&gt; up, down, left, right;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> HEAD_KEY = Integer.MIN_VALUE;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TAIL_KEY = Integer.MAX_VALUE;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SkipListNode</span><span class="params">(<span class="keyword">int</span> key, T value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.key = key;</span><br><span class="line">		<span class="keyword">this</span>.value = value;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span> == o) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (o == <span class="keyword">null</span> || getClass() != o.getClass()) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		SkipListNode&lt;?&gt; that = (SkipListNode&lt;?&gt;) o;</span><br><span class="line">		<span class="keyword">return</span> key == that.key &amp;&amp;</span><br><span class="line">				Objects.equals(value, that.value);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Objects.hash(key, value);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">"["</span> + key + <span class="string">","</span> + value + <span class="string">"]"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>SkipList:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.jimo.structure.skiplist.SkipListNode.HEAD_KEY;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.jimo.structure.skiplist.SkipListNode.TAIL_KEY;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SkipList</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> SkipListNode&lt;T&gt; head, tail;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> nodes;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> level;</span><br><span class="line">	<span class="keyword">private</span> Random random;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> PROBABILITY = <span class="number">0.5</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SkipList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		random = <span class="keyword">new</span> Random();</span><br><span class="line">		head = <span class="keyword">new</span> SkipListNode&lt;&gt;(HEAD_KEY, <span class="keyword">null</span>);</span><br><span class="line">		tail = <span class="keyword">new</span> SkipListNode&lt;&gt;(TAIL_KEY, <span class="keyword">null</span>);</span><br><span class="line">		linkHorizontal(head, tail);</span><br><span class="line">		level = <span class="number">0</span>;</span><br><span class="line">		nodes = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> nodes == <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> nodes;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> SkipListNode&lt;T&gt; <span class="title">findNode</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = <span class="keyword">this</span>.head;</span><br><span class="line">		<span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">			<span class="keyword">while</span> (p.right.key != TAIL_KEY &amp;&amp; p.right.key &lt;= key) &#123;</span><br><span class="line">				p = p.right;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (p.down != <span class="keyword">null</span>) &#123;</span><br><span class="line">				p = p.down;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> p;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> SkipListNode&lt;T&gt; <span class="title">search</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = findNode(key);</span><br><span class="line">		<span class="keyword">if</span> (p.key == key) &#123;</span><br><span class="line">			<span class="keyword">return</span> p;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> k, T v)</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = findNode(k);</span><br><span class="line">		<span class="keyword">if</span> (k == p.key) &#123;</span><br><span class="line">			p.value = v;</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		SkipListNode&lt;T&gt; newNode = <span class="keyword">new</span> SkipListNode&lt;&gt;(k, v);</span><br><span class="line">		linkToRight(p, newNode);</span><br><span class="line">		<span class="keyword">int</span> currentLevel = <span class="number">0</span>;</span><br><span class="line">		<span class="comment">// 抛硬币</span></span><br><span class="line">		<span class="keyword">while</span> (random.nextDouble() &lt; PROBABILITY) &#123;</span><br><span class="line">			<span class="keyword">if</span> (currentLevel &gt;= level) &#123;</span><br><span class="line">				level++;</span><br><span class="line">				SkipListNode&lt;T&gt; p1 = <span class="keyword">new</span> SkipListNode&lt;&gt;(HEAD_KEY, <span class="keyword">null</span>);</span><br><span class="line">				SkipListNode&lt;T&gt; p2 = <span class="keyword">new</span> SkipListNode&lt;&gt;(TAIL_KEY, <span class="keyword">null</span>);</span><br><span class="line">				linkHorizontal(p1, p2);</span><br><span class="line">				linkVertical(p1, head);</span><br><span class="line">				linkVertical(p2, tail);</span><br><span class="line">				head = p1;</span><br><span class="line">				tail = p2;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// p移到上一层</span></span><br><span class="line">			<span class="keyword">while</span> (p.up == <span class="keyword">null</span>) &#123;</span><br><span class="line">				p = p.left;</span><br><span class="line">			&#125;</span><br><span class="line">			p = p.up;</span><br><span class="line"></span><br><span class="line">			SkipListNode&lt;T&gt; e = <span class="keyword">new</span> SkipListNode&lt;&gt;(k, <span class="keyword">null</span>);</span><br><span class="line">			linkToRight(p, e);</span><br><span class="line">			linkVertical(e, newNode);</span><br><span class="line">			newNode = e;</span><br><span class="line">			currentLevel++;</span><br><span class="line">		&#125;</span><br><span class="line">		nodes++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * n2 插在 n1后面</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@author</span> jimo</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@date</span> 19-2-26 下午4:19</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">linkToRight</span><span class="params">(SkipListNode&lt;T&gt; n1, SkipListNode&lt;T&gt; n2)</span> </span>&#123;</span><br><span class="line">		n2.left = n1;</span><br><span class="line">		n2.right = n1.right;</span><br><span class="line">		n1.right.left = n2;</span><br><span class="line">		n1.right = n2;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">linkHorizontal</span><span class="params">(SkipListNode&lt;T&gt; n1, SkipListNode&lt;T&gt; n2)</span> </span>&#123;</span><br><span class="line">		n1.right = n2;</span><br><span class="line">		n2.left = n1;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">linkVertical</span><span class="params">(SkipListNode&lt;T&gt; n1, SkipListNode&lt;T&gt; n2)</span> </span>&#123;</span><br><span class="line">		n1.down = n2;</span><br><span class="line">		n2.up = n1;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printByLevel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		SkipListNode&lt;T&gt; p = <span class="keyword">this</span>.head;</span><br><span class="line">		<span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">			SkipListNode&lt;T&gt; tmp = p;</span><br><span class="line">			StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">			<span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">				sb.append(p).append(<span class="string">" "</span>);</span><br><span class="line">				p = p.right;</span><br><span class="line">			&#125;</span><br><span class="line">			System.out.println(sb.toString());</span><br><span class="line">			p = tmp.down;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="string">"empty"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">		SkipListNode&lt;T&gt; p = <span class="keyword">this</span>.head;</span><br><span class="line">		<span class="keyword">while</span> (p.down != <span class="keyword">null</span>) &#123;</span><br><span class="line">			p = p.down;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">while</span> (p.left != <span class="keyword">null</span>) &#123;</span><br><span class="line">			p = p.left;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (p.right != <span class="keyword">null</span>) &#123;</span><br><span class="line">			p = p.right;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">while</span> (p.right != <span class="keyword">null</span>) &#123;</span><br><span class="line">			sb.append(p);</span><br><span class="line">			sb.append(<span class="string">"\n"</span>);</span><br><span class="line">			p = p.right;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> sb.toString();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Test:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		SkipList&lt;String&gt; skipList = <span class="keyword">new</span> SkipList&lt;&gt;();</span><br><span class="line">		skipList.put(<span class="number">2</span>, <span class="string">"like"</span>);</span><br><span class="line">		skipList.put(<span class="number">1</span>, <span class="string">"I"</span>);</span><br><span class="line">		skipList.put(<span class="number">3</span>, <span class="string">"Jimo"</span>);</span><br><span class="line">		skipList.put(<span class="number">5</span>, <span class="string">"much"</span>);</span><br><span class="line">		skipList.put(<span class="number">4</span>, <span class="string">"very"</span>);</span><br><span class="line">		skipList.put(<span class="number">8</span>, <span class="string">"I"</span>);</span><br><span class="line">		skipList.put(<span class="number">6</span>, <span class="string">","</span>);</span><br><span class="line">		skipList.put(<span class="number">9</span>, <span class="string">"do"</span>);</span><br><span class="line">		skipList.put(<span class="number">7</span>, <span class="string">"yes"</span>);</span><br><span class="line">		skipList.put(<span class="number">6</span>, <span class="string">"!"</span>);</span><br><span class="line">		System.out.println(skipList);</span><br><span class="line">		System.out.println(skipList.size());</span><br><span class="line">		skipList.printByLevel();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可能的结果：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>,I]</span><br><span class="line">[<span class="number">2</span>,like]</span><br><span class="line">[<span class="number">3</span>,Jimo]</span><br><span class="line">[<span class="number">4</span>,very]</span><br><span class="line">[<span class="number">5</span>,much]</span><br><span class="line">[<span class="number">6</span>,!]</span><br><span class="line">[<span class="number">7</span>,yes]</span><br><span class="line">[<span class="number">8</span>,I]</span><br><span class="line">[<span class="number">9</span>,<span class="keyword">do</span>]</span><br><span class="line"></span><br><span class="line"><span class="number">9</span></span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">9</span>,<span class="keyword">null</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>] </span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">8</span>,<span class="keyword">null</span>] [<span class="number">9</span>,<span class="keyword">null</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>] </span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">2</span>,<span class="keyword">null</span>] [<span class="number">4</span>,<span class="keyword">null</span>] [<span class="number">6</span>,<span class="keyword">null</span>] [<span class="number">8</span>,<span class="keyword">null</span>] [<span class="number">9</span>,<span class="keyword">null</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>] </span><br><span class="line">[-<span class="number">2147483648</span>,<span class="keyword">null</span>] [<span class="number">1</span>,I] [<span class="number">2</span>,like] [<span class="number">3</span>,Jimo] [<span class="number">4</span>,very] [<span class="number">5</span>,much] [<span class="number">6</span>,!] [<span class="number">7</span>,yes] [<span class="number">8</span>,I] [<span class="number">9</span>,<span class="keyword">do</span>] [<span class="number">2147483647</span>,<span class="keyword">null</span>]</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文学习跳跃表及其java代码实现。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/26/algorithm/002-skip-list/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/26/algorithm/002-skip-list/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/26/algorithm/002-skip-list/" data-id="cjzjeukev0005sjchrcp0tvwh" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/data-structure/">data structure</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-java/027-cglib" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/25/java/027-cglib/" class="article-date">
+  <time datetime="2019-02-25T02:29:03.000Z" itemprop="datePublished">2019-02-25</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/25/java/027-cglib/">CGLib学习资源</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>学到spring aop原理时，发现一个cglib不太了解，特此记录下。</p>
+<h1 id="官方介绍"><a href="#官方介绍" class="headerlink" title="官方介绍"></a>官方介绍</h1><p>官方只有一个<a href="https://github.com/cglib/cglib/wiki" target="_blank" rel="noopener">github wiki页</a>,介绍很少，重要的就是cglib是干嘛的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cglib是一个功能强大，性能高，质量高的代码生成库，用于扩展JAVA类并在运行时实现接口。</span><br><span class="line"></span><br><span class="line">该库是免费软件，可以出于个人或商业目的自由重复使用。</span><br></pre></td></tr></table></figure>
+<p>有哪些项目用到了呢？ 看这里： <a href="https://github.com/cglib/cglib/wiki#projects" target="_blank" rel="noopener">projects</a></p>
+<p>既然这样，首先知道它的使用方式把。</p>
+<h1 id="使用cglib"><a href="#使用cglib" class="headerlink" title="使用cglib"></a>使用cglib</h1><p>怎么使用很简单，就不重复造轮子了，见 <a href="https://blog.csdn.net/zghwaicsdn/article/details/50957474" target="_blank" rel="noopener">blog</a>,<br><a href="https://dzone.com/articles/cglib-missing-manual" target="_blank" rel="noopener">老外的讲解-很详细</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>学到spring aop原理时，发现一个cglib不太了解，特此记录下。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/25/java/027-cglib/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/25/java/027-cglib/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/25/java/027-cglib/" data-id="cjzjeukhs006ysjchz5zq2dwp" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cglib/">cglib</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/026-java-create-instance" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/22/java/026-java-create-instance/" class="article-date">
@@ -155,7 +535,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/22/java/026-java-create-instance/" data-id="cjzi97pab009o3hch22yfgym0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/22/java/026-java-create-instance/" data-id="cjzjeukht0073sjchfaz46zhb" class="article-share-link">
           Share
         </a>
         
@@ -323,7 +703,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/lang/013-redis-design-principle/" data-id="cjzi97pb900d43hch9utiatsd" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/21/lang/013-redis-design-principle/" data-id="cjzjeuklt00g4sjchwo10gypw" class="article-share-link">
           Share
         </a>
         
@@ -450,7 +830,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/21/java/025-spring-source/" data-id="cjzi97pac009r3hch7vfk4z42" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/21/java/025-spring-source/" data-id="cjzjeukhu0078sjchq3tbiwuw" class="article-share-link">
           Share
         </a>
         
@@ -525,7 +905,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/20/maven/002-maven-install-linux/" data-id="cjzi97pci00h53hchzj2147x6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/20/maven/002-maven-install-linux/" data-id="cjzjeukn800kfsjchgkpbf7uj" class="article-share-link">
           Share
         </a>
         
@@ -599,7 +979,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/19/basic/014-code-optimization-way/" data-id="cjzi97p5j001j3hch9z1kkxvu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/19/basic/014-code-optimization-way/" data-id="cjzjeukg4001jsjchjy3ksm4t" class="article-share-link">
           Share
         </a>
         
@@ -683,7 +1063,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/19/db/006-mysql-error-1133/" data-id="cjzi97p98005z3hcho7c0v1jy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/19/db/006-mysql-error-1133/" data-id="cjzjeukgq003isjchk1h03o1q" class="article-share-link">
           Share
         </a>
         
@@ -793,7 +1173,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/15/linux/019-keepalived-learn/" data-id="cjzi97pc800g63hch3ofsi7e0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/15/linux/019-keepalived-learn/" data-id="cjzjeukmv00jdsjchb0j2k3d8" class="article-share-link">
           Share
         </a>
         
@@ -930,7 +1310,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/04/scala/004-scala-style/" data-id="cjzi97pcw00if3hchpnqjik3h" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/04/scala/004-scala-style/" data-id="cjzjeuknn00lpsjchtzqcjgpp" class="article-share-link">
           Share
         </a>
         
@@ -1044,7 +1424,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/02/03/spark/005-big-data-tutorial/" data-id="cjzi97pd600j73hchgw4dxrh0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/02/03/spark/005-big-data-tutorial/" data-id="cjzjeuko000mtsjchx4evyt71" class="article-share-link">
           Share
         </a>
         
@@ -1122,7 +1502,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/29/life/004-new-year/" data-id="cjzi97pba00d63hchr9l9rruz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/29/life/004-new-year/" data-id="cjzjeuklv00g9sjch3tbe097d" class="article-share-link">
           Share
         </a>
         
@@ -1203,7 +1583,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/28/java/024-java-fix-problem/" data-id="cjzi97pa9009h3hchj5fxu7xp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/28/java/024-java-fix-problem/" data-id="cjzjeukhr006vsjch5er2otyc" class="article-share-link">
           Share
         </a>
         
@@ -1281,7 +1661,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/27/linux/018-ubuntu-java/" data-id="cjzi97pc700g13hch7n8tat0u" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/27/linux/018-ubuntu-java/" data-id="cjzjeukmu00jbsjchsuvati1s" class="article-share-link">
           Share
         </a>
         
@@ -1360,7 +1740,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/18/java/023-springboot-logback-config/" data-id="cjzi97paa009m3hchf5cfkv7z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/18/java/023-springboot-logback-config/" data-id="cjzjeukhs0070sjchqf2d9eil" class="article-share-link">
           Share
         </a>
         
@@ -1471,7 +1851,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/16/ansible/005-ansible-demo1/" data-id="cjzi97p44000l3hchzdfzcmpy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/16/ansible/005-ansible-demo1/" data-id="cjzjeukff000nsjchyvijezf1" class="article-share-link">
           Share
         </a>
         
@@ -1580,7 +1960,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/12/ansible/004-ansible-playbook-variables/" data-id="cjzi97p4m00103hch3t3ni03o" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/12/ansible/004-ansible-playbook-variables/" data-id="cjzjeukfr000xsjchkp3fdycr" class="article-share-link">
           Share
         </a>
         
@@ -1731,424 +2111,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/10/ansible/003-ansible-roles/" data-id="cjzi97p47000n3hcht7t6rabb" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-hadoop/004-frequently-hbase-shell-cmd" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" class="article-date">
-  <time datetime="2019-01-09T00:54:38.000Z" itemprop="datePublished">2019-01-09</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/">常用的hbase shell命令</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文记录一下经常在排查hbase问题时用到的 shell命令。</p>
-<h1 id="list-查看有哪些表"><a href="#list-查看有哪些表" class="headerlink" title="list 查看有哪些表"></a>list 查看有哪些表</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> list</span><br></pre></td></tr></table></figure>
-<h1 id="查询起始行"><a href="#查询起始行" class="headerlink" title="查询起始行"></a>查询起始行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> scan 'table' , &#123; STARTROW=&gt;'', ENDROW=&gt;'', LIMIT=&gt;5 &#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文记录一下经常在排查hbase问题时用到的 shell命令。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" data-id="cjzi97p9m00773hchqxqxyth6" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-ansible/002-reusable-playbook" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/04/ansible/002-reusable-playbook/" class="article-date">
-  <time datetime="2019-01-04T09:54:32.000Z" itemprop="datePublished">2019-01-04</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/04/ansible/002-reusable-playbook/">创建可重用playbook</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>消除重复代码一直是程序员的目标，playbook也不例外。</p>
-<p>当一个playbook内容变得很大时，你就会想拆分了。</p>
-<p>拆分后，肯定要引入主剧本，这就有2种方式：<code>include/import</code>.</p>
-<h1 id="静态和动态引入"><a href="#静态和动态引入" class="headerlink" title="静态和动态引入"></a>静态和动态引入</h1><ol>
-<li>静态：使用<code>import</code>引入的；</li>
-<li>动态：使用<code>include</code>引入的。</li>
-</ol>
-<p>区别：</p>
-<ol>
-<li>静态引入的文件会在解析时被预处理，类似编译过程；</li>
-<li>动态引入的会在运行时才被处理</li>
-</ol>
-<p>当遇到如<code>tags</code>,<code>when</code>等选项：</p>
-<ol>
-<li>静态引入会将他们copy到所有子任务</li>
-<li>而动态只会应用到当前任务</li>
-</ol>
-<h1 id="使用权衡"><a href="#使用权衡" class="headerlink" title="使用权衡"></a>使用权衡</h1><p>使用<code>include * vs. import *</code>有一些优点，用户在选择时应考虑一些权衡：</p>
-<p>使用<code>include *</code>语句的主要优点是循环。当循环与include一起使用时，包含的任务或角色将对循环中的每个项执行一次。</p>
-<p>与<code>import *</code>语句相比，使用<code>include *</code>确实有一些限制：</p>
-<ol>
-<li>仅存在于动态包含内的标记不会显示在–list-tags输出中。</li>
-<li>仅存在于动态包含内的任务不会显示在–list-tasks输出中。</li>
-<li>不能使用<code>notify</code>来触发来自动态包含内的处理程序名称（请参阅下面的注释）。</li>
-<li>不能使用<code>--start-at-task</code>在动态包含内的任务中开启执行。</li>
-</ol>
-<p>与动态包含相比，使用<code>import *</code>也有一些限制：</p>
-<ol>
-<li>如上所述，循环根本不能与<code>import</code>一起使用。</li>
-<li>将变量用于目标文件或角色名称时，不能使用inventory中的变量（host/group变量等）。</li>
-</ol>
-<h1 id="import-playbook使用"><a href="#import-playbook使用" class="headerlink" title="import_playbook使用"></a>import_playbook使用</h1><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- import_playbook:</span> <span class="string">webservers.yml</span></span><br><span class="line"><span class="attr">- import_playbook:</span> <span class="string">databases.yml</span></span><br></pre></td></tr></table></figure>
-<h1 id="include-import-tasks使用"><a href="#include-import-tasks使用" class="headerlink" title="include/import_tasks使用"></a>include/import_tasks使用</h1><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># common_tasks.yml</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">placeholder</span> <span class="string">foo</span></span><br><span class="line"><span class="attr">  command:</span> <span class="string">/bin/foo</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">placeholder</span> <span class="string">bar</span></span><br><span class="line"><span class="attr">  command:</span> <span class="string">/bin/bar</span></span><br></pre></td></tr></table></figure>
-<p>然后引入：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">common_tasks.yml</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">- include_tasks:</span> <span class="string">common_tasks.yml</span></span><br></pre></td></tr></table></figure></p>
-<p>同时可以传递变量：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">jimo</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">jack</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">lily</span></span><br></pre></td></tr></table></figure></p>
-<p>用到handler中，我们先定义一个handler.yml:</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># more_handlers.yml</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">  service:</span> <span class="string">name=apache</span> <span class="string">state=restarted</span></span><br></pre></td></tr></table></figure>
-<p>引入例子：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">- include_tasks:</span> <span class="string">more_handlers.yml</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">more_handlers.yml</span></span><br></pre></td></tr></table></figure></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
-<li><a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse.html</a></li>
-<li><a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_includes.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_includes.html</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>消除重复代码一直是程序员的目标，playbook也不例外。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/01/04/ansible/002-reusable-playbook/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/01/04/ansible/002-reusable-playbook/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/04/ansible/002-reusable-playbook/" data-id="cjzi97p3y000g3hchsa61hf7a" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-ansible/001-playbook" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/03/ansible/001-playbook/" class="article-date">
-  <time datetime="2019-01-03T04:34:58.000Z" itemprop="datePublished">2019-01-03</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/03/ansible/001-playbook/">ansible-playbook</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>在入门了之后就开始进阶把。</p>
-<p>本文来自<a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html" target="_blank" rel="noopener">playbooks简介</a></p>
-<p>先理解3个东西：</p>
-<ol>
-<li>playbook（剧本）</li>
-<li>tasks（任务）</li>
-<li>handler（处理）</li>
-</ol>
-<p>理解他们都是什么，关系是什么，怎么用。</p>
-<h1 id="playbook"><a href="#playbook" class="headerlink" title="playbook"></a>playbook</h1><p>只有一个剧本：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    http_port:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">    max_clients:</span> <span class="number">200</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">write</span> <span class="string">the</span> <span class="string">apache</span> <span class="string">config</span> <span class="string">file</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">/srv/httpd.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd.conf</span></span><br><span class="line"><span class="attr">    notify:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">running</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br><span class="line"><span class="attr">  handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure></p>
-<p>有多个剧本：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">write</span> <span class="string">the</span> <span class="string">apache</span> <span class="string">config</span> <span class="string">file</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">/srv/httpd.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd.conf</span></span><br><span class="line"></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">databases</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">postgresql</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">postgresql</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">that</span> <span class="string">postgresql</span> <span class="string">is</span> <span class="string">started</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">postgresql</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br></pre></td></tr></table></figure></p>
-<p>一眼就能看懂对把，还是学下基础知识。</p>
-<h1 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h1><h2 id="Host和User"><a href="#Host和User" class="headerlink" title="Host和User"></a>Host和User</h2><p>hosts: 遵循pattern模式<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br></pre></td></tr></table></figure></p>
-<p>remote_user可以为每个任务独有：</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">test</span> <span class="string">connection</span></span><br><span class="line"><span class="attr">      ping:</span></span><br><span class="line"><span class="attr">      remote_user:</span> <span class="string">yourname</span></span><br></pre></td></tr></table></figure>
-<p>激活权限提升</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br></pre></td></tr></table></figure>
-<p>或者单独指定：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">started</span></span><br><span class="line"><span class="attr">      become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">      become_method:</span> <span class="string">sudo</span></span><br></pre></td></tr></table></figure></p>
-<p>切换用户：</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  become_user:</span> <span class="string">postgres</span></span><br></pre></td></tr></table></figure>
-<p>提升：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  become_method:</span> <span class="string">su</span></span><br></pre></td></tr></table></figure></p>
-<p>如果需要指定密码，使用<code>--ask-become-pass</code>.</p>
-<p>对主机排序，改变运行顺序：</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  order:</span> <span class="string">sorted</span></span><br><span class="line"><span class="attr">  gather_facts:</span> <span class="literal">False</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - debug:</span></span><br><span class="line"><span class="attr">        var:</span> <span class="string">inventory_hostname</span></span><br></pre></td></tr></table></figure>
-<h2 id="Task列表"><a href="#Task列表" class="headerlink" title="Task列表"></a>Task列表</h2><ol>
-<li>顺序执行</li>
-<li>冥等性： 执行一次和多次结果一样</li>
-<li>name属性：可读性输出</li>
-</ol>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">make</span> <span class="string">sure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">running</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br></pre></td></tr></table></figure>
-<p>直接写命令，参数这些很自由：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">enable</span> <span class="string">selinux</span></span><br><span class="line"><span class="attr">    command:</span> <span class="string">/sbin/setenforce</span> <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
-<p>shell和command关心返回值，也就是短路运算：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">and</span> <span class="string">ignore</span> <span class="string">the</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">/usr/bin/somecommand</span> <span class="string">||</span> <span class="string">/bin/true</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">and</span> <span class="string">ignore</span> <span class="string">the</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">/usr/bin/somecommand</span></span><br><span class="line"><span class="attr">    ignore_errors:</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure></p>
-<p>太长的命令可以缩进换行：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">Copy</span> <span class="string">ansible</span> <span class="string">inventory</span> <span class="string">file</span> <span class="string">to</span> <span class="string">client</span></span><br><span class="line"><span class="attr">    copy:</span> <span class="string">src=/etc/ansible/hosts</span> <span class="string">dest=/etc/ansible/hosts</span></span><br><span class="line">            <span class="string">owner=root</span> <span class="string">group=root</span> <span class="string">mode=0644</span></span><br></pre></td></tr></table></figure></p>
-<p>使用变量：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">create</span> <span class="string">a</span> <span class="string">virtual</span> <span class="string">host</span> <span class="string">file</span> <span class="string">for</span> <span class="string">&#123;&#123;</span> <span class="string">vhost</span> <span class="string">&#125;&#125;</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">somefile.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd/conf.d/&#123;&#123;</span> <span class="string">vhost</span> <span class="string">&#125;&#125;</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="Hnadler"><a href="#Hnadler" class="headerlink" title="Hnadler"></a>Hnadler</h2><p>状态改变时执行的操作。</p>
-<p>例如：文件内容改变时，重启2个服务<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- name:</span> <span class="string">template</span> <span class="string">configuration</span> <span class="string">file</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    src:</span> <span class="string">template.j2</span></span><br><span class="line"><span class="attr">    dest:</span> <span class="string">/etc/foo.conf</span></span><br><span class="line"><span class="attr">  notify:</span></span><br><span class="line"><span class="bullet">     -</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="bullet">     -</span> <span class="string">restart</span> <span class="string">apache</span></span><br></pre></td></tr></table></figure></p>
-<p>相应的2个handler定义如下：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure></p>
-<p>在2.2版本后，可以使用listen，这样只需要notify一次： 通过监听主题<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br><span class="line"><span class="attr">      listen:</span> <span class="string">"restart web services"</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">        state:</span><span class="string">restarted</span></span><br><span class="line"><span class="attr">      listen:</span> <span class="string">"restart web services"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">everything</span></span><br><span class="line"><span class="attr">      command:</span> <span class="string">echo</span> <span class="string">"this task will restart the web services"</span></span><br><span class="line"><span class="attr">      notify:</span> <span class="string">"restart web services"</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="执行playbook"><a href="#执行playbook" class="headerlink" title="执行playbook"></a>执行playbook</h2><p>并行度10，fork 10：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible-playbook playbook.yml -f 10</span><br></pre></td></tr></table></figure></p>
-<p>再看一个复合例子：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">$</span> <span class="string">cat</span> <span class="string">playbook.yml</span> </span><br><span class="line"><span class="attr">- name:</span> <span class="string">top</span> <span class="string">playbook</span></span><br><span class="line"><span class="attr">  hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ping</span> <span class="string">ping</span></span><br><span class="line"><span class="attr">    ping:</span> </span><br><span class="line"><span class="attr">  - include:</span> <span class="string">tasks/echo1.yml</span> <span class="string">the_user=root</span></span><br><span class="line"><span class="attr">  - include:</span> <span class="string">tasks/echo2.yml</span></span><br><span class="line"><span class="attr">  handlers:</span></span><br><span class="line"><span class="attr">      - include:</span> <span class="string">handlers/handlers.yml</span></span><br></pre></td></tr></table></figure></p>
-<p>输出结果的方式</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>在入门了之后就开始进阶把。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/01/03/ansible/001-playbook/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/01/03/ansible/001-playbook/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/03/ansible/001-playbook/" data-id="cjzi97p41000i3hchotr0p4pv" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-ansible/000-ansible-fresh" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/02/ansible/000-ansible-fresh/" class="article-date">
-  <time datetime="2019-01-02T08:38:38.000Z" itemprop="datePublished">2019-01-02</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/02/ansible/000-ansible-fresh/">ansible1-入门金殿</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>入门总是简单的，看看你有多快。</p>
-<p>关于ssh连接请查找相关知识。</p>
-<h1 id="一条命令格式"><a href="#一条命令格式" class="headerlink" title="一条命令格式"></a>一条命令格式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ansible PATTERNS -m MODULE -a PARAMS</span><br></pre></td></tr></table></figure>
-<p>只需要明白模式、模块、参数就可以实现命令行级别的使用了。</p>
-<h2 id="PATTERNS"><a href="#PATTERNS" class="headerlink" title="PATTERNS"></a>PATTERNS</h2><p><a href="https://docs.ansible.com/ansible/latest/user_guide/intro_patterns.html" target="_blank" rel="noopener">patterns</a></p>
-<p>可以分为3个部分：</p>
-<ol>
-<li>all/*， webservers[0-25]</li>
-<li>逻辑运算： &amp;/！</li>
-<li>正则表达式：~正则， <code>~(web|db).*\.example\.com</code></li>
-</ol>
-<h2 id="MODULE"><a href="#MODULE" class="headerlink" title="MODULE"></a>MODULE</h2><p>模块太多了，可以了解一下简单的：<br><a href="https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html" target="_blank" rel="noopener">ad-hoc</a></p>
-<p>大概有：</p>
-<ol>
-<li>ping</li>
-<li>shell</li>
-<li>copy</li>
-<li>file</li>
-<li>yum/apt/…</li>
-<li>user</li>
-<li>git</li>
-<li>service</li>
-<li>setup</li>
-</ol>
-<p>参数和模块对应。</p>
-<h1 id="连接方式"><a href="#连接方式" class="headerlink" title="连接方式"></a>连接方式</h1><p>当然是ssh，只是连接方式有区别。</p>
-<h2 id="SSH的key"><a href="#SSH的key" class="headerlink" title="SSH的key"></a>SSH的key</h2><p>不用说了。</p>
-<h2 id="密码登陆"><a href="#密码登陆" class="headerlink" title="密码登陆"></a>密码登陆</h2><p>加上<code>-k</code>选项。</p>
-<h1 id="Ansible配置文件"><a href="#Ansible配置文件" class="headerlink" title="Ansible配置文件"></a>Ansible配置文件</h1><ol>
-<li>配置文件优先顺序</li>
-<li>有哪些配置属性</li>
-</ol>
-<p><a href="https://ansible-tran.readthedocs.io/en/latest/docs/intro_configuration.html" target="_blank" rel="noopener">ansible config</a></p>
-<h1 id="hosts"><a href="#hosts" class="headerlink" title="hosts"></a>hosts</h1><p>对哪些机器执行，ansible里叫inventory（清单文件），这个hosts文件默认在<code>/etc/ansible/hosts</code>,不过我们可以在任何目录配置它。</p>
-<ol>
-<li>在工作目录新建ansible.cfg.</li>
-<li>加入配置： <code>inventory = hosts</code>, 注意，必须是在<code>[defaults]</code>模块下才行</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = hosts</span><br></pre></td></tr></table></figure>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>入门总是简单的，看看你有多快。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/01/02/ansible/000-ansible-fresh/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/01/02/ansible/000-ansible-fresh/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/02/ansible/000-ansible-fresh/" data-id="cjzi97p3w000d3hchd8q4fne3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/10/ansible/003-ansible-roles/" data-id="cjzjeukfl000rsjchz6jxf3ku" class="article-share-link">
           Share
         </a>
         
@@ -2190,7 +2153,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 12.5px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2212,23 +2175,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/">Tomcat9-文档3-部署</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/006-tomcat9-doc-1-introduction/">Tomcat9-文档1-介绍</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/12/linux/029-syslog/">认识syslog</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
           </li>
         
       </ul>

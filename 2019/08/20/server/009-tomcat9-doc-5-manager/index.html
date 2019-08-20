@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111673440-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>Tomcat9-文档4-管理 | 在我的世界</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文翻译自：https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html prev: Tomcat9-文档3-部署 介绍在许多生产环境中，部署新Web应用程序或取消部署现有Web应用程序的功能非常有用，而无需关闭并重新启动整个容器。此外，即使您尚未在Tomcat服务器配置文件中声明可重新加载，也可以请求现有应用程序重新加载。 为了支持这些功">
+<meta name="keywords" content="tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat9-文档4-管理">
+<meta property="og:url" content="http://http://jimolonely.github.io/2019/08/20/server/009-tomcat9-doc-5-manager/index.html">
+<meta property="og:site_name" content="在我的世界">
+<meta property="og:description" content="本文翻译自：https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html prev: Tomcat9-文档3-部署 介绍在许多生产环境中，部署新Web应用程序或取消部署现有Web应用程序的功能非常有用，而无需关闭并重新启动整个容器。此外，即使您尚未在Tomcat服务器配置文件中声明可重新加载，也可以请求现有应用程序重新加载。 为了支持这些功">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-20T08:46:51.403Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat9-文档4-管理">
+<meta name="twitter:description" content="本文翻译自：https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html prev: Tomcat9-文档3-部署 介绍在许多生产环境中，部署新Web应用程序或取消部署现有Web应用程序的功能非常有用，而无需关闭并重新启动整个容器。此外，即使您尚未在Tomcat服务器配置文件中声明可重新加载，也可以请求现有应用程序重新加载。 为了支持这些功">
+  
+    <link rel="alternate" href="/atom.xml" title="在我的世界" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/prism-atom-dark.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"><script src="/js/prism.js"></script>
+<script src="/js/prism-line-numbers.min.js"></script></head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">在我的世界</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">无敌是多么寂寞，此生有你足矣</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">home</a>
+        
+          <a class="main-nav-link" href="/archives">archives</a>
+        
+          <a class="main-nav-link" href="/about">about</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://http://jimolonely.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-server/009-tomcat9-doc-5-manager" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/" class="article-date">
+  <time datetime="2019-08-20T05:38:08.000Z" itemprop="datePublished">2019-08-20</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 class="article-title" itemprop="name">
+      Tomcat9-文档4-管理
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文翻译自：<a href="https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html</a></p>
+<a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/" title="prev: Tomcat9-文档3-部署">prev: Tomcat9-文档3-部署</a>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>在许多生产环境中，部署新Web应用程序或取消部署现有Web应用程序的功能非常有用，而无需关闭并重新启动整个容器。此外，即使您尚未在Tomcat服务器配置文件中声明可重新加载，也可以请求现有应用程序重新加载。</p>
+<p>为了支持这些功能，Tomcat包括一个Web应用程序（默认安装在上下文路径/<code>manager</code>上），它支持以下功能：</p>
+<ul>
+<li>从WAR文件的上载内容部署新的Web应用程序。</li>
+<li>从服务器文件系统在指定的上下文路径上部署新的Web应用程序。</li>
+<li>列出当前部署的Web应用程序，以及当前为这些Web应用程序处于活动状态的会话。</li>
+<li>重新加载现有Web应用程序，以反映<code>/WEB-INF/classes or /WEB-INF/lib</code>内容的更改。</li>
+<li>列出OS和JVM属性值。</li>
+<li>列出可用的全局JNDI资源，以便在准备嵌套在<code>&lt;Context&gt;</code>部署描述中的<code>&lt;ResourceLink&gt;</code>元素的部署工具中使用。</li>
+<li>启动已停止的应用程序（从而使其再次可用）。</li>
+<li>停止现有应用程序（以使其变得不可用），但不要取消部署它。</li>
+<li>取消部署已部署的Web应用程序并删除其文档基目录（除非它是从文件系统部署的）。</li>
+</ul>
+<p>默认的Tomcat安装包括Manager。要将Manager Web应用程序Context的实例添加到新主机，请在<code>$CATALINA_BASE/conf/[enginename]/[hostname]</code>文件夹中安装<code>manager.xml</code>上下文配置文件。这是一个例子：(PS: 这里的enginename一般是指Catalina)</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span> <span class="attr">antiResourceLocking</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">docBase</span>=<span class="string">"$&#123;catalina.home&#125;/webapps/manager"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果您将Tomcat配置为支持多个虚拟主机（网站），则需要为每个虚拟主机配置一个Manager。</p>
+<p>有三种方法可以使用Manager Web应用程序。</p>
+<ul>
+<li>作为具有用户界面的应用程序，您可以在浏览器中使用。 下面是一个示例URL，您可以在其中将<code>localhost</code>替换为您的网站主机名：<code>http://localhost:8080/manager/html</code>。</li>
+<li>仅使用HTTP请求的最小版本，适用于系统管理员设置的脚本。 命令作为请求URI的一部分给出，响应采用简单文本的形式，可以很容易地进行解析和处理。 有关更多信息，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html#Supported_Manager_Commands" target="_blank" rel="noopener">支持的管理器命令</a></li>
+<li>Ant（1.4版或更高版本）构建工具的一组方便的任务定义。 有关更多信息，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html#Executing_Manager_Commands_With_Ant" target="_blank" rel="noopener">使用Ant执行Manager命令</a>。</li>
+</ul>
+<h1 id="配置Manager应用的访问权限"><a href="#配置Manager应用的访问权限" class="headerlink" title="配置Manager应用的访问权限"></a>配置Manager应用的访问权限</h1><p>下面的描述使用变量名<code>$CATALINA_BASE</code>来引用解析大多数相对路径的基目录。如果尚未通过设置<code>CATALINA_BASE</code>目录为多个实例配置Tomcat，则<code>$CATALINA_BASE</code>将设置为<code>$CATALINA_HOME</code>的值，即已安装Tomcat的目录。</p>
+<p>使用默认设置使用Tomcat是非常不安全的，这些设置允许Internet上的任何人在您的服务器上执行Manager应用程序。因此，Manager应用程序出厂时要求尝试使用它的任何人必须使用具有与之关联的<code>manager-xxx</code>角色之一的用户名和密码进行身份验证（角色名称取决于所需的功能）。此外，分配给这些角色的默认用户文件（<code>$CATALINA_BASE/conf/tomcat-users.xml</code>）中没有用户名。<strong>因此，默认情况下完全禁用对Manager应用程序的访问</strong>。</p>
+<p>您可以在Manager Web应用程序的<code>web.xml</code>文件中找到角色名称。可用的角色是：</p>
+<ul>
+<li>manager-gui  - 访问HTML界面。</li>
+<li>manager-status  - 仅访问“服务器状态”页面。</li>
+<li>manager-script  - 访问本文档中描述的工具友好的纯文本界面，以及“服务器状态”页面。</li>
+<li>manager-jmx  - 访问JMX代理接口和“服务器状态”页面。</li>
+</ul>
+<p>HTML接口受到CSRF（跨站点请求伪造）攻击的保护，但文本和JMX接口无法受到保护。这意味着在使用Web浏览器访问Manager应用程序时，允许访问文本和JMX界面的用户必须小心谨慎。为了保持CSRF保护：</p>
+<ul>
+<li>如果使用Web浏览器使用具有<code>manager-script</code>或<code>manager-jmx</code>角色的用户访问Manager应用程序（例如，用于测试纯文本或JMX接口），则必须先关闭浏览器的所有窗口以终止会话。如果您不关闭浏览器并访问其他站点，您可能会成为CSRF攻击的受害者。</li>
+<li>建议永远不要将<code>manager-script</code>或<code>manager-jmx</code>角色授予具有<code>manager-gui</code>角色的用户。</li>
+</ul>
+<p><strong>请注意，JMX代理接口实际上是Tomcat的像超级权限的低级管理接口。如果他知道要调用什么命令，那么可以做很多事情。启用<code>manager-jmx</code>角色时应该谨慎</strong>。</p>
+<p>要启用对Manager Web应用程序的访问，您必须创建新的用户名/密码组合并将其中一个<code>manager-xxx</code>角色与其关联，或者将manager-xxx角色添加到某些现有用户名/密码组合中。由于本文档的大部分内容都描述了使用文本界面，因此本示例将使用角色<code>manager-script</code>。具体如何配置用户名/密码取决于您使用的<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/realm.html" target="_blank" rel="noopener">Realm实现</a>：</p>
+<ul>
+<li><code>UserDatabaseRealm</code>加上<code>MemoryUserDatabase</code>或<code>MemoryRealm</code>  -  UserDatabaseRealm和MemoryUserDatabase在默认的<code>$CATALINA_BASE/conf/server.xml</code>中配置.MemoryUserDatabase和MemoryRealm都默认读取存储在<code>$CATALINA_BASE/conf/tomcat-users.xml</code>的XML格式文件，可以使用任何文本编辑器进行编辑。此文件包含每个用户的XML <code>&lt;user&gt;</code>标签，可能如下所示：<ul>
+<li><code>&lt;user username =“craigmcc”password =“secret”roles =“standard，manager-script”/&gt;</code></li>
+<li>它定义了此人登录时使用的用户名和密码，以及与其关联的角色名称。您可以将<code>manager-script</code>角色添加到一个或多个现有用户的逗号分隔角色属性，和/或 使用该分配的角色创建新用户。</li>
+</ul>
+</li>
+<li>DataSourceRealm或JDBCRealm  - 您的用户和角色信息存储在通过JDBC访问的数据库中。根据环境的标准过程，将<code>manager-script</code>角色添加到一个或多个现有用户，和/或 创建一个或多个已分配此角色的新用户。</li>
+<li>JNDIRealm  - 您的用户和角色信息存储在通过LDAP访问的目录服务器中。根据环境的标准过程，将<code>manager-script</code>角色添加到一个或多个现有用户，和/或创建一个或多个已分配此角色的新用户。</li>
+</ul>
+<p>第一次尝试发出下一节中描述的Manager命令之一时，您将面临使用BASIC身份验证登录的挑战。您输入的用户名和密码无关紧要，只要它们在用户数据库中标识拥有角色管理器脚本的有效用户即可。</p>
+<p>除了密码限制之外，通过添加<code>RemoteAddrValve</code>或<code>RemoteHostValve</code>，远程IP地址或主机可以限制对Manager Web应用程序的访问。有关详情，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/valve.html#Remote_Address_Filter" target="_blank" rel="noopener">阀门文档</a>以下是通过IP地址限制对localhost的访问的示例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="用户友好的HTMML界面"><a href="#用户友好的HTMML界面" class="headerlink" title="用户友好的HTMML界面"></a>用户友好的HTMML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://&#123;host&#125;:&#123;port&#125;/manager/html</span><br></pre></td></tr></table></figure>
+<p>如上所述，您需要<code>manager-gui</code>角色才能访问它。 有一个单独的文档，提供有关此接口的帮助。 看：</p>
+<ul>
+<li><a href="https://tomcat.apache.org/tomcat-9.0-doc/html-manager-howto.html" target="_blank" rel="noopener">HTML Manager文档</a></li>
+</ul>
+<p>HTML接口受到CSRF（跨站点请求伪造）攻击的保护。 每次访问HTML页面都会生成一个随机令牌，该令牌存储在您的会话中，并包含在页面上的所有链接中。 如果您的下一个操作没有正确的令牌值，则该操作将被拒绝。 如果令牌已过期，您可以从Manager的主页面或列表应用程序页面重新开始。</p>
+<h2 id="实践环节"><a href="#实践环节" class="headerlink" title="实践环节"></a>实践环节</h2><p>这一节是我自己加的，边读文档边实践。</p>
+<ol>
+<li><p>在<code>apache-tomcat-9.0.24/conf/Catalina/localhost/</code>下建立<code>manager.xml</code>文件：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在<code>tomcat-users.xml</code>里增加角色：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-gui"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"jimo"</span> <span class="attr">password</span>=<span class="string">"jimo"</span> <span class="attr">roles</span>=<span class="string">"manager-gui,manager-status"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"jimo-script"</span> <span class="attr">password</span>=<span class="string">"jimo"</span> <span class="attr">roles</span>=<span class="string">"manager-script"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在chrome浏览器访问： <code>localhost:8080/manager/html</code></p>
+<ul>
+<li>结果找不到网页</li>
+</ul>
+</li>
+<li><p>在firefox中访问：会弹出basic验证的用户名密码输入框，可以正常访问</p>
+</li>
+<li><p>通过命令行访问： <code>curl -u jimo:jimo localhost:8080/manager/html</code></p>
+</li>
+</ol>
+<p>实践结果：谷歌浏览器不知啥时候禁用了BASIC验证，开发者还是使用firefox把。</p>
+<h1 id="支持的Manager命令"><a href="#支持的Manager命令" class="headerlink" title="支持的Manager命令"></a>支持的Manager命令</h1><p>Manager应用程序知道如何处理的所有命令都在单个请求URI中指定，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://&#123;host&#125;:&#123;port&#125;/manager/text/&#123;command&#125;?&#123;parameters&#125;</span><br></pre></td></tr></table></figure>
+<p>其中<code>{host}</code>和<code>{port}</code>表示运行Tomcat的主机名和端口号，<code>{command}</code>表示您希望执行的Manager命令，<code>{parameters}</code>表示特定于该命令的查询参数。在下面的插图中，根据您的安装自定义主机和端口。</p>
+<p>这些命令通常由HTTP GET请求执行。 <code>/deploy</code>命令具有由<code>HTTP PUT</code>请求执行的表单。</p>
+<h2 id="常用参数"><a href="#常用参数" class="headerlink" title="常用参数"></a>常用参数</h2><p>大多数命令接受以下一个或多个查询参数：</p>
+<ul>
+<li>path - 您正在处理的Web应用程序的上下文路径（包括前导斜杠）。要选择ROOT Web应用程序，请指定<code>“/”</code>。<ul>
+<li>注意：无法在Manager应用程序本身上执行管理命令。</li>
+<li>注意：如果未明确指定path参数，则将使用config参数中的标准上下文命名规则或如果config参数不存在而使用war参数来派生路径和版本。</li>
+</ul>
+</li>
+<li>version - <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/context.html" target="_blank" rel="noopener">并行部署</a>功能使用的此Web应用程序的版本。如果在需要路径的任何地方使用并行部署，则必须指定除路径之外的版本，并且路径和版本的组合必须是唯一的，而不仅仅是路径。<ul>
+<li>注意：如果未明确指定路径，则忽略version参数。</li>
+</ul>
+</li>
+<li>war - Web应用程序归档（WAR）文件的URL，或包含Web应用程序的目录的路径名，或Context的配置文件<code>&quot;.xml&quot;</code>。您可以使用以下任何格式的网址：<ul>
+<li><code>file:/absolute/path/to/a/directory</code> - 包含Web应用程序的解压缩版本的目录的绝对路径。此目录将附加到您指定的上下文路径，而不进行任何更改。</li>
+<li><code>file:/absolute/path/to/a/webapp.war</code> -  Web应用程序归档（WAR）文件的绝对路径。这仅对<code>/deploy</code>命令有效，并且是该命令唯一可接受的格式。</li>
+<li><code>file/absolute/path/to/a/context.xml</code>  -  Web应用程序的绝对路径上下文配置“.xml”文件，其中包含Context配置元素。</li>
+<li><code>directory</code>  - 主机应用程序基目录中Web应用程序上下文的目录名称。</li>
+<li><code>webapp.war</code>  - 位于主机应用程序基目录中的Web应用程序war文件的名称。</li>
+</ul>
+</li>
+</ul>
+<p>每个命令将以<code>text/plain</code>格式返回响应（即没有HTML标记的纯ASCII），使人和程序都能轻松阅读）。响应的第一行将以OK或FAIL开头，指示请求的命令是否成功。如果失败，第一行的其余部分将包含遇到的问题的描述。一些命令包括如下所述的附加信息行。</p>
+<p>国际化注 -  Manager应用程序在资源包中查找其消息字符串，因此可能已为您的平台翻译了字符串。以下示例显示了消息的英文版本。</p>
+<h2 id="远程部署应用程序存档（WAR）"><a href="#远程部署应用程序存档（WAR）" class="headerlink" title="远程部署应用程序存档（WAR）"></a>远程部署应用程序存档（WAR）</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?path=/foo</span><br></pre></td></tr></table></figure>
+<p>在HTTP PUT请求中指定为Web应用程序归档（WAR）文件为请求体，将其安装到相应虚拟主机的<code>appBase</code>目录中，然后启动，从中导出添加到appBase的WAR文件的名称。稍后可以使用<code>/undeploy</code>命令取消部署应用程序（并删除相应的WAR文件）。</p>
+<p>该命令由HTTP PUT请求执行。</p>
+<p><code>.WAR</code>文件可以包括Tomcat特定的部署配置，在<code>/META-INF/context.xml</code>中包含Context配置XML文件。</p>
+<p>URL参数包括：</p>
+<ul>
+<li><code>update</code>：设置为true时，将首先取消部署任何现有更新。默认值设置为false。</li>
+<li><code>tag</code>：指定标记名称，这允许将已部署的webapp与标记或标签相关联。如果取消部署Web应用程序，则可以在需要时仅使用标记重新部署它。</li>
+<li><code>config</code>：格式文件中的Context配置“.xml”文件的URL：<code>/absolute/path/to/a/context.xml</code>。这必须是Web应用程序上下文配置“.xml”文件的<code>绝对路径</code>，该文件包含Context配置元素。</li>
+</ul>
+<p>注 - 该命令与<code>/undeploy</code>命令逻辑相反。</p>
+<p>如果安装和启动成功，您将收到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Deployed application at context path /foo</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以<code>FAIL</code>开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li>应用程序已经存在于<code>path/foo</code>中<ul>
+<li>所有当前运行的Web应用程序的上下文路径必须是唯一的。因此，必须使用此上下文路径取消部署现有Web应用程序，或为新应用程序选择其他上下文路径。可以将update参数指定为URL上的参数，值为true以避免此错误。在这种情况下，将在执行部署之前对现有应用程序执行取消部署。</li>
+</ul>
+</li>
+<li>遇到异常<ul>
+<li>尝试启动新的Web应用程序时遇到异常。检查Tomcat日志以获取详细信息，但可能的解释包括解析<code>/WEB-INF/web.xml</code>文件时出现问题，或者在初始化应用程序事件侦听器和过滤器时遇到缺少的类。</li>
+</ul>
+</li>
+</ul>
+<h2 id="从本地路径部署新应用程序"><a href="#从本地路径部署新应用程序" class="headerlink" title="从本地路径部署新应用程序"></a>从本地路径部署新应用程序</h2><p>部署并启动一个新的Web应用程序，该应用程序附加到指定的上下文路径（任何其他Web应用程序都不能使用它）。此命令与<code>/undeploy</code>命令逻辑相反。</p>
+<p>此命令由HTTP GET请求执行。可以使用许多不同的方法来使用deploy命令。</p>
+<h3 id="部署以前部署的Web应用程序"><a href="#部署以前部署的Web应用程序" class="headerlink" title="部署以前部署的Web应用程序"></a>部署以前部署的Web应用程序</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?path=/footoo&amp;tag=footag</span><br></pre></td></tr></table></figure>
+<p>这可用于部署先前部署的Web应用程序，该应用程序已使用tag属性进行部署。请注意，Manager webapp的工作目录将包含以前部署的WAR;删除它会使部署失败。</p>
+<h3 id="按URL部署-目录或WAR"><a href="#按URL部署-目录或WAR" class="headerlink" title="按URL部署 目录或WAR"></a>按URL部署 目录或WAR</h3><p>部署位于Tomcat服务器上的Web应用程序目录或<code>&quot;.war&quot;</code>文件。如果未指定路径，则路径和版本将从目录名称或war文件名称派生。 <code>war</code>参数指定目录或Web应用程序归档（WAR）文件的URL（包括<code>file:</code>scheme）。引用WAR文件的URL支持的语法在<code>java.net.JarURLConnection</code>类的Javadocs页面上描述。仅使用引用整个WAR文件的URL。</p>
+<p>在此示例中，位于Tomcat服务器上的目录<code>/path/to/foo</code>中的Web应用程序被部署为名为<code>/footoo</code>的Web应用程序上下文。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?path=/footoo&amp;war=file:/path/to/foo</span><br></pre></td></tr></table></figure>
+<p>在此示例中，Tomcat服务器上的“.war”文件<code>/path/to/bar.war</code>被部署为名为<code>/bar</code>的Web应用程序上下文。请注意，如果没有路径参数，那么上下文路径默认为没有“.war”扩展名的Web应用程序归档文件的名称（如下为：<code>bar</code>）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?war=file:/path/to/bar.war</span><br></pre></td></tr></table></figure>
+<h3 id="从主机appBase部署-目录或war包"><a href="#从主机appBase部署-目录或war包" class="headerlink" title="从主机appBase部署 目录或war包"></a>从主机appBase部署 目录或war包</h3><p>部署位于Host appBase目录中的Web应用程序目录或“.war”文件。路径和可选版本派生自目录或war文件名。</p>
+<p>在此示例中，位于Tomcat服务器的Host appBase目录中名为<code>foo</code>的子目录中的Web应用程序被部署为名为<code>/foo</code>的Web应用程序上下文。请注意，使用的上下文路径是Web应用程序目录的名称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?war=foo</span><br></pre></td></tr></table></figure>
+<p>在下面示例中，位于Tomcat服务器上的Host appBase目录中的“.war”文件bar.war被部署为名为<code>/bar</code>的Web应用程序上下文。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?war=bar.war</span><br></pre></td></tr></table></figure>
+<h3 id="使用Context-“-xml”配置文件进行部署"><a href="#使用Context-“-xml”配置文件进行部署" class="headerlink" title="使用Context “.xml”配置文件进行部署"></a>使用Context “.xml”配置文件进行部署</h3><p>如果Host deployXML标志设置为true，则可以使用Context “.xml”配置文件和可选的<code>&quot;.war&quot;</code>文件或Web应用程序目录来部署Web应用程序。使用上下文“.xml”配置文件部署Web应用程序时，不使用上下文路径。</p>
+<p>Context配置“.xml”文件可以包含Web应用程序的有效XML，就像在Tomcat <code>server.xml</code>配置文件中配置它一样。这是一个例子：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">path</span>=<span class="string">"/foobar"</span> <span class="attr">docBase</span>=<span class="string">"/path/to/application/foobar"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>当可选的war参数设置为Web应用程序“.war”文件或目录的URL时，它将覆盖在上下文配置“.xml”文件中配置的任何docBase。</p>
+<p>以下是使用Context配置“.xml”文件部署应用程序的示例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?config=file:/path/context.xml</span><br></pre></td></tr></table></figure>
+<p>以下是使用Context配置“.xml”文件和位于服务器上的Web应用程序“.war”文件部署应用程序的示例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy</span><br><span class="line"> ?config=file:/path/context.xml&amp;war=file:/path/bar.war</span><br></pre></td></tr></table></figure>
+<h3 id="部署说明"><a href="#部署说明" class="headerlink" title="部署说明"></a>部署说明</h3><p>如果Host配置了<code>unpackWARs = true</code>并且您部署了war文件，则war将被解压缩到Host appBase目录中的目录中。</p>
+<p>如果应用程序war或目录安装在Host appBase目录中，并且Host配置了<code>autoDeploy = true</code>，Context路径必须与目录名称或war文件名不匹配，而不是“.war”扩展名。</p>
+<p>为了在不受信任的用户可以管理Web应用程序时的安全性，可以将Host <code>deployXML</code>标志设置为false。这可以防止不受信任的用户使用配置XML文件部署Web应用程序，并防止他们部署位于其主机appBase之外的应用程序目录或“.war”文件。</p>
+<h3 id="部署响应"><a href="#部署响应" class="headerlink" title="部署响应"></a>部署响应</h3><p>如果安装和启动成功，您将收到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Deployed application at context path /foo</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>应用程序已经存在于<code>path/foo</code>中</p>
+<ul>
+<li>所有当前运行的Web应用程序的上下文路径必须是唯一的。因此，必须使用此上下文路径取消部署现有Web应用程序，或为新应用程序选择其他上下文路径。可以将update参数指定为URL上的参数，值为true以避免此错误。在这种情况下，将在执行部署之前对现有应用程序执行取消部署。</li>
+</ul>
+</li>
+<li><p><code>docBase</code>不存在或不是可读目录</p>
+<ul>
+<li>war参数指定的URL必须标识此服务器上包含Web应用程序的“解压缩”版本的目录，或包含此应用程序的Web应用程序归档（WAR）文件的绝对URL。更正war参数指定的值。</li>
+</ul>
+</li>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试启动新的Web应用程序时遇到异常。检查Tomcat日志以获取详细信息，但可能的解释包括解析<code>/WEB-INF/web.xml</code>文件时出现问题，或者在初始化应用程序事件侦听器和过滤器时遇到缺少的类。</li>
+</ul>
+</li>
+<li><p>指定了无效的应用程序URL</p>
+<ul>
+<li>您指定的目录或Web应用程序的URL无效。此类URL必须以<code>file:</code>开头，WAR文件的URL必须以“.war”结尾。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>上下文路径必须与目录或WAR文件名匹配：</p>
+<ul>
+<li>如果应用程序war或目录安装在Host appBase目录中，并且Host配置了<code>autoDeploy = true</code>，则Context路径必须与没有“.war”扩展名的目录名或war文件名匹配。</li>
+</ul>
+</li>
+<li><p>只能安装Host Web应用程序目录中的Web应用程序</p>
+<ul>
+<li>如果Host deployXML标志设置为false，则尝试在Host appBase目录之外部署Web应用程序目录或“.war”文件时，将发生此错误。</li>
+</ul>
+</li>
+</ul>
+<h2 id="列出当前部署的应用程序"><a href="#列出当前部署的应用程序" class="headerlink" title="列出当前部署的应用程序"></a>列出当前部署的应用程序</h2><p>列出所有当前部署的Web应用程序的上下文路径，当前状态（运行或已停止）以及活动会话数。 启动Tomcat后立即执行的典型响应可能如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/list</span><br><span class="line">OK - Listed applications for virtual host [localhost]</span><br><span class="line">/:running:0:ROOT</span><br><span class="line">/spring-boot-pkg-war-0.0.1:running:0:spring-boot-pkg-war-0.0.1</span><br><span class="line">/examples:running:0:examples</span><br><span class="line">/host-manager:running:0:host-manager</span><br><span class="line">/spring-boot-pkg-war:running:0:spring-boot-pkg-war</span><br><span class="line">/manager:running:0:manager</span><br><span class="line">/docs:running:0:docs</span><br></pre></td></tr></table></figure>
+<h2 id="重新加载现有应用程序"><a href="#重新加载现有应用程序" class="headerlink" title="重新加载现有应用程序"></a>重新加载现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/reload?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发信号通知现有应用程序关闭并重新加载。当Web应用程序上下文不可重新加载并且您在<code>/WEB-INF/classes</code>目录中更新了类或属性文件，或者在<code>/WEB-INF/lib</code>目录中添加或更新了jar文件时，这非常有用。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Reloaded application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试重新启动Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p><code>path/foo</code>没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径</p>
+<ul>
+<li>path参数是必需的。</li>
+</ul>
+</li>
+<li><p>在路径<code>/foo</code>上部署的WAR不支持重新加载</p>
+<ul>
+<li>当前，直接从WAR文件部署Web应用程序时，不支持应用程序重新加载（以获取对类或web.xml文件的更改）。它仅在从解压缩目录部署Web应用程序时才有效。如果您使用的是WAR文件，则应取消部署，然后再使用update参数部署或部署应用程序以获取更改。</li>
+</ul>
+</li>
+</ul>
+<p>实践练习：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/reload?path=/spring-boot-pkg-war</span><br><span class="line">OK - Reloaded application at context path [/spring-boot-pkg-war]</span><br><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/reload?path=/xxx</span><br><span class="line">FAIL - No context exists named [&amp;#47;xxx]</span><br></pre></td></tr></table></figure>
+<h2 id="列出OS和JVM属性"><a href="#列出OS和JVM属性" class="headerlink" title="列出OS和JVM属性"></a>列出OS和JVM属性</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/serverinfo</span><br></pre></td></tr></table></figure>
+<p>列出有关Tomcat版本，操作系统和JVM属性的信息。</p>
+<p>如果发生错误，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li>遇到异常<ul>
+<li>尝试枚举系统属性时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/serverinfo</span><br><span class="line"></span><br><span class="line">OK - Server info</span><br><span class="line">Tomcat Version: [Apache Tomcat/9.0.24]</span><br><span class="line">OS Name: [Linux]</span><br><span class="line">OS Version: [5.0.0-25-generic]</span><br><span class="line">OS Architecture: [amd64]</span><br><span class="line">JVM Version: [1.8.0_222-8u222-b10-1ubuntu1~18.04.1-b10]</span><br><span class="line">JVM Vendor: [Private Build]</span><br></pre></td></tr></table></figure>
+<h2 id="列出可用的全局JNDI资源"><a href="#列出可用的全局JNDI资源" class="headerlink" title="列出可用的全局JNDI资源"></a>列出可用的全局JNDI资源</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/resources[?type=xxxxx]</span><br></pre></td></tr></table></figure>
+<p>列出可在上下文配置文件的资源链接中使用的全局JNDI资源。如果指定类型请求参数，则该值必须是您感兴趣的资源类型的完全限定Java类名称（例如，您将指定<code>javax.sql.DataSource</code>以获取所有可用JDBC数据源的名称）。如果未指定类型请求参数，则将返回所有类型的资源。</p>
+<p>根据是否指定了类型请求参数，正常响应的第一行将是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Listed global resources of all types</span><br></pre></td></tr></table></figure>
+<p>要么<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Listed global resources of type xxxxx</span><br></pre></td></tr></table></figure></p>
+<p>每个资源后跟一行。每行由冒号字符（“：”）分隔的字段组成，如下所示：</p>
+<ul>
+<li>全局资源名称 - 此全局JNDI资源的名称，该资源将在<code>&lt;ResourceLink&gt;</code>元素的全局属性中使用。</li>
+<li>全局资源类型 - 此全局JNDI资源的完全限定Java类名。</li>
+</ul>
+<p>如果发生错误，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试枚举全局JNDI资源时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>没有可用的全局JNDI资源</p>
+<ul>
+<li>您运行的Tomcat服务器已配置为没有全局JNDI资源。</li>
+</ul>
+</li>
+</ul>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/resources</span><br><span class="line">OK - 列出所有类型的全部资源</span><br><span class="line">UserDatabase:org.apache.catalina.users.MemoryUserDatabase</span><br></pre></td></tr></table></figure>
+<h2 id="会话统计"><a href="#会话统计" class="headerlink" title="会话统计"></a>会话统计</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sessions?path=/examples</span><br></pre></td></tr></table></figure>
+<p>显示Web应用程序的默认会话超时，以及在实际超时时间的一分钟范围内的当前活动会话数。例如，在重新启动Tomcat然后执行<code>/examples</code> Web应用程序中的一个JSP示例后，您可能会得到如下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">OK - Session information for application at context path /examples</span><br><span class="line">Default maximum session inactive interval 30 minutes</span><br><span class="line">&lt;1 minutes: 1 sessions</span><br><span class="line">1 - &lt;2 minutes: 1 sessions</span><br></pre></td></tr></table></figure>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sessions?path=/manager</span><br><span class="line">OK - Session information for application at context path [/manager]</span><br><span class="line">Default maximum session inactive interval is [30] minutes</span><br></pre></td></tr></table></figure></p>
+<h2 id="过期会话"><a href="#过期会话" class="headerlink" title="过期会话"></a>过期会话</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/expire?path=/examples&amp;idle=num</span><br></pre></td></tr></table></figure>
+<p>显示会话统计信息（如上面的<code>/sessions</code>命令），并使空闲时间超过num分钟的会话到期。要使所有会话到期，请使用<code>＆idle = 0</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">OK - Session information for application at context path /examples</span><br><span class="line">Default maximum session inactive interval 30 minutes</span><br><span class="line">1 - &lt;2 minutes: 1 sessions</span><br><span class="line">3 - &lt;4 minutes: 1 sessions</span><br><span class="line">&gt;0 minutes: 2 sessions were expired</span><br></pre></td></tr></table></figure>
+<p>实际上<code>/sessions</code>和<code>/expire</code>是同一命令的同义词。不同之处在于存在空闲参数。</p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/expire?path=/spring-boot-pkg-war&amp;idle=1</span><br><span class="line">[1] 4560</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">```s</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                                                
+                                                    
+                                                      
+                                                        <p>本文翻译自：<a href="https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html</a></p>
+<a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/" title="prev: Tomcat9-文档3-部署">prev: Tomcat9-文档3-部署</a>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>在许多生产环境中，部署新Web应用程序或取消部署现有Web应用程序的功能非常有用，而无需关闭并重新启动整个容器。此外，即使您尚未在Tomcat服务器配置文件中声明可重新加载，也可以请求现有应用程序重新加载。</p>
+<p>为了支持这些功能，Tomcat包括一个Web应用程序（默认安装在上下文路径/<code>manager</code>上），它支持以下功能：</p>
+<ul>
+<li>从WAR文件的上载内容部署新的Web应用程序。</li>
+<li>从服务器文件系统在指定的上下文路径上部署新的Web应用程序。</li>
+<li>列出当前部署的Web应用程序，以及当前为这些Web应用程序处于活动状态的会话。</li>
+<li>重新加载现有Web应用程序，以反映<code>/WEB-INF/classes or /WEB-INF/lib</code>内容的更改。</li>
+<li>列出OS和JVM属性值。</li>
+<li>列出可用的全局JNDI资源，以便在准备嵌套在<code>&lt;Context&gt;</code>部署描述中的<code>&lt;ResourceLink&gt;</code>元素的部署工具中使用。</li>
+<li>启动已停止的应用程序（从而使其再次可用）。</li>
+<li>停止现有应用程序（以使其变得不可用），但不要取消部署它。</li>
+<li>取消部署已部署的Web应用程序并删除其文档基目录（除非它是从文件系统部署的）。</li>
+</ul>
+<p>默认的Tomcat安装包括Manager。要将Manager Web应用程序Context的实例添加到新主机，请在<code>$CATALINA_BASE/conf/[enginename]/[hostname]</code>文件夹中安装<code>manager.xml</code>上下文配置文件。这是一个例子：(PS: 这里的enginename一般是指Catalina)</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span> <span class="attr">antiResourceLocking</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">docBase</span>=<span class="string">"$&#123;catalina.home&#125;/webapps/manager"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果您将Tomcat配置为支持多个虚拟主机（网站），则需要为每个虚拟主机配置一个Manager。</p>
+<p>有三种方法可以使用Manager Web应用程序。</p>
+<ul>
+<li>作为具有用户界面的应用程序，您可以在浏览器中使用。 下面是一个示例URL，您可以在其中将<code>localhost</code>替换为您的网站主机名：<code>http://localhost:8080/manager/html</code>。</li>
+<li>仅使用HTTP请求的最小版本，适用于系统管理员设置的脚本。 命令作为请求URI的一部分给出，响应采用简单文本的形式，可以很容易地进行解析和处理。 有关更多信息，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html#Supported_Manager_Commands" target="_blank" rel="noopener">支持的管理器命令</a></li>
+<li>Ant（1.4版或更高版本）构建工具的一组方便的任务定义。 有关更多信息，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html#Executing_Manager_Commands_With_Ant" target="_blank" rel="noopener">使用Ant执行Manager命令</a>。</li>
+</ul>
+<h1 id="配置Manager应用的访问权限"><a href="#配置Manager应用的访问权限" class="headerlink" title="配置Manager应用的访问权限"></a>配置Manager应用的访问权限</h1><p>下面的描述使用变量名<code>$CATALINA_BASE</code>来引用解析大多数相对路径的基目录。如果尚未通过设置<code>CATALINA_BASE</code>目录为多个实例配置Tomcat，则<code>$CATALINA_BASE</code>将设置为<code>$CATALINA_HOME</code>的值，即已安装Tomcat的目录。</p>
+<p>使用默认设置使用Tomcat是非常不安全的，这些设置允许Internet上的任何人在您的服务器上执行Manager应用程序。因此，Manager应用程序出厂时要求尝试使用它的任何人必须使用具有与之关联的<code>manager-xxx</code>角色之一的用户名和密码进行身份验证（角色名称取决于所需的功能）。此外，分配给这些角色的默认用户文件（<code>$CATALINA_BASE/conf/tomcat-users.xml</code>）中没有用户名。<strong>因此，默认情况下完全禁用对Manager应用程序的访问</strong>。</p>
+<p>您可以在Manager Web应用程序的<code>web.xml</code>文件中找到角色名称。可用的角色是：</p>
+<ul>
+<li>manager-gui  - 访问HTML界面。</li>
+<li>manager-status  - 仅访问“服务器状态”页面。</li>
+<li>manager-script  - 访问本文档中描述的工具友好的纯文本界面，以及“服务器状态”页面。</li>
+<li>manager-jmx  - 访问JMX代理接口和“服务器状态”页面。</li>
+</ul>
+<p>HTML接口受到CSRF（跨站点请求伪造）攻击的保护，但文本和JMX接口无法受到保护。这意味着在使用Web浏览器访问Manager应用程序时，允许访问文本和JMX界面的用户必须小心谨慎。为了保持CSRF保护：</p>
+<ul>
+<li>如果使用Web浏览器使用具有<code>manager-script</code>或<code>manager-jmx</code>角色的用户访问Manager应用程序（例如，用于测试纯文本或JMX接口），则必须先关闭浏览器的所有窗口以终止会话。如果您不关闭浏览器并访问其他站点，您可能会成为CSRF攻击的受害者。</li>
+<li>建议永远不要将<code>manager-script</code>或<code>manager-jmx</code>角色授予具有<code>manager-gui</code>角色的用户。</li>
+</ul>
+<p><strong>请注意，JMX代理接口实际上是Tomcat的像超级权限的低级管理接口。如果他知道要调用什么命令，那么可以做很多事情。启用<code>manager-jmx</code>角色时应该谨慎</strong>。</p>
+<p>要启用对Manager Web应用程序的访问，您必须创建新的用户名/密码组合并将其中一个<code>manager-xxx</code>角色与其关联，或者将manager-xxx角色添加到某些现有用户名/密码组合中。由于本文档的大部分内容都描述了使用文本界面，因此本示例将使用角色<code>manager-script</code>。具体如何配置用户名/密码取决于您使用的<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/realm.html" target="_blank" rel="noopener">Realm实现</a>：</p>
+<ul>
+<li><code>UserDatabaseRealm</code>加上<code>MemoryUserDatabase</code>或<code>MemoryRealm</code>  -  UserDatabaseRealm和MemoryUserDatabase在默认的<code>$CATALINA_BASE/conf/server.xml</code>中配置.MemoryUserDatabase和MemoryRealm都默认读取存储在<code>$CATALINA_BASE/conf/tomcat-users.xml</code>的XML格式文件，可以使用任何文本编辑器进行编辑。此文件包含每个用户的XML <code>&lt;user&gt;</code>标签，可能如下所示：<ul>
+<li><code>&lt;user username =“craigmcc”password =“secret”roles =“standard，manager-script”/&gt;</code></li>
+<li>它定义了此人登录时使用的用户名和密码，以及与其关联的角色名称。您可以将<code>manager-script</code>角色添加到一个或多个现有用户的逗号分隔角色属性，和/或 使用该分配的角色创建新用户。</li>
+</ul>
+</li>
+<li>DataSourceRealm或JDBCRealm  - 您的用户和角色信息存储在通过JDBC访问的数据库中。根据环境的标准过程，将<code>manager-script</code>角色添加到一个或多个现有用户，和/或 创建一个或多个已分配此角色的新用户。</li>
+<li>JNDIRealm  - 您的用户和角色信息存储在通过LDAP访问的目录服务器中。根据环境的标准过程，将<code>manager-script</code>角色添加到一个或多个现有用户，和/或创建一个或多个已分配此角色的新用户。</li>
+</ul>
+<p>第一次尝试发出下一节中描述的Manager命令之一时，您将面临使用BASIC身份验证登录的挑战。您输入的用户名和密码无关紧要，只要它们在用户数据库中标识拥有角色管理器脚本的有效用户即可。</p>
+<p>除了密码限制之外，通过添加<code>RemoteAddrValve</code>或<code>RemoteHostValve</code>，远程IP地址或主机可以限制对Manager Web应用程序的访问。有关详情，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/valve.html#Remote_Address_Filter" target="_blank" rel="noopener">阀门文档</a>以下是通过IP地址限制对localhost的访问的示例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="用户友好的HTMML界面"><a href="#用户友好的HTMML界面" class="headerlink" title="用户友好的HTMML界面"></a>用户友好的HTMML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://&#123;host&#125;:&#123;port&#125;/manager/html</span><br></pre></td></tr></table></figure>
+<p>如上所述，您需要<code>manager-gui</code>角色才能访问它。 有一个单独的文档，提供有关此接口的帮助。 看：</p>
+<ul>
+<li><a href="https://tomcat.apache.org/tomcat-9.0-doc/html-manager-howto.html" target="_blank" rel="noopener">HTML Manager文档</a></li>
+</ul>
+<p>HTML接口受到CSRF（跨站点请求伪造）攻击的保护。 每次访问HTML页面都会生成一个随机令牌，该令牌存储在您的会话中，并包含在页面上的所有链接中。 如果您的下一个操作没有正确的令牌值，则该操作将被拒绝。 如果令牌已过期，您可以从Manager的主页面或列表应用程序页面重新开始。</p>
+<h2 id="实践环节"><a href="#实践环节" class="headerlink" title="实践环节"></a>实践环节</h2><p>这一节是我自己加的，边读文档边实践。</p>
+<ol>
+<li><p>在<code>apache-tomcat-9.0.24/conf/Catalina/localhost/</code>下建立<code>manager.xml</code>文件：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在<code>tomcat-users.xml</code>里增加角色：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-gui"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"jimo"</span> <span class="attr">password</span>=<span class="string">"jimo"</span> <span class="attr">roles</span>=<span class="string">"manager-gui,manager-status"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"jimo-script"</span> <span class="attr">password</span>=<span class="string">"jimo"</span> <span class="attr">roles</span>=<span class="string">"manager-script"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在chrome浏览器访问： <code>localhost:8080/manager/html</code></p>
+<ul>
+<li>结果找不到网页</li>
+</ul>
+</li>
+<li><p>在firefox中访问：会弹出basic验证的用户名密码输入框，可以正常访问</p>
+</li>
+<li><p>通过命令行访问： <code>curl -u jimo:jimo localhost:8080/manager/html</code></p>
+</li>
+</ol>
+<p>实践结果：谷歌浏览器不知啥时候禁用了BASIC验证，开发者还是使用firefox把。</p>
+<h1 id="支持的Manager命令"><a href="#支持的Manager命令" class="headerlink" title="支持的Manager命令"></a>支持的Manager命令</h1><p>Manager应用程序知道如何处理的所有命令都在单个请求URI中指定，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://&#123;host&#125;:&#123;port&#125;/manager/text/&#123;command&#125;?&#123;parameters&#125;</span><br></pre></td></tr></table></figure>
+<p>其中<code>{host}</code>和<code>{port}</code>表示运行Tomcat的主机名和端口号，<code>{command}</code>表示您希望执行的Manager命令，<code>{parameters}</code>表示特定于该命令的查询参数。在下面的插图中，根据您的安装自定义主机和端口。</p>
+<p>这些命令通常由HTTP GET请求执行。 <code>/deploy</code>命令具有由<code>HTTP PUT</code>请求执行的表单。</p>
+<h2 id="常用参数"><a href="#常用参数" class="headerlink" title="常用参数"></a>常用参数</h2><p>大多数命令接受以下一个或多个查询参数：</p>
+<ul>
+<li>path - 您正在处理的Web应用程序的上下文路径（包括前导斜杠）。要选择ROOT Web应用程序，请指定<code>“/”</code>。<ul>
+<li>注意：无法在Manager应用程序本身上执行管理命令。</li>
+<li>注意：如果未明确指定path参数，则将使用config参数中的标准上下文命名规则或如果config参数不存在而使用war参数来派生路径和版本。</li>
+</ul>
+</li>
+<li>version - <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/context.html" target="_blank" rel="noopener">并行部署</a>功能使用的此Web应用程序的版本。如果在需要路径的任何地方使用并行部署，则必须指定除路径之外的版本，并且路径和版本的组合必须是唯一的，而不仅仅是路径。<ul>
+<li>注意：如果未明确指定路径，则忽略version参数。</li>
+</ul>
+</li>
+<li>war - Web应用程序归档（WAR）文件的URL，或包含Web应用程序的目录的路径名，或Context的配置文件<code>&quot;.xml&quot;</code>。您可以使用以下任何格式的网址：<ul>
+<li><code>file:/absolute/path/to/a/directory</code> - 包含Web应用程序的解压缩版本的目录的绝对路径。此目录将附加到您指定的上下文路径，而不进行任何更改。</li>
+<li><code>file:/absolute/path/to/a/webapp.war</code> -  Web应用程序归档（WAR）文件的绝对路径。这仅对<code>/deploy</code>命令有效，并且是该命令唯一可接受的格式。</li>
+<li><code>file/absolute/path/to/a/context.xml</code>  -  Web应用程序的绝对路径上下文配置“.xml”文件，其中包含Context配置元素。</li>
+<li><code>directory</code>  - 主机应用程序基目录中Web应用程序上下文的目录名称。</li>
+<li><code>webapp.war</code>  - 位于主机应用程序基目录中的Web应用程序war文件的名称。</li>
+</ul>
+</li>
+</ul>
+<p>每个命令将以<code>text/plain</code>格式返回响应（即没有HTML标记的纯ASCII），使人和程序都能轻松阅读）。响应的第一行将以OK或FAIL开头，指示请求的命令是否成功。如果失败，第一行的其余部分将包含遇到的问题的描述。一些命令包括如下所述的附加信息行。</p>
+<p>国际化注 -  Manager应用程序在资源包中查找其消息字符串，因此可能已为您的平台翻译了字符串。以下示例显示了消息的英文版本。</p>
+<h2 id="远程部署应用程序存档（WAR）"><a href="#远程部署应用程序存档（WAR）" class="headerlink" title="远程部署应用程序存档（WAR）"></a>远程部署应用程序存档（WAR）</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?path=/foo</span><br></pre></td></tr></table></figure>
+<p>在HTTP PUT请求中指定为Web应用程序归档（WAR）文件为请求体，将其安装到相应虚拟主机的<code>appBase</code>目录中，然后启动，从中导出添加到appBase的WAR文件的名称。稍后可以使用<code>/undeploy</code>命令取消部署应用程序（并删除相应的WAR文件）。</p>
+<p>该命令由HTTP PUT请求执行。</p>
+<p><code>.WAR</code>文件可以包括Tomcat特定的部署配置，在<code>/META-INF/context.xml</code>中包含Context配置XML文件。</p>
+<p>URL参数包括：</p>
+<ul>
+<li><code>update</code>：设置为true时，将首先取消部署任何现有更新。默认值设置为false。</li>
+<li><code>tag</code>：指定标记名称，这允许将已部署的webapp与标记或标签相关联。如果取消部署Web应用程序，则可以在需要时仅使用标记重新部署它。</li>
+<li><code>config</code>：格式文件中的Context配置“.xml”文件的URL：<code>/absolute/path/to/a/context.xml</code>。这必须是Web应用程序上下文配置“.xml”文件的<code>绝对路径</code>，该文件包含Context配置元素。</li>
+</ul>
+<p>注 - 该命令与<code>/undeploy</code>命令逻辑相反。</p>
+<p>如果安装和启动成功，您将收到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Deployed application at context path /foo</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以<code>FAIL</code>开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li>应用程序已经存在于<code>path/foo</code>中<ul>
+<li>所有当前运行的Web应用程序的上下文路径必须是唯一的。因此，必须使用此上下文路径取消部署现有Web应用程序，或为新应用程序选择其他上下文路径。可以将update参数指定为URL上的参数，值为true以避免此错误。在这种情况下，将在执行部署之前对现有应用程序执行取消部署。</li>
+</ul>
+</li>
+<li>遇到异常<ul>
+<li>尝试启动新的Web应用程序时遇到异常。检查Tomcat日志以获取详细信息，但可能的解释包括解析<code>/WEB-INF/web.xml</code>文件时出现问题，或者在初始化应用程序事件侦听器和过滤器时遇到缺少的类。</li>
+</ul>
+</li>
+</ul>
+<h2 id="从本地路径部署新应用程序"><a href="#从本地路径部署新应用程序" class="headerlink" title="从本地路径部署新应用程序"></a>从本地路径部署新应用程序</h2><p>部署并启动一个新的Web应用程序，该应用程序附加到指定的上下文路径（任何其他Web应用程序都不能使用它）。此命令与<code>/undeploy</code>命令逻辑相反。</p>
+<p>此命令由HTTP GET请求执行。可以使用许多不同的方法来使用deploy命令。</p>
+<h3 id="部署以前部署的Web应用程序"><a href="#部署以前部署的Web应用程序" class="headerlink" title="部署以前部署的Web应用程序"></a>部署以前部署的Web应用程序</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?path=/footoo&amp;tag=footag</span><br></pre></td></tr></table></figure>
+<p>这可用于部署先前部署的Web应用程序，该应用程序已使用tag属性进行部署。请注意，Manager webapp的工作目录将包含以前部署的WAR;删除它会使部署失败。</p>
+<h3 id="按URL部署-目录或WAR"><a href="#按URL部署-目录或WAR" class="headerlink" title="按URL部署 目录或WAR"></a>按URL部署 目录或WAR</h3><p>部署位于Tomcat服务器上的Web应用程序目录或<code>&quot;.war&quot;</code>文件。如果未指定路径，则路径和版本将从目录名称或war文件名称派生。 <code>war</code>参数指定目录或Web应用程序归档（WAR）文件的URL（包括<code>file:</code>scheme）。引用WAR文件的URL支持的语法在<code>java.net.JarURLConnection</code>类的Javadocs页面上描述。仅使用引用整个WAR文件的URL。</p>
+<p>在此示例中，位于Tomcat服务器上的目录<code>/path/to/foo</code>中的Web应用程序被部署为名为<code>/footoo</code>的Web应用程序上下文。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?path=/footoo&amp;war=file:/path/to/foo</span><br></pre></td></tr></table></figure>
+<p>在此示例中，Tomcat服务器上的“.war”文件<code>/path/to/bar.war</code>被部署为名为<code>/bar</code>的Web应用程序上下文。请注意，如果没有路径参数，那么上下文路径默认为没有“.war”扩展名的Web应用程序归档文件的名称（如下为：<code>bar</code>）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?war=file:/path/to/bar.war</span><br></pre></td></tr></table></figure>
+<h3 id="从主机appBase部署-目录或war包"><a href="#从主机appBase部署-目录或war包" class="headerlink" title="从主机appBase部署 目录或war包"></a>从主机appBase部署 目录或war包</h3><p>部署位于Host appBase目录中的Web应用程序目录或“.war”文件。路径和可选版本派生自目录或war文件名。</p>
+<p>在此示例中，位于Tomcat服务器的Host appBase目录中名为<code>foo</code>的子目录中的Web应用程序被部署为名为<code>/foo</code>的Web应用程序上下文。请注意，使用的上下文路径是Web应用程序目录的名称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?war=foo</span><br></pre></td></tr></table></figure>
+<p>在下面示例中，位于Tomcat服务器上的Host appBase目录中的“.war”文件bar.war被部署为名为<code>/bar</code>的Web应用程序上下文。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?war=bar.war</span><br></pre></td></tr></table></figure>
+<h3 id="使用Context-“-xml”配置文件进行部署"><a href="#使用Context-“-xml”配置文件进行部署" class="headerlink" title="使用Context “.xml”配置文件进行部署"></a>使用Context “.xml”配置文件进行部署</h3><p>如果Host deployXML标志设置为true，则可以使用Context “.xml”配置文件和可选的<code>&quot;.war&quot;</code>文件或Web应用程序目录来部署Web应用程序。使用上下文“.xml”配置文件部署Web应用程序时，不使用上下文路径。</p>
+<p>Context配置“.xml”文件可以包含Web应用程序的有效XML，就像在Tomcat <code>server.xml</code>配置文件中配置它一样。这是一个例子：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">path</span>=<span class="string">"/foobar"</span> <span class="attr">docBase</span>=<span class="string">"/path/to/application/foobar"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>当可选的war参数设置为Web应用程序“.war”文件或目录的URL时，它将覆盖在上下文配置“.xml”文件中配置的任何docBase。</p>
+<p>以下是使用Context配置“.xml”文件部署应用程序的示例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy?config=file:/path/context.xml</span><br></pre></td></tr></table></figure>
+<p>以下是使用Context配置“.xml”文件和位于服务器上的Web应用程序“.war”文件部署应用程序的示例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/deploy</span><br><span class="line"> ?config=file:/path/context.xml&amp;war=file:/path/bar.war</span><br></pre></td></tr></table></figure>
+<h3 id="部署说明"><a href="#部署说明" class="headerlink" title="部署说明"></a>部署说明</h3><p>如果Host配置了<code>unpackWARs = true</code>并且您部署了war文件，则war将被解压缩到Host appBase目录中的目录中。</p>
+<p>如果应用程序war或目录安装在Host appBase目录中，并且Host配置了<code>autoDeploy = true</code>，Context路径必须与目录名称或war文件名不匹配，而不是“.war”扩展名。</p>
+<p>为了在不受信任的用户可以管理Web应用程序时的安全性，可以将Host <code>deployXML</code>标志设置为false。这可以防止不受信任的用户使用配置XML文件部署Web应用程序，并防止他们部署位于其主机appBase之外的应用程序目录或“.war”文件。</p>
+<h3 id="部署响应"><a href="#部署响应" class="headerlink" title="部署响应"></a>部署响应</h3><p>如果安装和启动成功，您将收到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Deployed application at context path /foo</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>应用程序已经存在于<code>path/foo</code>中</p>
+<ul>
+<li>所有当前运行的Web应用程序的上下文路径必须是唯一的。因此，必须使用此上下文路径取消部署现有Web应用程序，或为新应用程序选择其他上下文路径。可以将update参数指定为URL上的参数，值为true以避免此错误。在这种情况下，将在执行部署之前对现有应用程序执行取消部署。</li>
+</ul>
+</li>
+<li><p><code>docBase</code>不存在或不是可读目录</p>
+<ul>
+<li>war参数指定的URL必须标识此服务器上包含Web应用程序的“解压缩”版本的目录，或包含此应用程序的Web应用程序归档（WAR）文件的绝对URL。更正war参数指定的值。</li>
+</ul>
+</li>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试启动新的Web应用程序时遇到异常。检查Tomcat日志以获取详细信息，但可能的解释包括解析<code>/WEB-INF/web.xml</code>文件时出现问题，或者在初始化应用程序事件侦听器和过滤器时遇到缺少的类。</li>
+</ul>
+</li>
+<li><p>指定了无效的应用程序URL</p>
+<ul>
+<li>您指定的目录或Web应用程序的URL无效。此类URL必须以<code>file:</code>开头，WAR文件的URL必须以“.war”结尾。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>上下文路径必须与目录或WAR文件名匹配：</p>
+<ul>
+<li>如果应用程序war或目录安装在Host appBase目录中，并且Host配置了<code>autoDeploy = true</code>，则Context路径必须与没有“.war”扩展名的目录名或war文件名匹配。</li>
+</ul>
+</li>
+<li><p>只能安装Host Web应用程序目录中的Web应用程序</p>
+<ul>
+<li>如果Host deployXML标志设置为false，则尝试在Host appBase目录之外部署Web应用程序目录或“.war”文件时，将发生此错误。</li>
+</ul>
+</li>
+</ul>
+<h2 id="列出当前部署的应用程序"><a href="#列出当前部署的应用程序" class="headerlink" title="列出当前部署的应用程序"></a>列出当前部署的应用程序</h2><p>列出所有当前部署的Web应用程序的上下文路径，当前状态（运行或已停止）以及活动会话数。 启动Tomcat后立即执行的典型响应可能如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/list</span><br><span class="line">OK - Listed applications for virtual host [localhost]</span><br><span class="line">/:running:0:ROOT</span><br><span class="line">/spring-boot-pkg-war-0.0.1:running:0:spring-boot-pkg-war-0.0.1</span><br><span class="line">/examples:running:0:examples</span><br><span class="line">/host-manager:running:0:host-manager</span><br><span class="line">/spring-boot-pkg-war:running:0:spring-boot-pkg-war</span><br><span class="line">/manager:running:0:manager</span><br><span class="line">/docs:running:0:docs</span><br></pre></td></tr></table></figure>
+<h2 id="重新加载现有应用程序"><a href="#重新加载现有应用程序" class="headerlink" title="重新加载现有应用程序"></a>重新加载现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/reload?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发信号通知现有应用程序关闭并重新加载。当Web应用程序上下文不可重新加载并且您在<code>/WEB-INF/classes</code>目录中更新了类或属性文件，或者在<code>/WEB-INF/lib</code>目录中添加或更新了jar文件时，这非常有用。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Reloaded application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试重新启动Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p><code>path/foo</code>没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径</p>
+<ul>
+<li>path参数是必需的。</li>
+</ul>
+</li>
+<li><p>在路径<code>/foo</code>上部署的WAR不支持重新加载</p>
+<ul>
+<li>当前，直接从WAR文件部署Web应用程序时，不支持应用程序重新加载（以获取对类或web.xml文件的更改）。它仅在从解压缩目录部署Web应用程序时才有效。如果您使用的是WAR文件，则应取消部署，然后再使用update参数部署或部署应用程序以获取更改。</li>
+</ul>
+</li>
+</ul>
+<p>实践练习：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/reload?path=/spring-boot-pkg-war</span><br><span class="line">OK - Reloaded application at context path [/spring-boot-pkg-war]</span><br><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/reload?path=/xxx</span><br><span class="line">FAIL - No context exists named [&amp;#47;xxx]</span><br></pre></td></tr></table></figure>
+<h2 id="列出OS和JVM属性"><a href="#列出OS和JVM属性" class="headerlink" title="列出OS和JVM属性"></a>列出OS和JVM属性</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/serverinfo</span><br></pre></td></tr></table></figure>
+<p>列出有关Tomcat版本，操作系统和JVM属性的信息。</p>
+<p>如果发生错误，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li>遇到异常<ul>
+<li>尝试枚举系统属性时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/serverinfo</span><br><span class="line"></span><br><span class="line">OK - Server info</span><br><span class="line">Tomcat Version: [Apache Tomcat/9.0.24]</span><br><span class="line">OS Name: [Linux]</span><br><span class="line">OS Version: [5.0.0-25-generic]</span><br><span class="line">OS Architecture: [amd64]</span><br><span class="line">JVM Version: [1.8.0_222-8u222-b10-1ubuntu1~18.04.1-b10]</span><br><span class="line">JVM Vendor: [Private Build]</span><br></pre></td></tr></table></figure>
+<h2 id="列出可用的全局JNDI资源"><a href="#列出可用的全局JNDI资源" class="headerlink" title="列出可用的全局JNDI资源"></a>列出可用的全局JNDI资源</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/resources[?type=xxxxx]</span><br></pre></td></tr></table></figure>
+<p>列出可在上下文配置文件的资源链接中使用的全局JNDI资源。如果指定类型请求参数，则该值必须是您感兴趣的资源类型的完全限定Java类名称（例如，您将指定<code>javax.sql.DataSource</code>以获取所有可用JDBC数据源的名称）。如果未指定类型请求参数，则将返回所有类型的资源。</p>
+<p>根据是否指定了类型请求参数，正常响应的第一行将是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Listed global resources of all types</span><br></pre></td></tr></table></figure>
+<p>要么<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Listed global resources of type xxxxx</span><br></pre></td></tr></table></figure></p>
+<p>每个资源后跟一行。每行由冒号字符（“：”）分隔的字段组成，如下所示：</p>
+<ul>
+<li>全局资源名称 - 此全局JNDI资源的名称，该资源将在<code>&lt;ResourceLink&gt;</code>元素的全局属性中使用。</li>
+<li>全局资源类型 - 此全局JNDI资源的完全限定Java类名。</li>
+</ul>
+<p>如果发生错误，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试枚举全局JNDI资源时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>没有可用的全局JNDI资源</p>
+<ul>
+<li>您运行的Tomcat服务器已配置为没有全局JNDI资源。</li>
+</ul>
+</li>
+</ul>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/resources</span><br><span class="line">OK - 列出所有类型的全部资源</span><br><span class="line">UserDatabase:org.apache.catalina.users.MemoryUserDatabase</span><br></pre></td></tr></table></figure>
+<h2 id="会话统计"><a href="#会话统计" class="headerlink" title="会话统计"></a>会话统计</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sessions?path=/examples</span><br></pre></td></tr></table></figure>
+<p>显示Web应用程序的默认会话超时，以及在实际超时时间的一分钟范围内的当前活动会话数。例如，在重新启动Tomcat然后执行<code>/examples</code> Web应用程序中的一个JSP示例后，您可能会得到如下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">OK - Session information for application at context path /examples</span><br><span class="line">Default maximum session inactive interval 30 minutes</span><br><span class="line">&lt;1 minutes: 1 sessions</span><br><span class="line">1 - &lt;2 minutes: 1 sessions</span><br></pre></td></tr></table></figure>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sessions?path=/manager</span><br><span class="line">OK - Session information for application at context path [/manager]</span><br><span class="line">Default maximum session inactive interval is [30] minutes</span><br></pre></td></tr></table></figure></p>
+<h2 id="过期会话"><a href="#过期会话" class="headerlink" title="过期会话"></a>过期会话</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/expire?path=/examples&amp;idle=num</span><br></pre></td></tr></table></figure>
+<p>显示会话统计信息（如上面的<code>/sessions</code>命令），并使空闲时间超过num分钟的会话到期。要使所有会话到期，请使用<code>＆idle = 0</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">OK - Session information for application at context path /examples</span><br><span class="line">Default maximum session inactive interval 30 minutes</span><br><span class="line">1 - &lt;2 minutes: 1 sessions</span><br><span class="line">3 - &lt;4 minutes: 1 sessions</span><br><span class="line">&gt;0 minutes: 2 sessions were expired</span><br></pre></td></tr></table></figure>
+<p>实际上<code>/sessions</code>和<code>/expire</code>是同一命令的同义词。不同之处在于存在空闲参数。</p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/expire?path=/spring-boot-pkg-war&amp;idle=1</span><br><span class="line">[1] 4560</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">```s</span><br></pre></td></tr></table></figure>
+
+          </div>
+          
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/009-tomcat9-doc-5-manager/" data-id="cjzjeuknw00mhsjchv5cb05w4" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+        
+<nav id="article-nav">
+  
+  
+    <a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Tomcat9-文档3-部署</div>
+    </a>
+  
+</nav>
+
+          
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 12.5px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/">Tomcat9-文档3-部署</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/006-tomcat9-doc-1-introduction/">Tomcat9-文档1-介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Jackpler<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">home</a>
+  
+    <a href="/archives" class="mobile-nav-link">archives</a>
+  
+    <a href="/about" class="mobile-nav-link">about</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

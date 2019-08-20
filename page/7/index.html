@@ -86,6 +86,423 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-hadoop/004-frequently-hbase-shell-cmd" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" class="article-date">
+  <time datetime="2019-01-09T00:54:38.000Z" itemprop="datePublished">2019-01-09</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/">常用的hbase shell命令</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文记录一下经常在排查hbase问题时用到的 shell命令。</p>
+<h1 id="list-查看有哪些表"><a href="#list-查看有哪些表" class="headerlink" title="list 查看有哪些表"></a>list 查看有哪些表</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> list</span><br></pre></td></tr></table></figure>
+<h1 id="查询起始行"><a href="#查询起始行" class="headerlink" title="查询起始行"></a>查询起始行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> scan 'table' , &#123; STARTROW=&gt;'', ENDROW=&gt;'', LIMIT=&gt;5 &#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文记录一下经常在排查hbase问题时用到的 shell命令。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" data-id="cjzjeukh6004osjch46trhq2o" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-ansible/002-reusable-playbook" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/04/ansible/002-reusable-playbook/" class="article-date">
+  <time datetime="2019-01-04T09:54:32.000Z" itemprop="datePublished">2019-01-04</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/04/ansible/002-reusable-playbook/">创建可重用playbook</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>消除重复代码一直是程序员的目标，playbook也不例外。</p>
+<p>当一个playbook内容变得很大时，你就会想拆分了。</p>
+<p>拆分后，肯定要引入主剧本，这就有2种方式：<code>include/import</code>.</p>
+<h1 id="静态和动态引入"><a href="#静态和动态引入" class="headerlink" title="静态和动态引入"></a>静态和动态引入</h1><ol>
+<li>静态：使用<code>import</code>引入的；</li>
+<li>动态：使用<code>include</code>引入的。</li>
+</ol>
+<p>区别：</p>
+<ol>
+<li>静态引入的文件会在解析时被预处理，类似编译过程；</li>
+<li>动态引入的会在运行时才被处理</li>
+</ol>
+<p>当遇到如<code>tags</code>,<code>when</code>等选项：</p>
+<ol>
+<li>静态引入会将他们copy到所有子任务</li>
+<li>而动态只会应用到当前任务</li>
+</ol>
+<h1 id="使用权衡"><a href="#使用权衡" class="headerlink" title="使用权衡"></a>使用权衡</h1><p>使用<code>include * vs. import *</code>有一些优点，用户在选择时应考虑一些权衡：</p>
+<p>使用<code>include *</code>语句的主要优点是循环。当循环与include一起使用时，包含的任务或角色将对循环中的每个项执行一次。</p>
+<p>与<code>import *</code>语句相比，使用<code>include *</code>确实有一些限制：</p>
+<ol>
+<li>仅存在于动态包含内的标记不会显示在–list-tags输出中。</li>
+<li>仅存在于动态包含内的任务不会显示在–list-tasks输出中。</li>
+<li>不能使用<code>notify</code>来触发来自动态包含内的处理程序名称（请参阅下面的注释）。</li>
+<li>不能使用<code>--start-at-task</code>在动态包含内的任务中开启执行。</li>
+</ol>
+<p>与动态包含相比，使用<code>import *</code>也有一些限制：</p>
+<ol>
+<li>如上所述，循环根本不能与<code>import</code>一起使用。</li>
+<li>将变量用于目标文件或角色名称时，不能使用inventory中的变量（host/group变量等）。</li>
+</ol>
+<h1 id="import-playbook使用"><a href="#import-playbook使用" class="headerlink" title="import_playbook使用"></a>import_playbook使用</h1><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- import_playbook:</span> <span class="string">webservers.yml</span></span><br><span class="line"><span class="attr">- import_playbook:</span> <span class="string">databases.yml</span></span><br></pre></td></tr></table></figure>
+<h1 id="include-import-tasks使用"><a href="#include-import-tasks使用" class="headerlink" title="include/import_tasks使用"></a>include/import_tasks使用</h1><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># common_tasks.yml</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">placeholder</span> <span class="string">foo</span></span><br><span class="line"><span class="attr">  command:</span> <span class="string">/bin/foo</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">placeholder</span> <span class="string">bar</span></span><br><span class="line"><span class="attr">  command:</span> <span class="string">/bin/bar</span></span><br></pre></td></tr></table></figure>
+<p>然后引入：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">common_tasks.yml</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">- include_tasks:</span> <span class="string">common_tasks.yml</span></span><br></pre></td></tr></table></figure></p>
+<p>同时可以传递变量：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">jimo</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">jack</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">wordpress.yml</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    user_name:</span> <span class="string">lily</span></span><br></pre></td></tr></table></figure></p>
+<p>用到handler中，我们先定义一个handler.yml:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># more_handlers.yml</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">  service:</span> <span class="string">name=apache</span> <span class="string">state=restarted</span></span><br></pre></td></tr></table></figure>
+<p>引入例子：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">- include_tasks:</span> <span class="string">more_handlers.yml</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">- import_tasks:</span> <span class="string">more_handlers.yml</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li><a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse.html</a></li>
+<li><a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_includes.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_includes.html</a></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>消除重复代码一直是程序员的目标，playbook也不例外。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/04/ansible/002-reusable-playbook/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/04/ansible/002-reusable-playbook/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/04/ansible/002-reusable-playbook/" data-id="cjzjeukf7000gsjchxpr4z4jn" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-ansible/001-playbook" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/03/ansible/001-playbook/" class="article-date">
+  <time datetime="2019-01-03T04:34:58.000Z" itemprop="datePublished">2019-01-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/03/ansible/001-playbook/">ansible-playbook</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>在入门了之后就开始进阶把。</p>
+<p>本文来自<a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html" target="_blank" rel="noopener">playbooks简介</a></p>
+<p>先理解3个东西：</p>
+<ol>
+<li>playbook（剧本）</li>
+<li>tasks（任务）</li>
+<li>handler（处理）</li>
+</ol>
+<p>理解他们都是什么，关系是什么，怎么用。</p>
+<h1 id="playbook"><a href="#playbook" class="headerlink" title="playbook"></a>playbook</h1><p>只有一个剧本：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    http_port:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">    max_clients:</span> <span class="number">200</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">write</span> <span class="string">the</span> <span class="string">apache</span> <span class="string">config</span> <span class="string">file</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">/srv/httpd.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd.conf</span></span><br><span class="line"><span class="attr">    notify:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">running</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br><span class="line"><span class="attr">  handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure></p>
+<p>有多个剧本：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">write</span> <span class="string">the</span> <span class="string">apache</span> <span class="string">config</span> <span class="string">file</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">/srv/httpd.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd.conf</span></span><br><span class="line"></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">databases</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">postgresql</span> <span class="string">is</span> <span class="string">at</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span></span><br><span class="line"><span class="attr">    yum:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">postgresql</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ensure</span> <span class="string">that</span> <span class="string">postgresql</span> <span class="string">is</span> <span class="string">started</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">postgresql</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br></pre></td></tr></table></figure></p>
+<p>一眼就能看懂对把，还是学下基础知识。</p>
+<h1 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h1><h2 id="Host和User"><a href="#Host和User" class="headerlink" title="Host和User"></a>Host和User</h2><p>hosts: 遵循pattern模式<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br></pre></td></tr></table></figure></p>
+<p>remote_user可以为每个任务独有：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">test</span> <span class="string">connection</span></span><br><span class="line"><span class="attr">      ping:</span></span><br><span class="line"><span class="attr">      remote_user:</span> <span class="string">yourname</span></span><br></pre></td></tr></table></figure>
+<p>激活权限提升</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br></pre></td></tr></table></figure>
+<p>或者单独指定：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">started</span></span><br><span class="line"><span class="attr">      become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">      become_method:</span> <span class="string">sudo</span></span><br></pre></td></tr></table></figure></p>
+<p>切换用户：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  become_user:</span> <span class="string">postgres</span></span><br></pre></td></tr></table></figure>
+<p>提升：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">webservers</span></span><br><span class="line"><span class="attr">  remote_user:</span> <span class="string">yourname</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  become_method:</span> <span class="string">su</span></span><br></pre></td></tr></table></figure></p>
+<p>如果需要指定密码，使用<code>--ask-become-pass</code>.</p>
+<p>对主机排序，改变运行顺序：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  order:</span> <span class="string">sorted</span></span><br><span class="line"><span class="attr">  gather_facts:</span> <span class="literal">False</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - debug:</span></span><br><span class="line"><span class="attr">        var:</span> <span class="string">inventory_hostname</span></span><br></pre></td></tr></table></figure>
+<h2 id="Task列表"><a href="#Task列表" class="headerlink" title="Task列表"></a>Task列表</h2><ol>
+<li>顺序执行</li>
+<li>冥等性： 执行一次和多次结果一样</li>
+<li>name属性：可读性输出</li>
+</ol>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">make</span> <span class="string">sure</span> <span class="string">apache</span> <span class="string">is</span> <span class="string">running</span></span><br><span class="line"><span class="attr">    service:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">started</span></span><br></pre></td></tr></table></figure>
+<p>直接写命令，参数这些很自由：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">enable</span> <span class="string">selinux</span></span><br><span class="line"><span class="attr">    command:</span> <span class="string">/sbin/setenforce</span> <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>shell和command关心返回值，也就是短路运算：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">and</span> <span class="string">ignore</span> <span class="string">the</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">/usr/bin/somecommand</span> <span class="string">||</span> <span class="string">/bin/true</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">run</span> <span class="string">this</span> <span class="string">command</span> <span class="string">and</span> <span class="string">ignore</span> <span class="string">the</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">/usr/bin/somecommand</span></span><br><span class="line"><span class="attr">    ignore_errors:</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure></p>
+<p>太长的命令可以缩进换行：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">Copy</span> <span class="string">ansible</span> <span class="string">inventory</span> <span class="string">file</span> <span class="string">to</span> <span class="string">client</span></span><br><span class="line"><span class="attr">    copy:</span> <span class="string">src=/etc/ansible/hosts</span> <span class="string">dest=/etc/ansible/hosts</span></span><br><span class="line">            <span class="string">owner=root</span> <span class="string">group=root</span> <span class="string">mode=0644</span></span><br></pre></td></tr></table></figure></p>
+<p>使用变量：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">create</span> <span class="string">a</span> <span class="string">virtual</span> <span class="string">host</span> <span class="string">file</span> <span class="string">for</span> <span class="string">&#123;&#123;</span> <span class="string">vhost</span> <span class="string">&#125;&#125;</span></span><br><span class="line"><span class="attr">    template:</span></span><br><span class="line"><span class="attr">      src:</span> <span class="string">somefile.j2</span></span><br><span class="line"><span class="attr">      dest:</span> <span class="string">/etc/httpd/conf.d/&#123;&#123;</span> <span class="string">vhost</span> <span class="string">&#125;&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Hnadler"><a href="#Hnadler" class="headerlink" title="Hnadler"></a>Hnadler</h2><p>状态改变时执行的操作。</p>
+<p>例如：文件内容改变时，重启2个服务<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- name:</span> <span class="string">template</span> <span class="string">configuration</span> <span class="string">file</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    src:</span> <span class="string">template.j2</span></span><br><span class="line"><span class="attr">    dest:</span> <span class="string">/etc/foo.conf</span></span><br><span class="line"><span class="attr">  notify:</span></span><br><span class="line"><span class="bullet">     -</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="bullet">     -</span> <span class="string">restart</span> <span class="string">apache</span></span><br></pre></td></tr></table></figure></p>
+<p>相应的2个handler定义如下：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure></p>
+<p>在2.2版本后，可以使用listen，这样只需要notify一次： 通过监听主题<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">handlers:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">memcached</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">restarted</span></span><br><span class="line"><span class="attr">      listen:</span> <span class="string">"restart web services"</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">      service:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">apache</span></span><br><span class="line"><span class="attr">        state:</span><span class="string">restarted</span></span><br><span class="line"><span class="attr">      listen:</span> <span class="string">"restart web services"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">restart</span> <span class="string">everything</span></span><br><span class="line"><span class="attr">      command:</span> <span class="string">echo</span> <span class="string">"this task will restart the web services"</span></span><br><span class="line"><span class="attr">      notify:</span> <span class="string">"restart web services"</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="执行playbook"><a href="#执行playbook" class="headerlink" title="执行playbook"></a>执行playbook</h2><p>并行度10，fork 10：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible-playbook playbook.yml -f 10</span><br></pre></td></tr></table></figure></p>
+<p>再看一个复合例子：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">$</span> <span class="string">cat</span> <span class="string">playbook.yml</span> </span><br><span class="line"><span class="attr">- name:</span> <span class="string">top</span> <span class="string">playbook</span></span><br><span class="line"><span class="attr">  hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">ping</span> <span class="string">ping</span></span><br><span class="line"><span class="attr">    ping:</span> </span><br><span class="line"><span class="attr">  - include:</span> <span class="string">tasks/echo1.yml</span> <span class="string">the_user=root</span></span><br><span class="line"><span class="attr">  - include:</span> <span class="string">tasks/echo2.yml</span></span><br><span class="line"><span class="attr">  handlers:</span></span><br><span class="line"><span class="attr">      - include:</span> <span class="string">handlers/handlers.yml</span></span><br></pre></td></tr></table></figure></p>
+<p>输出结果的方式</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>在入门了之后就开始进阶把。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/03/ansible/001-playbook/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/03/ansible/001-playbook/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/03/ansible/001-playbook/" data-id="cjzjeukf8000isjchw5fhjvu5" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-ansible/000-ansible-fresh" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/02/ansible/000-ansible-fresh/" class="article-date">
+  <time datetime="2019-01-02T08:38:38.000Z" itemprop="datePublished">2019-01-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/02/ansible/000-ansible-fresh/">ansible1-入门金殿</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>入门总是简单的，看看你有多快。</p>
+<p>关于ssh连接请查找相关知识。</p>
+<h1 id="一条命令格式"><a href="#一条命令格式" class="headerlink" title="一条命令格式"></a>一条命令格式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ansible PATTERNS -m MODULE -a PARAMS</span><br></pre></td></tr></table></figure>
+<p>只需要明白模式、模块、参数就可以实现命令行级别的使用了。</p>
+<h2 id="PATTERNS"><a href="#PATTERNS" class="headerlink" title="PATTERNS"></a>PATTERNS</h2><p><a href="https://docs.ansible.com/ansible/latest/user_guide/intro_patterns.html" target="_blank" rel="noopener">patterns</a></p>
+<p>可以分为3个部分：</p>
+<ol>
+<li>all/*， webservers[0-25]</li>
+<li>逻辑运算： &amp;/！</li>
+<li>正则表达式：~正则， <code>~(web|db).*\.example\.com</code></li>
+</ol>
+<h2 id="MODULE"><a href="#MODULE" class="headerlink" title="MODULE"></a>MODULE</h2><p>模块太多了，可以了解一下简单的：<br><a href="https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html" target="_blank" rel="noopener">ad-hoc</a></p>
+<p>大概有：</p>
+<ol>
+<li>ping</li>
+<li>shell</li>
+<li>copy</li>
+<li>file</li>
+<li>yum/apt/…</li>
+<li>user</li>
+<li>git</li>
+<li>service</li>
+<li>setup</li>
+</ol>
+<p>参数和模块对应。</p>
+<h1 id="连接方式"><a href="#连接方式" class="headerlink" title="连接方式"></a>连接方式</h1><p>当然是ssh，只是连接方式有区别。</p>
+<h2 id="SSH的key"><a href="#SSH的key" class="headerlink" title="SSH的key"></a>SSH的key</h2><p>不用说了。</p>
+<h2 id="密码登陆"><a href="#密码登陆" class="headerlink" title="密码登陆"></a>密码登陆</h2><p>加上<code>-k</code>选项。</p>
+<h1 id="Ansible配置文件"><a href="#Ansible配置文件" class="headerlink" title="Ansible配置文件"></a>Ansible配置文件</h1><ol>
+<li>配置文件优先顺序</li>
+<li>有哪些配置属性</li>
+</ol>
+<p><a href="https://ansible-tran.readthedocs.io/en/latest/docs/intro_configuration.html" target="_blank" rel="noopener">ansible config</a></p>
+<h1 id="hosts"><a href="#hosts" class="headerlink" title="hosts"></a>hosts</h1><p>对哪些机器执行，ansible里叫inventory（清单文件），这个hosts文件默认在<code>/etc/ansible/hosts</code>,不过我们可以在任何目录配置它。</p>
+<ol>
+<li>在工作目录新建ansible.cfg.</li>
+<li>加入配置： <code>inventory = hosts</code>, 注意，必须是在<code>[defaults]</code>模块下才行</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[defaults]</span><br><span class="line">inventory = hosts</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>入门总是简单的，看看你有多快。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/02/ansible/000-ansible-fresh/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/02/ansible/000-ansible-fresh/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/02/ansible/000-ansible-fresh/" data-id="cjzjeukf4000dsjch21p5kvut" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/013-ssh" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/01/02/tools/013-ssh/" class="article-date">
@@ -152,7 +569,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/02/tools/013-ssh/" data-id="cjzi97pdk00kf3hchipfjw47t" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/02/tools/013-ssh/" data-id="cjzjeukog00o1sjchv76rhv5o" class="article-share-link">
           Share
         </a>
         
@@ -242,7 +659,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/01/git/002-git-commit-wrong-person/" data-id="cjzi97p9i006v3hchtmvil24r" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/01/git/002-git-commit-wrong-person/" data-id="cjzjeukh0004bsjchhdfqxmlf" class="article-share-link">
           Share
         </a>
         
@@ -317,7 +734,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/22/algorithm/001-week-algo/" data-id="cjzi97p3f00013hchuzpldwat" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/22/algorithm/001-week-algo/" data-id="cjzjeukeo0001sjch91b6aet8" class="article-share-link">
           Share
         </a>
         
@@ -413,7 +830,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/19/basic/013-consumer-driven-contracts/" data-id="cjzi97p65001w3hch5ami1z1a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/19/basic/013-consumer-driven-contracts/" data-id="cjzjeukg8001wsjch96du2qog" class="article-share-link">
           Share
         </a>
         
@@ -510,7 +927,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/17/basic/012-circuit-breaker/" data-id="cjzi97p5g001h3hchgg0o4c1k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/17/basic/012-circuit-breaker/" data-id="cjzjeukg3001hsjchs0go3vjn" class="article-share-link">
           Share
         </a>
         
@@ -602,7 +1019,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/14/tools/012-idea-question/" data-id="cjzi97pdk00kd3hchqzaf9z3f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/14/tools/012-idea-question/" data-id="cjzjeukog00nzsjchnekr4szr" class="article-share-link">
           Share
         </a>
         
@@ -747,7 +1164,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/14/algorithm/000-week-algo/" data-id="cjzi97p3s00093hch4m7esyhi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/14/algorithm/000-week-algo/" data-id="cjzjeukf3000bsjchveqj1yqa" class="article-share-link">
           Share
         </a>
         
@@ -822,7 +1239,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/12/hadoop/003-hdfs-cmd/" data-id="cjzi97p9m00793hch5ih8uvz3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/12/hadoop/003-hdfs-cmd/" data-id="cjzjeukh5004nsjchwmn8dn81" class="article-share-link">
           Share
         </a>
         
@@ -960,7 +1377,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/11/basic/011-microservice-trade-offs/" data-id="cjzi97p5d001e3hch78dph1cf" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/11/basic/011-microservice-trade-offs/" data-id="cjzjeukg3001esjchlm3rwl7q" class="article-share-link">
           Share
         </a>
         
@@ -1053,7 +1470,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/010-devops-culture/" data-id="cjzi97p59001c3hchcbla8c2f" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/010-devops-culture/" data-id="cjzjeukg10019sjchtmyg28q2" class="article-share-link">
           Share
         </a>
         
@@ -1130,7 +1547,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/shell/002-join-list/" data-id="cjzi97pd400j23hchorsbs0es" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/10/shell/002-join-list/" data-id="cjzjeukny00mmsjchsmrv3pyk" class="article-share-link">
           Share
         </a>
         
@@ -1216,7 +1633,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/009-observed-required/" data-id="cjzi97p5100193hcht581xuj4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/009-observed-required/" data-id="cjzjeukg00015sjchwz4vwxad" class="article-share-link">
           Share
         </a>
         
@@ -1314,7 +1731,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/09/basic/008-continuous-delivery/" data-id="cjzi97p4y00163hchk75bre1b" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/09/basic/008-continuous-delivery/" data-id="cjzjeukg10017sjch45k7kuhi" class="article-share-link">
           Share
         </a>
         
@@ -1499,7 +1916,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/06/basic/007-continuous-integration/" data-id="cjzi97p62001u3hchxn0a80n5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/06/basic/007-continuous-integration/" data-id="cjzjeukg7001rsjch6cx6ij5c" class="article-share-link">
           Share
         </a>
         
@@ -1587,7 +2004,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/04/basic/006-microservice-prerequisites/" data-id="cjzi97p4v00143hch43egto65" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/04/basic/006-microservice-prerequisites/" data-id="cjzjeukfx0012sjch81h965r8" class="article-share-link">
           Share
         </a>
         
@@ -1728,330 +2145,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/30/basic/005-how-to-break-monolith-into-microservices/" data-id="cjzi97p56001a3hchvxxbl0vh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/11/30/basic/005-how-to-break-monolith-into-microservices/" data-id="cjzjeukg2001csjchzc1r58dt" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/microservice/">microservice</a><span class="article-tag-list-count">9</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/022-jvm-monitor" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/29/java/022-jvm-monitor/" class="article-date">
-  <time datetime="2018-11-29T09:28:32.000Z" itemprop="datePublished">2018-11-29</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/29/java/022-jvm-monitor/">java JVM 监控</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文涉及JVM工具的使用，命令行参数使用。</p>
-<p>命令行参数：<a href="https://gist.github.com/rafaeltuelho/f3334d3526bdb0e6d3f2cc41a79e0523" target="_blank" rel="noopener">https://gist.github.com/rafaeltuelho/f3334d3526bdb0e6d3f2cc41a79e0523</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文涉及JVM工具的使用，命令行参数使用。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/29/java/022-jvm-monitor/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/29/java/022-jvm-monitor/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/29/java/022-jvm-monitor/" data-id="cjzi97pa8009e3hchvinjsiz1" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/017-ubuntu-wallpaper-slide" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/" class="article-date">
-  <time datetime="2018-11-26T23:48:55.000Z" itemprop="datePublished">2018-11-27</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/">ubuntu设置桌面背景幻灯片</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>定时切换ubuntu18.04 桌面幻灯片。</p>
-<p>使用自带工具Shotwell即可。</p>
-<p>选中所有图片—》文件—》set as desktop slideshow.</p>
-<p><a href="http://ubuntuhandbook.org/index.php/2018/07/4-wallpaper-changer-ubuntu-18-04/" target="_blank" rel="noopener">4种方法设置</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>定时切换ubuntu18.04 桌面幻灯片。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/27/linux/017-ubuntu-wallpaper-slide/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/27/linux/017-ubuntu-wallpaper-slide/" data-id="cjzi97pc600fz3hchadvff2qn" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">8</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-life/003-work-ready" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/26/life/003-work-ready/" class="article-date">
-  <time datetime="2018-11-26T12:11:26.000Z" itemprop="datePublished">2018-11-26</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/26/life/003-work-ready/">begin to work</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>how to quickly begin to work?</p>
-<h1 id="openvpn"><a href="#openvpn" class="headerlink" title="openvpn"></a>openvpn</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apt install openvpn</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 把config目录拷过来</span><br><span class="line"></span><br><span class="line">sudo openvpn --config client-lenovo.ovpn</span><br></pre></td></tr></table></figure>
-<h1 id="navicat"><a href="#navicat" class="headerlink" title="navicat"></a>navicat</h1><ol>
-<li><p>下载解压</p>
-</li>
-<li><p>解决中文乱码问题:<a href="https://blog.csdn.net/qq_41376740/article/details/80499545" target="_blank" rel="noopener">blog</a></p>
-</li>
-</ol>
-<h1 id="配置gitlab-ssh"><a href="#配置gitlab-ssh" class="headerlink" title="配置gitlab ssh"></a>配置gitlab ssh</h1><h1 id="下载项目并导入"><a href="#下载项目并导入" class="headerlink" title="下载项目并导入"></a>下载项目并导入</h1><p>记得切换分支i后再pull一下，保持最新代码。</p>
-<h1 id="IDEA-配置"><a href="#IDEA-配置" class="headerlink" title="IDEA 配置"></a>IDEA 配置</h1><ol>
-<li>给IDEA安装阿里的插件。</li>
-<li>注释模板</li>
-<li>修改快捷键（alt+w）</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>how to quickly begin to work?</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/26/life/003-work-ready/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/26/life/003-work-ready/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/26/life/003-work-ready/" data-id="cjzi97pb800d23hchv3cawb0r" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/work/">work</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-life/002-just-forward" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/22/life/002-just-forward/" class="article-date">
-  <time datetime="2018-11-22T00:54:48.000Z" itemprop="datePublished">2018-11-22</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/22/life/002-just-forward/">只是向前</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>在一个早上，我突然自己内心狂躁。</p>
-<p>我的眼里只有前方，已经懒得回头看一看身后，我曾经学过的，曾经放下的，曾经想要的，曾经得不到的。</p>
-<p>然而，在紧张的生活进程里，如果回过头，会发现以前学过的忘了，曾经放下的还可以拿起，曾经想要的得到了，曾经得不到的也不想要了。</p>
-<p>回头看，这是个反思的过程，这是个总结的过程，我已经失去了过目不忘的本领，过了一日千里的学习能力，我剩下的只是经验的沉淀，加上自己的判断原则，我依然保持着对世间万物的批判，却已经没有改变他们的勇气。</p>
-<p>好多事情都在走回头路，发展的速度跟不上满足人们好奇心的速度，所以将以前的东西包装一下，人们也会愚蠢地被吸引，偶尔有人犹豫了一下，但也懒得思考了。在这个碎片化地信息时代，人们懒得思考了。</p>
-<p>一直向前不可避免，但不能阻止我的倒退。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>在一个早上，我突然自己内心狂躁。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/11/22/life/002-just-forward/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/11/22/life/002-just-forward/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/11/22/life/002-just-forward/" data-id="cjzi97pb700cz3hch9qjgdelh" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li></ul>
 
       </footer>
       </div>
@@ -2088,7 +2187,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 12.5px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2110,23 +2209,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/">Tomcat9-文档3-部署</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/20/server/006-tomcat9-doc-1-introduction/">Tomcat9-文档1-介绍</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/16/java/057-spring-boot-starter-demo/">自定义spring-boot starter步骤</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/14/tools/018-ascii-flow-graph/">ASCII码（字符集）绘制流程图</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/12/linux/029-syslog/">认识syslog</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/12/life/027-weekly-learn/">2019-33-周报</a>
           </li>
         
       </ul>
