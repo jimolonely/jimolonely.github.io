@@ -86,6 +86,169 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/mybatis-pgsql-return-insert-id" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/" class="article-date">
+  <time datetime="2019-07-24T11:55:39.000Z" itemprop="datePublished">2019-07-24</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>当需要返回插入后的主键id时，需要特别注意。</p>
+<h1 id="pgsql返回插入id"><a href="#pgsql返回插入id" class="headerlink" title="pgsql返回插入id"></a>pgsql返回插入id</h1><p>在pgsql中存在相应的语法，在插入后，可以返回一个列的值：即<code>returning id</code><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> api(<span class="keyword">id</span>, uri, method_id, <span class="keyword">type</span>, <span class="string">"desc"</span>, ignore_param, project_id)</span><br><span class="line"><span class="keyword">values</span> (<span class="number">4</span>, <span class="string">'/test'</span>, <span class="number">1</span>, <span class="string">'normal'</span>, <span class="literal">null</span>, <span class="literal">false</span>, <span class="number">1</span>)</span><br><span class="line"><span class="keyword">returning</span> <span class="keyword">id</span>;</span><br></pre></td></tr></table></figure></p>
+<p>然后，在mybatis的xml中这样是行不通的：</p>
+<h1 id="mybatis-pgsql"><a href="#mybatis-pgsql" class="headerlink" title="mybatis+pgsql"></a>mybatis+pgsql</h1><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"addOrUpdate"</span>&gt;</span></span><br><span class="line">    insert into api(uri, method_id, type, "desc", ignore_param, project_id)</span><br><span class="line">    values ( #&#123;api.uri&#125;, #&#123;api.methodId&#125;, #&#123;api.type&#125;, #&#123;api.desc&#125;, #&#123;api.ignoreParam&#125;, #&#123;api.projectId&#125;)</span><br><span class="line">    returning id</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">addOrUpdate</span><span class="params">(@Param(<span class="string">"api"</span>)</span> Api api)</span>;</span><br></pre></td></tr></table></figure>
+<p>这样返回的依然是更新条数1.</p>
+<p>因为mybatis的插入语句的返回值不是这样的，需要人家的方法才行：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"addOrUpdate"</span> <span class="attr">useGeneratedKeys</span>=<span class="string">"true"</span> <span class="attr">keyProperty</span>=<span class="string">"id"</span>&gt;</span></span><br><span class="line">    insert into api(uri, method_id, type, "desc", ignore_param, project_id)</span><br><span class="line">    values (#&#123;api.uri&#125;, #&#123;api.methodId&#125;, #&#123;api.type&#125;, #&#123;api.desc&#125;, #&#123;api.ignoreParam&#125;, #&#123;api.projectId&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>也就是使用：<code>useGeneratedKeys=&quot;true&quot; keyProperty=&quot;id&quot;</code>, 注意，这个<code>keyProperty=&quot;id&quot;</code>里的id是要返回的主键列，和实体类的属性要对应。</p>
+<p>于是，调用的java<br>代码变成了这样：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Api api = <span class="keyword">new</span> Api();</span><br><span class="line">dao.addOrUpdate(api);</span><br><span class="line"><span class="keyword">int</span> id = api.getId();</span><br></pre></td></tr></table></figure></p>
+<h1 id="插入或更新操作"><a href="#插入或更新操作" class="headerlink" title="插入或更新操作"></a>插入或更新操作</h1><p>再附一个重复id就更新的情况，如果id是0，代表插入：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"addOrUpdate"</span> <span class="attr">useGeneratedKeys</span>=<span class="string">"true"</span> <span class="attr">keyProperty</span>=<span class="string">"id"</span>&gt;</span></span><br><span class="line">    insert into api(id, uri, method_id, type, "desc", ignore_param, project_id)</span><br><span class="line">    values (</span><br><span class="line">    <span class="tag">&lt;<span class="name">choose</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">"api.id == 0"</span>&gt;</span></span><br><span class="line">            nextval('api_id_seq')</span><br><span class="line">        <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">otherwise</span>&gt;</span></span><br><span class="line">            #&#123;api.id&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">otherwise</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">choose</span>&gt;</span></span><br><span class="line">    , #&#123;api.uri&#125;, #&#123;api.methodId&#125;, #&#123;api.type&#125;, #&#123;api.desc&#125;, #&#123;api.ignoreParam&#125;, #&#123;api.projectId&#125;)</span><br><span class="line">    on conflict (id) do update set uri=#&#123;api.uri&#125;,</span><br><span class="line">    method_id=#&#123;api.methodId&#125;,</span><br><span class="line">    type=#&#123;api.type&#125;,</span><br><span class="line">    "desc"=#&#123;api.desc&#125;,</span><br><span class="line">    ignore_param= #&#123;api.ignoreParam&#125;,</span><br><span class="line">    project_id= #&#123;api.projectId&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>参考：<a href="https://cofcool.github.io/tech/2017/11/06/Mybatis-insert-get-id" target="_blank" rel="noopener">https://cofcool.github.io/tech/2017/11/06/Mybatis-insert-get-id</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>当需要返回插入后的主键id时，需要特别注意。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/07/24/java/mybatis-pgsql-return-insert-id/" data-id="cjzm1nrvn009z52chl81ybhra" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pgsql/">pgsql</a><span class="article-tag-list-count">4</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-java/051-spring-http-status-code" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/24/java/051-spring-http-status-code/" class="article-date">
+  <time datetime="2019-07-24T00:22:27.000Z" itemprop="datePublished">2019-07-24</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/24/java/051-spring-http-status-code/">spring如何返回http状态码</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如何在sring里返回404,400这种状态码？</p>
+<p>查看这篇文章提供的3个方法：<a href="https://jaskey.github.io/blog/2014/09/27/how-to-return-404-in-spring-controller/" target="_blank" rel="noopener">https://jaskey.github.io/blog/2014/09/27/how-to-return-404-in-spring-controller/</a></p>
+<h1 id="1-自定义异常-ResponseStatus注解："><a href="#1-自定义异常-ResponseStatus注解：" class="headerlink" title="1.自定义异常+@ResponseStatus注解："></a>1.自定义异常+@ResponseStatus注解：</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义一个自定义异常，抛出时返回状态码404</span></span><br><span class="line"><span class="meta">@ResponseStatus</span>(value = HttpStatus.NOT_FOUND)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResourceNotFoundException</span> <span class="keyword">extends</span> <span class="title">RuntimeException</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//在Controller里面直接抛出这个异常</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SomeController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@RequestMapping</span>(value=<span class="string">"/video/&#123;id&#125;"</span>,method=RequestMethod.GET)</span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">Video <span class="title">getVidoeById</span><span class="params">(@PathVariable <span class="keyword">long</span> id)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isFound()) &#123;</span><br><span class="line">            <span class="comment">// 做该做的逻辑</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ResourceNotFoundException();<span class="comment">//把这个异常抛出 </span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="2-使用Spring的内置异常"><a href="#2-使用Spring的内置异常" class="headerlink" title="2.使用Spring的内置异常"></a>2.使用Spring的内置异常</h1><p>默认情况下，Spring 的DispatcherServlet注册了DefaultHandlerExceptionResolver,这个resolver会处理标准的Spring MVC异常来表示特定的状态码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Exception                                   HTTP Status Code</span><br><span class="line">ConversionNotSupportedException             <span class="number">500</span> (Internal Server Error)</span><br><span class="line">HttpMediaTypeNotAcceptableException         <span class="number">406</span> (Not Acceptable)</span><br><span class="line">HttpMediaTypeNotSupportedException          <span class="number">415</span> (Unsupported Media Type)</span><br><span class="line">HttpMessageNotReadableException             <span class="number">400</span> (Bad Request)</span><br><span class="line">HttpMessageNotWritableException             <span class="number">500</span> (Internal Server Error)</span><br><span class="line">HttpRequestMethodNotSupportedException      <span class="number">405</span> (Method Not Allowed)</span><br><span class="line">MissingServletRequestParameterException     <span class="number">400</span> (Bad Request)</span><br><span class="line">NoSuchRequestHandlingMethodException        <span class="number">404</span> (Not Found)</span><br><span class="line">TypeMismatchException                       <span class="number">400</span> (Bad Request)</span><br></pre></td></tr></table></figure></p>
+<h1 id="3-在Controller方法中通过HttpServletResponse参数直接设值"><a href="#3-在Controller方法中通过HttpServletResponse参数直接设值" class="headerlink" title="3.在Controller方法中通过HttpServletResponse参数直接设值"></a>3.在Controller方法中通过HttpServletResponse参数直接设值</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//任何一个RequestMapping 的函数都可以接受一个HttpServletResponse类型的参数</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SomeController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@RequestMapping</span>(value=<span class="string">"/video/&#123;id&#125;"</span>,method=RequestMethod.GET)</span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">Video <span class="title">getVidoeById</span><span class="params">(@PathVariable <span class="keyword">long</span> id ,HttpServletResponse response)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isFound()) &#123;</span><br><span class="line">            <span class="comment">// 做该做的逻辑</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            response.setStatus(HttpServletResponse.SC_NOT_FOUND);<span class="comment">//设置状态码</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ....</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>如何在sring里返回404,400这种状态码？</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/07/24/java/051-spring-http-status-code/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/07/24/java/051-spring-http-status-code/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/07/24/java/051-spring-http-status-code/" data-id="cjzm1nrvi009f52chy5e7xcqk" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/050-java-run-js" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/07/23/java/050-java-run-js/" class="article-date">
@@ -151,7 +314,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/23/java/050-java-run-js/" data-id="cjzjeukla00eisjcho6rt85jw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/23/java/050-java-run-js/" data-id="cjzm1nrvh009d52chebo97ks9" class="article-share-link">
           Share
         </a>
         
@@ -229,7 +392,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/23/linux/028-ubuntu-application-launcher/" data-id="cjzjeukn100jvsjch1wff66cs" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/23/linux/028-ubuntu-application-launcher/" data-id="cjzm1nrws00dq52chmjosuvqw" class="article-share-link">
           Share
         </a>
         
@@ -319,7 +482,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/22/life/024-weekly-learn/" data-id="cjzjeukma00hnsjchtbud0cod" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/22/life/024-weekly-learn/" data-id="cjzm1nrw300bb52choz6i9vgp" class="article-share-link">
           Share
         </a>
         
@@ -401,7 +564,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/17/java/049-spring-autowire-in-dependency/" data-id="cjzjeukla00efsjchhibtccjq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/17/java/049-spring-autowire-in-dependency/" data-id="cjzm1nrvj009k52chbupltx0f" class="article-share-link">
           Share
         </a>
         
@@ -488,7 +651,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/17/linux/027-snap-ubuntu/" data-id="cjzjeukn000jssjchd8h9001m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/17/linux/027-snap-ubuntu/" data-id="cjzm1nrwp00dg52ch7n02axk4" class="article-share-link">
           Share
         </a>
         
@@ -634,7 +797,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/15/linux/026-centos-firewalld/" data-id="cjzjeukn200jxsjchr1zjtoha" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/15/linux/026-centos-firewalld/" data-id="cjzm1nrwr00dl52chki0qm3vq" class="article-share-link">
           Share
         </a>
         
@@ -722,7 +885,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/15/life/023-weekly-learn/" data-id="cjzjeukm900hksjchqvqrsvua" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/15/life/023-weekly-learn/" data-id="cjzm1nrw400bg52chxify4n44" class="article-share-link">
           Share
         </a>
         
@@ -814,7 +977,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/14/linux/025-ubuntu-use-navidia-card/" data-id="cjzjeukn400k5sjchu4ym8k36" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/14/linux/025-ubuntu-use-navidia-card/" data-id="cjzm1nrwq00dj52chg2lb42gk" class="article-share-link">
           Share
         </a>
         
@@ -891,7 +1054,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/14/tools/016-vscode-config/" data-id="cjzjeukoj00o9sjchd0fqsqsx" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/14/tools/016-vscode-config/" data-id="cjzm1nry200i052chaanjnlsf" class="article-share-link">
           Share
         </a>
         
@@ -993,7 +1156,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/10/git/006-git-revert-deleted-files/" data-id="cjzjeukh4004hsjchui170git" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/10/git/006-git-revert-deleted-files/" data-id="cjzm1nru0004g52chxfntjg5g" class="article-share-link">
           Share
         </a>
         
@@ -1067,7 +1230,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/09/basic/019-cs-basic-concept/" data-id="cjzjeukg8001xsjchbd18bshm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/09/basic/019-cs-basic-concept/" data-id="cjzm1nrt0001l52ch3jjgdsxv" class="article-share-link">
           Share
         </a>
         
@@ -1160,7 +1323,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/08/life/022-weekly-learn/" data-id="cjzjeukm700hdsjchxgte7goj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/08/life/022-weekly-learn/" data-id="cjzm1nrw500bl52ch1hbf722k" class="article-share-link">
           Share
         </a>
         
@@ -1417,7 +1580,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/01/cloudcompute/018-docker-conclude-to-graph/" data-id="cjzjeukgm0037sjch9lxakjwq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/01/cloudcompute/018-docker-conclude-to-graph/" data-id="cjzm1nrtg003052chlsfhxaly" class="article-share-link">
           Share
         </a>
         
@@ -1496,7 +1659,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/01/elasticsearch/007-lucene-es/" data-id="cjzjeukgx0041sjchfithxcp0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/01/elasticsearch/007-lucene-es/" data-id="cjzm1nrtv004252chikrmblx8" class="article-share-link">
           Share
         </a>
         
@@ -1582,7 +1745,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/01/life/021-weekly-learn/" data-id="cjzjeukmb00hpsjch8j2qzsb3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/01/life/021-weekly-learn/" data-id="cjzm1nrw100b752ch2tch087i" class="article-share-link">
           Share
         </a>
         
@@ -1665,7 +1828,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/27/linux/024-linux-hostname/" data-id="cjzjeukmx00jisjchykam6ow8" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/27/linux/024-linux-hostname/" data-id="cjzm1nrws00do52chiavkmtpm" class="article-share-link">
           Share
         </a>
         
@@ -1759,7 +1922,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/24/life/020-weekly-learn/" data-id="cjzjeukm900hisjchi4hbf08z" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/24/life/020-weekly-learn/" data-id="cjzm1nrw200b852chapryhv0l" class="article-share-link">
           Share
         </a>
         
@@ -1843,198 +2006,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/19/life/019-weekly-learn/" data-id="cjzjeukm800hfsjch9r4yxfdl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/06/19/life/019-weekly-learn/" data-id="cjzm1nrw000b452ch08jpgwao" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">27</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/week/">week</a><span class="article-tag-list-count">21</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-basic/018-float-double-format-in-binary" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/19/basic/018-float-double-format-in-binary/" class="article-date">
-  <time datetime="2019-06-19T06:04:30.000Z" itemprop="datePublished">2019-06-19</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/19/basic/018-float-double-format-in-binary/">float/double的存储格式与精度</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="https://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html" target="_blank" rel="noopener">https://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html</a></p>
-<p><a href="https://www.cnblogs.com/BradMiller/archive/2010/11/25/1887945.html" target="_blank" rel="noopener">https://www.cnblogs.com/BradMiller/archive/2010/11/25/1887945.html</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p><a href="https://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html" target="_blank" rel="noopener">https://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/06/19/basic/018-float-double-format-in-binary/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/06/19/basic/018-float-double-format-in-binary/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/19/basic/018-float-double-format-in-binary/" data-id="cjzjeukg7001tsjchdnjpl2qs" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/basic/">basic</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/computer-principle/">computer principle</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-cloudcompute/017-docker-spring-cloud-build" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/17/cloudcompute/017-docker-spring-cloud-build/" class="article-date">
-  <time datetime="2019-06-17T02:43:56.000Z" itemprop="datePublished">2019-06-17</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/17/cloudcompute/017-docker-spring-cloud-build/">docker搭建springcloud微服务集群环境</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>一个简单的细节问题，导致eureka的url设置不正确。</p>
-<p><a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/2541" target="_blank" rel="noopener">但我肯定不是孤独的</a></p>
-<p>设置eureka的defaultZone时：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    service-url:</span></span><br><span class="line"><span class="attr">      default-zone:</span> <span class="attr">http://epay-eureka:8761/eureka/</span></span><br></pre></td></tr></table></figure></p>
-<p><code>default-zone</code>失效，导致eureka加载的默认配置： 在 <code>EurekaClientConfigBean</code>类里：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DEFAULT_ZONE = <span class="string">"defaultZone"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> Map&lt;String, String&gt; serviceUrl = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">this</span>.serviceUrl.put(DEFAULT_ZONE, DEFAULT_URL);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>DEFAULT_ZONE的默认值是驼峰命名的， 而写成<code>default-zone</code>会被当成全小写<code>defaultzone</code>, 因此不起作用。<br>这算是一个坑吧，</p>
-<p>ok，可以开始叙述正式内容了： spring cloud在docker中的单机和集群部署实践。</p>
-<h1 id="单机部署"><a href="#单机部署" class="headerlink" title="单机部署"></a>单机部署</h1><p>要说为什么把单机部署单独提出来将，有2个目的：</p>
-<ol>
-<li>用作实验教学，搭建最小</li>
-<li>单机和集群有本质的区别</li>
-</ol>
-<p>本次环境是一个电子支付的例子，最小环境里只包括了4个服务： <code>epay-eureka, epay-zuul, epay-icbc, epay-ccb</code>.<br>ICBC需要访问CCB来测试服务间调用。</p>
-<h2 id="spring-cloud配置"><a href="#spring-cloud配置" class="headerlink" title="spring cloud配置"></a>spring cloud配置</h2><p>关于每个服务的maven依赖见<a href="#附录">附录</a></p>
-<p>下面是每个服务的application.yml配置：</p>
-<p>epay-eureka<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">8761</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  application:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">epay-eureka</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    register-with-eureka:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">    fetch-registry:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">    service-url:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="string">$&#123;EUREKA_URLS&#125;</span></span><br><span class="line"><span class="attr">  server:</span></span><br><span class="line"><span class="attr">    wait-time-in-ms-when-sync-empty:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">    enable-self-preservation:</span> <span class="literal">false</span></span><br><span class="line">    <span class="comment"># 主动失效检测间隔，默认60s有点慢</span></span><br><span class="line"><span class="attr">    eviction-interval-timer-in-ms:</span> <span class="number">30000</span></span><br></pre></td></tr></table></figure></p>
-<p>epay-zuul<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  application:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">epay-zuul</span></span><br><span class="line"></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">5555</span></span><br><span class="line"></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    service-url:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="string">$&#123;EUREKA_URLS&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">zuul:</span></span><br><span class="line"><span class="attr">  add-host-header:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  routes:</span></span><br><span class="line"><span class="attr">    icbc:</span></span><br><span class="line"><span class="attr">      path:</span> <span class="string">/icbc/**</span></span><br><span class="line"><span class="attr">      service-id:</span> <span class="string">epay-icbc</span></span><br><span class="line"><span class="attr">    ccb:</span></span><br><span class="line"><span class="attr">      path:</span> <span class="string">/ccb/**</span></span><br><span class="line"><span class="attr">      service-id:</span> <span class="string">epay-ccb</span></span><br><span class="line"><span class="attr">  ribbon-isolation-strategy:</span> <span class="string">thread</span></span><br><span class="line"><span class="attr">  thread-pool:</span></span><br><span class="line"><span class="attr">    use-separate-thread-pools:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    thread-pool-key-prefix:</span> <span class="string">zullgateway</span></span><br><span class="line">  <span class="comment"># 这些参数可根据实际监控情况调节</span></span><br><span class="line"><span class="attr">  host:</span></span><br><span class="line"><span class="attr">    max-per-route-connections:</span> <span class="number">50</span></span><br><span class="line"><span class="attr">    max-total-connections:</span> <span class="number">300</span></span><br><span class="line"><span class="attr">    socket-timeout-millis:</span> <span class="number">5000</span></span><br><span class="line"><span class="attr">    connect-timeout-millis:</span> <span class="number">5000</span></span><br><span class="line"></span><br><span class="line"><span class="attr">ribbon:</span></span><br><span class="line"><span class="attr">  ConnectTimeout:</span> <span class="number">5000</span></span><br><span class="line"><span class="attr">  ReadTimeout:</span> <span class="number">5000</span></span><br><span class="line"><span class="attr">  MaxAutoRetries:</span> <span class="number">0</span> <span class="comment"># 考虑到支付的特殊性，可能出现冥等问题，所以不重试</span></span><br><span class="line"><span class="attr">  MaxAutoRetriesNextServer:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">  OkToRetryOnAllOperations:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">hystrix:</span></span><br><span class="line"><span class="attr">  threadpool:</span></span><br><span class="line"><span class="attr">    default:</span></span><br><span class="line"><span class="attr">      coresize:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">      maximumSize:</span> <span class="number">50</span></span><br><span class="line"><span class="attr">      allowMaximumSizeToDivergeFromCoresize:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  command:</span></span><br><span class="line"><span class="attr">    default:</span></span><br><span class="line"><span class="attr">      execution:</span></span><br><span class="line"><span class="attr">        isolation:</span></span><br><span class="line"><span class="attr">          thread:</span></span><br><span class="line"><span class="attr">            timeoutInMilliseconds:</span> <span class="number">10000</span></span><br><span class="line"></span><br><span class="line"><span class="attr">management:</span></span><br><span class="line"><span class="attr">  endpoints:</span></span><br><span class="line"><span class="attr">    web:</span></span><br><span class="line"><span class="attr">      exposure:</span></span><br><span class="line"><span class="attr">        include:</span> <span class="string">"*"</span></span><br><span class="line"><span class="attr">  endpoint:</span></span><br><span class="line"><span class="attr">    health:</span></span><br><span class="line"><span class="attr">      show-details:</span> <span class="string">ALWAYS</span></span><br></pre></td></tr></table></figure></p>
-<p>epay-icbc<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">8001</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  application:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">epay-icbc</span></span><br><span class="line"></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    service-url:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="string">$&#123;EUREKA_URLS&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">ribbon:</span></span><br><span class="line"><span class="attr">  ConnectTimeout:</span> <span class="number">5000</span></span><br><span class="line"><span class="attr">  ReadTimeout:</span> <span class="number">5000</span></span><br><span class="line"><span class="attr">  MaxAutoRetries:</span> <span class="number">0</span> <span class="comment"># 考虑到支付的特殊性，可能出现冥等问题，所以不重试</span></span><br><span class="line"><span class="attr">  MaxAutoRetriesNextServer:</span> <span class="number">0</span></span><br><span class="line"><span class="attr">  OkToRetryOnAllOperations:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">hystrix:</span></span><br><span class="line"><span class="attr">  command:</span></span><br><span class="line"><span class="attr">    default:</span></span><br><span class="line"><span class="attr">      execution:</span></span><br><span class="line"><span class="attr">        isolation:</span></span><br><span class="line"><span class="attr">          thread:</span></span><br><span class="line"><span class="attr">            timeoutInMilliseconds:</span> <span class="number">10000</span></span><br><span class="line"></span><br><span class="line"><span class="attr">feign:</span></span><br><span class="line"><span class="attr">  hystrix:</span></span><br><span class="line"><span class="attr">    enabled:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
-<p>epay-ccb<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">8002</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  application:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">epay-ccb</span></span><br><span class="line"></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    service-url:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="string">$&#123;EUREKA_URLS&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">feign:</span></span><br><span class="line"><span class="attr">  hystrix:</span></span><br><span class="line"><span class="attr">    enabled:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">management:</span></span><br><span class="line"><span class="attr">  endpoints:</span></span><br><span class="line"><span class="attr">    web:</span></span><br><span class="line"><span class="attr">      exposure:</span></span><br><span class="line"><span class="attr">        include:</span> <span class="string">"*"</span></span><br><span class="line"><span class="attr">  endpoint:</span></span><br><span class="line"><span class="attr">    health:</span></span><br><span class="line"><span class="attr">      show-details:</span> <span class="string">always</span></span><br></pre></td></tr></table></figure></p>
-<p>注意点： <code>defaultZone: ${EUREKA_URLS}</code> 里面的EUREKA参数我们会从系统环境变量里读取。</p>
-<h2 id="Dockerfile编写"><a href="#Dockerfile编写" class="headerlink" title="Dockerfile编写"></a>Dockerfile编写</h2><p>很简单，我们以openjdk8为底层镜像：<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> openjdk:<span class="number">8</span>-jre</span><br><span class="line"><span class="keyword">MAINTAINER</span> jimo</span><br><span class="line"><span class="keyword">COPY</span> epay-eureka/target/epay-eureka.jar /opt/lib/</span><br><span class="line"><span class="keyword">ENTRYPOINT</span> ["java", "-jar", "/opt/lib/epay-eureka.jar"]</span><br></pre></td></tr></table></figure></p>
-<p>注意，我们会在docker-compose里指定context，jar包的相对路径是根据此来的。</p>
-<h2 id="docker-compose组合"><a href="#docker-compose组合" class="headerlink" title="docker compose组合"></a>docker compose组合</h2><p>这里需要看下我的项目结构：</p>
-<img src="/2019/06/17/cloudcompute/017-docker-spring-cloud-build/000.png">
-<p>docker-compose.yml<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2.2'</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">  epay-eureka:</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">epay-eureka</span></span><br><span class="line"><span class="attr">    build:</span></span><br><span class="line"><span class="attr">      context:</span> <span class="string">..</span></span><br><span class="line"><span class="attr">      dockerfile:</span> <span class="string">docker/Dockerfile-eureka</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">EUREKA_URLS=http://epay-eureka:8761/eureka/</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">epay-eureka</span></span><br><span class="line"><span class="attr">    expose:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">8761</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">8761</span><span class="string">:8761</span></span><br><span class="line"><span class="attr">    mem_limit:</span> <span class="number">996</span><span class="string">m</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  epay-zuul:</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">epay-zuul</span></span><br><span class="line"><span class="attr">    build:</span></span><br><span class="line"><span class="attr">      context:</span> <span class="string">..</span></span><br><span class="line"><span class="attr">      dockerfile:</span> <span class="string">docker/Dockerfile-zuul</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">EUREKA_URLS=http://epay-eureka:8761/eureka/</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">epay-zuul</span></span><br><span class="line"><span class="attr">    expose:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">5555</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">5555</span><span class="string">:5555</span></span><br><span class="line"><span class="attr">    mem_limit:</span> <span class="number">996</span><span class="string">m</span></span><br><span class="line"><span class="attr">    depends_on:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">epay-eureka</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  epay-icbc:</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">epay-icbc</span></span><br><span class="line"><span class="attr">    build:</span></span><br><span class="line"><span class="attr">      context:</span> <span class="string">..</span></span><br><span class="line"><span class="attr">      dockerfile:</span> <span class="string">docker/Dockerfile-icbc</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">EUREKA_URLS=http://epay-eureka:8761/eureka/</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">epay-icbc</span></span><br><span class="line"><span class="attr">    expose:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">8001</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">8001</span><span class="string">:8001</span></span><br><span class="line"><span class="attr">    mem_limit:</span> <span class="number">996</span><span class="string">m</span></span><br><span class="line"><span class="attr">    depends_on:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">epay-eureka</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  epay-ccb:</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">epay-ccb</span></span><br><span class="line"><span class="attr">    build:</span></span><br><span class="line"><span class="attr">      context:</span> <span class="string">..</span></span><br><span class="line"><span class="attr">      dockerfile:</span> <span class="string">docker/Dockerfile-ccb</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">EUREKA_URLS=http://epay-eureka:8761/eureka/</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">epay-ccb</span></span><br><span class="line"><span class="attr">    expose:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">8002</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">8002</span><span class="string">:8002</span></span><br><span class="line"><span class="attr">    mem_limit:</span> <span class="number">996</span><span class="string">m</span></span><br><span class="line"><span class="attr">    depends_on:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">epay-eureka</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><ol>
-<li>打包好jar包</li>
-<li>在项目根目录（sc-epay-demo）运行： <code>docker-compose up --build</code></li>
-<li>访问<code>localhost:8761</code></li>
-</ol>
-<h1 id="集群部署"><a href="#集群部署" class="headerlink" title="集群部署"></a>集群部署</h1><p><a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/3373" target="_blank" rel="noopener">https://github.com/spring-cloud/spring-cloud-netflix/issues/3373</a></p>
-<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><p>spring cloud服务maven依赖</p>
-<p>父模块依赖<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.0.6.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">relativePath</span>/&gt;</span> <span class="comment">&lt;!-- lookup parent from repository --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.sinorail<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>sc-epay-demo<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">name</span>&gt;</span>sc-epay-demo<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">description</span>&gt;</span>电子支付spring cloud微服务框架demo<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">project.build.sourceEncoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">project.build.sourceEncoding</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">project.reporting.outputEncoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">project.reporting.outputEncoding</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">spring-cloud.version</span>&gt;</span>Finchley.RELEASE<span class="tag">&lt;/<span class="name">spring-cloud.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sleuth.version</span>&gt;</span>2.1.0.RELEASE<span class="tag">&lt;/<span class="name">sleuth.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dockerfile-maven-version</span>&gt;</span>1.4.9<span class="tag">&lt;/<span class="name">dockerfile-maven-version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- spring-boot-starter-test测试框架依赖 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spring-cloud.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--多模块声明--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">modules</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>epay-config<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>epay-eureka<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>epay-zuul<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>epay-ccb<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>epay-icbc<span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">modules</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>epay-eureka pom<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">epay-zuul pom</span><br><span class="line">```xml</span><br></pre></td></tr></table></figure></p>
-<p>epay-icbc pom<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">epay-ccb pom</span><br><span class="line">```xml</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">```xml</span><br></pre></td></tr></table></figure>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">```xml</span><br></pre></td></tr></table></figure>
-<pre class="line-numbers language-xml"><code class="language-xml">
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>一个简单的细节问题，导致eureka的url设置不正确。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/06/17/cloudcompute/017-docker-spring-cloud-build/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/06/17/cloudcompute/017-docker-spring-cloud-build/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/06/17/cloudcompute/017-docker-spring-cloud-build/" data-id="cjzjeukgl0031sjch7vlbfk8q" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a><span class="article-tag-list-count">13</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-cloud/">spring cloud</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -2071,7 +2048,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 12.5px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.75px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 13.13px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2093,6 +2070,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/">Tomcat9-文档5-主机管理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/22/maven/006-read-book-maven-practice/">读《maven实战》笔记</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
           </li>
         
@@ -2102,14 +2087,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/20/server/006-tomcat9-doc-1-introduction/">Tomcat9-文档1-介绍</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
           </li>
         
       </ul>

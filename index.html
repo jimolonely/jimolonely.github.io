@@ -86,6 +86,269 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-server/010-tomcat9-doc-6-host-manager" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/" class="article-date">
+  <time datetime="2019-08-22T00:59:30.000Z" itemprop="datePublished">2019-08-22</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/">Tomcat9-文档5-主机管理</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文翻译自：<a href="https://tomcat.apache.org/tomcat-9.0-doc/host-manager-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-9.0-doc/host-manager-howto.html</a></p>
+<a href="/2019/08/20/server/009-tomcat9-doc-5-manager/" title="prev: Tomcat9-文档4-管理">prev: Tomcat9-文档4-管理</a>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>Tomcat Host Manager应用程序使您可以在Tomcat中创建，删除和管理虚拟主机。本操作指南最好附有以下文档：</p>
+<ul>
+<li>有关虚拟主机的更多信息，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/virtual-hosting-howto.html" target="_blank" rel="noopener">虚拟主机方法</a>。</li>
+<li><a href="https://tomcat.apache.org/tomcat-9.0-doc/config/host.html" target="_blank" rel="noopener">主机容器</a>，以获取有关虚拟主机的基础xml配置和属性描述的更多信息。</li>
+</ul>
+<p>Tomcat Host Manager应用程序是Tomcat安装的一部分，默认情况下使用以下上下文：<code>/host-manager</code>。您可以通过以下方式使用主机管理器：</p>
+<ul>
+<li>利用图形用户界面，可在以下位置访问：<code>{server}:{port}/host-manager/html</code>。</li>
+<li>利用一组适合脚本编写的最小HTTP请求。您可以在以下位置访问此模式：<code>{server}:{port}/host-manager/text</code>。</li>
+</ul>
+<p>这两种方式都允许您添加，删除，启动和停止虚拟主机。可以使用persist命令预先进行更改。本文档重点介绍文本界面。有关图形界面的更多信息，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/html-host-manager-howto.html" target="_blank" rel="noopener">Host Manager App  -  HTML界面</a>。</p>
+<h1 id="配置Manager应用的访问权限"><a href="#配置Manager应用的访问权限" class="headerlink" title="配置Manager应用的访问权限"></a>配置Manager应用的访问权限</h1><p>下面的描述使用<code>$CATALINA_HOME</code>来引用基本Tomcat目录。它是您安装Tomcat的目录，例如<code>C:\tomcat9</code>, or <code>/usr/share/tomcat9</code>。</p>
+<p>Host Manager应用程序要求用户具有以下角色之一：</p>
+<ul>
+<li><code>admin-gui</code>  - 将此角色用于图形Web界面。</li>
+<li><code>admin-script</code>  - 将此角色用于脚本Web界面。</li>
+</ul>
+<p>要启用对Host Manager应用程序的文本界面的访问，请为Tomcat用户授予适当的角色，或者创建具有正确角色的新角色。例如，打开<code>${CATALINA_BASE}/conf/tomcat-users.xml</code>并输入以下内容：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"test"</span> <span class="attr">password</span>=<span class="string">"chang3m3N#w"</span> <span class="attr">roles</span>=<span class="string">"admin-script"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>无需进一步设置。当您现在访问<code>{server}:{port}/host-manager/text/${COMMAND}</code>时，您可以使用创建的凭据登录。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u $&#123;USERNAME&#125;:$&#123;PASSWORD&#125; http://localhost:8080/host-manager/text/list</span><br><span class="line">OK - Listed hosts</span><br><span class="line">localhost:</span><br></pre></td></tr></table></figure>
+<p>请注意，如果使用<code>DataSourceRealm</code>，<code>JDBCRealm</code>或<code>JNDIRealm</code>机制检索用户，请分别在数据库或目录服务器中添加适当的角色。</p>
+<h1 id="命令列表"><a href="#命令列表" class="headerlink" title="命令列表"></a>命令列表</h1><p>支持以下命令：</p>
+<ul>
+<li>list</li>
+<li>add</li>
+<li>remove</li>
+<li>start</li>
+<li>stop</li>
+<li>persist</li>
+</ul>
+<p>在以下小节中，假定用户名和密码为<code>test:test</code>。 对于您的环境，请使用前面部分中创建的凭据。</p>
+<h2 id="list命令"><a href="#list命令" class="headerlink" title="list命令"></a>list命令</h2><p>使用list命令查看Tomcat实例上的可用虚拟主机。</p>
+<p>示例命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u test:test http://localhost:8080/host-manager/text/list</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/list</span><br><span class="line">OK - 已列出Host</span><br><span class="line">[localhost]:[]</span><br></pre></td></tr></table></figure></p>
+<h2 id="add命令"><a href="#add命令" class="headerlink" title="add命令"></a>add命令</h2><p>使用add命令添加新的虚拟主机。用于add命令的参数：</p>
+<ul>
+<li>String name：虚拟主机的名称。需要</li>
+<li>String aliases：虚拟主机的别名。</li>
+<li>String appBase：将由此虚拟主机提供服务的应用程序的基本路径。提供相对或绝对路径。</li>
+<li>Boolean manager：如果为true，则将Manager应用程序添加到虚拟主机。您可以使用<code>/manager</code>上下文访问它。</li>
+<li>Boolean autoDeploy：如果为true，Tomcat会自动重新部署appBase目录中的应用程序。</li>
+<li>Boolean deployOnStartup：如果为true，则Tomcat会在启动时自动部署appBase目录中的应用程序。</li>
+<li>Boolean deployXML：如果为true，则Tomcat将读取并使用<code>/META-INF/context.xml</code>文件。</li>
+<li>Boolean copyXML：如果为true，则Tomcat会复制<code>/META-INF/context.xml</code>文件并使用原始副本，而不管应用程序的<code>/META-INF/context.xml</code>文件的更新如何。</li>
+</ul>
+<p>示例命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -u test:test http://localhost:8080/host-manager/text/add?name=www.awesomeserver.com\</span><br><span class="line">&amp;aliases=awesomeserver.com&amp;appBase/mnt/appDir&amp;deployOnStartup=true</span><br></pre></td></tr></table></figure></p>
+<p>响应示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add: Adding host [www.awesomeserver.com]</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/add?name=www.jimo.com\</span><br><span class="line">&gt; &amp;aliases=jimo.com&amp;appBase=/home/jack/workspace/temp/&amp;deployOnStartUp=true</span><br><span class="line">[1] 21859</span><br><span class="line">[2] 21860</span><br><span class="line">[3] 21861</span><br><span class="line">[2]-  已完成               aliases=jimo.com</span><br><span class="line">确定-添加主机[www.jimo.com]</span><br><span class="line">[1]-  已完成               curl -u jimo-host-script:jimo localhost:8080/host-manager/text/add?name=www.jimo.com</span><br><span class="line">[3]+  已完成               appBase=/home/jack/workspace/temp/</span><br></pre></td></tr></table></figure></p>
+<p>结果： <code>${CATALINA_HOME}</code>和<code>${CATALINA_HOME}/conf/catalina/</code>下都出现了<code>www.jimo.com</code>目录</p>
+<h2 id="start命令"><a href="#start命令" class="headerlink" title="start命令"></a>start命令</h2><p>使用start命令启动虚拟主机。 用于start命令的参数：</p>
+<ul>
+<li>字符串name：要启动的虚拟主机的名称。 需要</li>
+</ul>
+<p>示例命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u test:test http://localhost:8080/host-manager/text/start?name=www.awesomeserver.com</span><br></pre></td></tr></table></figure></p>
+<p>响应示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Host www.awesomeserver.com started</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/start?name=www.jimo.com</span><br><span class="line">失败 - Host[www.jimo.com]已经启动。</span><br></pre></td></tr></table></figure></p>
+<h2 id="stop命令"><a href="#stop命令" class="headerlink" title="stop命令"></a>stop命令</h2><p>使用stop命令停止虚拟主机。 用于stop命令的参数：</p>
+<ul>
+<li>字符串name：要停止的虚拟主机的名称。 需要</li>
+</ul>
+<p>示例命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u test:test http://localhost:8080/host-manager/text/stop?name=www.awesomeserver.com</span><br></pre></td></tr></table></figure></p>
+<p>响应示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Host www.awesomeserver.com stopped</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/stop?name=www.jimo.com</span><br><span class="line">OK - 主机 [www.jimo.com] 已停止</span><br></pre></td></tr></table></figure></p>
+<h2 id="persist命令"><a href="#persist命令" class="headerlink" title="persist命令"></a>persist命令</h2><p>使用persist命令将虚拟主机持久保存到<code>server.xml</code>中。 用于persist命令的参数：</p>
+<ul>
+<li>字符串name：要保留的虚拟主机的名称。 需要</li>
+</ul>
+<p>默认情况下禁用此功能。 要启用此选项，必须首先配置<code>StoreConfigLifecycleListener</code>侦听器。 为此，请将以下侦听器添加到<code>server.xml</code>：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Listener</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.storeconfig.StoreConfigLifecycleListener"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>示例命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u test:test http://localhost:8080/host-manager/text/persist?name=www.awesomeserver.com</span><br></pre></td></tr></table></figure></p>
+<p>响应示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Configuration persisted</span><br></pre></td></tr></table></figure></p>
+<p>手动输入示例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Host</span> <span class="attr">appBase</span>=<span class="string">"www.awesomeserver.com"</span> <span class="attr">name</span>=<span class="string">"www.awesomeserver.com"</span> <span class="attr">deployXML</span>=<span class="string">"false"</span> <span class="attr">unpackWARs</span>=<span class="string">"false"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Host</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 未开启功能</span><br><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/persist?name=www.jimo.com</span><br><span class="line">失败 - 无法持久化配置</span><br><span class="line">Please enable StoreConfig to use this feature.</span><br><span class="line"></span><br><span class="line"># 开启之后： 记得重启tomcat， 重启完后之前add的主机会丢失，需要重新添加</span><br><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/persist?name=www.jimo.com</span><br><span class="line">OK - 配置持久化了.</span><br><span class="line"></span><br><span class="line"># server.xml里增加了Host</span><br><span class="line">      &lt;Host appBase=&quot;www.jimo.com&quot; name=&quot;www.jimo.com&quot;&gt;</span><br><span class="line">      &lt;/Host&gt;</span><br></pre></td></tr></table></figure></p>
+<p>每次持久化，server.xml都会被备份：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apache-tomcat-9.0.24/conf$ ll server.xml*</span><br><span class="line">-rw-r----- 1 jack jack 1906 8月  22 09:58 server.xml</span><br><span class="line">-rw-r--r-- 1 jack jack 7767 8月  22 09:52 server.xml.2019-08-22.09-54-11</span><br><span class="line">-rw-r----- 1 jack jack 1836 8月  22 09:54 server.xml.2019-08-22.09-58-47</span><br></pre></td></tr></table></figure></p>
+<h2 id="remove命令"><a href="#remove命令" class="headerlink" title="remove命令"></a>remove命令</h2><p>使用remove命令删除虚拟主机。 用于remove命令的参数：</p>
+<ul>
+<li>字符串name：要删除的虚拟主机的名称。 需要</li>
+</ul>
+<p>示例命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u test:test http://localhost:8080/host-manager/text/remove?name=www.awesomeserver.com</span><br></pre></td></tr></table></figure></p>
+<p>响应示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">remove: Removing host [www.awesomeserver.com]</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/remove?name=www.jimo.com</span><br><span class="line">确定-已删除主机[www.jimo.com]</span><br><span class="line"></span><br><span class="line">$ curl -u jimo-host-script:jimo localhost:8080/host-manager/text/persist?name=www.jimo.com</span><br><span class="line">OK - 配置持久化了.</span><br></pre></td></tr></table></figure></p>
+<hr>
+
+
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文翻译自：<a href="https://tomcat.apache.org/tomcat-9.0-doc/host-manager-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-9.0-doc/host-manager-howto.html</a></p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/08/22/server/010-tomcat9-doc-6-host-manager/" data-id="cjzm1nrxi00g252chl2pyj0o3" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-maven/006-read-book-maven-practice" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/22/maven/006-read-book-maven-practice/" class="article-date">
+  <time datetime="2019-08-22T00:13:23.000Z" itemprop="datePublished">2019-08-22</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/22/maven/006-read-book-maven-practice/">读《maven实战》笔记</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文为阅读书籍《maven实战–》的读书笔记。</p>
+<h1 id="maven坐标"><a href="#maven坐标" class="headerlink" title="maven坐标"></a>maven坐标</h1><ol>
+<li>groupId：公司+项目，，eg：<code>org.springframework.boot</code></li>
+<li>artifactId: 项目下的模块，eg：<code>spring-boot-starter-web</code></li>
+<li>version</li>
+<li>packaging: jar, war等</li>
+<li>classfier: 附属构件，由附加的插件生成，比如<code>spring-boot-starter-web-2.0.4.RELEASE-javadoc.jar</code></li>
+</ol>
+<h2 id="dependency"><a href="#dependency" class="headerlink" title="dependency"></a>dependency</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span><span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span><span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span><span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">type</span>&gt;</span><span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span><span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">optional</span>&gt;</span><span class="tag">&lt;/<span class="name">optional</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">          ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>type: packaging, jar(默认)/war</li>
+<li>scope: 见后面</li>
+<li>optional: 是否可选</li>
+</ul>
+<h2 id="scope"><a href="#scope" class="headerlink" title="scope"></a>scope</h2><ul>
+<li>compile: 编译、测试、运行都有效</li>
+<li>test: 只对测试有效,eg: <code>junit</code></li>
+<li>provided: 编译和测试有效，运行时无效，eg：<code>servlet-api.jar</code></li>
+<li>runtime: 测试和运行有效，编译时无效: eg: <code>JDBC驱动</code></li>
+<li><p>system: 和provided一样，只是依赖时必须用systemPath显示指定依赖路径，而不是由maven解析，是与本机绑定：</p>
+  <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span><span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span><span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span><span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">scope</span>&gt;</span>system<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">systemPath</span>&gt;</span>/xxx/xx.jar<span class="tag">&lt;/<span class="name">systemPath</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>import: TODO</p>
+</li>
+</ul>
+<h1 id="传递性依赖"><a href="#传递性依赖" class="headerlink" title="传递性依赖"></a>传递性依赖</h1><p>A -&gt; B -&gt; C</p>
+<p>A–&gt; C</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">```xml</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-xml"><code class="language-xml">
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文为阅读书籍《maven实战–》的读书笔记。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/08/22/maven/006-read-book-maven-practice/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/08/22/maven/006-read-book-maven-practice/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/08/22/maven/006-read-book-maven-practice/" data-id="cjzm1nrwy00ea52ch04yilnf4" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">7</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-server/009-tomcat9-doc-5-manager" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/" class="article-date">
@@ -160,7 +423,7 @@ ga('send', 'pageview');
 <p>第一次尝试发出下一节中描述的Manager命令之一时，您将面临使用BASIC身份验证登录的挑战。您输入的用户名和密码无关紧要，只要它们在用户数据库中标识拥有角色管理器脚本的有效用户即可。</p>
 <p>除了密码限制之外，通过添加<code>RemoteAddrValve</code>或<code>RemoteHostValve</code>，远程IP地址或主机可以限制对Manager Web应用程序的访问。有关详情，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/valve.html#Remote_Address_Filter" target="_blank" rel="noopener">阀门文档</a>以下是通过IP地址限制对localhost的访问的示例：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h1 id="用户友好的HTMML界面"><a href="#用户友好的HTMML界面" class="headerlink" title="用户友好的HTMML界面"></a>用户友好的HTMML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
+<h1 id="用户友好的HTML界面"><a href="#用户友好的HTML界面" class="headerlink" title="用户友好的HTML界面"></a>用户友好的HTML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://&#123;host&#125;:&#123;port&#125;/manager/html</span><br></pre></td></tr></table></figure>
 <p>如上所述，您需要<code>manager-gui</code>角色才能访问它。 有一个单独的文档，提供有关此接口的帮助。 看：</p>
 <ul>
@@ -381,8 +644,154 @@ ga('send', 'pageview');
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">OK - Session information for application at context path /examples</span><br><span class="line">Default maximum session inactive interval 30 minutes</span><br><span class="line">1 - &lt;2 minutes: 1 sessions</span><br><span class="line">3 - &lt;4 minutes: 1 sessions</span><br><span class="line">&gt;0 minutes: 2 sessions were expired</span><br></pre></td></tr></table></figure>
 <p>实际上<code>/sessions</code>和<code>/expire</code>是同一命令的同义词。不同之处在于存在空闲参数。</p>
 <p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/expire?path=/spring-boot-pkg-war&amp;idle=1</span><br><span class="line">[1] 4560</span><br></pre></td></tr></table></figure></p>
+<h2 id="启动现有应用程序"><a href="#启动现有应用程序" class="headerlink" title="启动现有应用程序"></a>启动现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/start?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发出停止的应用程序信号以重新启动，并使其自身再次可用例如，如果应用程序所需的数据库暂时不可用，则停止和启动很有用。通常最好停止依赖此数据库的Web应用程序，而不是让用户不断遇到数据库异常。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Started application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试启动Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>path / foo没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径</p>
+<ul>
+<li>path参数是必需的。</li>
+</ul>
+</li>
+</ul>
+<h2 id="停止现有的应用程序"><a href="#停止现有的应用程序" class="headerlink" title="停止现有的应用程序"></a>停止现有的应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/stop?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发信号通知现有应用程序使其自身不可用，但将其部署。应用程序停止时进入的任何请求都将看到HTTP错误404，此应用程序将在列表应用程序命令中显示为“已停止”。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Stopped application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试停止Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>path / foo没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径path参数是必需的。</p>
+</li>
+</ul>
+<h2 id="取消部署现有应用程序"><a href="#取消部署现有应用程序" class="headerlink" title="取消部署现有应用程序"></a>取消部署现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/undeploy?path=/examples</span><br></pre></td></tr></table></figure>
+<p><strong>警告 - 此命令将删除此虚拟主机的<code>appBase</code>目录（通常为“<code>webapps</code>”）中存在的所有Web应用程序源码。这将删除应用程序<code>.WAR</code>（如果存在），应用程序目录来自<code>unpacked</code>形式的部署或<code>.WAR</code>扩展以及<code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code>目录中的XML Context定义。如果您只是想让应用程序停止服务，则应该使用<code>/stop</code>命令</strong>。</p>
+<p>发信号通知现有应用程序正常关闭自身，并将其从Tomcat中删除（这也使得此上下文路径可供以后重用）。此外，如果文档根目录存在于此虚拟主机的appBase目录（通常为“webapps”）中，则将其删除。此命令与/ deploy命令逻辑相反。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Undeployed application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试取消部署Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>没有名为/ foo的上下文</p>
+<ul>
+<li>没有已指定名称的已部署应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径path参数是必需的。</p>
+</li>
+</ul>
+<h2 id="发现内存泄漏"><a href="#发现内存泄漏" class="headerlink" title="发现内存泄漏"></a>发现内存泄漏</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/findleaks[?statusLine=[true|false]]</span><br></pre></td></tr></table></figure>
+<p>查找会触发完整垃圾回收（Full GC）的泄漏诊断。它应该在生产系统中极其谨慎地使用。</p>
+<p>查找泄漏诊断尝试识别在停止，重新加载或取消部署时导致内存泄漏的Web应用程序。应始终使用分析器确认结果。诊断使用<code>StandardHost</code>实现提供的其他功能。如果使用不扩展<code>StandardHost</code>的自定义主机，它将无法工作。</p>
+<p>从Java代码中明确触发完整的垃圾收集被记录为不可靠。此外，根据所使用的JVM，还有禁用显式GC触发的选项，如<code>-XX：+ DisableExplicitGC</code>。如果要确保诊断程序成功运行完整的GC，则需要使用GC日志记录，JConsole或类似工具进行检查。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/leaking-webapp</span><br></pre></td></tr></table></figure>
+<p>如果您希望在响应中看到状态行，则在请求中包含<code>statusLine</code>查询参数，其值为<code>true</code>。</p>
+<p>已停止，重新加载或取消部署的Web应用程序的每个上下文路径，但先前运行中的哪些类仍然加载到内存中，从而导致内存泄漏，将列在新行上。如果应用程序已多次重新加载，则可能会多次列出。</p>
+<p>如果命令不成功，响应将以FAIL开头并包含错误消息。</p>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/findleaks?statusLine=true</span><br><span class="line">OK - 没有发现内存泄漏</span><br></pre></td></tr></table></figure>
+<h2 id="连接器SSL-TLS密码信息"><a href="#连接器SSL-TLS密码信息" class="headerlink" title="连接器SSL / TLS密码信息"></a>连接器SSL / TLS密码信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorCiphers</span><br></pre></td></tr></table></figure>
+<p>SSL连接器/密码诊断列出了当前为每个连接器配置的SSL / TLS密码。 对于NIO和NIO2，列出了各个密码套件的名称。 对于APR，返回SSLCipherSuite的值。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / SSL Cipher information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">  SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]</span><br><span class="line">  TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</span><br><span class="line">  TLS_DHE_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  TLS_ECDH_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslConnectorCiphers</span><br><span class="line">OK - Connector/SSL 密码.信息</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">  不允许SSL连接</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">  不允许SSL连接</span><br></pre></td></tr></table></figure></p>
+<h2 id="连接器SSL-TLS证书链信息"><a href="#连接器SSL-TLS证书链信息" class="headerlink" title="连接器SSL / TLS证书链信息"></a>连接器SSL / TLS证书链信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorCerts</span><br></pre></td></tr></table></figure>
+<p>SSL Connector / Certs诊断列出了当前为每个虚拟主机配置的证书链。</p>
+<p>响应将如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / Certificate Chain information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]-_default_-RSA</span><br><span class="line">[</span><br><span class="line">[</span><br><span class="line">  Version: V3</span><br><span class="line">  Subject: CN=localhost, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US</span><br><span class="line">  Signature Algorithm: SHA256withRSA, OID = 1.2.840.113549.1.1.11</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslConnectorCerts</span><br><span class="line">OK - Connector / Certificate Chain information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">不允许SSL连接</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">不允许SSL连接</span><br></pre></td></tr></table></figure></p>
+<h2 id="连接器SSL-TLS可信证书信息"><a href="#连接器SSL-TLS可信证书信息" class="headerlink" title="连接器SSL / TLS可信证书信息"></a>连接器SSL / TLS可信证书信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorTrustedCerts</span><br></pre></td></tr></table></figure>
+<p>SSL Connector / Certs诊断列出了当前为每个虚拟主机配置的可信证书。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / Trusted Certificate information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]-_default_</span><br><span class="line">[</span><br><span class="line">[</span><br><span class="line">  Version: V3</span><br><span class="line">  Subject: CN=Apache Tomcat Test CA, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
+<h2 id="重新加载TLS配置"><a href="#重新加载TLS配置" class="headerlink" title="重新加载TLS配置"></a>重新加载TLS配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslReload?tlsHostName=name</span><br></pre></td></tr></table></figure>
+<p>重新加载TLS配置文件（证书和密钥文件，这不会触发重新解析<code>server.xml</code>）。 要为所有主机重新加载文件，请不要指定tlsHostName参数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslReload</span><br><span class="line">FAIL - 重新加载TLS配制失败</span><br></pre></td></tr></table></figure></p>
+<h2 id="线程转储"><a href="#线程转储" class="headerlink" title="线程转储"></a>线程转储</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/threaddump</span><br></pre></td></tr></table></figure>
+<p>编写JVM线程转储。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">OK - JVM thread dump</span><br><span class="line">2014-12-08 07:24:40.080</span><br><span class="line">Full thread dump Java HotSpot(TM) Client VM (25.25-b02 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;http-nio-8080-exec-2&quot; Id=26 cpu=46800300 ns usr=46800300 ns blocked 0 for -1 ms waited 0 for -1 ms</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">        locks java.util.concurrent.ThreadPoolExecutor$Worker@1738ad4</span><br><span class="line">        at sun.management.ThreadImpl.dumpThreads0(Native Method)</span><br><span class="line">        at sun.management.ThreadImpl.dumpAllThreads(ThreadImpl.java:446)</span><br><span class="line">        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:440)</span><br><span class="line">        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:409)</span><br><span class="line">        at org.apache.catalina.manager.ManagerServlet.threadDump(ManagerServlet.java:557)</span><br><span class="line">        at org.apache.catalina.manager.ManagerServlet.doGet(ManagerServlet.java:371)</span><br><span class="line">        at javax.servlet.http.HttpServlet.service(HttpServlet.java:618)</span><br><span class="line">        at javax.servlet.http.HttpServlet.service(HttpServlet.java:725)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/threaddump</span><br><span class="line">OK - JVM thread dump</span><br><span class="line">2019-08-21 15:17:32.786</span><br><span class="line">打印全部线程 OpenJDK 64-Bit Server VM (25.222-b10 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;ajp-nio-8009-Acceptor&quot; Id=48 cpu=69203 ns usr=0 ns blocked 0 for -1 ms waited 0 for -1 ms (running in native)</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept0(Native Method)</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:422)</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:250)</span><br><span class="line">	- locked (a java.lang.Object@226a310c) index 2 frame sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:250)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:463)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:73)</span><br><span class="line">	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:95)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line"></span><br><span class="line">&quot;ajp-nio-8009-ClientPoller&quot; Id=47 cpu=331431986 ns usr=250000000 ns blocked 0 for -1 ms waited 0 for -1 ms (running in native)</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">	at sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)</span><br><span class="line">	at sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)</span><br><span class="line">	at sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)</span><br><span class="line">	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)</span><br><span class="line">	- locked (a sun.nio.ch.EPollSelectorImpl@56c54bf3) index 3 frame sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)</span><br><span class="line">	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint$Poller.run(NioEndpoint.java:708)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="VM信息"><a href="#VM信息" class="headerlink" title="VM信息"></a>VM信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/vminfo</span><br></pre></td></tr></table></figure>
+<p>编写有关Java虚拟机的一些诊断信息。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/vminfo</span><br><span class="line">OK - VM信息</span><br><span class="line">2019-08-21 15:19:23.113</span><br><span class="line">运行时信息:</span><br><span class="line">  vmName: OpenJDK 64-Bit Server VM</span><br><span class="line">  vmVersion: 25.222-b10</span><br><span class="line">  vmVendor: Private Build</span><br><span class="line">  specName: Java Virtual Machine Specification</span><br><span class="line">  specVersion: 1.8</span><br><span class="line">  specVendor: Oracle Corporation</span><br><span class="line">  managementSpecVersion: 1.2</span><br><span class="line">  name: 1197@jack</span><br><span class="line">  startTime: 1566366568078</span><br><span class="line">  uptime: 5395096</span><br><span class="line">  isBootClassPathSupported: true</span><br><span class="line"></span><br><span class="line">操作系统信息:</span><br><span class="line">  name: Linux</span><br><span class="line">  version: 5.0.0-25-generic</span><br><span class="line">  architecture: amd64</span><br><span class="line">  availableProcessors: 12</span><br><span class="line">  systemLoadAverage: 0.21</span><br><span class="line"></span><br><span class="line">ThreadMXBean capabilities:</span><br><span class="line">  isCurrentThreadCpuTimeSupported: true</span><br><span class="line">  isThreadCpuTimeSupported: true</span><br><span class="line">  isThreadCpuTimeEnabled: true</span><br><span class="line">  isObjectMonitorUsageSupported: true</span><br><span class="line">  isSynchronizerUsageSupported: true</span><br><span class="line">  isThreadContentionMonitoringSupported: true</span><br><span class="line">  isThreadContentionMonitoringEnabled: false</span><br><span class="line"></span><br><span class="line">线程数:</span><br><span class="line">  daemon: 32</span><br><span class="line">  total: 35</span><br><span class="line">  peak: 35</span><br><span class="line">  totalStarted: 39</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="保存配置"><a href="#保存配置" class="headerlink" title="保存配置"></a>保存配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/save</span><br></pre></td></tr></table></figure>
+<p>如果指定不带任何参数，则此命令将服务器的当前配置保存到<code>server.xml</code>。 如果需要，现有文件将重命名为备份。</p>
+<p>如果使用与已部署的Web应用程序的路径匹配的path参数指定，则该Web应用程序的配置将保存到xmlBase中适当命名的<code>context.xml</code>文件中，以用于当前主机。</p>
+<p>要使用该命令，必须存在<code>StoreConfig MBean</code>。 通常，这是使用<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina.storeconfig.StoreConfigLifecycleListener" target="_blank" rel="noopener">StoreConfigLifecycleListener</a>配置的。</p>
+<p>如果命令不成功，响应将以FAIL开头并包含错误消息。</p>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/save</span><br><span class="line">FAIL - No StoreConfig MBean registered at [Catalina:type=StoreConfig]. </span><br><span class="line">Registration is typically performed by the StoreConfigLifecycleListener.</span><br></pre></td></tr></table></figure>
+<h1 id="服务器状态"><a href="#服务器状态" class="headerlink" title="服务器状态"></a>服务器状态</h1><p>从以下链接中，您可以查看有关服务器的状态信息。 <code>manager-xxx</code>角色中的任何一个都允许访问此页面。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/status</span><br><span class="line">http://localhost:8080/manager/status/all</span><br></pre></td></tr></table></figure>
+<p>以HTML格式显示服务器状态信息。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/status?XML=true</span><br><span class="line">http://localhost:8080/manager/status/all?XML=true</span><br></pre></td></tr></table></figure></p>
+<p>以XML格式显示服务器状态信息。</p>
+<p>首先，您有服务器和JVM版本号，JVM提供程序，操作系统名称和编号，后跟架构类型。</p>
+<p>其次，有关于JVM的内存使用情况的信息。</p>
+<p>然后，有关于Tomcat AJP和HTTP连接器的信息。两者都有相同的信息：</p>
+<ul>
+<li><p>线程信息：最大线程数，最小和最大备用线程数，当前线程数和当前线程忙数。</p>
+</li>
+<li><p>请求信息：最大处理时间和处理时间，请求和错误计数，接收和发送的字节数。</p>
+</li>
+<li><p>显示阶段，时间，发送字节，字节接收，客户端，VHost和请求的表。表中列出了所有现有线程。以下是可能的线程阶段列表：</p>
+<ul>
+<li><p>“解析和准备请求”：正在解析请求标头或正在进行读取请求主体的必要准备（如果已指定传输编码）。</p>
+</li>
+<li><p>“service”：线程正在处理请求并生成响应。此阶段遵循“解析和准备请求”阶段，并在“完成”阶段之前。此阶段始终至少有一个线程（服务器状态页面）。</p>
+</li>
+<li><p>“finishing”：请求处理结束。仍在输出缓冲区中的任何其余响应都将发送到客户端。如果适当保持连接活动，则此阶段之后是“保持活动”，如果“保持活动”不合适，则“准备好”。</p>
+</li>
+<li><p>“Keep-Alive”：如果客户端发送另一个请求，则线程会保持对客户端的连接打开。如果收到另一个请求，则下一阶段将是“解析和准备请求”。如果在保持活动超时之前没有收到请求，则连接将关闭，下一阶段将为“就绪”。</p>
+</li>
+<li><p>“ready”：线程处于静止状态并准备好使用。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>如果您使用<code>/status/all</code>命令，则可以使用有关每个已部署Web应用程序的其他信息。</p>
+<h1 id="使用JMX代理Servlet"><a href="#使用JMX代理Servlet" class="headerlink" title="使用JMX代理Servlet"></a>使用JMX代理Servlet</h1><h2 id="什么是JMX代理Servlet"><a href="#什么是JMX代理Servlet" class="headerlink" title="什么是JMX代理Servlet"></a>什么是JMX代理Servlet</h2><p>JMX代理Servlet是一个轻量级代理，用于获取和设置tomcat内部.（或者通过MBean公开的任何类）其用法不是非常用户友好，但UI对于集成命令行脚本以监视和更改tomcat的内部非常有用。 您可以使用代理执行两项操作：获取信息和设置信息。 为了让您真正了解JMX代理Servlet，您应该对JMX有一个大致的了解。 如果您不知道JMX是什么，那么请准备好遭罪把。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">```s</span><br></pre></td></tr></table></figure>
+<hr>
 
+<a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/" title="next: Tomcat9-文档5-主机管理">next: Tomcat9-文档5-主机管理</a>
       
     </div> -->
           <div class="article-entry" itemprop="articleBody">
@@ -419,12 +828,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/009-tomcat9-doc-5-manager/" data-id="cjzjeuknw00mhsjchv5cb05w4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/009-tomcat9-doc-5-manager/" data-id="cjzm1nrxk00g952ch024nnz3e" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -570,12 +979,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/008-tomcat9-doc-4-deployer/" data-id="cjzjeuknt00m7sjchyps971wn" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/008-tomcat9-doc-4-deployer/" data-id="cjzm1nrxl00gc52ch98wb51el" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -686,12 +1095,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/007-tomcat9-doc-2-setup/" data-id="cjzjeuknv00mcsjch420cjz4j" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/007-tomcat9-doc-2-setup/" data-id="cjzm1nrxi00g552chef4vox3l" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -839,12 +1248,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/006-tomcat9-doc-1-introduction/" data-id="cjzjeuknt00m9sjchuukvpok6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/006-tomcat9-doc-1-introduction/" data-id="cjzm1nrxh00g052ch4451m8jb" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -891,6 +1300,8 @@ ga('send', 'pageview');
 </li>
 <li><a href="/2019/08/20/server/009-tomcat9-doc-5-manager/" title="Tomcat9-文档4-管理">Tomcat9-文档4-管理</a>
 </li>
+<li><a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/" title="Tomcat9-文档5-主机管理">Tomcat9-文档5-主机管理</a>
+</li>
 </ol>
 
       
@@ -929,7 +1340,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/19/life/028-weekly-learn/" data-id="cjzjeukme00hzsjchx785nea9" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/19/life/028-weekly-learn/" data-id="cjzm1nrw400bi52chnd6m2ck2" class="article-share-link">
           Share
         </a>
         
@@ -1045,7 +1456,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/16/java/057-spring-boot-starter-demo/" data-id="cjzjeuklk00f8sjchp2ij6acz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/16/java/057-spring-boot-starter-demo/" data-id="cjzm1nrvl009s52chg26h7wkl" class="article-share-link">
           Share
         </a>
         
@@ -1129,7 +1540,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/14/tools/018-ascii-flow-graph/" data-id="cjzjeukol00oesjchyq9ffud0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/14/tools/018-ascii-flow-graph/" data-id="cjzm1nry200hy52chfx30yzz7" class="article-share-link">
           Share
         </a>
         
@@ -1235,7 +1646,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/12/linux/029-syslog/" data-id="cjzjeukn300k0sjchfv0g2gz3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/12/linux/029-syslog/" data-id="cjzm1nrwv00e052chgpu60dwz" class="article-share-link">
           Share
         </a>
         
@@ -1328,7 +1739,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/12/life/027-weekly-learn/" data-id="cjzjeukmd00hxsjchcgf39rg3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/12/life/027-weekly-learn/" data-id="cjzm1nrw300bd52ch162xuihl" class="article-share-link">
           Share
         </a>
         
@@ -1407,7 +1818,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/10/basic/020-urban-computing/" data-id="cjzjeukg90020sjchyibc08gc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/10/basic/020-urban-computing/" data-id="cjzm1nrt1001r52chczznbzmq" class="article-share-link">
           Share
         </a>
         
@@ -1542,7 +1953,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/05/life/026-weekly-learn/" data-id="cjzjeukmc00husjchlhknkzon" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/05/life/026-weekly-learn/" data-id="cjzm1nrwa00bz52chtcfajx08" class="article-share-link">
           Share
         </a>
         
@@ -1639,7 +2050,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/01/java/056-mybatis-generate-plugin/" data-id="cjzjeuklf00ewsjchm2dvpi9a" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/01/java/056-mybatis-generate-plugin/" data-id="cjzm1nrvk009n52ch67e84bws" class="article-share-link">
           Share
         </a>
         
@@ -1723,7 +2134,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/30/android/001-android-webdav-client/" data-id="cjzjeukez0008sjchm6wbhxuy" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/30/android/001-android-webdav-client/" data-id="cjzm1nrsk000g52chyjcwz3m9" class="article-share-link">
           Share
         </a>
         
@@ -1815,7 +2226,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/29/life/025-weekly-learn/" data-id="cjzjeukmc00hssjchjnm5tqm0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/29/life/025-weekly-learn/" data-id="cjzm1nrw600bn52chj9s1ndkp" class="article-share-link">
           Share
         </a>
         
@@ -1897,7 +2308,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/28/java/055-java-webdav-client/" data-id="cjzjeukld00ersjchts57yxy6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/28/java/055-java-webdav-client/" data-id="cjzm1nrvm009u52chflnl52ho" class="article-share-link">
           Share
         </a>
         
@@ -1973,7 +2384,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/28/tools/017-pandoc/" data-id="cjzjeukok00obsjch822lvcdi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/28/tools/017-pandoc/" data-id="cjzm1nry300i252chwjvmjwfo" class="article-share-link">
           Share
         </a>
         
@@ -2061,7 +2472,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/27/java/054-why-need-thread-pool/" data-id="cjzjeuklc00emsjchrm1ebhqb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/27/java/054-why-need-thread-pool/" data-id="cjzm1nrvl009p52chd8baq99e" class="article-share-link">
           Share
         </a>
         
@@ -2138,175 +2549,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/25/java/053-jdk-javac-compile/" data-id="cjzjeukle00etsjchk2xvtyde" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/07/25/java/053-jdk-javac-compile/" data-id="cjzm1nrvn009x52ch0nm59f67" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jvm/">jvm</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/mybatis-pgsql-return-insert-id" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/" class="article-date">
-  <time datetime="2019-07-24T11:55:39.000Z" itemprop="datePublished">2019-07-24</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/24/java/mybatis-pgsql-return-insert-id/">mybatis+pgsql返回插入(更新)后的主键id</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>当需要返回插入后的主键id时，需要特别注意。</p>
-<h1 id="pgsql返回插入id"><a href="#pgsql返回插入id" class="headerlink" title="pgsql返回插入id"></a>pgsql返回插入id</h1><p>在pgsql中存在相应的语法，在插入后，可以返回一个列的值：即<code>returning id</code><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> api(<span class="keyword">id</span>, uri, method_id, <span class="keyword">type</span>, <span class="string">"desc"</span>, ignore_param, project_id)</span><br><span class="line"><span class="keyword">values</span> (<span class="number">4</span>, <span class="string">'/test'</span>, <span class="number">1</span>, <span class="string">'normal'</span>, <span class="literal">null</span>, <span class="literal">false</span>, <span class="number">1</span>)</span><br><span class="line"><span class="keyword">returning</span> <span class="keyword">id</span>;</span><br></pre></td></tr></table></figure></p>
-<p>然后，在mybatis的xml中这样是行不通的：</p>
-<h1 id="mybatis-pgsql"><a href="#mybatis-pgsql" class="headerlink" title="mybatis+pgsql"></a>mybatis+pgsql</h1><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"addOrUpdate"</span>&gt;</span></span><br><span class="line">    insert into api(uri, method_id, type, "desc", ignore_param, project_id)</span><br><span class="line">    values ( #&#123;api.uri&#125;, #&#123;api.methodId&#125;, #&#123;api.type&#125;, #&#123;api.desc&#125;, #&#123;api.ignoreParam&#125;, #&#123;api.projectId&#125;)</span><br><span class="line">    returning id</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">addOrUpdate</span><span class="params">(@Param(<span class="string">"api"</span>)</span> Api api)</span>;</span><br></pre></td></tr></table></figure>
-<p>这样返回的依然是更新条数1.</p>
-<p>因为mybatis的插入语句的返回值不是这样的，需要人家的方法才行：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"addOrUpdate"</span> <span class="attr">useGeneratedKeys</span>=<span class="string">"true"</span> <span class="attr">keyProperty</span>=<span class="string">"id"</span>&gt;</span></span><br><span class="line">    insert into api(uri, method_id, type, "desc", ignore_param, project_id)</span><br><span class="line">    values (#&#123;api.uri&#125;, #&#123;api.methodId&#125;, #&#123;api.type&#125;, #&#123;api.desc&#125;, #&#123;api.ignoreParam&#125;, #&#123;api.projectId&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>也就是使用：<code>useGeneratedKeys=&quot;true&quot; keyProperty=&quot;id&quot;</code>, 注意，这个<code>keyProperty=&quot;id&quot;</code>里的id是要返回的主键列，和实体类的属性要对应。</p>
-<p>于是，调用的java<br>代码变成了这样：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Api api = <span class="keyword">new</span> Api();</span><br><span class="line">dao.addOrUpdate(api);</span><br><span class="line"><span class="keyword">int</span> id = api.getId();</span><br></pre></td></tr></table></figure></p>
-<h1 id="插入或更新操作"><a href="#插入或更新操作" class="headerlink" title="插入或更新操作"></a>插入或更新操作</h1><p>再附一个重复id就更新的情况，如果id是0，代表插入：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"addOrUpdate"</span> <span class="attr">useGeneratedKeys</span>=<span class="string">"true"</span> <span class="attr">keyProperty</span>=<span class="string">"id"</span>&gt;</span></span><br><span class="line">    insert into api(id, uri, method_id, type, "desc", ignore_param, project_id)</span><br><span class="line">    values (</span><br><span class="line">    <span class="tag">&lt;<span class="name">choose</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">"api.id == 0"</span>&gt;</span></span><br><span class="line">            nextval('api_id_seq')</span><br><span class="line">        <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">otherwise</span>&gt;</span></span><br><span class="line">            #&#123;api.id&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">otherwise</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">choose</span>&gt;</span></span><br><span class="line">    , #&#123;api.uri&#125;, #&#123;api.methodId&#125;, #&#123;api.type&#125;, #&#123;api.desc&#125;, #&#123;api.ignoreParam&#125;, #&#123;api.projectId&#125;)</span><br><span class="line">    on conflict (id) do update set uri=#&#123;api.uri&#125;,</span><br><span class="line">    method_id=#&#123;api.methodId&#125;,</span><br><span class="line">    type=#&#123;api.type&#125;,</span><br><span class="line">    "desc"=#&#123;api.desc&#125;,</span><br><span class="line">    ignore_param= #&#123;api.ignoreParam&#125;,</span><br><span class="line">    project_id= #&#123;api.projectId&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>参考：<a href="https://cofcool.github.io/tech/2017/11/06/Mybatis-insert-get-id" target="_blank" rel="noopener">https://cofcool.github.io/tech/2017/11/06/Mybatis-insert-get-id</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>当需要返回插入后的主键id时，需要特别注意。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/07/24/java/mybatis-pgsql-return-insert-id/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/24/java/mybatis-pgsql-return-insert-id/" data-id="cjzjeuklh00f1sjch6mk2nmcl" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pgsql/">pgsql</a><span class="article-tag-list-count">4</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/051-spring-http-status-code" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/07/24/java/051-spring-http-status-code/" class="article-date">
-  <time datetime="2019-07-24T00:22:27.000Z" itemprop="datePublished">2019-07-24</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/24/java/051-spring-http-status-code/">spring如何返回http状态码</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>如何在sring里返回404,400这种状态码？</p>
-<p>查看这篇文章提供的3个方法：<a href="https://jaskey.github.io/blog/2014/09/27/how-to-return-404-in-spring-controller/" target="_blank" rel="noopener">https://jaskey.github.io/blog/2014/09/27/how-to-return-404-in-spring-controller/</a></p>
-<h1 id="1-自定义异常-ResponseStatus注解："><a href="#1-自定义异常-ResponseStatus注解：" class="headerlink" title="1.自定义异常+@ResponseStatus注解："></a>1.自定义异常+@ResponseStatus注解：</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义一个自定义异常，抛出时返回状态码404</span></span><br><span class="line"><span class="meta">@ResponseStatus</span>(value = HttpStatus.NOT_FOUND)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResourceNotFoundException</span> <span class="keyword">extends</span> <span class="title">RuntimeException</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//在Controller里面直接抛出这个异常</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SomeController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@RequestMapping</span>(value=<span class="string">"/video/&#123;id&#125;"</span>,method=RequestMethod.GET)</span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">Video <span class="title">getVidoeById</span><span class="params">(@PathVariable <span class="keyword">long</span> id)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isFound()) &#123;</span><br><span class="line">            <span class="comment">// 做该做的逻辑</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ResourceNotFoundException();<span class="comment">//把这个异常抛出 </span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="2-使用Spring的内置异常"><a href="#2-使用Spring的内置异常" class="headerlink" title="2.使用Spring的内置异常"></a>2.使用Spring的内置异常</h1><p>默认情况下，Spring 的DispatcherServlet注册了DefaultHandlerExceptionResolver,这个resolver会处理标准的Spring MVC异常来表示特定的状态码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Exception                                   HTTP Status Code</span><br><span class="line">ConversionNotSupportedException             <span class="number">500</span> (Internal Server Error)</span><br><span class="line">HttpMediaTypeNotAcceptableException         <span class="number">406</span> (Not Acceptable)</span><br><span class="line">HttpMediaTypeNotSupportedException          <span class="number">415</span> (Unsupported Media Type)</span><br><span class="line">HttpMessageNotReadableException             <span class="number">400</span> (Bad Request)</span><br><span class="line">HttpMessageNotWritableException             <span class="number">500</span> (Internal Server Error)</span><br><span class="line">HttpRequestMethodNotSupportedException      <span class="number">405</span> (Method Not Allowed)</span><br><span class="line">MissingServletRequestParameterException     <span class="number">400</span> (Bad Request)</span><br><span class="line">NoSuchRequestHandlingMethodException        <span class="number">404</span> (Not Found)</span><br><span class="line">TypeMismatchException                       <span class="number">400</span> (Bad Request)</span><br></pre></td></tr></table></figure></p>
-<h1 id="3-在Controller方法中通过HttpServletResponse参数直接设值"><a href="#3-在Controller方法中通过HttpServletResponse参数直接设值" class="headerlink" title="3.在Controller方法中通过HttpServletResponse参数直接设值"></a>3.在Controller方法中通过HttpServletResponse参数直接设值</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//任何一个RequestMapping 的函数都可以接受一个HttpServletResponse类型的参数</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SomeController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@RequestMapping</span>(value=<span class="string">"/video/&#123;id&#125;"</span>,method=RequestMethod.GET)</span><br><span class="line">    <span class="keyword">public</span> <span class="meta">@ResponseBody</span> <span class="function">Video <span class="title">getVidoeById</span><span class="params">(@PathVariable <span class="keyword">long</span> id ,HttpServletResponse response)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isFound()) &#123;</span><br><span class="line">            <span class="comment">// 做该做的逻辑</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            response.setStatus(HttpServletResponse.SC_NOT_FOUND);<span class="comment">//设置状态码</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ....</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>如何在sring里返回404,400这种状态码？</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2019/07/24/java/051-spring-http-status-code/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2019/07/24/java/051-spring-http-status-code/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/07/24/java/051-spring-http-status-code/" data-id="cjzjeukld00epsjch4sd7yqns" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
@@ -2343,7 +2591,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 12.5px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.75px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 13.13px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2365,6 +2613,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/">Tomcat9-文档5-主机管理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/22/maven/006-read-book-maven-practice/">读《maven实战》笔记</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
           </li>
         
@@ -2374,14 +2630,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/20/server/006-tomcat9-doc-1-introduction/">Tomcat9-文档1-介绍</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
           </li>
         
       </ul>

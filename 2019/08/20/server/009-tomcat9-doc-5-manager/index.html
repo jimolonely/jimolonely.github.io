@@ -28,7 +28,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="在我的世界">
 <meta property="og:description" content="本文翻译自：https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html prev: Tomcat9-文档3-部署 介绍在许多生产环境中，部署新Web应用程序或取消部署现有Web应用程序的功能非常有用，而无需关闭并重新启动整个容器。此外，即使您尚未在Tomcat服务器配置文件中声明可重新加载，也可以请求现有应用程序重新加载。 为了支持这些功">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-20T08:46:51.403Z">
+<meta property="og:updated_time" content="2019-08-22T02:04:46.513Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tomcat9-文档4-管理">
 <meta name="twitter:description" content="本文翻译自：https://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html prev: Tomcat9-文档3-部署 介绍在许多生产环境中，部署新Web应用程序或取消部署现有Web应用程序的功能非常有用，而无需关闭并重新启动整个容器。此外，即使您尚未在Tomcat服务器配置文件中声明可重新加载，也可以请求现有应用程序重新加载。 为了支持这些功">
@@ -160,7 +160,7 @@ ga('send', 'pageview');
 <p>第一次尝试发出下一节中描述的Manager命令之一时，您将面临使用BASIC身份验证登录的挑战。您输入的用户名和密码无关紧要，只要它们在用户数据库中标识拥有角色管理器脚本的有效用户即可。</p>
 <p>除了密码限制之外，通过添加<code>RemoteAddrValve</code>或<code>RemoteHostValve</code>，远程IP地址或主机可以限制对Manager Web应用程序的访问。有关详情，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/valve.html#Remote_Address_Filter" target="_blank" rel="noopener">阀门文档</a>以下是通过IP地址限制对localhost的访问的示例：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h1 id="用户友好的HTMML界面"><a href="#用户友好的HTMML界面" class="headerlink" title="用户友好的HTMML界面"></a>用户友好的HTMML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
+<h1 id="用户友好的HTML界面"><a href="#用户友好的HTML界面" class="headerlink" title="用户友好的HTML界面"></a>用户友好的HTML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://&#123;host&#125;:&#123;port&#125;/manager/html</span><br></pre></td></tr></table></figure>
 <p>如上所述，您需要<code>manager-gui</code>角色才能访问它。 有一个单独的文档，提供有关此接口的帮助。 看：</p>
 <ul>
@@ -381,8 +381,154 @@ ga('send', 'pageview');
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">OK - Session information for application at context path /examples</span><br><span class="line">Default maximum session inactive interval 30 minutes</span><br><span class="line">1 - &lt;2 minutes: 1 sessions</span><br><span class="line">3 - &lt;4 minutes: 1 sessions</span><br><span class="line">&gt;0 minutes: 2 sessions were expired</span><br></pre></td></tr></table></figure>
 <p>实际上<code>/sessions</code>和<code>/expire</code>是同一命令的同义词。不同之处在于存在空闲参数。</p>
 <p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/expire?path=/spring-boot-pkg-war&amp;idle=1</span><br><span class="line">[1] 4560</span><br></pre></td></tr></table></figure></p>
+<h2 id="启动现有应用程序"><a href="#启动现有应用程序" class="headerlink" title="启动现有应用程序"></a>启动现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/start?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发出停止的应用程序信号以重新启动，并使其自身再次可用例如，如果应用程序所需的数据库暂时不可用，则停止和启动很有用。通常最好停止依赖此数据库的Web应用程序，而不是让用户不断遇到数据库异常。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Started application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试启动Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>path / foo没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径</p>
+<ul>
+<li>path参数是必需的。</li>
+</ul>
+</li>
+</ul>
+<h2 id="停止现有的应用程序"><a href="#停止现有的应用程序" class="headerlink" title="停止现有的应用程序"></a>停止现有的应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/stop?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发信号通知现有应用程序使其自身不可用，但将其部署。应用程序停止时进入的任何请求都将看到HTTP错误404，此应用程序将在列表应用程序命令中显示为“已停止”。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Stopped application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试停止Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>path / foo没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径path参数是必需的。</p>
+</li>
+</ul>
+<h2 id="取消部署现有应用程序"><a href="#取消部署现有应用程序" class="headerlink" title="取消部署现有应用程序"></a>取消部署现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/undeploy?path=/examples</span><br></pre></td></tr></table></figure>
+<p><strong>警告 - 此命令将删除此虚拟主机的<code>appBase</code>目录（通常为“<code>webapps</code>”）中存在的所有Web应用程序源码。这将删除应用程序<code>.WAR</code>（如果存在），应用程序目录来自<code>unpacked</code>形式的部署或<code>.WAR</code>扩展以及<code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code>目录中的XML Context定义。如果您只是想让应用程序停止服务，则应该使用<code>/stop</code>命令</strong>。</p>
+<p>发信号通知现有应用程序正常关闭自身，并将其从Tomcat中删除（这也使得此上下文路径可供以后重用）。此外，如果文档根目录存在于此虚拟主机的appBase目录（通常为“webapps”）中，则将其删除。此命令与/ deploy命令逻辑相反。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Undeployed application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试取消部署Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>没有名为/ foo的上下文</p>
+<ul>
+<li>没有已指定名称的已部署应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径path参数是必需的。</p>
+</li>
+</ul>
+<h2 id="发现内存泄漏"><a href="#发现内存泄漏" class="headerlink" title="发现内存泄漏"></a>发现内存泄漏</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/findleaks[?statusLine=[true|false]]</span><br></pre></td></tr></table></figure>
+<p>查找会触发完整垃圾回收（Full GC）的泄漏诊断。它应该在生产系统中极其谨慎地使用。</p>
+<p>查找泄漏诊断尝试识别在停止，重新加载或取消部署时导致内存泄漏的Web应用程序。应始终使用分析器确认结果。诊断使用<code>StandardHost</code>实现提供的其他功能。如果使用不扩展<code>StandardHost</code>的自定义主机，它将无法工作。</p>
+<p>从Java代码中明确触发完整的垃圾收集被记录为不可靠。此外，根据所使用的JVM，还有禁用显式GC触发的选项，如<code>-XX：+ DisableExplicitGC</code>。如果要确保诊断程序成功运行完整的GC，则需要使用GC日志记录，JConsole或类似工具进行检查。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/leaking-webapp</span><br></pre></td></tr></table></figure>
+<p>如果您希望在响应中看到状态行，则在请求中包含<code>statusLine</code>查询参数，其值为<code>true</code>。</p>
+<p>已停止，重新加载或取消部署的Web应用程序的每个上下文路径，但先前运行中的哪些类仍然加载到内存中，从而导致内存泄漏，将列在新行上。如果应用程序已多次重新加载，则可能会多次列出。</p>
+<p>如果命令不成功，响应将以FAIL开头并包含错误消息。</p>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/findleaks?statusLine=true</span><br><span class="line">OK - 没有发现内存泄漏</span><br></pre></td></tr></table></figure>
+<h2 id="连接器SSL-TLS密码信息"><a href="#连接器SSL-TLS密码信息" class="headerlink" title="连接器SSL / TLS密码信息"></a>连接器SSL / TLS密码信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorCiphers</span><br></pre></td></tr></table></figure>
+<p>SSL连接器/密码诊断列出了当前为每个连接器配置的SSL / TLS密码。 对于NIO和NIO2，列出了各个密码套件的名称。 对于APR，返回SSLCipherSuite的值。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / SSL Cipher information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">  SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]</span><br><span class="line">  TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</span><br><span class="line">  TLS_DHE_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  TLS_ECDH_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslConnectorCiphers</span><br><span class="line">OK - Connector/SSL 密码.信息</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">  不允许SSL连接</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">  不允许SSL连接</span><br></pre></td></tr></table></figure></p>
+<h2 id="连接器SSL-TLS证书链信息"><a href="#连接器SSL-TLS证书链信息" class="headerlink" title="连接器SSL / TLS证书链信息"></a>连接器SSL / TLS证书链信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorCerts</span><br></pre></td></tr></table></figure>
+<p>SSL Connector / Certs诊断列出了当前为每个虚拟主机配置的证书链。</p>
+<p>响应将如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / Certificate Chain information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]-_default_-RSA</span><br><span class="line">[</span><br><span class="line">[</span><br><span class="line">  Version: V3</span><br><span class="line">  Subject: CN=localhost, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US</span><br><span class="line">  Signature Algorithm: SHA256withRSA, OID = 1.2.840.113549.1.1.11</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslConnectorCerts</span><br><span class="line">OK - Connector / Certificate Chain information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">不允许SSL连接</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">不允许SSL连接</span><br></pre></td></tr></table></figure></p>
+<h2 id="连接器SSL-TLS可信证书信息"><a href="#连接器SSL-TLS可信证书信息" class="headerlink" title="连接器SSL / TLS可信证书信息"></a>连接器SSL / TLS可信证书信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorTrustedCerts</span><br></pre></td></tr></table></figure>
+<p>SSL Connector / Certs诊断列出了当前为每个虚拟主机配置的可信证书。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / Trusted Certificate information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]-_default_</span><br><span class="line">[</span><br><span class="line">[</span><br><span class="line">  Version: V3</span><br><span class="line">  Subject: CN=Apache Tomcat Test CA, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
+<h2 id="重新加载TLS配置"><a href="#重新加载TLS配置" class="headerlink" title="重新加载TLS配置"></a>重新加载TLS配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslReload?tlsHostName=name</span><br></pre></td></tr></table></figure>
+<p>重新加载TLS配置文件（证书和密钥文件，这不会触发重新解析<code>server.xml</code>）。 要为所有主机重新加载文件，请不要指定tlsHostName参数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslReload</span><br><span class="line">FAIL - 重新加载TLS配制失败</span><br></pre></td></tr></table></figure></p>
+<h2 id="线程转储"><a href="#线程转储" class="headerlink" title="线程转储"></a>线程转储</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/threaddump</span><br></pre></td></tr></table></figure>
+<p>编写JVM线程转储。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">OK - JVM thread dump</span><br><span class="line">2014-12-08 07:24:40.080</span><br><span class="line">Full thread dump Java HotSpot(TM) Client VM (25.25-b02 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;http-nio-8080-exec-2&quot; Id=26 cpu=46800300 ns usr=46800300 ns blocked 0 for -1 ms waited 0 for -1 ms</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">        locks java.util.concurrent.ThreadPoolExecutor$Worker@1738ad4</span><br><span class="line">        at sun.management.ThreadImpl.dumpThreads0(Native Method)</span><br><span class="line">        at sun.management.ThreadImpl.dumpAllThreads(ThreadImpl.java:446)</span><br><span class="line">        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:440)</span><br><span class="line">        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:409)</span><br><span class="line">        at org.apache.catalina.manager.ManagerServlet.threadDump(ManagerServlet.java:557)</span><br><span class="line">        at org.apache.catalina.manager.ManagerServlet.doGet(ManagerServlet.java:371)</span><br><span class="line">        at javax.servlet.http.HttpServlet.service(HttpServlet.java:618)</span><br><span class="line">        at javax.servlet.http.HttpServlet.service(HttpServlet.java:725)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/threaddump</span><br><span class="line">OK - JVM thread dump</span><br><span class="line">2019-08-21 15:17:32.786</span><br><span class="line">打印全部线程 OpenJDK 64-Bit Server VM (25.222-b10 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;ajp-nio-8009-Acceptor&quot; Id=48 cpu=69203 ns usr=0 ns blocked 0 for -1 ms waited 0 for -1 ms (running in native)</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept0(Native Method)</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:422)</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:250)</span><br><span class="line">	- locked (a java.lang.Object@226a310c) index 2 frame sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:250)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:463)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:73)</span><br><span class="line">	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:95)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line"></span><br><span class="line">&quot;ajp-nio-8009-ClientPoller&quot; Id=47 cpu=331431986 ns usr=250000000 ns blocked 0 for -1 ms waited 0 for -1 ms (running in native)</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">	at sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)</span><br><span class="line">	at sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)</span><br><span class="line">	at sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)</span><br><span class="line">	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)</span><br><span class="line">	- locked (a sun.nio.ch.EPollSelectorImpl@56c54bf3) index 3 frame sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)</span><br><span class="line">	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint$Poller.run(NioEndpoint.java:708)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="VM信息"><a href="#VM信息" class="headerlink" title="VM信息"></a>VM信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/vminfo</span><br></pre></td></tr></table></figure>
+<p>编写有关Java虚拟机的一些诊断信息。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/vminfo</span><br><span class="line">OK - VM信息</span><br><span class="line">2019-08-21 15:19:23.113</span><br><span class="line">运行时信息:</span><br><span class="line">  vmName: OpenJDK 64-Bit Server VM</span><br><span class="line">  vmVersion: 25.222-b10</span><br><span class="line">  vmVendor: Private Build</span><br><span class="line">  specName: Java Virtual Machine Specification</span><br><span class="line">  specVersion: 1.8</span><br><span class="line">  specVendor: Oracle Corporation</span><br><span class="line">  managementSpecVersion: 1.2</span><br><span class="line">  name: 1197@jack</span><br><span class="line">  startTime: 1566366568078</span><br><span class="line">  uptime: 5395096</span><br><span class="line">  isBootClassPathSupported: true</span><br><span class="line"></span><br><span class="line">操作系统信息:</span><br><span class="line">  name: Linux</span><br><span class="line">  version: 5.0.0-25-generic</span><br><span class="line">  architecture: amd64</span><br><span class="line">  availableProcessors: 12</span><br><span class="line">  systemLoadAverage: 0.21</span><br><span class="line"></span><br><span class="line">ThreadMXBean capabilities:</span><br><span class="line">  isCurrentThreadCpuTimeSupported: true</span><br><span class="line">  isThreadCpuTimeSupported: true</span><br><span class="line">  isThreadCpuTimeEnabled: true</span><br><span class="line">  isObjectMonitorUsageSupported: true</span><br><span class="line">  isSynchronizerUsageSupported: true</span><br><span class="line">  isThreadContentionMonitoringSupported: true</span><br><span class="line">  isThreadContentionMonitoringEnabled: false</span><br><span class="line"></span><br><span class="line">线程数:</span><br><span class="line">  daemon: 32</span><br><span class="line">  total: 35</span><br><span class="line">  peak: 35</span><br><span class="line">  totalStarted: 39</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="保存配置"><a href="#保存配置" class="headerlink" title="保存配置"></a>保存配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/save</span><br></pre></td></tr></table></figure>
+<p>如果指定不带任何参数，则此命令将服务器的当前配置保存到<code>server.xml</code>。 如果需要，现有文件将重命名为备份。</p>
+<p>如果使用与已部署的Web应用程序的路径匹配的path参数指定，则该Web应用程序的配置将保存到xmlBase中适当命名的<code>context.xml</code>文件中，以用于当前主机。</p>
+<p>要使用该命令，必须存在<code>StoreConfig MBean</code>。 通常，这是使用<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina.storeconfig.StoreConfigLifecycleListener" target="_blank" rel="noopener">StoreConfigLifecycleListener</a>配置的。</p>
+<p>如果命令不成功，响应将以FAIL开头并包含错误消息。</p>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/save</span><br><span class="line">FAIL - No StoreConfig MBean registered at [Catalina:type=StoreConfig]. </span><br><span class="line">Registration is typically performed by the StoreConfigLifecycleListener.</span><br></pre></td></tr></table></figure>
+<h1 id="服务器状态"><a href="#服务器状态" class="headerlink" title="服务器状态"></a>服务器状态</h1><p>从以下链接中，您可以查看有关服务器的状态信息。 <code>manager-xxx</code>角色中的任何一个都允许访问此页面。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/status</span><br><span class="line">http://localhost:8080/manager/status/all</span><br></pre></td></tr></table></figure>
+<p>以HTML格式显示服务器状态信息。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/status?XML=true</span><br><span class="line">http://localhost:8080/manager/status/all?XML=true</span><br></pre></td></tr></table></figure></p>
+<p>以XML格式显示服务器状态信息。</p>
+<p>首先，您有服务器和JVM版本号，JVM提供程序，操作系统名称和编号，后跟架构类型。</p>
+<p>其次，有关于JVM的内存使用情况的信息。</p>
+<p>然后，有关于Tomcat AJP和HTTP连接器的信息。两者都有相同的信息：</p>
+<ul>
+<li><p>线程信息：最大线程数，最小和最大备用线程数，当前线程数和当前线程忙数。</p>
+</li>
+<li><p>请求信息：最大处理时间和处理时间，请求和错误计数，接收和发送的字节数。</p>
+</li>
+<li><p>显示阶段，时间，发送字节，字节接收，客户端，VHost和请求的表。表中列出了所有现有线程。以下是可能的线程阶段列表：</p>
+<ul>
+<li><p>“解析和准备请求”：正在解析请求标头或正在进行读取请求主体的必要准备（如果已指定传输编码）。</p>
+</li>
+<li><p>“service”：线程正在处理请求并生成响应。此阶段遵循“解析和准备请求”阶段，并在“完成”阶段之前。此阶段始终至少有一个线程（服务器状态页面）。</p>
+</li>
+<li><p>“finishing”：请求处理结束。仍在输出缓冲区中的任何其余响应都将发送到客户端。如果适当保持连接活动，则此阶段之后是“保持活动”，如果“保持活动”不合适，则“准备好”。</p>
+</li>
+<li><p>“Keep-Alive”：如果客户端发送另一个请求，则线程会保持对客户端的连接打开。如果收到另一个请求，则下一阶段将是“解析和准备请求”。如果在保持活动超时之前没有收到请求，则连接将关闭，下一阶段将为“就绪”。</p>
+</li>
+<li><p>“ready”：线程处于静止状态并准备好使用。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>如果您使用<code>/status/all</code>命令，则可以使用有关每个已部署Web应用程序的其他信息。</p>
+<h1 id="使用JMX代理Servlet"><a href="#使用JMX代理Servlet" class="headerlink" title="使用JMX代理Servlet"></a>使用JMX代理Servlet</h1><h2 id="什么是JMX代理Servlet"><a href="#什么是JMX代理Servlet" class="headerlink" title="什么是JMX代理Servlet"></a>什么是JMX代理Servlet</h2><p>JMX代理Servlet是一个轻量级代理，用于获取和设置tomcat内部.（或者通过MBean公开的任何类）其用法不是非常用户友好，但UI对于集成命令行脚本以监视和更改tomcat的内部非常有用。 您可以使用代理执行两项操作：获取信息和设置信息。 为了让您真正了解JMX代理Servlet，您应该对JMX有一个大致的了解。 如果您不知道JMX是什么，那么请准备好遭罪把。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">```s</span><br></pre></td></tr></table></figure>
+<hr>
 
+<a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/" title="next: Tomcat9-文档5-主机管理">next: Tomcat9-文档5-主机管理</a>
       
     </div> -->
           <div class="article-entry" itemprop="articleBody">
@@ -443,7 +589,7 @@ ga('send', 'pageview');
 <p>第一次尝试发出下一节中描述的Manager命令之一时，您将面临使用BASIC身份验证登录的挑战。您输入的用户名和密码无关紧要，只要它们在用户数据库中标识拥有角色管理器脚本的有效用户即可。</p>
 <p>除了密码限制之外，通过添加<code>RemoteAddrValve</code>或<code>RemoteHostValve</code>，远程IP地址或主机可以限制对Manager Web应用程序的访问。有关详情，请参阅<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/valve.html#Remote_Address_Filter" target="_blank" rel="noopener">阀门文档</a>以下是通过IP地址限制对localhost的访问的示例：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Context</span> <span class="attr">privileged</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteAddrValve"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">allow</span>=<span class="string">"127\.0\.0\.1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Context</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h1 id="用户友好的HTMML界面"><a href="#用户友好的HTMML界面" class="headerlink" title="用户友好的HTMML界面"></a>用户友好的HTMML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
+<h1 id="用户友好的HTML界面"><a href="#用户友好的HTML界面" class="headerlink" title="用户友好的HTML界面"></a>用户友好的HTML界面</h1><p>Manager Web应用程序的用户友好HTML界面位于</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://&#123;host&#125;:&#123;port&#125;/manager/html</span><br></pre></td></tr></table></figure>
 <p>如上所述，您需要<code>manager-gui</code>角色才能访问它。 有一个单独的文档，提供有关此接口的帮助。 看：</p>
 <ul>
@@ -664,25 +810,180 @@ ga('send', 'pageview');
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">OK - Session information for application at context path /examples</span><br><span class="line">Default maximum session inactive interval 30 minutes</span><br><span class="line">1 - &lt;2 minutes: 1 sessions</span><br><span class="line">3 - &lt;4 minutes: 1 sessions</span><br><span class="line">&gt;0 minutes: 2 sessions were expired</span><br></pre></td></tr></table></figure>
 <p>实际上<code>/sessions</code>和<code>/expire</code>是同一命令的同义词。不同之处在于存在空闲参数。</p>
 <p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/expire?path=/spring-boot-pkg-war&amp;idle=1</span><br><span class="line">[1] 4560</span><br></pre></td></tr></table></figure></p>
+<h2 id="启动现有应用程序"><a href="#启动现有应用程序" class="headerlink" title="启动现有应用程序"></a>启动现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/start?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发出停止的应用程序信号以重新启动，并使其自身再次可用例如，如果应用程序所需的数据库暂时不可用，则停止和启动很有用。通常最好停止依赖此数据库的Web应用程序，而不是让用户不断遇到数据库异常。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Started application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试启动Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>path / foo没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径</p>
+<ul>
+<li>path参数是必需的。</li>
+</ul>
+</li>
+</ul>
+<h2 id="停止现有的应用程序"><a href="#停止现有的应用程序" class="headerlink" title="停止现有的应用程序"></a>停止现有的应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/stop?path=/examples</span><br></pre></td></tr></table></figure>
+<p>发信号通知现有应用程序使其自身不可用，但将其部署。应用程序停止时进入的任何请求都将看到HTTP错误404，此应用程序将在列表应用程序命令中显示为“已停止”。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Stopped application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试停止Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>path / foo没有上下文</p>
+<ul>
+<li>您指定的上下文路径上没有已部署的应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径path参数是必需的。</p>
+</li>
+</ul>
+<h2 id="取消部署现有应用程序"><a href="#取消部署现有应用程序" class="headerlink" title="取消部署现有应用程序"></a>取消部署现有应用程序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/undeploy?path=/examples</span><br></pre></td></tr></table></figure>
+<p><strong>警告 - 此命令将删除此虚拟主机的<code>appBase</code>目录（通常为“<code>webapps</code>”）中存在的所有Web应用程序源码。这将删除应用程序<code>.WAR</code>（如果存在），应用程序目录来自<code>unpacked</code>形式的部署或<code>.WAR</code>扩展以及<code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code>目录中的XML Context定义。如果您只是想让应用程序停止服务，则应该使用<code>/stop</code>命令</strong>。</p>
+<p>发信号通知现有应用程序正常关闭自身，并将其从Tomcat中删除（这也使得此上下文路径可供以后重用）。此外，如果文档根目录存在于此虚拟主机的appBase目录（通常为“webapps”）中，则将其删除。此命令与/ deploy命令逻辑相反。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OK - Undeployed application at context path /examples</span><br></pre></td></tr></table></figure>
+<p>否则，响应将以FAIL开头并包含错误消息。可能的问题原因包括：</p>
+<ul>
+<li><p>遇到异常</p>
+<ul>
+<li>尝试取消部署Web应用程序时遇到异常。检查Tomcat日志以获取详细信息。</li>
+</ul>
+</li>
+<li><p>指定了无效的上下文路径</p>
+<ul>
+<li>上下文路径必须以斜杠字符开头。要引用ROOT Web应用程序，请使用“/”。</li>
+</ul>
+</li>
+<li><p>没有名为/ foo的上下文</p>
+<ul>
+<li>没有已指定名称的已部署应用程序。</li>
+</ul>
+</li>
+<li><p>未指定上下文路径path参数是必需的。</p>
+</li>
+</ul>
+<h2 id="发现内存泄漏"><a href="#发现内存泄漏" class="headerlink" title="发现内存泄漏"></a>发现内存泄漏</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/findleaks[?statusLine=[true|false]]</span><br></pre></td></tr></table></figure>
+<p>查找会触发完整垃圾回收（Full GC）的泄漏诊断。它应该在生产系统中极其谨慎地使用。</p>
+<p>查找泄漏诊断尝试识别在停止，重新加载或取消部署时导致内存泄漏的Web应用程序。应始终使用分析器确认结果。诊断使用<code>StandardHost</code>实现提供的其他功能。如果使用不扩展<code>StandardHost</code>的自定义主机，它将无法工作。</p>
+<p>从Java代码中明确触发完整的垃圾收集被记录为不可靠。此外，根据所使用的JVM，还有禁用显式GC触发的选项，如<code>-XX：+ DisableExplicitGC</code>。如果要确保诊断程序成功运行完整的GC，则需要使用GC日志记录，JConsole或类似工具进行检查。</p>
+<p>如果此命令成功，您将看到如下响应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/leaking-webapp</span><br></pre></td></tr></table></figure>
+<p>如果您希望在响应中看到状态行，则在请求中包含<code>statusLine</code>查询参数，其值为<code>true</code>。</p>
+<p>已停止，重新加载或取消部署的Web应用程序的每个上下文路径，但先前运行中的哪些类仍然加载到内存中，从而导致内存泄漏，将列在新行上。如果应用程序已多次重新加载，则可能会多次列出。</p>
+<p>如果命令不成功，响应将以FAIL开头并包含错误消息。</p>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/findleaks?statusLine=true</span><br><span class="line">OK - 没有发现内存泄漏</span><br></pre></td></tr></table></figure>
+<h2 id="连接器SSL-TLS密码信息"><a href="#连接器SSL-TLS密码信息" class="headerlink" title="连接器SSL / TLS密码信息"></a>连接器SSL / TLS密码信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorCiphers</span><br></pre></td></tr></table></figure>
+<p>SSL连接器/密码诊断列出了当前为每个连接器配置的SSL / TLS密码。 对于NIO和NIO2，列出了各个密码套件的名称。 对于APR，返回SSLCipherSuite的值。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / SSL Cipher information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">  SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]</span><br><span class="line">  TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</span><br><span class="line">  TLS_DHE_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  TLS_ECDH_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslConnectorCiphers</span><br><span class="line">OK - Connector/SSL 密码.信息</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">  不允许SSL连接</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">  不允许SSL连接</span><br></pre></td></tr></table></figure></p>
+<h2 id="连接器SSL-TLS证书链信息"><a href="#连接器SSL-TLS证书链信息" class="headerlink" title="连接器SSL / TLS证书链信息"></a>连接器SSL / TLS证书链信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorCerts</span><br></pre></td></tr></table></figure>
+<p>SSL Connector / Certs诊断列出了当前为每个虚拟主机配置的证书链。</p>
+<p>响应将如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / Certificate Chain information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]-_default_-RSA</span><br><span class="line">[</span><br><span class="line">[</span><br><span class="line">  Version: V3</span><br><span class="line">  Subject: CN=localhost, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US</span><br><span class="line">  Signature Algorithm: SHA256withRSA, OID = 1.2.840.113549.1.1.11</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslConnectorCerts</span><br><span class="line">OK - Connector / Certificate Chain information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">不允许SSL连接</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">不允许SSL连接</span><br></pre></td></tr></table></figure></p>
+<h2 id="连接器SSL-TLS可信证书信息"><a href="#连接器SSL-TLS可信证书信息" class="headerlink" title="连接器SSL / TLS可信证书信息"></a>连接器SSL / TLS可信证书信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslConnectorTrustedCerts</span><br></pre></td></tr></table></figure>
+<p>SSL Connector / Certs诊断列出了当前为每个虚拟主机配置的可信证书。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">OK - Connector / Trusted Certificate information</span><br><span class="line">Connector[HTTP/1.1-8080]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[AJP/1.3-8009]</span><br><span class="line">SSL is not enabled for this connector</span><br><span class="line">Connector[HTTP/1.1-8443]-_default_</span><br><span class="line">[</span><br><span class="line">[</span><br><span class="line">  Version: V3</span><br><span class="line">  Subject: CN=Apache Tomcat Test CA, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
+<h2 id="重新加载TLS配置"><a href="#重新加载TLS配置" class="headerlink" title="重新加载TLS配置"></a>重新加载TLS配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/sslReload?tlsHostName=name</span><br></pre></td></tr></table></figure>
+<p>重新加载TLS配置文件（证书和密钥文件，这不会触发重新解析<code>server.xml</code>）。 要为所有主机重新加载文件，请不要指定tlsHostName参数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/sslReload</span><br><span class="line">FAIL - 重新加载TLS配制失败</span><br></pre></td></tr></table></figure></p>
+<h2 id="线程转储"><a href="#线程转储" class="headerlink" title="线程转储"></a>线程转储</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/threaddump</span><br></pre></td></tr></table></figure>
+<p>编写JVM线程转储。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">OK - JVM thread dump</span><br><span class="line">2014-12-08 07:24:40.080</span><br><span class="line">Full thread dump Java HotSpot(TM) Client VM (25.25-b02 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;http-nio-8080-exec-2&quot; Id=26 cpu=46800300 ns usr=46800300 ns blocked 0 for -1 ms waited 0 for -1 ms</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">        locks java.util.concurrent.ThreadPoolExecutor$Worker@1738ad4</span><br><span class="line">        at sun.management.ThreadImpl.dumpThreads0(Native Method)</span><br><span class="line">        at sun.management.ThreadImpl.dumpAllThreads(ThreadImpl.java:446)</span><br><span class="line">        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:440)</span><br><span class="line">        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:409)</span><br><span class="line">        at org.apache.catalina.manager.ManagerServlet.threadDump(ManagerServlet.java:557)</span><br><span class="line">        at org.apache.catalina.manager.ManagerServlet.doGet(ManagerServlet.java:371)</span><br><span class="line">        at javax.servlet.http.HttpServlet.service(HttpServlet.java:618)</span><br><span class="line">        at javax.servlet.http.HttpServlet.service(HttpServlet.java:725)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/threaddump</span><br><span class="line">OK - JVM thread dump</span><br><span class="line">2019-08-21 15:17:32.786</span><br><span class="line">打印全部线程 OpenJDK 64-Bit Server VM (25.222-b10 mixed mode):</span><br><span class="line"></span><br><span class="line">&quot;ajp-nio-8009-Acceptor&quot; Id=48 cpu=69203 ns usr=0 ns blocked 0 for -1 ms waited 0 for -1 ms (running in native)</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept0(Native Method)</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:422)</span><br><span class="line">	at sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:250)</span><br><span class="line">	- locked (a java.lang.Object@226a310c) index 2 frame sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:250)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:463)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:73)</span><br><span class="line">	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:95)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line"></span><br><span class="line">&quot;ajp-nio-8009-ClientPoller&quot; Id=47 cpu=331431986 ns usr=250000000 ns blocked 0 for -1 ms waited 0 for -1 ms (running in native)</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">	at sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)</span><br><span class="line">	at sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)</span><br><span class="line">	at sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)</span><br><span class="line">	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)</span><br><span class="line">	- locked (a sun.nio.ch.EPollSelectorImpl@56c54bf3) index 3 frame sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)</span><br><span class="line">	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint$Poller.run(NioEndpoint.java:708)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="VM信息"><a href="#VM信息" class="headerlink" title="VM信息"></a>VM信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/vminfo</span><br></pre></td></tr></table></figure>
+<p>编写有关Java虚拟机的一些诊断信息。</p>
+<p>响应将如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/vminfo</span><br><span class="line">OK - VM信息</span><br><span class="line">2019-08-21 15:19:23.113</span><br><span class="line">运行时信息:</span><br><span class="line">  vmName: OpenJDK 64-Bit Server VM</span><br><span class="line">  vmVersion: 25.222-b10</span><br><span class="line">  vmVendor: Private Build</span><br><span class="line">  specName: Java Virtual Machine Specification</span><br><span class="line">  specVersion: 1.8</span><br><span class="line">  specVendor: Oracle Corporation</span><br><span class="line">  managementSpecVersion: 1.2</span><br><span class="line">  name: 1197@jack</span><br><span class="line">  startTime: 1566366568078</span><br><span class="line">  uptime: 5395096</span><br><span class="line">  isBootClassPathSupported: true</span><br><span class="line"></span><br><span class="line">操作系统信息:</span><br><span class="line">  name: Linux</span><br><span class="line">  version: 5.0.0-25-generic</span><br><span class="line">  architecture: amd64</span><br><span class="line">  availableProcessors: 12</span><br><span class="line">  systemLoadAverage: 0.21</span><br><span class="line"></span><br><span class="line">ThreadMXBean capabilities:</span><br><span class="line">  isCurrentThreadCpuTimeSupported: true</span><br><span class="line">  isThreadCpuTimeSupported: true</span><br><span class="line">  isThreadCpuTimeEnabled: true</span><br><span class="line">  isObjectMonitorUsageSupported: true</span><br><span class="line">  isSynchronizerUsageSupported: true</span><br><span class="line">  isThreadContentionMonitoringSupported: true</span><br><span class="line">  isThreadContentionMonitoringEnabled: false</span><br><span class="line"></span><br><span class="line">线程数:</span><br><span class="line">  daemon: 32</span><br><span class="line">  total: 35</span><br><span class="line">  peak: 35</span><br><span class="line">  totalStarted: 39</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="保存配置"><a href="#保存配置" class="headerlink" title="保存配置"></a>保存配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/text/save</span><br></pre></td></tr></table></figure>
+<p>如果指定不带任何参数，则此命令将服务器的当前配置保存到<code>server.xml</code>。 如果需要，现有文件将重命名为备份。</p>
+<p>如果使用与已部署的Web应用程序的路径匹配的path参数指定，则该Web应用程序的配置将保存到xmlBase中适当命名的<code>context.xml</code>文件中，以用于当前主机。</p>
+<p>要使用该命令，必须存在<code>StoreConfig MBean</code>。 通常，这是使用<a href="https://tomcat.apache.org/tomcat-9.0-doc/config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina.storeconfig.StoreConfigLifecycleListener" target="_blank" rel="noopener">StoreConfigLifecycleListener</a>配置的。</p>
+<p>如果命令不成功，响应将以FAIL开头并包含错误消息。</p>
+<p>实践：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ curl -u jimo-script:jimo localhost:8080/manager/text/save</span><br><span class="line">FAIL - No StoreConfig MBean registered at [Catalina:type=StoreConfig]. </span><br><span class="line">Registration is typically performed by the StoreConfigLifecycleListener.</span><br></pre></td></tr></table></figure>
+<h1 id="服务器状态"><a href="#服务器状态" class="headerlink" title="服务器状态"></a>服务器状态</h1><p>从以下链接中，您可以查看有关服务器的状态信息。 <code>manager-xxx</code>角色中的任何一个都允许访问此页面。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/status</span><br><span class="line">http://localhost:8080/manager/status/all</span><br></pre></td></tr></table></figure>
+<p>以HTML格式显示服务器状态信息。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8080/manager/status?XML=true</span><br><span class="line">http://localhost:8080/manager/status/all?XML=true</span><br></pre></td></tr></table></figure></p>
+<p>以XML格式显示服务器状态信息。</p>
+<p>首先，您有服务器和JVM版本号，JVM提供程序，操作系统名称和编号，后跟架构类型。</p>
+<p>其次，有关于JVM的内存使用情况的信息。</p>
+<p>然后，有关于Tomcat AJP和HTTP连接器的信息。两者都有相同的信息：</p>
+<ul>
+<li><p>线程信息：最大线程数，最小和最大备用线程数，当前线程数和当前线程忙数。</p>
+</li>
+<li><p>请求信息：最大处理时间和处理时间，请求和错误计数，接收和发送的字节数。</p>
+</li>
+<li><p>显示阶段，时间，发送字节，字节接收，客户端，VHost和请求的表。表中列出了所有现有线程。以下是可能的线程阶段列表：</p>
+<ul>
+<li><p>“解析和准备请求”：正在解析请求标头或正在进行读取请求主体的必要准备（如果已指定传输编码）。</p>
+</li>
+<li><p>“service”：线程正在处理请求并生成响应。此阶段遵循“解析和准备请求”阶段，并在“完成”阶段之前。此阶段始终至少有一个线程（服务器状态页面）。</p>
+</li>
+<li><p>“finishing”：请求处理结束。仍在输出缓冲区中的任何其余响应都将发送到客户端。如果适当保持连接活动，则此阶段之后是“保持活动”，如果“保持活动”不合适，则“准备好”。</p>
+</li>
+<li><p>“Keep-Alive”：如果客户端发送另一个请求，则线程会保持对客户端的连接打开。如果收到另一个请求，则下一阶段将是“解析和准备请求”。如果在保持活动超时之前没有收到请求，则连接将关闭，下一阶段将为“就绪”。</p>
+</li>
+<li><p>“ready”：线程处于静止状态并准备好使用。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>如果您使用<code>/status/all</code>命令，则可以使用有关每个已部署Web应用程序的其他信息。</p>
+<h1 id="使用JMX代理Servlet"><a href="#使用JMX代理Servlet" class="headerlink" title="使用JMX代理Servlet"></a>使用JMX代理Servlet</h1><h2 id="什么是JMX代理Servlet"><a href="#什么是JMX代理Servlet" class="headerlink" title="什么是JMX代理Servlet"></a>什么是JMX代理Servlet</h2><p>JMX代理Servlet是一个轻量级代理，用于获取和设置tomcat内部.（或者通过MBean公开的任何类）其用法不是非常用户友好，但UI对于集成命令行脚本以监视和更改tomcat的内部非常有用。 您可以使用代理执行两项操作：获取信息和设置信息。 为了让您真正了解JMX代理Servlet，您应该对JMX有一个大致的了解。 如果您不知道JMX是什么，那么请准备好遭罪把。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">```s</span><br></pre></td></tr></table></figure>
+<hr>
 
+<a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/" title="next: Tomcat9-文档5-主机管理">next: Tomcat9-文档5-主机管理</a>
           </div>
           
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/009-tomcat9-doc-5-manager/" data-id="cjzjeuknw00mhsjchv5cb05w4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/08/20/server/009-tomcat9-doc-5-manager/" data-id="cjzm1nrxk00g952ch024nnz3e" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tomcat/">tomcat</a><span class="article-tag-list-count">6</span></li></ul>
 
       </footer>
       </div>
       
         
 <nav id="article-nav">
+  
+    <a href="/2019/08/22/maven/006-read-book-maven-practice/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          读《maven实战》笔记
+        
+      </div>
+    </a>
   
   
     <a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/" id="article-nav-older" class="article-nav-link-wrap">
@@ -716,7 +1017,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 12.5px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.75px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 13.13px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -738,6 +1039,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/">Tomcat9-文档5-主机管理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/22/maven/006-read-book-maven-practice/">读《maven实战》笔记</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
           </li>
         
@@ -747,14 +1056,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/20/server/006-tomcat9-doc-1-introduction/">Tomcat9-文档1-介绍</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
           </li>
         
       </ul>

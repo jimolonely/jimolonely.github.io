@@ -86,6 +86,168 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-math/001-fourier-wavelet-transform" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/15/math/001-fourier-wavelet-transform/" class="article-date">
+  <time datetime="2018-05-15T05:51:55.000Z" itemprop="datePublished">2018-05-15</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/15/math/001-fourier-wavelet-transform/">傅里叶和小波变换</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>傅里叶和小波变换,咱们不说公式,就谈人生.对于没学过通信原理和信号系统处理与分析的<br>开发者来说,世界就像小了一半,那就试试吧,反正我很容易就看懂了,足够跨学科编程.</p>
+<h1 id="傅里叶变换"><a href="#傅里叶变换" class="headerlink" title="傅里叶变换"></a>傅里叶变换</h1><p>肯定会搜到<a href="http://blog.jobbole.com/70549/" target="_blank" rel="noopener">这篇文章</a>.</p>
+<p>那就完了,需要理解的就几个概念:</p>
+<ol>
+<li>时域</li>
+<li>频域</li>
+<li>叠加</li>
+<li>变换</li>
+</ol>
+<p>我想下面的图足够了.<br><img src="/2018/05/15/math/001-fourier-wavelet-transform/000.gif"><br><img src="/2018/05/15/math/001-fourier-wavelet-transform/001.gif"><br><img src="/2018/05/15/math/001-fourier-wavelet-transform/002.jpg"></p>
+<p>至于什么是变换,可以简单可以复杂.</p>
+<p>问题就是 什么–&gt;傅里叶变换–&gt;什么?</p>
+<p><strong>答案: 对时域信号做傅立叶变换，就会得到信号的频谱。</strong></p>
+<h1 id="小波变换"><a href="#小波变换" class="headerlink" title="小波变换"></a>小波变换</h1><p>可以看知乎的一个解释:<br>咦？ 题主要的不是通俗的解释吗？ 我相信这个解释文科生也能看懂，绝对木有公式，木有看不懂的术语，连叫人头疼的数字也没有！恰好N年前做课题的时候得益于小波变换， 当然，数学公式， 推导过程， 等等我都已经通通不记得了（老师看到可不要打我）。别急， 我真的不是来捣乱的！ 虽然这些都不记得了， 但是小波变换的原理神马的我还是记得的， 我换个方式解释一下， 不知道是否恰当， 欢迎各位批评指正或者讨论。 相信大家都看过油画。 对于特别巨幅的油画， 不知道有没有过体会， 油画是只可远观而不可亵玩？ 当你在足够远的距离观察油画时， 油画所表达的内容是有层次且内容丰富的， 但是当你靠近油画甚至贴在油画上看时， 你只能看到一个个的小色块， 而此时这些小色块此时变成毫无意义的无规则排列。 我们假设油画中的每个小色块都对应某一信号中的某个瞬时时间，那么无数个小色块就拼凑成了整幅画， 相当于无数个瞬时时间片段组成了整个信号。那么，当我们想看看在这个信号的某个时间发生了什么的时候， 我们不得不试图靠近这幅画。假设一个信号所包含的全部频率信息包含在一副无边无际的油画之中， 辣么， 当你和油画的距离为无穷远的时候你能够毫不费力的看清楚这幅画的全貌，（相当于傅立叶变换，可获得此信号的全部频率信息）， 但是你却无法看清楚这幅画的细节（无法得知此信号在某个时刻的瞬时频率）。 当你慢慢走向这幅画的时候（给傅立叶变换加窗）， 你走得越近（窗长越短）， 细节越清楚（信号的时间分辨率越来越高）， 也就是每个小色块都越来越清晰，  但每个色块所包含的信息量（频率信息）也越来越少，这就是著名的海森堡测不准原理（你永远无法得知一个信号之中任一时刻的准确频率信息， 即瞬时频率）， 也就是说你永远不可能在距离油画0 cm的位置观测出油画所画的内容。如果，以上我的假设你都认同的话，辣么加窗傅立叶变换相当于你选择了一个固定的距离观察这幅油画，当距离近时（窗长减少）， 油画的细节更加清楚， 但是油画所表达的信息量随之减少。这时候就有人提出来了，这个问题还不容易吗？ 油画在有的地方细节多，我们就离近一点看嘛（增大变换尺度，增加时间分辨率）；有的地方细节少，我们就离得稍微远一点看嘛（减小变化尺度，缩减时间分辨率），这样，在细节和内容的信息量上都能兼顾，能够更全面的欣赏这幅油画，这就是所谓的小波变换啦！其实这个原理非常简单， 题主可以想象我们看一副大型油画时，通常都是先离远点看看全貌， 然而对于一些细节丰富的地方，我们会走近观察。 </p>
+<p><strong>最后总结： 傅立叶变换就相当于： 你只能在远距离观察油画； 加窗傅立叶变换相当于： 你只能在固定的距离观察油画； 而小波变换相当于，你可以在任意的距离观察油画。</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">作者：兔宝</span><br><span class="line">链接：https://www.zhihu.com/question/22864189/answer/136518602</span><br><span class="line">来源：知乎</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>傅里叶和小波变换,咱们不说公式,就谈人生.对于没学过通信原理和信号系统处理与分析的<br>开发者来说,世界就像小了一半,那就试试吧,反正我很容易就看懂了,足够跨学科编程.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/05/15/math/001-fourier-wavelet-transform/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/05/15/math/001-fourier-wavelet-transform/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/05/15/math/001-fourier-wavelet-transform/" data-id="cjzm1nrx000eh52chm867qwkp" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/math/">math</a><span class="article-tag-list-count">3</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-math/000-basic-concept" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/10/math/000-basic-concept/" class="article-date">
+  <time datetime="2018-05-10T05:51:55.000Z" itemprop="datePublished">2018-05-10</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/10/math/000-basic-concept/">概率与统计学基本概念</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>那些必须明白的概率与统计学基本概念.</p>
+<h1 id="归一化-标准化-正则化区别"><a href="#归一化-标准化-正则化区别" class="headerlink" title="归一化/标准化/正则化区别"></a>归一化/标准化/正则化区别</h1>
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>那些必须明白的概率与统计学基本概念.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/05/10/math/000-basic-concept/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/05/10/math/000-basic-concept/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/05/10/math/000-basic-concept/" data-id="cjzm1nrwt00dt52chc5f6v2rs" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/math/">math</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/probability/">probability</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/statistics/">statistics</a><span class="article-tag-list-count">1</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-tools/010-ffmpeg" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/01/tools/010-ffmpeg/" class="article-date">
@@ -152,7 +314,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/05/01/tools/010-ffmpeg/" data-id="cjzjeukoe00nusjch8r8o4cvz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/05/01/tools/010-ffmpeg/" data-id="cjzm1nrxy00hm52chi5cn1luf" class="article-share-link">
           Share
         </a>
         
@@ -294,7 +456,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjzjeukmj00ihsjchf2c46bt3" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/27/linux/008-linux-kernel1/" data-id="cjzm1nrwd00ca52chgwkf90mu" class="article-share-link">
           Share
         </a>
         
@@ -376,7 +538,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/20/linux/011-linux-terminal-qq/" data-id="cjzjeukmp00iwsjch6utdn3qi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/20/linux/011-linux-terminal-qq/" data-id="cjzm1nrwg00ck52chxijyztt4" class="article-share-link">
           Share
         </a>
         
@@ -462,7 +624,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjzjeukgn003asjch31o13hh6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/18/db/003-sql-must-know/" data-id="cjzm1nrtj003952chksgslqqr" class="article-share-link">
           Share
         </a>
         
@@ -547,7 +709,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/17/python/008-python-error/" data-id="cjzjeuknj00lbsjch8pjccmau" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/17/python/008-python-error/" data-id="cjzm1nrx700f652ch6vhyv0sh" class="article-share-link">
           Share
         </a>
         
@@ -636,7 +798,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjzjeukni00l8sjchpbe9myfm" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/15/python/007-use-pandas/" data-id="cjzm1nrx600f452cho780yepd" class="article-share-link">
           Share
         </a>
         
@@ -713,7 +875,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjzjeukgm0036sjch6tamnt34" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/002-sqlserver-datetime-to-constellation/" data-id="cjzm1nrti003552chbeipe0zf" class="article-share-link">
           Share
         </a>
         
@@ -791,7 +953,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjzjeukgn0039sjch71vwkihc" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/14/db/001-sqlserver-datetime-to-string/" data-id="cjzm1nrti003752ch2zg91mq5" class="article-share-link">
           Share
         </a>
         
@@ -881,7 +1043,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjzjeukgd002dsjchxsokjn14" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/05/cloudcompute/005-docker/" data-id="cjzm1nrt8002d52ch9xcoswcm" class="article-share-link">
           Share
         </a>
         
@@ -958,7 +1120,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjzjeuknh00l6sjch0hmss338" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjzm1nrx500f152chpto65lk8" class="article-share-link">
           Share
         </a>
         
@@ -1041,7 +1203,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjzjeukgc002asjch68kz68tt" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjzm1nrt6002552chishrdyu7" class="article-share-link">
           Share
         </a>
         
@@ -1137,7 +1299,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjzjeukmp00itsjchaw05qxpi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjzm1nrwe00cd52chcbq9myfw" class="article-share-link">
           Share
         </a>
         
@@ -1225,7 +1387,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/04/01/shell/001-shell-common-use/" data-id="cjzjeuknv00mesjchmw0braw4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/04/01/shell/001-shell-common-use/" data-id="cjzm1nrxj00g752cheabylk14" class="article-share-link">
           Share
         </a>
         
@@ -1310,7 +1472,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjzjeukge002fsjch2wpy15e4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjzm1nrt6002352chna6v16q1" class="article-share-link">
           Share
         </a>
         
@@ -1394,7 +1556,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjzjeukgc0028sjch9qx18bv1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjzm1nrt7002852chhvt9py4v" class="article-share-link">
           Share
         </a>
         
@@ -1471,7 +1633,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjzjeukgl0034sjch8l3en8p1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjzm1nrth003252chjz470bhy" class="article-share-link">
           Share
         </a>
         
@@ -1597,7 +1759,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjzjeukoc00npsjch1vwx0tz1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjzm1nrxw00hg52chrnjg8i2m" class="article-share-link">
           Share
         </a>
         
@@ -1702,176 +1864,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjzjeukgb0025sjchop37tdh6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjzm1nrt5002152chhbevbag3" class="article-share-link">
           Share
         </a>
         
             
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-python/005-module-import" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/24/python/005-module-import/" class="article-date">
-  <time datetime="2018-03-24T01:04:29.000Z" itemprop="datePublished">2018-03-24</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/24/python/005-module-import/">ModuleNotFoundError:No module named xxx</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这是个常见问题.</p>
-<h1 id="demo结构"><a href="#demo结构" class="headerlink" title="demo结构"></a>demo结构</h1><img src="/2018/03/24/python/005-module-import/000.png">
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>我们在最外层main.py里引用任何包下的模块都是ok的.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pkg1.module1 <span class="keyword">import</span> func1</span><br><span class="line"><span class="keyword">from</span> other <span class="keyword">import</span> other</span><br><span class="line"><span class="keyword">from</span> pkg1.pkg11.module11 <span class="keyword">import</span> func11</span><br><span class="line"><span class="keyword">from</span> pkg2.module2 <span class="keyword">import</span> func2</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'main'</span>)</span><br><span class="line"></span><br><span class="line">other()</span><br><span class="line">func1()</span><br><span class="line">func11()</span><br><span class="line">func2()</span><br></pre></td></tr></table></figure></p>
-<p>现在我们在module1里引用module2的函数:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># module1.py</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pkg2.module2 <span class="keyword">import</span> func2</span><br><span class="line"></span><br><span class="line">func2()</span><br></pre></td></tr></table></figure></p>
-<p>就出现问题了:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ python module1.py </span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"module1.py"</span>, line <span class="number">6</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    <span class="keyword">from</span> pkg2.module2 <span class="keyword">import</span> func2</span><br><span class="line">ModuleNotFoundError: No module named <span class="string">'pkg2'</span></span><br></pre></td></tr></table></figure></p>
-<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>既然找不到,就追加路径:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">sys.path.append(<span class="string">'../'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pkg2.module2 <span class="keyword">import</span> func2</span><br><span class="line"></span><br><span class="line">func2()</span><br></pre></td></tr></table></figure></p>
-<p>ok了.</p>
-<h1 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h1><ol>
-<li>一般来说,我们只会有一个入口文件,也就是main.py,只有单独运行module1.py时才需要这样做.</li>
-<li>不能出现循环引用,比如module2.py也引用module1的话,就行不通了.</li>
-<li>pycharm这个IDE可以直接运行模块,而无需修改,除非要在命令行运行才需要改变路径.</li>
-<li>参考官方文档:<a href="https://docs.python.org/3/tutorial/modules.html" target="_blank" rel="noopener">https://docs.python.org/3/tutorial/modules.html</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这是个常见问题.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/24/python/005-module-import/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/24/python/005-module-import/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjzjeukng00l3sjchzgar1cf3" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-java/000-date-util" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/22/java/000-date-util/" class="article-date">
-  <time datetime="2018-03-22T07:42:32.000Z" itemprop="datePublished">2018-03-22</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/22/java/000-date-util/">Java中日期常用操作</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>java中常用日期操作.</p>
-<h1 id="取得一年中的第几周"><a href="#取得一年中的第几周" class="headerlink" title="取得一年中的第几周"></a>取得一年中的第几周</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Calendar calendar = Calendar.getInstance();</span><br><span class="line">calendar.setFirstDayOfWeek(Calendar.MONDAY);</span><br><span class="line">calendar.setTime(<span class="keyword">new</span> Date());</span><br><span class="line"><span class="keyword">return</span> calendar.get(Calendar.WEEK_OF_YEAR);</span><br></pre></td></tr></table></figure>
-<h1 id="取得第几月"><a href="#取得第几月" class="headerlink" title="取得第几月"></a>取得第几月</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Calendar calendar = Calendar.getInstance();</span><br><span class="line">calendar.setTime(<span class="keyword">new</span> Date());</span><br><span class="line"><span class="keyword">return</span> calendar.get(Calendar.MONTH);</span><br></pre></td></tr></table></figure>
-<h1 id="取得一周的起始日期"><a href="#取得一周的起始日期" class="headerlink" title="取得一周的起始日期"></a>取得一周的起始日期</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 起的话offset=0,终的话offset=1</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function">String <span class="title">getDayOfWeek</span><span class="params">(<span class="keyword">int</span> year, <span class="keyword">int</span> week, <span class="keyword">int</span> offset)</span> </span>&#123;</span><br><span class="line">    Calendar c = Calendar.getInstance();</span><br><span class="line"></span><br><span class="line">    c.set(Calendar.YEAR, year);</span><br><span class="line">    c.set(Calendar.WEEK_OF_YEAR, week + offset);</span><br><span class="line">    c.setFirstDayOfWeek(Calendar.MONDAY);</span><br><span class="line">    c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());</span><br><span class="line">    c.set(Calendar.HOUR, <span class="number">0</span>);</span><br><span class="line">    c.set(Calendar.MINUTE, <span class="number">0</span>);</span><br><span class="line">    c.set(Calendar.SECOND, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> formatDate(c.getTime());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="取得一个月的起始日期"><a href="#取得一个月的起始日期" class="headerlink" title="取得一个月的起始日期"></a>取得一个月的起始日期</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getFirstDayOfMonth</span><span class="params">(<span class="keyword">int</span> month)</span> </span>&#123;</span><br><span class="line">    Calendar c = Calendar.getInstance();</span><br><span class="line">    c.set(Calendar.MONTH, month - <span class="number">1</span>);</span><br><span class="line">    c.set(Calendar.DAY_OF_MONTH, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> formatDate(c.getTime());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getLastDayOfMonth</span><span class="params">(<span class="keyword">int</span> month)</span> </span>&#123;</span><br><span class="line">    Calendar c = Calendar.getInstance();</span><br><span class="line">    c.set(Calendar.MONTH, month);</span><br><span class="line">    c.set(Calendar.DAY_OF_MONTH, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> formatDate(c.getTime());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="取得偏移日期"><a href="#取得偏移日期" class="headerlink" title="取得偏移日期"></a>取得偏移日期</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getDateBefore</span><span class="params">(<span class="keyword">int</span> distanceDay)</span> </span>&#123;</span><br><span class="line">    SimpleDateFormat dft = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd"</span>);</span><br><span class="line">    Date beginDate = <span class="keyword">new</span> Date();</span><br><span class="line">    Calendar date = Calendar.getInstance();</span><br><span class="line">    date.setTime(beginDate);</span><br><span class="line">    date.set(Calendar.DATE, date.get(Calendar.DATE) + distanceDay);</span><br><span class="line">    Date endDate = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        endDate = dft.parse(dft.format(date.getTime()));</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ParseException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dft.format(endDate);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>java中常用日期操作.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/22/java/000-date-util/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/22/java/000-date-util/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjzjeukhd005esjchck5iscx7" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
 
       </footer>
       </div>
@@ -1908,7 +1906,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.13px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 12.5px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.75px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 13.13px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1930,6 +1928,14 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/">Tomcat9-文档5-主机管理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/22/maven/006-read-book-maven-practice/">读《maven实战》笔记</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
           </li>
         
@@ -1939,14 +1945,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/20/server/006-tomcat9-doc-1-introduction/">Tomcat9-文档1-介绍</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/19/life/028-weekly-learn/">2019-34-周报</a>
           </li>
         
       </ul>
