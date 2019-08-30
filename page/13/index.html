@@ -86,6 +86,827 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/006-python-warning" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/03/python/006-python-warning/" class="article-date">
+  <time datetime="2018-04-03T07:02:27.000Z" itemprop="datePublished">2018-04-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/03/python/006-python-warning/">python中的那些警告</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>python中的那些警告,有时警告不仅是编程风格的问题.</p>
+<h1 id="This-dictionary-creation-could-be-rewritten-as-a-dictionary-literal"><a href="#This-dictionary-creation-could-be-rewritten-as-a-dictionary-literal" class="headerlink" title="This dictionary creation could be rewritten as a dictionary literal."></a>This dictionary creation could be rewritten as a dictionary literal.</h1><p>原:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dic = &#123;&#125;</span><br><span class="line">dic[<span class="string">'aaa'</span>] = <span class="number">5</span></span><br></pre></td></tr></table></figure></p>
+<p>后:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dic = dict()</span><br><span class="line">dic[<span class="string">'aaa'</span>] = <span class="number">5</span></span><br></pre></td></tr></table></figure></p>
+<p>why?<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 因为你可能事先已经声明过dic了:</span></span><br><span class="line">dic = &#123;<span class="string">'aaa'</span>: <span class="number">5</span>&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>python中的那些警告,有时警告不仅是编程风格的问题.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/03/python/006-python-warning/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/03/python/006-python-warning/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/03/python/006-python-warning/" data-id="cjzxx0dp700ff61chacqol5x4" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-cloudcompute/004-docker" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/02/cloudcompute/004-docker/" class="article-date">
+  <time datetime="2018-04-02T03:48:19.000Z" itemprop="datePublished">2018-04-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/02/cloudcompute/004-docker/">docker那些事-进入</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>docker的那些事.</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>如果安装时使用的root用户,那么普通用户使用时就收到限制,会出现:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker images</span><br><span class="line">Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdocker.sock/v1.37/images/json: dial unix /var/run/docker.sock: connect: permission denied</span><br></pre></td></tr></table></figure></p>
+<p>解决办法很简单,将当前用户加入docker用户组:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo usermod -aG docker $USER</span><br><span class="line"><span class="meta">$</span> sudo systemctl restart docker</span><br><span class="line"><span class="meta">$</span> newgrp docker</span><br><span class="line"><span class="meta">$</span> docker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置镜像源"><a href="#配置镜像源" class="headerlink" title="配置镜像源"></a>配置镜像源</h1><p>可以参考<a href="https://ieevee.com/tech/2016/09/28/docker-mirror.html" target="_blank" rel="noopener">镜像对比文档</a></p>
+<p>我就先使用阿里云了,登进去<a href="https://cr.console.aliyun.com/" target="_blank" rel="noopener">https://cr.console.aliyun.com/</a>,<br>选择镜像加速器就可以看到自己的地址和配置方法了.</p>
+<h1 id="docker的存储目录"><a href="#docker的存储目录" class="headerlink" title="docker的存储目录"></a>docker的存储目录</h1><p>默认:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo ls /var/lib/docker/</span><br><span class="line">[sudo] jimo 的密码：</span><br><span class="line">builder  containerd  containers  image	network  overlay2  plugins  runtimes  swarm  tmp  trust  volumes</span><br></pre></td></tr></table></figure></p>
+<h1 id="学习docker"><a href="#学习docker" class="headerlink" title="学习docker"></a>学习docker</h1><ol>
+<li><a href="https://docs.docker.com/get-started/#test-docker-installation" target="_blank" rel="noopener">docker-get-started(推荐,很容易)</a></li>
+<li><a href="https://www.rails365.net/articles/docker-de-rong-qi-san" target="_blank" rel="noopener">docker</a></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>docker的那些事.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/02/cloudcompute/004-docker/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/02/cloudcompute/004-docker/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/cloudcompute/004-docker/" data-id="cjzxx0dku002861chhx765h3q" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-linux/009-write-my-own-os" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/02/linux/009-write-my-own-os/" class="article-date">
+  <time datetime="2018-04-02T02:04:45.000Z" itemprop="datePublished">2018-04-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/02/linux/009-write-my-own-os/">写自己的操作系统1</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>从零写自己的操作系统.</p>
+<h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>来自youtube上一位腼腆的牛人推出的<a href="http://wyoos.org/" target="_blank" rel="noopener">视频</a>.</p>
+<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><p>完成一个自己的系统的iso文件,在屏幕上打印一句话,效果如下:</p>
+<img src="/2018/04/02/linux/009-write-my-own-os/000.png">
+<h1 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h1><ol>
+<li>makefle</li>
+<li>ASM汇编</li>
+<li>链接</li>
+<li>C++</li>
+</ol>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>types.h: 声明数据类型<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> __TYPES_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __TYPES_H</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">char</span>                     <span class="keyword">int8_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">char</span>           <span class="keyword">uint8_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">short</span>                   <span class="keyword">int16_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">short</span>         <span class="keyword">uint16_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span>                     <span class="keyword">int32_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">int</span>           <span class="keyword">uint32_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="keyword">int</span>           <span class="keyword">int64_t</span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="keyword">uint64_t</span>;</span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+<p>kernel.cpp:打印逻辑<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"types.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printf</span><span class="params">(<span class="keyword">char</span>* str)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">uint16_t</span>* VideoMemory = (<span class="keyword">uint16_t</span>*)<span class="number">0xb8000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; str[i] != <span class="string">'\0'</span>; ++i)</span><br><span class="line">        VideoMemory[i] = (VideoMemory[i] &amp; <span class="number">0xFF00</span>) | str[i];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*constructor)</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> constructor start_ctors;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> constructor end_ctors;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">callConstructors</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(constructor* i = &amp;start_ctors; i != &amp;end_ctors; i++)</span><br><span class="line">        (*i)();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">kernelMain</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span>* multiboot_structure, <span class="keyword">uint32_t</span> <span class="comment">/*multiboot_magic*/</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Hello World! --- jimo - OS1"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>loader.s:从硬件启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">.set MAGIC, 0x1badb002</span><br><span class="line">.set FLAGS, (1&lt;&lt;0 | 1&lt;&lt;1)</span><br><span class="line">.set CHECKSUM, -(MAGIC + FLAGS)</span><br><span class="line"></span><br><span class="line">.section .multiboot</span><br><span class="line">    .long MAGIC</span><br><span class="line">    .long FLAGS</span><br><span class="line">    .long CHECKSUM</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.section .text</span><br><span class="line">.extern kernelMain</span><br><span class="line">#.extern callConstructors</span><br><span class="line">.global loader</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">loader:</span><br><span class="line">    mov $kernel_stack, %esp</span><br><span class="line">    call callConstructors</span><br><span class="line">    push %eax</span><br><span class="line">    push %ebx</span><br><span class="line">    call kernelMain</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">_stop:</span><br><span class="line">    cli</span><br><span class="line">    hlt</span><br><span class="line">    jmp _stop</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.section .bss</span><br><span class="line">.space 2*1024*1024; # 2 MiB</span><br><span class="line">kernel_stack:</span><br></pre></td></tr></table></figure></p>
+<p>linker.ld:用于链接,手写<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">ENTRY(loader)</span><br><span class="line">OUTPUT_FORMAT(elf32-i386)</span><br><span class="line">OUTPUT_ARCH(i386:i386)</span><br><span class="line"></span><br><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">  . = 0x0100000;</span><br><span class="line"></span><br><span class="line">  .text :</span><br><span class="line">  &#123;</span><br><span class="line">    *(.multiboot)</span><br><span class="line">    *(.text*)</span><br><span class="line">    *(.rodata)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .data  :</span><br><span class="line">  &#123;</span><br><span class="line">    start_ctors = .;</span><br><span class="line">    KEEP(*( .init_array ));</span><br><span class="line">    KEEP(*(SORT_BY_INIT_PRIORITY( .init_array.* )));</span><br><span class="line">    end_ctors = .;</span><br><span class="line"></span><br><span class="line">    *(.data)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .bss  :</span><br><span class="line">  &#123;</span><br><span class="line">    *(.bss)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /DISCARD/ : &#123; *(.fini_array*) *(.comment) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>makefile:方便make<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">GCCPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore</span><br><span class="line">ASPARAMS = --32</span><br><span class="line">LDPARAMS = -melf_i386</span><br><span class="line"></span><br><span class="line">objects = loader.o kernel.o</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">%.o: %.cpp</span></span><br><span class="line">	gcc <span class="variable">$(GCCPARAMS)</span> -c -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">%.o: %.s</span></span><br><span class="line">	as <span class="variable">$(ASPARAMS)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">mykernel.bin: linker.ld <span class="variable">$(objects)</span></span></span><br><span class="line">	ld <span class="variable">$(LDPARAMS)</span> -T <span class="variable">$&lt;</span> -o <span class="variable">$@</span> <span class="variable">$(objects)</span></span><br><span class="line"></span><br><span class="line"><span class="section">install: mykernel.bin</span></span><br><span class="line">	sudo cp <span class="variable">$&lt;</span> /boot/mykernel.bin</span><br><span class="line"></span><br><span class="line"><span class="section">mykernel.iso: mykernel.bin</span></span><br><span class="line">	rm -rf iso</span><br><span class="line">	mkdir iso</span><br><span class="line">	mkdir iso/boot</span><br><span class="line">	mkdir iso/boot/grub</span><br><span class="line">	cp mykernel.bin iso/boot/mykernel.bin</span><br><span class="line">	echo 'set timeout=0'                      &gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo 'set default=0'                     &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo ''                                  &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo 'menuentry <span class="string">"My Operating System"</span> &#123;' &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '  multiboot /boot/mykernel.bin'    &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '  boot'                            &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	echo '&#125;'                                 &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">	grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">	rm -rf iso</span><br><span class="line"></span><br><span class="line"><span class="section">run: mykernel.iso</span></span><br><span class="line">	(killall VirtualBox &amp;&amp; sleep 1) || true</span><br><span class="line">	VirtualBox --startvm 'my-os' &amp;</span><br></pre></td></tr></table></figure></p>
+<h1 id="编译与链接"><a href="#编译与链接" class="headerlink" title="编译与链接"></a>编译与链接</h1><p>1.编译cpp<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make kernel.o</span><br><span class="line">gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -c -o kernel.o kernel.cpp</span><br><span class="line">kernel.cpp: 在函数‘void kernelMain(const void*, uint32_t)’中:</span><br><span class="line">kernel.cpp:26:41: 警告：ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]</span><br><span class="line">     printf("Hello World! --- jimo - OS1");</span><br></pre></td></tr></table></figure></p>
+<p>2.编译loader<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make loader.o</span><br><span class="line">as --32 -o loader.o loader.s</span><br><span class="line">loader.s: Assembler messages:</span><br><span class="line">loader.s: 警告：end of file not at end of a line; newline inserted</span><br></pre></td></tr></table></figure></p>
+<p>3.链接<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make mykernel.bin</span><br><span class="line">gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -c -o kernel.o kernel.cpp</span><br><span class="line">kernel.cpp: 在函数‘void kernelMain(const void*, unsigned int)’中:</span><br><span class="line">kernel.cpp:24:41: 警告：ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]</span><br><span class="line">     printf("Hello World! --- jimo - OS1");</span><br><span class="line">                                         ^</span><br><span class="line">ld -melf_i386 -T linker.ld -o mykernel.bin loader.o kernel.o</span><br></pre></td></tr></table></figure></p>
+<p>4.制作ISO文件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> make mykernel.iso</span><br><span class="line">rm -rf iso</span><br><span class="line">mkdir iso</span><br><span class="line">mkdir iso/boot</span><br><span class="line">mkdir iso/boot/grub</span><br><span class="line">cp mykernel.bin iso/boot/mykernel.bin</span><br><span class="line">echo 'set timeout=0'                      &gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo 'set default=0'                     &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo ''                                  &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo 'menuentry "My Operating System" &#123;' &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '  multiboot /boot/mykernel.bin'    &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '  boot'                            &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">echo '&#125;'                                 &gt;&gt; iso/boot/grub/grub.cfg</span><br><span class="line">grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">xorriso 1.4.8 : RockRidge filesystem manipulator, libburnia project.</span><br><span class="line"></span><br><span class="line">Drive current: -outdev 'stdio:mykernel.iso'</span><br><span class="line">Media current: stdio file, overwriteable</span><br><span class="line">Media status : is blank</span><br><span class="line">Media summary: 0 sessions, 0 data blocks, 0 data, 25.7g free</span><br><span class="line">Added to ISO image: directory '/'='/tmp/grub.lWPSfY'</span><br><span class="line">xorriso : UPDATE : 633 files added in 1 seconds</span><br><span class="line">Added to ISO image: directory '/'='/home/jimo/workspace/temp/os/iso'</span><br><span class="line">xorriso : UPDATE : 637 files added in 1 seconds</span><br><span class="line">xorriso : NOTE : Copying to System Area: 512 bytes from file '/usr/lib/grub/i386-pc/boot_hybrid.img'</span><br><span class="line">ISO image produced: 8831 sectors</span><br><span class="line">Written to medium : 8831 sectors at LBA 0</span><br><span class="line">Writing to 'stdio:mykernel.iso' completed successfully.</span><br><span class="line"></span><br><span class="line">rm -rf iso</span><br></pre></td></tr></table></figure></p>
+<p>如果这一步出现错误,比如没有xorriso,那么请安装<a href="https://dev.lovelyhq.com/libburnia" target="_blank" rel="noopener">libisoburn</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grub-mkrescue --output=mykernel.iso iso</span><br><span class="line">grub-mkrescue：错误： xorriso not found.</span><br></pre></td></tr></table></figure></p>
+<p>这时当前目录下有iso文件了:</p>
+<img src="/2018/04/02/linux/009-write-my-own-os/001.png">
+<p>5.导入虚拟机新建就ok了.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>从零写自己的操作系统.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/02/linux/009-write-my-own-os/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/02/linux/009-write-my-own-os/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/02/linux/009-write-my-own-os/" data-id="cjzxx0dod00ct61ch2udxnbhk" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-shell/001-shell-common-use" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/01/shell/001-shell-common-use/" class="article-date">
+  <time datetime="2018-04-01T05:51:55.000Z" itemprop="datePublished">2018-04-01</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/01/shell/001-shell-common-use/">shell常用操作</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>shell那些常用操作.</p>
+<h1 id="字符串为空判断"><a href="#字符串为空判断" class="headerlink" title="字符串为空判断"></a>字符串为空判断</h1><p>注意有引号<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">str=</span><br><span class="line"></span><br><span class="line">if [ -z "$str" ];then</span><br><span class="line">    echo "is empty"</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ -n "$str" ];then</span><br><span class="line">    echo "not empty"</span><br></pre></td></tr></table></figure></p>
+<h1 id="读取文件的某一行"><a href="#读取文件的某一行" class="headerlink" title="读取文件的某一行"></a>读取文件的某一行</h1><p>比如读取第3行<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sed -n '3p' fileName</span><br></pre></td></tr></table></figure></p>
+<h1 id="数组作为函数参数"><a href="#数组作为函数参数" class="headerlink" title="数组作为函数参数"></a>数组作为函数参数</h1><p>分2种情况：</p>
+<ol>
+<li>声明的数组</li>
+<li>脚本命令行参数</li>
+</ol>
+<p>如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">declare -a apps=("a" "b")</span><br><span class="line"></span><br><span class="line">test_func() &#123;</span><br><span class="line">    arr=$1</span><br><span class="line">    for app in $&#123;arr[*]&#125;</span><br><span class="line">    do</span><br><span class="line">        echo "[$&#123;app&#125;]"</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 接受参数</span><br><span class="line">args=$@</span><br><span class="line">if [[ -z "$args" ]];then</span><br><span class="line">    echo "from inner"</span><br><span class="line">    test_func "$&#123;apps[*]&#125;"</span><br><span class="line">else</span><br><span class="line">    echo "from command line"</span><br><span class="line">    test_func "$&#123;args[@]&#125;"</span><br><span class="line">fi</span><br></pre></td></tr></table></figure></p>
+<p>带参数运行时： <code>$ bash script.sh c d e</code></p>
+<p>如果只想截取部分list，比如从第二个开始：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">args=$&#123;@:2&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="文件相关判断"><a href="#文件相关判断" class="headerlink" title="文件相关判断"></a>文件相关判断</h1><ol>
+<li>文件夹是否存在： <code>[[ -d &quot;${DIR}&quot; ]]</code> 表示存在</li>
+<li>文件存在： <code>[[ -e &quot;${file}&quot; ]]</code></li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>shell那些常用操作.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/04/01/shell/001-shell-common-use/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/04/01/shell/001-shell-common-use/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/04/01/shell/001-shell-common-use/" data-id="cjzxx0dpm00gu61chr3g91ijn" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-cloudcompute/003-openstack-basic" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/30/cloudcompute/003-openstack-basic/" class="article-date">
+  <time datetime="2018-03-30T07:45:45.000Z" itemprop="datePublished">2018-03-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/30/cloudcompute/003-openstack-basic/">openstack基础</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这是我学习openstack的路径.</p>
+<h1 id="安装openstack"><a href="#安装openstack" class="headerlink" title="安装openstack"></a>安装openstack</h1><p>参考</p>
+<h1 id="基础术语"><a href="#基础术语" class="headerlink" title="基础术语"></a>基础术语</h1><p>User<br>Credentials<br>Authentication<br>Token<br>Tenant<br>Service<br>Endpoint<br>Role</p>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><img src="/2018/03/30/cloudcompute/003-openstack-basic/000.png">
+<h1 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h1><p>每个节点有3张网卡,一个用于内网,一个外网,一个心跳.</p>
+<h1 id="学会如何使用openstack"><a href="#学会如何使用openstack" class="headerlink" title="学会如何使用openstack"></a>学会如何使用openstack</h1><p>装好了,也有了基本概念,最快上手的方式就是使用起来.<br>根据<a href="https://docs.openstack.org/mitaka/user-guide/intro-user.html" target="_blank" rel="noopener">官网</a>介绍,使用的方式可多了.</p>
+<p>Horizon界面,CLI,python SDK等等.</p>
+<h1 id="学会使用Horizon界面"><a href="#学会使用Horizon界面" class="headerlink" title="学会使用Horizon界面"></a>学会使用Horizon界面</h1><p>创建实例,配置网络等.<br><a href="https://docs.openstack.org/mitaka/user-guide/dashboard.html" target="_blank" rel="noopener">文档</a>.</p>
+<h1 id="使用命令行"><a href="#使用命令行" class="headerlink" title="使用命令行"></a>使用命令行</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# source keystonerc_demo </span><br><span class="line">[root@localhost ~(keystone_demo)]# nova list</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| ID                                   | Name    | Status  | Task State | Power State | Networks         |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br><span class="line">| 19498801-c774-4297-8a75-bff9c2503c5e | cissor1 | SHUTOFF | -          | Shutdown    | private=10.0.0.7 |</span><br><span class="line">+--------------------------------------+---------+---------+------------+-------------+------------------+</span><br></pre></td></tr></table></figure>
+<p>常用命令参考<a href="https://docs.openstack.org/mitaka/user-guide/cli_cheat_sheet.html" target="_blank" rel="noopener">文档</a></p>
+<p>通过debug标志可以看到整个API的请求过程:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~(keystone_demo)]# nova --debug list</span><br><span class="line">...</span><br><span class="line">REQ: curl -g -i -X GET http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail -H "OpenStack-API-Version: compute 2.53" -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-OpenStack-Nova-API-Version: 2.53" -H "X-Auth-Token: &#123;SHA1&#125;a6994f0daf077433ede7e26fd93007a12472e7e5"</span><br><span class="line">DEBUG (connectionpool:395) http://10.0.2.15:8774 "GET /v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/detail HTTP/1.1" 200 1443</span><br><span class="line">DEBUG (session:419) RESP: [200] Content-Length: 1443 Content-Type: application/json Openstack-Api-Version: compute 2.53 X-Openstack-Nova-Api-Version: 2.53 Vary: OpenStack-API-Version, X-OpenStack-Nova-API-Version X-Openstack-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 X-Compute-Request-Id: req-050308b9-3752-44e8-80ab-01c5e8468000 Date: Fri, 30 Mar 2018 08:33:39 GMT Connection: keep-alive </span><br><span class="line">RESP BODY: &#123;"servers": [&#123;"OS-EXT-STS:task_state": null, "addresses": &#123;"private": [&#123;"OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:7d:96:7e", "version": 4, "addr": "10.0.0.7", "OS-EXT-IPS:type": "fixed"&#125;]&#125;, "links": [&#123;"href": "http://10.0.2.15:8774/v2.1/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "self"&#125;, &#123;"href": "http://10.0.2.15:8774/ab4c85f86cc04230894ba9eaa0c412e4/servers/19498801-c774-4297-8a75-bff9c2503c5e", "rel": "bookmark"&#125;], "image": "", "OS-EXT-STS:vm_state": "stopped", "OS-SRV-USG:launched_at": "2018-03-30T03:05:47.000000", "flavor": &#123;"ephemeral": 0, "ram": 512, "original_name": "m1.tiny", "vcpus": 1, "extra_specs": &#123;&#125;, "swap": 0, "disk": 1&#125;, "id": "19498801-c774-4297-8a75-bff9c2503c5e", "security_groups": [&#123;"name": "default"&#125;], "OS-SRV-USG:terminated_at": null, "user_id": "d069531f171b422289a106e106572aa7", "OS-DCF:diskConfig": "AUTO", "accessIPv4": "", "accessIPv6": "", "OS-EXT-STS:power_state": 4, "OS-EXT-AZ:availability_zone": "nova", "config_drive": "", "status": "SHUTOFF", "updated": "2018-03-30T03:10:19Z", "hostId": "a6480a085edf3a7b6698b4f6972bf20fba65501c4dbaeae382d274f0", "description": null, "tags": [], "key_name": null, "locked": false, "name": "cissor1", "created": "2018-03-30T03:05:04Z", "tenant_id": "ab4c85f86cc04230894ba9eaa0c412e4", "os-extended-volumes:volumes_attached": [&#123;"id": "9736b299-0d18-4389-a7e9-67c864023a9e", "delete_on_termination": false&#125;], "metadata": &#123;&#125;&#125;]&#125;</span><br></pre></td></tr></table></figure></p>
+<p>更多<a href="https://docs.openstack.org/mitaka/user-guide/cli.html" target="_blank" rel="noopener">官方文档</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>这是我学习openstack的路径.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/003-openstack-basic/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/003-openstack-basic/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/003-openstack-basic/" data-id="cjzxx0dkv002a61chn8ehwote" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-cloudcompute/002-packstack" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/30/cloudcompute/002-packstack/" class="article-date">
+  <time datetime="2018-03-30T04:49:34.000Z" itemprop="datePublished">2018-03-30</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/30/cloudcompute/002-packstack/">packstack安装openstack</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>安装openstack的一些方法.</p>
+<h1 id="1-从源码安装"><a href="#1-从源码安装" class="headerlink" title="1.从源码安装"></a>1.从源码安装</h1><p>可以参考<a href="/2018/01/26/cloudcompute/000-install-openstack-unbuntu/" title="在ubuntu上安装openstack">在ubuntu上安装openstack</a></p>
+<h1 id="2-按照官方文档"><a href="#2-按照官方文档" class="headerlink" title="2.按照官方文档"></a>2.按照官方文档</h1><p>官方文档是这样开始的 :<a href="https://docs.openstack.org/install-guide/environment.html" target="_blank" rel="noopener">install openstack</a></p>
+<h1 id="3-使用packstack"><a href="#3-使用packstack" class="headerlink" title="3.使用packstack"></a>3.使用packstack</h1><p>packstack安装可以参考<a href="https://www.rdoproject.org/install/packstack/" target="_blank" rel="noopener">官网</a></p>
+<p>它可以在一台节点上模拟一个概念上的云,想很快尝试openstack是很快的.</p>
+<p>在CentOS上:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo yum install -y centos-release-openstack-queens</span><br><span class="line"><span class="meta">$</span> sudo yum update -y</span><br><span class="line"><span class="meta">$</span> sudo yum install -y openstack-packstack</span><br><span class="line"><span class="meta">$</span> sudo packstack --allinone</span><br></pre></td></tr></table></figure></p>
+<p>最后一步需要的时间最长,其中下面是主要花的时间:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pplying 10.0.2.15_controller.pp</span><br><span class="line">10.0.2.15_controller.pp:                             [ DONE ]      </span><br><span class="line">Applying 10.0.2.15_network.pp</span><br><span class="line">10.0.2.15_network.pp:                                [ DONE ]   </span><br><span class="line">Applying 10.0.2.15_compute.pp</span><br><span class="line">10.0.2.15_compute.pp:                                [ DONE ]   </span><br><span class="line">Applying Puppet manifests                            [ DONE ]</span><br><span class="line">Finalizing                                           [ DONE ]</span><br><span class="line"></span><br><span class="line"> **** Installation completed successfully ******</span><br></pre></td></tr></table></figure></p>
+<p>其默认创建了2个用户:admin和demo,其密码在用户目录下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls key*</span><br><span class="line">keystonerc_admin  keystonerc_demo</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# cat keystonerc_demo </span><br><span class="line">unset OS_SERVICE_TOKEN</span><br><span class="line">export OS_USERNAME=demo</span><br><span class="line">export OS_PASSWORD='6c43ac4dbcc141e3'</span><br><span class="line">export PS1='[\u@\h \W(keystone_demo)]\$ '</span><br><span class="line">export OS_AUTH_URL=http://10.0.2.15:5000/v3</span><br><span class="line">    </span><br><span class="line">export OS_PROJECT_NAME=demo</span><br><span class="line">export OS_USER_DOMAIN_NAME=Default</span><br><span class="line">export OS_PROJECT_DOMAIN_NAME=Default</span><br><span class="line">export OS_IDENTITY_API_VERSION=3</span><br></pre></td></tr></table></figure></p>
+<p>启动openstack只需在浏览器输入自己的ip/dashboard:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">To access the OpenStack Dashboard browse to http://10.0.2.15/dashboard</span><br></pre></td></tr></table></figure></p>
+<p>如果重启了系统,只需要再运行上次的answer-file下的配置:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls packstack*</span><br><span class="line">packstack-answers-20180329-220625.txt</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# packstack --answer-file packstack-answers-20180329-220625.txt </span><br><span class="line">Welcome to the Packstack setup utility</span><br><span class="line"></span><br><span class="line">The installation log file is available at: /var/tmp/packstack/20180330-004508-tneRpU/openstack-setup.log</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>使用demo用户登录然后可以创建一个实例试试:<br><img src="/2018/03/30/cloudcompute/002-packstack/000.png"></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>安装openstack的一些方法.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/002-packstack/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/30/cloudcompute/002-packstack/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/30/cloudcompute/002-packstack/" data-id="cjzxx0dku002661ch0c2god1d" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos/">centos</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a><span class="article-tag-list-count">5</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-db/000-mysql-error-1698" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/27/db/000-mysql-error-1698/" class="article-date">
+  <time datetime="2018-03-27T01:07:24.000Z" itemprop="datePublished">2018-03-27</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/27/db/000-mysql-error-1698/">ERROR 1698 (28000):Access denied for user</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>ERROR 1698 (28000): Access denied for user 问题的解决.</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在ubuntu下,使用sudo安装mysql后,普通用户登录时会出现该问题:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> mysql -uroot -p</span><br><span class="line">Enter password: </span><br><span class="line">ERROR 1698 (28000): Access denied for user 'root'@'localhost'</span><br></pre></td></tr></table></figure></p>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>使用sudo用户权限登录进行修改:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo mysql -uroot</span><br><span class="line">Welcome to the MariaDB monitor.  Commands end with ; or \g.</span><br><span class="line">Your MariaDB connection id is 41</span><br><span class="line">Server version: 10.0.34-MariaDB-0ubuntu0.16.04.1 Ubuntu 16.04</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.</span><br><span class="line"></span><br><span class="line">Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; use mysql;</span><br><span class="line">Reading table information for completion of table and column names</span><br><span class="line">You can turn off this feature to get a quicker startup with -A</span><br><span class="line"></span><br><span class="line">Database changed</span><br><span class="line">MariaDB [mysql]&gt; update user set plugin ='' where user='root';</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line">Rows matched: 1  Changed: 1  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [mysql]&gt; flush privileges;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [mysql]&gt; exit;</span><br><span class="line">Bye</span><br></pre></td></tr></table></figure></p>
+<p>简单来说就是:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql -uroot</span><br><span class="line">use mysql;</span><br><span class="line">update user set plugin='' where user='root';</span><br><span class="line">flush privileges;</span><br><span class="line">exit;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>ERROR 1698 (28000): Access denied for user 问题的解决.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/27/db/000-mysql-error-1698/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/27/db/000-mysql-error-1698/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/27/db/000-mysql-error-1698/" data-id="cjzxx0dl7003661ch7a52q3lw" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a><span class="article-tag-list-count">4</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-tools/008-computer-basic" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/25/tools/008-computer-basic/" class="article-date">
+  <time datetime="2018-03-25T07:54:09.000Z" itemprop="datePublished">2018-03-25</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/25/tools/008-computer-basic/">不得不知的计算机基础知识</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>不得不知的计算机基础知识.</p>
+<h1 id="SSH原理"><a href="#SSH原理" class="headerlink" title="SSH原理"></a>SSH原理</h1><p>参考<a href="http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html" target="_blank" rel="noopener">SSH</a></p>
+<h1 id="DevOps"><a href="#DevOps" class="headerlink" title="DevOps"></a>DevOps</h1><p>作为IT人员,开发与运维之间的那些事不可不知.<br>参考<a href="https://zh.wikipedia.org/wiki/DevOps" target="_blank" rel="noopener">wiki</a></p>
+<h1 id="进程终止信号"><a href="#进程终止信号" class="headerlink" title="进程终止信号"></a>进程终止信号</h1><p>由一篇<a href="http://turnoff.us/geek/dont-sigkill/" target="_blank" rel="noopener">漫画</a>引起了我的好奇,看来必须要知道这些命令,不然漫画都看不懂.</p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>操作</th>
+<th>影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SIGINT</td>
+<td>在终端中敲入interrupt key（DELETE或ctrl+c）</td>
+<td>中断前台进程</td>
+</tr>
+<tr>
+<td>SIGKILL</td>
+<td>kill -9 pid</td>
+<td>信号进程不能够捕获,强制结束进程pid</td>
+</tr>
+<tr>
+<td>SIGTERM</td>
+<td>kill pid</td>
+<td>它会导致一过程的终止，但是SIGKILL信号不同，它可以被捕获和解释（或忽略）的过程。因此，SIGTERM类似于问一个进程终止可好，让清理文件和关闭</td>
+</tr>
+</tbody>
+</table>
+<h1 id="make命令"><a href="#make命令" class="headerlink" title="make命令"></a>make命令</h1><p>如果经常从源码编译软件,那肯定会用到make命令,而要学习make,除了man make之外,其makefile的语法学习是必不可少的.<br>下面是可以参考的学习文档.</p>
+<ol>
+<li><a href="http://www.gnu.org/software/make/manual/html_node/index.html#SEC_Contents" target="_blank" rel="noopener">官方文档</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2015/02/make.html" target="_blank" rel="noopener">阮一峰写的</a></li>
+<li><a href="https://seisman.github.io/how-to-write-makefile/" target="_blank" rel="noopener">跟我一起写Makefile</a></li>
+</ol>
+<h1 id="开源协议"><a href="#开源协议" class="headerlink" title="开源协议"></a>开源协议</h1><p>作为开源爱好者,怎么会不了解开源协议呢?常见的也就6种:<br><a href="http://www.gnu.org/licenses/quick-guide-gplv3.html" target="_blank" rel="noopener">GPL</a>,<br><a href="https://en.wikipedia.org/wiki/BSD_licenses" target="_blank" rel="noopener">BSD</a>,<br><a href="https://en.wikipedia.org/wiki/MIT_License" target="_blank" rel="noopener">MIT</a>,<br><a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache</a>,<br><a href="http://www.gnu.org/copyleft/lesser.html" target="_blank" rel="noopener">LGPL</a>,<br><a href="https://www.mozilla.org/en-US/MPL/" target="_blank" rel="noopener">Mozilla</a></p>
+<p>看到大多数都引用的<a href="http://www.ruanyifeng.com/blog/2011/05/how_to_choose_free_software_licenses.html" target="_blank" rel="noopener">阮一峰翻译的那张图</a>.<br>现在GPL出到3.0版本,还需要重新学习下.</p>
+<img src="/2018/03/25/tools/008-computer-basic/000.png">
+<h1 id="视频文件格式"><a href="#视频文件格式" class="headerlink" title="视频文件格式"></a>视频文件格式</h1><p>视频已经离不开生活,了解常见的视频文件格式还是很有必要的.<br><a href="https://zh.wikipedia.org/wiki/%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F" target="_blank" rel="noopener">wiki-视频文件格式</a><br><a href="https://en.wikipedia.org/wiki/Comparison_of_video_container_formats" target="_blank" rel="noopener">compare</a></p>
+<h1 id="编码那些事"><a href="#编码那些事" class="headerlink" title="编码那些事"></a>编码那些事</h1><p>有没有好奇UTF-8是什么,UTF-8和UTF-16的区别是什么?走进字符集的世界,奠定表示的基础.<br>可以参考以下文章:</p>
+<ol>
+<li><a href="http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html" target="_blank" rel="noopener">阮大神的曾经</a></li>
+<li><a href="http://www.rfcreader.com/#rfc3629" target="_blank" rel="noopener">RFC-UTF-8(3629)</a></li>
+<li><a href="http://www.unicode.org/" target="_blank" rel="noopener">unicode官网</a></li>
+<li><a href="http://www.chi2ko.com/tool/CJK.htm" target="_blank" rel="noopener">查看中日韩汉字unicode编码</a></li>
+</ol>
+<p>大概结果就是:</p>
+<ol>
+<li>了解unicode的历史,从65535到一百多万的字符集;</li>
+<li>UTF8和UTF16,UTF32都是unicode的实现,是编码方式;</li>
+<li>UTF8并不是只有8位,可根据情况变化1到3个字节.</li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>不得不知的计算机基础知识.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/25/tools/008-computer-basic/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/25/tools/008-computer-basic/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/tools/008-computer-basic/" data-id="cjzxx0dpy00hx61chkkb3c9de" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-cloudcompute/001-virtualbox-network" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/25/cloudcompute/001-virtualbox-network/" class="article-date">
+  <time datetime="2018-03-25T03:10:49.000Z" itemprop="datePublished">2018-03-25</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/25/cloudcompute/001-virtualbox-network/">virtualbox局域网配置</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>有时不仅需要虚拟机能连外网,还需要虚拟机之间能互相通信.</p>
+<h1 id="了解virtualbox的4种联网方式"><a href="#了解virtualbox的4种联网方式" class="headerlink" title="了解virtualbox的4种联网方式"></a>了解virtualbox的4种联网方式</h1><p>可以参考<a href="https://www.cnblogs.com/york-hust/archive/2012/03/29/2422911.html" target="_blank" rel="noopener">文章</a></p>
+<p>通过3张图来看看.</p>
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/004.png">
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/005.png">
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/006.png">
+<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><ol>
+<li>虚拟机可以访问外网</li>
+<li>虚拟机有静态IP可以互相通信</li>
+</ol>
+<h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><p>2台redhut虚拟机.(其他系统也可以,都可以在界面上配置IP)</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><ol>
+<li>每台虚拟机准备2个网卡,第一个设置为NAT(这里名为enp0s3),第二个设置为host only(名为enp0s8)</li>
+</ol>
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/000.png"> 
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/001.png">
+<ol start="2">
+<li>enp0s3设置为DHCP,enp0s8设置为静态IP,手动配置</li>
+</ol>
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/002.png"> 
+<img src="/2018/03/25/cloudcompute/001-virtualbox-network/003.png">
+<ol start="3">
+<li>另一台除了enp0s8的静态IP变了,其余一样.</li>
+</ol>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在ubuntu里会出现2张网卡,但内部通讯的网卡成了默认的,也就是enp0s8:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ip r</span><br><span class="line">default via 192.168.56.1 dev enp0s8  proto static  metric 100 </span><br><span class="line">default via 10.0.2.2 dev enp0s3  proto static  metric 101 </span><br><span class="line">10.0.2.0/24 dev enp0s3  proto kernel  scope link  src 10.0.2.15  metric 100 </span><br><span class="line">169.254.0.0/16 dev enp0s8  scope link  metric 1000 </span><br><span class="line">192.168.56.0/24 dev enp0s8  proto kernel  scope link  src 192.168.56.11  metric 100 </span><br><span class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1 linkdown</span><br></pre></td></tr></table></figure></p>
+<p>这时候会导致虚拟机之间可以通信,但无法访问外网.</p>
+<p>所以我们需要修改网卡顺序,经过查找,ifmetric这个工具可以解决.</p>
+<p>1.先安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install ifmetric</span><br></pre></td></tr></table></figure></p>
+<p>2.修改<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo ifmetric enp0s3</span><br></pre></td></tr></table></figure></p>
+<p>3.查看路由<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ip r</span><br><span class="line">default via 10.0.2.2 dev enp0s3  proto static </span><br><span class="line">default via 192.168.56.1 dev enp0s8  proto static  metric 100 </span><br><span class="line">10.0.2.0/24 dev enp0s3  proto kernel  scope link  src 10.0.2.15 </span><br><span class="line">169.254.0.0/16 dev enp0s8  scope link  metric 1000 </span><br><span class="line">192.168.56.0/24 dev enp0s8  proto kernel  scope link  src 192.168.56.11  metric 100 </span><br><span class="line">192.168.122.0/24 dev virbr0  proto kernel  scope link  src 192.168.122.1 linkdown</span><br></pre></td></tr></table></figure></p>
+<p>这时候可以访问外网,虚拟机也可以通讯了.</p>
+<p>有时候重启了又会恢复,可以在开机脚本里搞定.</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>有时不仅需要虚拟机能连外网,还需要虚拟机之间能互相通信.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/03/25/cloudcompute/001-virtualbox-network/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/03/25/cloudcompute/001-virtualbox-network/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/03/25/cloudcompute/001-virtualbox-network/" data-id="cjzxx0dkr002361ch9uzsw1nx" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/云计算/">云计算</a><span class="article-tag-list-count">6</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-python/005-module-import" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/24/python/005-module-import/" class="article-date">
@@ -158,7 +979,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjzm1nrx500ez52cht4baynzp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/24/python/005-module-import/" data-id="cjzxx0dp700fd61cht25oqg7z" class="article-share-link">
           Share
         </a>
         
@@ -236,12 +1057,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjzm1nrui006452ch5fwicmwu" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/000-date-util/" data-id="cjzxx0dly005g61chwf3lop5u" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">85</span></li></ul>
 
       </footer>
       </div>
@@ -320,12 +1141,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/001-junit-design-pattern/" data-id="cjzm1nrui006652ch8uza8cz0" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/22/java/001-junit-design-pattern/" data-id="cjzxx0dly005h61ch724ag5nq" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/junit/">junit</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">85</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/junit/">junit</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -395,7 +1216,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjzm1nrtr003t52chpj6k7zcg" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/17/elasticsearch/004-configure/" data-id="cjzxx0dlh003z61ch6cv99mgr" class="article-share-link">
           Share
         </a>
         
@@ -489,7 +1310,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjzm1nrtr003r52chrikbmrdj" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/15/elasticsearch/003-data-explore/" data-id="cjzxx0dlh003x61ch14ntss39" class="article-share-link">
           Share
         </a>
         
@@ -573,7 +1394,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjzm1nrtq003q52chjjbn9hyq" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/14/elasticsearch/002-modify-data/" data-id="cjzxx0dlg003v61ch8c6l1how" class="article-share-link">
           Share
         </a>
         
@@ -649,7 +1470,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjzm1nru5004v52ch7d4xbo2x" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/13/js/000-echarts-graph/" data-id="cjzxx0dls004w61chl1ijc55q" class="article-share-link">
           Share
         </a>
         
@@ -750,7 +1571,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjzm1nrx400ew52chutwkbxj6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/12/python/004-python-common-use/" data-id="cjzxx0dp500f861chj7d55wk0" class="article-share-link">
           Share
         </a>
         
@@ -843,7 +1664,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjzm1nrts003v52cht63hnbys" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/001-cluster-explore/" data-id="cjzxx0dlf003s61chcswbkyag" class="article-share-link">
           Share
         </a>
         
@@ -928,7 +1749,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjzm1nrtq003o52chxgvxj5er" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/11/elasticsearch/000-basic-concept/" data-id="cjzxx0dlf003q61chfau2ugf2" class="article-share-link">
           Share
         </a>
         
@@ -1024,7 +1845,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjzm1nrua005f52ch6b6el4o5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/03/09/lang/002-redis/" data-id="cjzxx0dne009u61chm1hae9ee" class="article-share-link">
           Share
         </a>
         
@@ -1038,766 +1859,11 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-android/000-adb-root" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/06/android/000-adb-root/" class="article-date">
-  <time datetime="2018-03-06T07:22:57.000Z" itemprop="datePublished">2018-03-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/06/android/000-adb-root/">adb使用root权限调试</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>使用adb root调试Android手机.</p>
-<h1 id="使用环境"><a href="#使用环境" class="headerlink" title="使用环境"></a>使用环境</h1><p>使用Google手机模拟器.查看下设备:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb devices</span><br><span class="line">List of devices attached</span><br><span class="line">emulator-5554	device</span><br></pre></td></tr></table></figure></p>
-<p>直接用adb shell进入调试时会发现permission denied:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb shell</span><br><span class="line">generic_x86:/ $ pwd</span><br><span class="line">/</span><br><span class="line">generic_x86:/ $ ls</span><br><span class="line">ls: ./ueventd.rc: Permission denied</span><br><span class="line">ls: ./ueventd.ranchu.rc: Permission denied</span><br><span class="line">ls: ./init.zygote32.rc: Permission denied</span><br><span class="line">acct  bugreports  cache  charger  config  d  data  default.prop  dev  etc  mnt  oem  proc  root  sbin  sdcard  storage  sys  system  var  vendor</span><br></pre></td></tr></table></figure></p>
-<p>解决办法,先切换到root用户:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb root</span><br><span class="line">restarting adbd as root</span><br><span class="line"><span class="meta">$</span> adb root</span><br><span class="line">adbd is already running as root</span><br></pre></td></tr></table></figure></p>
-<p>再进入就ok了:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> adb shell</span><br><span class="line">generic_x86:/ # whoami</span><br><span class="line">root</span><br><span class="line">generic_x86:/ # ls data</span><br><span class="line">adb  app-asec       app-private    bootchart     data   lost+found  misc     nativetest   property        system     tombstones  var     </span><br><span class="line">anr  app-ephemeral  backup         cache         drm    media       misc_ce  ota          resource-cache  system_ce  user        vendor  </span><br><span class="line">app  app-lib        benchmarktest  dalvik-cache  local  mediadrm    misc_de  ota_package  ss              system_de  user_de</span><br></pre></td></tr></table></figure></p>
-<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>要在实体机上使用时必须root手机才行.</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>使用adb root调试Android手机.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/06/android/000-adb-root/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/06/android/000-adb-root/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/android/000-adb-root/" data-id="cjzm1nrsp000o52chvhmqfkyo" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-lang/001-ant" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/06/lang/001-ant/" class="article-date">
-  <time datetime="2018-03-06T02:39:22.000Z" itemprop="datePublished">2018-03-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/06/lang/001-ant/">Ant必经之路</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这一款构建工具Ant不知道怎么样.</p>
-<h1 id="什么是Ant"><a href="#什么是Ant" class="headerlink" title="什么是Ant"></a>什么是Ant</h1><p>Ant 是一个Apache基金会下的跨平台的基于 Java 语言开发的构件工具。</p>
-<h1 id="用来干什么"><a href="#用来干什么" class="headerlink" title="用来干什么"></a>用来干什么</h1><p>一般情况，开发人员花费大量的时间做一般性的任务，比如：构建和部署，通常包含下面的工作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">编译代码</span><br><span class="line">封装二进制文件</span><br><span class="line">在测试服务器上部署二进制文件</span><br><span class="line">测试改变</span><br><span class="line">从一个地点拷贝代码到另一个地点</span><br></pre></td></tr></table></figure></p>
-<p>为了自动和简化上面的工作，Apache Ant 是非常有用的。这是一个基于开放的操作系统构建和部署的工具，该工具需要从命令行执行。</p>
-<h1 id="更多学习"><a href="#更多学习" class="headerlink" title="更多学习"></a>更多学习</h1><p><a href="http://ant.apache.org/manual/index.html" target="_blank" rel="noopener">官网的详尽文档</a></p>
-<p><a href="https://www.w3cschool.cn/ant/3p7y1hwe.html" target="_blank" rel="noopener">W3C的教程</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这一款构建工具Ant不知道怎么样.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/06/lang/001-ant/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/06/lang/001-ant/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/001-ant/" data-id="cjzm1nru9005952chn03e7oj5" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ant/">ant</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-lang/000-groovy" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/06/lang/000-groovy/" class="article-date">
-  <time datetime="2018-03-06T01:18:25.000Z" itemprop="datePublished">2018-03-06</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/06/lang/000-groovy/">Groovy必经之路</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这种胶水脚本语言不得不了解.</p>
-<h1 id="Groovy简介"><a href="#Groovy简介" class="headerlink" title="Groovy简介"></a>Groovy简介</h1><p>官网首页说得很清楚:<a href="http://groovy-lang.org" target="_blank" rel="noopener">http://groovy-lang.org</a></p>
-<p>apache groovy是一种强大的，可选择的类型和动态语言，具有静态类型和静态编译功能，适用于java平台，旨在通过简洁，熟悉和易于学习的语法提高开发人员的生产力。<br>它可以与任何Java程序顺利集成，并立即为您的应用程序提供强大的功能，包括脚本功能，特定领域的语言创作，运行时和编译时元编程和函数式编程.</p>
-<h1 id="Groovy如何学习"><a href="#Groovy如何学习" class="headerlink" title="Groovy如何学习"></a>Groovy如何学习</h1><p>将官网的例子全部跑一遍就ok了:</p>
-<ol>
-<li><p><a href="http://groovy-lang.org/documentation.html#gettingstarted" target="_blank" rel="noopener">http://groovy-lang.org/documentation.html#gettingstarted</a></p>
-</li>
-<li><p><a href="http://groovy-lang.org/differences.html" target="_blank" rel="noopener">Groovy与Java的区别</a></p>
-</li>
-<li><a href="https://www.ibm.com/developerworks/cn/education/java/j-groovy/j-groovy.html" target="_blank" rel="noopener">IBM写的教程也可以</a></li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这种胶水脚本语言不得不了解.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/06/lang/000-groovy/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/06/lang/000-groovy/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/06/lang/000-groovy/" data-id="cjzm1nrub005h52chb5zbyqnn" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/groovy/">groovy</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/007-magnet" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/05/tools/007-magnet/" class="article-date">
-  <time datetime="2018-03-05T08:47:54.000Z" itemprop="datePublished">2018-03-05</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/05/tools/007-magnet/">不得不知的magnet链接</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>什么是磁力链接?</p>
-<h1 id="magnet链接"><a href="#magnet链接" class="headerlink" title="magnet链接"></a>magnet链接</h1><p>解析请看<a href="https://linux.cn/article-9388-1.html" target="_blank" rel="noopener">https://linux.cn/article-9388-1.html</a></p>
-<h1 id="一个magnet网站"><a href="#一个magnet网站" class="headerlink" title="一个magnet网站"></a>一个magnet网站</h1><p><a href="https://kickass.cd" target="_blank" rel="noopener">https://kickass.cd</a></p>
-<p>因为遍布广告,所以程序员会找到想要的链接地址,如下图:</p>
-<img src="/2018/03/05/tools/007-magnet/000.png">
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>什么是磁力链接?</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/05/tools/007-magnet/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/05/tools/007-magnet/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/007-magnet/" data-id="cjzm1nrxv00hd52chlz55f2wt" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/magnet/">magnet</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/006-gradle" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/05/tools/006-gradle/" class="article-date">
-  <time datetime="2018-03-05T02:30:57.000Z" itemprop="datePublished">2018-03-05</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/05/tools/006-gradle/">gradle必经之路</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>这篇讲了如何学习gradle以及会遇到的问题.</p>
-<h1 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h1><p>对<a href="/2018/03/06/lang/000-groovy/" title="Groovy">Groovy</a>语言有了解,对Java开发了解.</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>参考<a href="https://gradle.org/install/" target="_blank" rel="noopener">https://gradle.org/install/</a></p>
-<h1 id="下载gradle慢"><a href="#下载gradle慢" class="headerlink" title="下载gradle慢"></a>下载gradle慢</h1><p>如果是下载gradle本身慢,<br>比如遇到:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc basic-demo]$ ./gradlew copy</span><br><span class="line">Downloading https://services.gradle.org/distributions/gradle-4.5.1-bin.zip</span><br><span class="line">....</span><br></pre></td></tr></table></figure></p>
-<p>一般只有30k,所以去下载:<a href="https://services.gradle.org/distributions/gradle-4.5.1-bin.zip" target="_blank" rel="noopener">https://services.gradle.org/distributions/gradle-4.5.1-bin.zip</a><br>,然后修改该项目的配置文件:basic-demo/gradle/wrapper/gradle-wrapper.properties<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">distributionBase=GRADLE_USER_HOME</span><br><span class="line">distributionPath=wrapper/dists</span><br><span class="line">zipStoreBase=GRADLE_USER_HOME</span><br><span class="line">zipStorePath=wrapper/dists</span><br><span class="line"><span class="meta">#</span>distributionUrl=https\://services.gradle.org/distributions/gradle-4.5.1-bin.zip</span><br><span class="line">distributionUrl=gradle-4.5.1-bin.zip</span><br></pre></td></tr></table></figure></p>
-<p>当然这个路径可以自由修改.</p>
-<p>然后编译就简单了:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc basic-demo]$ ./gradlew copy</span><br><span class="line">Downloading file:/home/xxx/basic-demo/gradle/wrapper/gradle-4.5.1-bin.zip</span><br><span class="line">.....................................................................</span><br><span class="line">Unzipping /home/jimo/.gradle/wrapper/dists/gradle-4.5.1-bin/3o6uzay4hcvg4k8e46n74bbqi/gradle-4.5.1-bin.zip to /home/jimo/.gradle/wrapper/dists/gradle-4.5.1-bin/3o6uzay4hcvg4k8e46n74bbqi</span><br><span class="line">Set executable permissions for: /home/jimo/.gradle/wrapper/dists/gradle-4.5.1-bin/3o6uzay4hcvg4k8e46n74bbqi/gradle-4.5.1/bin/gradle</span><br><span class="line"></span><br><span class="line">BUILD SUCCESSFUL in 1s</span><br><span class="line">1 actionable task: 1 executed</span><br></pre></td></tr></table></figure></p>
-<h1 id="下载jar包慢"><a href="#下载jar包慢" class="headerlink" title="下载jar包慢"></a>下载jar包慢</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        maven &#123; url 'http://maven.aliyun.com/nexus/content/groups/public/' &#125;</span><br><span class="line">        jcenter()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">allprojects &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        maven &#123; url 'http://maven.aliyun.com/nexus/content/groups/public/' &#125;</span><br><span class="line">        jcenter()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="怎么学习"><a href="#怎么学习" class="headerlink" title="怎么学习"></a>怎么学习</h1><p>用官网提供的例子即可:<a href="https://gradle.org/guides/#getting-started" target="_blank" rel="noopener">https://gradle.org/guides/#getting-started</a></p>
-<p><a href="https://www.w3cschool.cn/gradle/ms7n1hu2.html" target="_blank" rel="noopener">W3C提供的教程也可以</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>这篇讲了如何学习gradle以及会遇到的问题.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/05/tools/006-gradle/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/05/tools/006-gradle/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/05/tools/006-gradle/" data-id="cjzm1nrxv00hb52chm26dync3" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gradle/">gradle</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">80</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/010-linux-background" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/01/linux/010-linux-background/" class="article-date">
-  <time datetime="2018-03-01T05:51:55.000Z" itemprop="datePublished">2018-03-01</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/01/linux/010-linux-background/">linux后台进程那些事</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>linux后台进程那些事.</p>
-<h1 id="amp"><a href="#amp" class="headerlink" title="&amp;"></a>&amp;</h1><p>一般就这样</p>
-<h1 id="nohup"><a href="#nohup" class="headerlink" title="nohup"></a>nohup</h1><p>但是有输出时</p>
-<p>如果遇到警告:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup: redirecting stderr to stdout</span><br></pre></td></tr></table></figure></p>
-<p>再加上来进行重定向<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">command 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>linux后台进程那些事.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/03/01/linux/010-linux-background/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/03/01/linux/010-linux-background/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/03/01/linux/010-linux-background/" data-id="cjzm1nrwi00cr52chihv87rdg" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-hexo/001-hexo-backup" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/02/20/hexo/001-hexo-backup/" class="article-date">
-  <time datetime="2018-02-20T05:51:55.000Z" itemprop="datePublished">2018-02-20</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/02/20/hexo/001-hexo-backup/">hexo换电脑或备份</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文对hexo的源代码如何备份做一个方案的探讨.我们知道hexo生成的静态页面放在public目录下,<br>每次将这个目录推送到github上,但是hexo本身却没上传,如果换电脑就无力回天了.下面就是一些解决方案.</p>
-<h1 id="1-暴力备份"><a href="#1-暴力备份" class="headerlink" title="1.暴力备份"></a>1.暴力备份</h1><p>如果不嫌麻烦,每次更新博客后都手动将hexo源代码备份,即使是这样也需要知道哪些是必须备份的.<br>下面是所有文件:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc myblog]$ ls -lha</span><br><span class="line">总用量 240K</span><br><span class="line">drwxr-xr-x   8 jimo jimo 4.0K 12月 27 18:12 .</span><br><span class="line">drwxr-xr-x  26 jimo jimo 4.0K 5月  16 21:29 ..</span><br><span class="line">-rw-r--r--   1 jimo jimo 2.1K 4月  27 11:19 _config.yml</span><br><span class="line">-rw-r--r--   1 jimo jimo  174 5月  17 20:20 db.json</span><br><span class="line">drwxr-xr-x  13 jimo jimo 4.0K 5月  15 12:47 .deploy_git</span><br><span class="line">-rw-r--r--   1 jimo jimo   65 12月 23 21:46 .gitignore</span><br><span class="line">drwxr-xr-x 298 jimo jimo  12K 12月 23 22:14 node_modules</span><br><span class="line">-rw-r--r--   1 jimo jimo  483 12月 23 22:14 package.json</span><br><span class="line">-rw-r--r--   1 jimo jimo 106K 12月 23 22:14 package-lock.json</span><br><span class="line">drwxr-xr-x  12 jimo jimo 4.0K 1月   1 15:48 public</span><br><span class="line">drwxr-xr-x   2 jimo jimo 4.0K 12月 23 21:46 scaffolds</span><br><span class="line">drwxr-xr-x   4 jimo jimo 4.0K 12月 27 18:10 source</span><br><span class="line">drwxr-xr-x   3 jimo jimo 4.0K 12月 23 21:46 themes</span><br><span class="line">-rw-r--r--   1 jimo jimo  73K 12月 23 21:46 yarn.lock</span><br></pre></td></tr></table></figure></p>
-<p>需要备份的有:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_config.yml，themes/，source/，scaffolds/，package.json，.gitignore</span><br></pre></td></tr></table></figure></p>
-<p>不需要的有: 到时候npm install再安装一遍即可.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.git/，node_modules/，public/，.deploy_git/，db.json</span><br></pre></td></tr></table></figure></p>
-<h1 id="2-自动备份"><a href="#2-自动备份" class="headerlink" title="2.自动备份"></a>2.自动备份</h1><p>既然要备份,为什么不做成自动的呢? 其实源码也可以push到github上嘛,那现在就有2个仓库,一个<br>用来存hexo源码,一个用来存博客.这样的话每次得2次push.</p>
-<p>当然首先我肯定会想到写一个脚本,把这两步放在一起,大概如下:<br>backup.sh<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/bash</span><br><span class="line"></span><br><span class="line">hexo g &amp;&amp; hexo d # 先更新博客</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 再更新源码</span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update'</span><br><span class="line">git push</span><br></pre></td></tr></table></figure></p>
-<p>注意在.gitignore把不需要的过滤掉就行了.</p>
-<h1 id="3-持续集成"><a href="#3-持续集成" class="headerlink" title="3.持续集成"></a>3.持续集成</h1><p>我们也可以把这2步交给持续集成的框架,常用的有<a href="https://www.appveyor.com/" target="_blank" rel="noopener">appveyor</a>,<a href="https://www.travis-ci.org/" target="_blank" rel="noopener">travis-ci</a>.</p>
-<p>可以参考<a href="https://formulahendry.github.io/2016/12/04/hexo-ci/" target="_blank" rel="noopener">这个博客</a></p>
-<h1 id="4-多分支同步"><a href="#4-多分支同步" class="headerlink" title="4.多分支同步"></a>4.多分支同步</h1><p>不需要2个仓库,使用同一个仓库的2个分之即可.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">作者：CrazyMilk</span><br><span class="line">链接：https://www.zhihu.com/question/21193762/answer/79109280</span><br><span class="line">来源：知乎</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br><span class="line"></span><br><span class="line">其实，Hexo生成的文件里面是有一个.gitignore的，所以它的本意应该也是想我们把这些文件放到GitHub上存放的。但是考虑到如果每个GitHub Pages都需要额外的一个仓库存放这些文件，就显得特别冗余了。这个时候就可以用分支的思路！一个分支用来存放Hexo生成的网站原始的文件，另一个分支用来存放生成的静态网页。最近我也用GitHub Pages搭建了一个独立博客，想到了这个方法，使用之后真的特别简洁。为了更直观地说明，奉上使用这种方法不同时候的流程：</span><br><span class="line"></span><br><span class="line">一、关于搭建的流程</span><br><span class="line">1. 创建仓库，http://CrazyMilk.github.io；</span><br><span class="line">2. 创建两个分支：master 与 hexo；</span><br><span class="line">3. 设置hexo为默认分支（因为我们只需要手动管理这个分支上的Hexo网站文件）；</span><br><span class="line">4. 使用git clone git@github.com:CrazyMilk/CrazyMilk.github.io.git拷贝仓库；</span><br><span class="line">5. 在本地http://CrazyMilk.github.io文件夹下通过Git bash依次执行npm install hexo、hexo init、npm install 和 npm install hexo-deployer-git（此时当前分支应显示为hexo）;</span><br><span class="line">6. 修改_config.yml中的deploy参数，分支应为master；</span><br><span class="line">7. 依次执行git add .、git commit -m &quot;...&quot;、git push origin hexo提交网站相关的文件；</span><br><span class="line">8. 执行hexo g -d生成网站并部署到GitHub上。</span><br><span class="line">这样一来，在GitHub上的http://CrazyMilk.github.io仓库就有两个分支，一个hexo分支用来存放网站的原始文件，一个master分支用来存放生成的静态网页。完美( •̀ ω •́ )y！</span><br><span class="line"></span><br><span class="line">二、关于日常的改动流程在本地对博客进行修改（添加新博文、修改样式等等）后，通过下面的流程进行管理。</span><br><span class="line">1. 依次执行git add .、git commit -m &quot;...&quot;、git push origin hexo指令将改动推送到GitHub（此时当前分支应为hexo）；2. 然后才执行hexo g -d发布网站到master分支上。</span><br><span class="line">虽然两个过程顺序调转一般不会有问题，不过逻辑上这样的顺序是绝对没问题的（例如突然死机要重装了，悲催....的情况，调转顺序就有问题了）。</span><br><span class="line">三、本地资料丢失后的流程当重装电脑之后，或者想在其他电脑上修改博客，可以使用下列步骤：</span><br><span class="line">1. 使用git clone git@github.com:CrazyMilk/CrazyMilk.github.io.git拷贝仓库（默认分支为hexo）；</span><br><span class="line">2. 在本地新拷贝的http://CrazyMilk.github.io文件夹下通过Git bash依次执行下列指令：npm install hexo、npm install、npm install hexo-deployer-git（记得，不需要hexo init这条指令）。</span><br></pre></td></tr></table></figure>
-<h1 id="5-使用插件"><a href="#5-使用插件" class="headerlink" title="5.使用插件"></a>5.使用插件</h1><p>可以更新使用最新的 hexo-deployer-git 插件，因为没有发布到 npm 的原因，必须得从 github 安装<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install git+git@github.com:hexojs/hexo-deployer-git.git --save</span><br></pre></td></tr></table></figure></p>
-<p>在项目根目录下的 _config.yml 里面就可以这样配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># _config.yaml</span><br><span class="line">deploy:</span><br><span class="line">  - type: git</span><br><span class="line">    repo: git@github.com:&lt;username&gt;/&lt;username&gt;.github.io.git</span><br><span class="line">    branch: master</span><br><span class="line">  - type: git</span><br><span class="line">    repo: git@github.com:&lt;username&gt;/&lt;username&gt;.github.io.git</span><br><span class="line">    branch: src</span><br><span class="line">    extend_dirs: /</span><br><span class="line">    ignore_hidden: false</span><br><span class="line">    ignore_pattern:</span><br><span class="line">        public: .</span><br></pre></td></tr></table></figure></p>
-<p>这样，在每次写完博客的时候时候使用 hexo d 命令就能将所有其他文件发布到 src 分支换电脑的时候就能通过 git 重新下载下来整个项目，然后本地切换到远端的 src 分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout origin/src</span><br></pre></td></tr></table></figure></p>
-<p>就能重新获得所有的源文件，就能重新 hexo d 发布对于每一个从 git 下载下来的项目或者主题，最好把每个的 .git 文件夹删掉，否则得通过 submodule 的方式来安装。</p>
-<h1 id="6-总结"><a href="#6-总结" class="headerlink" title="6.总结"></a>6.总结</h1><p>个人觉得方法2最简单也不容易出错.</p>
-<p>以下是我的shell脚本<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/bash</span><br><span class="line"><span class="meta">#</span>--------------------------------------------</span><br><span class="line"><span class="meta">#</span> 提交博客脚本,同步hexo源码和推送博客修改到不同仓库</span><br><span class="line"><span class="meta">#</span> author：jimolonely</span><br><span class="line"><span class="meta">#</span> site：jimolonely.github.io</span><br><span class="line"><span class="meta">#</span> slogan：shell is a way!</span><br><span class="line"><span class="meta">#</span>--------------------------------------------</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 接受git commit 提交参数</span><br><span class="line">msg="$*"</span><br><span class="line"></span><br><span class="line">if [ -z "$msg" ];then</span><br><span class="line">    msg=$(git status --short)</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br><span class="line"></span><br><span class="line">git status</span><br><span class="line">git add .</span><br><span class="line">git commit -m "$msg"</span><br><span class="line">git push</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文对hexo的源代码如何备份做一个方案的探讨.我们知道hexo生成的静态页面放在public目录下,<br>每次将这个目录推送到github上,但是hexo本身却没上传,如果换电脑就无力回天了.下面就是一些解决方案.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/02/20/hexo/001-hexo-backup/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/02/20/hexo/001-hexo-backup/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/20/hexo/001-hexo-backup/" data-id="cjzm1nru4004s52chixne85ox" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a><span class="article-tag-list-count">2</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-tools/005-latex2" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/02/07/tools/005-latex2/" class="article-date">
-  <time datetime="2018-02-07T00:45:25.000Z" itemprop="datePublished">2018-02-07</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/02/07/tools/005-latex2/">不得不会的latex2</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文将使用10分钟入门latex.</p>
-<h1 id="环境介绍"><a href="#环境介绍" class="headerlink" title="环境介绍"></a>环境介绍</h1><p>使用texlive2017,vs code作为开发工具.</p>
-<p>vscode的用户自定义配置如下,为了支持中文:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">"latex-workshop.latex.toolchain": [</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="attr">"command"</span>: <span class="string">"xelatex"</span>,</span><br><span class="line">         <span class="attr">"args"</span>: [</span><br><span class="line">             <span class="string">"-synctex=1"</span>,</span><br><span class="line">             <span class="string">"-interaction=nonstopmode"</span>,</span><br><span class="line">             <span class="string">"-file-line-error"</span>,</span><br><span class="line">             <span class="string">"-pdf"</span>,</span><br><span class="line">             <span class="string">"%DOC%"</span></span><br><span class="line">         ]</span><br><span class="line">     &#125;</span><br><span class="line"> ]</span><br></pre></td></tr></table></figure></p>
-<p>安装的插件是:LaTeX Workshop.</p>
-<h1 id="最小结构"><a href="#最小结构" class="headerlink" title="最小结构"></a>最小结构</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\documentclass&#123;article&#125;</span><br><span class="line"></span><br><span class="line">\usepackage&#123;xeCJK&#125; %调用 xeCJK 宏包,支持中文</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line">  LaTEX（/ˈlɑːtɛx/，常被读作/ˈlɑːtɛk/或/ˈleɪtɛk/），文字形式写作LaTeX，是一种基于TEX的排版系统，</span><br><span class="line">  由美国计算机科学家莱斯利·兰伯特在20世纪80年代初期开发，利用这种格式系统的处理，即使用户没有排版和程序设计的知识也可以充分发挥由TEX所提供的强大功能，不必一一亲自去设计或校对，能在几天，甚至几小时内生成很多具有书籍质量的印刷品。对于生成复杂表格和数学公式，这一点表现得尤为突出。因此它非常适用于生成高印刷质量的科技和数学、化学类文档。这个系统同样适用于生成从简单的信件到完整书籍的所有其他种类的文档。</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="增加标题-作者-日期"><a href="#增加标题-作者-日期" class="headerlink" title="增加标题,作者,日期"></a>增加标题,作者,日期</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">\title&#123;Latex学习&#125;</span><br><span class="line">\author&#123;jackpler \thanks&#123;jimo&#125;&#125;</span><br><span class="line">\date&#123;2019-01-01&#125; % 或则\today</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line">  \maketitle % 这才显示出来</span><br></pre></td></tr></table></figure>
-<h1 id="粗体-斜体-下划线"><a href="#粗体-斜体-下划线" class="headerlink" title="粗体,斜体,下划线"></a>粗体,斜体,下划线</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由\underline&#123;美国&#125;计算机科学家\textbf&#123;莱斯利·兰伯特&#125;在\textit&#123;20世纪80年代初期&#125;开发</span><br></pre></td></tr></table></figure>
-<p>现在可以看下效果了:</p>
-<img src="/2018/02/07/tools/005-latex2/000.png">
-<h1 id="插入图片"><a href="#插入图片" class="headerlink" title="插入图片"></a>插入图片</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\usepackage&#123;graphicx&#125;</span><br><span class="line">\graphicspath&#123;&#123;images/&#125;&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;document&#125;</span><br><span class="line"></span><br><span class="line">  \includegraphics&#123;0&#125;</span><br><span class="line">  </span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/001.png">
-<h1 id="图表标题-标签和引用"><a href="#图表标题-标签和引用" class="headerlink" title="图表标题,标签和引用"></a>图表标题,标签和引用</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;figure&#125;[h]</span><br><span class="line">    \centering</span><br><span class="line">    \includegraphics[width=0.5\textwidth]&#123;0&#125;</span><br><span class="line">    \caption&#123;我的头像&#125;</span><br><span class="line">    \label&#123;fig:me&#125;</span><br><span class="line">  \end&#123;figure&#125;</span><br><span class="line"></span><br><span class="line">  请查看在\pageref&#123;fig:me&#125;页的Figure \ref&#123;fig:me&#125;</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/002.png">
-<h1 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">\begin&#123;itemize&#125;</span><br><span class="line">  \item 我是个男人</span><br><span class="line">  \item 我不是个女人</span><br><span class="line">\end&#123;itemize&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;enumerate&#125;</span><br><span class="line">  \item 我是个男人</span><br><span class="line">  \item 我不是个女人</span><br><span class="line">\end&#123;enumerate&#125;</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/003.png">
-<h1 id="数学公式"><a href="#数学公式" class="headerlink" title="数学公式"></a>数学公式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">物理学著名公式(行内): $E=m^2$</span><br><span class="line"></span><br><span class="line">行间公式: $$E=m^2$$</span><br><span class="line"></span><br><span class="line">$$T^&#123;i_1 i_2 \dots i_p&#125;_&#123;j_1 j_2 \dots j_q&#125; = T(x^&#123;i_1&#125;,\dots,x^&#123;i_p&#125;,e_&#123;j_1&#125;,\dots,e_&#123;j_q&#125;)$$</span><br></pre></td></tr></table></figure>
-<img src="/2018/02/07/tools/005-latex2/004.png">
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文将使用10分钟入门latex.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/02/07/tools/005-latex2/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/02/07/tools/005-latex2/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/07/tools/005-latex2/" data-id="cjzm1nrxu00h952chpgjs4zsk" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/">latex</a><span class="article-tag-list-count">3</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-linux/012-linux-fun-tools" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/02/01/linux/012-linux-fun-tools/" class="article-date">
-  <time datetime="2018-02-01T05:51:55.000Z" itemprop="datePublished">2018-02-01</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/02/01/linux/012-linux-fun-tools/">linux下有趣的工具</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>纯粹为了娱乐.不过真的很有趣</p>
-<h1 id="1-装逼网站"><a href="#1-装逼网站" class="headerlink" title="1.装逼网站"></a>1.装逼网站</h1><p><a href="https://hackertyper.net/" target="_blank" rel="noopener">https://hackertyper.net/</a>,<br><a href="http://geektyper.com/" target="_blank" rel="noopener">http://geektyper.com/</a></p>
-<h1 id="2-复古终端"><a href="#2-复古终端" class="headerlink" title="2.复古终端"></a>2.复古终端</h1><p><a href="https://github.com/Swordfish90/cool-retro-term" target="_blank" rel="noopener">github</a></p>
-<h1 id="3-假装很忙的命令行"><a href="#3-假装很忙的命令行" class="headerlink" title="3.假装很忙的命令行"></a>3.假装很忙的命令行</h1><ol>
-<li><a href="https://github.com/svenstaro/genact" target="_blank" rel="noopener">genact</a></li>
-<li><a href="https://github.com/dustinkirkland/hollywood" target="_blank" rel="noopener">hollywood</a></li>
-<li><p><a href="https://github.com/yaronn/blessed-contrib" target="_blank" rel="noopener">blessed</a><br>第三个还需要会js相关技能才能玩转,还要自己编程实现效果,不过helloworld总是简单的:</p>
-</li>
-<li><p>安装blessed模块:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install blessed</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>编写代码:</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> blessed = <span class="built_in">require</span>(<span class="string">'blessed'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a screen object.</span></span><br><span class="line"><span class="keyword">var</span> screen = blessed.screen(&#123;</span><br><span class="line">  smartCSR: <span class="literal">true</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">screen.title = <span class="string">'my window title'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a box perfectly centered horizontally and vertically.</span></span><br><span class="line"><span class="keyword">var</span> box = blessed.box(&#123;</span><br><span class="line">  top: <span class="string">'center'</span>,</span><br><span class="line">  left: <span class="string">'center'</span>,</span><br><span class="line">  width: <span class="string">'50%'</span>,</span><br><span class="line">  height: <span class="string">'50%'</span>,</span><br><span class="line">  content: <span class="string">'Hello &#123;bold&#125;world&#123;/bold&#125;!'</span>,</span><br><span class="line">  tags: <span class="literal">true</span>,</span><br><span class="line">  border: &#123;</span><br><span class="line">    type: <span class="string">'line'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  style: &#123;</span><br><span class="line">    fg: <span class="string">'white'</span>,</span><br><span class="line">    bg: <span class="string">'magenta'</span>,</span><br><span class="line">    border: &#123;</span><br><span class="line">      fg: <span class="string">'#f0f0f0'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    hover: &#123;</span><br><span class="line">      bg: <span class="string">'green'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Append our box to the screen.</span></span><br><span class="line">screen.append(box);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a png icon to the box</span></span><br><span class="line"><span class="keyword">var</span> icon = blessed.image(&#123;</span><br><span class="line">  parent: box,</span><br><span class="line">  top: <span class="number">0</span>,</span><br><span class="line">  left: <span class="number">0</span>,</span><br><span class="line">  type: <span class="string">'overlay'</span>,</span><br><span class="line">  width: <span class="string">'shrink'</span>,</span><br><span class="line">  height: <span class="string">'shrink'</span>,</span><br><span class="line">  file: __dirname + <span class="string">'/my-program-icon.png'</span>,</span><br><span class="line">  search: <span class="literal">false</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// If our box is clicked, change the content.</span></span><br><span class="line">box.on(<span class="string">'click'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">  box.setContent(<span class="string">'&#123;center&#125;Some different &#123;red-fg&#125;content&#123;/red-fg&#125;.&#123;/center&#125;'</span>);</span><br><span class="line">  screen.render();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// If box is focused, handle `enter`/`return` and give us some more content.</span></span><br><span class="line">box.key(<span class="string">'enter'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">ch, key</span>) </span>&#123;</span><br><span class="line">  box.setContent(<span class="string">'&#123;right&#125;Even different &#123;black-fg&#125;content&#123;/black-fg&#125;.&#123;/right&#125;\n'</span>);</span><br><span class="line">  box.setLine(<span class="number">1</span>, <span class="string">'bar'</span>);</span><br><span class="line">  box.insertLine(<span class="number">1</span>, <span class="string">'foo'</span>);</span><br><span class="line">  screen.render();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Quit on Escape, q, or Control-C.</span></span><br><span class="line">screen.key([<span class="string">'escape'</span>, <span class="string">'q'</span>, <span class="string">'C-c'</span>], <span class="function"><span class="keyword">function</span>(<span class="params">ch, key</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> process.exit(<span class="number">0</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Focus our element.</span></span><br><span class="line">box.focus();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Render the screen.</span></span><br><span class="line">screen.render();</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>运行:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> node hello.js</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>效果:</p>
-<img src="/2018/02/01/linux/012-linux-fun-tools/000.png">
-</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>纯粹为了娱乐.不过真的很有趣</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/02/01/linux/012-linux-fun-tools/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/02/01/linux/012-linux-fun-tools/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/02/01/linux/012-linux-fun-tools/" data-id="cjzm1nrwg00ci52ch32ctfubl" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tool/">tool</a><span class="article-tag-list-count">14</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
 
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/12/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/14/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/12/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/14/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -1811,7 +1877,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/aop/">aop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mhtml/">mhtml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -1821,7 +1887,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 12.5px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 10.63px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 16.88px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.25px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.63px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 13.75px;">maven</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.25px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/spark/" style="font-size: 11.88px;">spark</a> <a href="/tags/spring/" style="font-size: 13.13px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 13.75px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 13.13px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.38px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.67px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.67px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.67px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 14px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/aop/" style="font-size: 10px;">aop</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 13.33px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.67px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.67px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 11.33px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.67px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 14px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/git/" style="font-size: 14px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.33px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.67px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 12px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.67px;">hexo</a> <a href="/tags/html/" style="font-size: 10.67px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 10.67px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 12px;">javascript</a> <a href="/tags/js/" style="font-size: 14px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.67px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.33px;">latex</a> <a href="/tags/life/" style="font-size: 18.67px;">life</a> <a href="/tags/linux/" style="font-size: 19.33px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.33px;">math</a> <a href="/tags/maven/" style="font-size: 14.67px;">maven</a> <a href="/tags/mhtml/" style="font-size: 10px;">mhtml</a> <a href="/tags/microservice/" style="font-size: 15.33px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.33px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 12px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.67px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.67px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 12px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.33px;">python</a> <a href="/tags/quartz/" style="font-size: 10.67px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.67px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 12.67px;">shell</a> <a href="/tags/spark/" style="font-size: 12px;">spark</a> <a href="/tags/spring/" style="font-size: 14px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.67px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 14px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.33px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.67px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.67px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 14px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.33px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 14.67px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.67px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.33px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.67px;">webpack</a> <a href="/tags/week/" style="font-size: 18px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.33px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1843,23 +1909,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/08/22/server/010-tomcat9-doc-6-host-manager/">Tomcat9-文档5-主机管理</a>
+            <a href="/2019/08/30/java/061-spring-aop-doc-translate/">spring aop文档阅读与翻译</a>
           </li>
         
           <li>
-            <a href="/2019/08/22/maven/006-read-book-maven-practice/">读《maven实战》笔记</a>
+            <a href="/2019/08/28/java/060-hbase-shell-hex-decode/">hbase shell里编码原理与解析</a>
           </li>
         
           <li>
-            <a href="/2019/08/20/server/009-tomcat9-doc-5-manager/">Tomcat9-文档4-管理</a>
+            <a href="/2019/08/27/java/059-byte-int-string-utf8/">int和string转byte时的区别</a>
           </li>
         
           <li>
-            <a href="/2019/08/20/server/008-tomcat9-doc-4-deployer/">Tomcat9-文档3-部署</a>
+            <a href="/2019/08/26/java/058-jvm-gc-test/">触发5次ygc，然后3次fgc，然后3次ygc，然后1次fgc</a>
           </li>
         
           <li>
-            <a href="/2019/08/20/server/007-tomcat9-doc-2-setup/">Tomcat9-文档2-安装</a>
+            <a href="/2019/08/26/life/029-weekly-learn/">2019-35-周报</a>
           </li>
         
       </ul>
