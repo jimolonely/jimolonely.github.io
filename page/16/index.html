@@ -86,6 +86,536 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-python/001-music21" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/06/python/001-music21/" class="article-date">
+  <time datetime="2018-01-06T07:32:29.000Z" itemprop="datePublished">2018-01-06</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/06/python/001-music21/">music21</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
+<h1 id="music21是什么"><a href="#music21是什么" class="headerlink" title="music21是什么"></a>music21是什么</h1><p>music21是一个基于python的计算机辅助音乐学工具包。该系统自2008年以来一直在不断发展壮大。<br>music21中的方法和传统已被用在许多以前的软件系统中。</p>
+<p>music21中的21指的是在MIT中所有的课程都有数字和音乐，还有其他一些人文科学部门，编号为21. </p>
+<p>MIT的音乐部门以及哈佛大学，史密斯学院和圣约克山学院帮助把这个工具包从最简单的根源变成了一个成熟的系统。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接用pip就行,更多安装参考官方文档<a href="http://web.mit.edu/music21/doc/installing/index.html" target="_blank" rel="noopener">music</a><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> pip install music21</span><br></pre></td></tr></table></figure></p>
+<h1 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h1><h3 id="1-展示一个音符"><a href="#1-展示一个音符" class="headerlink" title="1. 展示一个音符"></a>1. 展示一个音符</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> music21 <span class="keyword">import</span> *</span><br><span class="line">In [<span class="number">2</span>]: n = note.Note(<span class="string">"D#3"</span>)</span><br><span class="line">In [<span class="number">3</span>]: n.duration.type = <span class="string">'half'</span></span><br><span class="line">In [<span class="number">4</span>]: n.show()</span><br></pre></td></tr></table></figure>
+<p>你以为会出现图片,但由于没有打开mxl文件的应用会报错:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SubConverterException: Cannot find a valid application path <span class="keyword">for</span> format musicxml. Specify this <span class="keyword">in</span> your Environment by calling environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/path/to/application'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这时安装<a href="https://musescore.org/zh-hans" target="_blank" rel="noopener">musescore</a>,这个跨平台的开源乐谱编辑器.其路径默认在/usr/bin/musescore</p>
+<p>然后配置路径再显示: (注意:这个environment是music21下的)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">7</span>]: environment.set(<span class="string">'musicxmlPath'</span>, <span class="string">'/usr/bin/musescore'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: n.show()</span><br><span class="line">qt5ct: using qt5ct plugin</span><br></pre></td></tr></table></figure></p>
+<p>应该会打开musescore软件:</p>
+<img src="/2018/01/06/python/001-music21/000.png">
+<h3 id="2-播放midi"><a href="#2-播放midi" class="headerlink" title="2.播放midi"></a>2.播放midi</h3><p>同样需要配置midi播放器:这里使用timidity<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">9</span>]: littleMelody = converter.parse(<span class="string">"tinynotation: 3/4 c4 d8 f g16 a g f#"</span>)</span><br><span class="line">In [<span class="number">13</span>]: environment.set(<span class="string">'midiPath'</span>, <span class="string">'/usr/bin/timidity'</span>)</span><br><span class="line">In [<span class="number">14</span>]: littleMelody.show(<span class="string">'midi'</span>)</span><br><span class="line">Requested buffer size <span class="number">32768</span>, fragment size <span class="number">8192</span></span><br><span class="line">ALSA pcm <span class="string">'default'</span> set buffer size <span class="number">32768</span>, period size <span class="number">8192</span> bytes</span><br><span class="line">Playing /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">MIDI file: /tmp/music21/tmpxc26drbk.mid</span><br><span class="line">Format: <span class="number">1</span>  Tracks: <span class="number">1</span>  Divisions: <span class="number">1024</span></span><br><span class="line">Sequence: </span><br><span class="line">No instrument mapped to tone bank <span class="number">0</span>, program <span class="number">0</span> - this instrument will <span class="keyword">not</span> be heard</span><br><span class="line">No pre-resampling cache hit</span><br><span class="line">Last <span class="number">1</span> MIDI events are ignored</span><br><span class="line">Playing time: ~<span class="number">4</span> seconds</span><br><span class="line">Notes cut: <span class="number">0</span></span><br><span class="line">Notes lost totally: <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到,默认这些临时文件都在/tmp/music21/下.</p>
+<h3 id="3-其他"><a href="#3-其他" class="headerlink" title="3.其他"></a>3.其他</h3><p>还可以生成图片,读取mxl文件,生成和弦等.</p>
+<p>如果不想配置软件,就直接去tmp目录下查看文件.</p>
+<p>学习还是官方文档最好:<a href="http://web.mit.edu/music21/doc/index.html" target="_blank" rel="noopener">music21-doc</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>如果你问玩音乐知不知道music21,我不知道,但对于喜欢音乐的程序员来说,利用代码创造音乐<br>是一种必然.<br>而music21是一个python语言下的工具,很强大.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/06/python/001-music21/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/06/python/001-music21/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/06/python/001-music21/" data-id="ck0kbsw9200kwaxchxppg4uba" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/music/">music</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-spark/04-pyspark-jupyter" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/05/spark/04-pyspark-jupyter/" class="article-date">
+  <time datetime="2018-01-05T10:52:49.000Z" itemprop="datePublished">2018-01-05</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/05/spark/04-pyspark-jupyter/">配置pyspark和jupyter一起使用</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用默认的pyspark会调用python命令行,但总是不太方便.<br>本文会讲解2种方法使用jupyter打开pyspark,加载spark的环境.</p>
+<p>简直太简单.</p>
+<h1 id="本次环境"><a href="#本次环境" class="headerlink" title="本次环境"></a>本次环境</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">spark:2.2.0</span><br><span class="line">python:3.6</span><br><span class="line">jupyter:4.3.0</span><br><span class="line">Arch linux</span><br></pre></td></tr></table></figure>
+<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><img src="/2018/01/05/spark/04-pyspark-jupyter/000.png">
+<h1 id="配置方法1"><a href="#配置方法1" class="headerlink" title="配置方法1"></a>配置方法1</h1><ol>
+<li><p>配置环境变量:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export SPARK_HOME=/home/temp/spark-2.2.0-bin-hadoop2.7</span><br><span class="line">export PATH=$SPARK_HOME/bin:$PATH</span><br><span class="line"></span><br><span class="line">export PYSPARK_DRIVER_PYTHON=jupyter</span><br><span class="line">export PYSPARK_DRIVER_PYTHON_OPTS='notebook'</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使变量生效后和原方法一样使用命令:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> source .bashrc</span><br><span class="line"><span class="meta">$</span> pyspark</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="配置方法2"><a href="#配置方法2" class="headerlink" title="配置方法2"></a>配置方法2</h1><p>通过findspark这个库.</p>
+<ol>
+<li><p>先安装:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> pip install findspark</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>加载notebook</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jupyter notebook</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过导入使用:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> findspark</span><br><span class="line">findspark.init()</span><br><span class="line"><span class="keyword">import</span> pyspark</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">sc = pyspark.SparkContext(appName=<span class="string">"Pi"</span>)</span><br><span class="line">num_samples = <span class="number">100000000</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inside</span><span class="params">(p)</span>:</span>     </span><br><span class="line">  x, y = random.random(), random.random()</span><br><span class="line">  <span class="keyword">return</span> x*x + y*y &lt; <span class="number">1</span></span><br><span class="line">count = sc.parallelize(range(<span class="number">0</span>, num_samples)).filter(inside).count()</span><br><span class="line">pi = <span class="number">4</span> * count / num_samples</span><br><span class="line">print(pi)</span><br><span class="line">sc.stop()</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>本文翻译自:<a href="https://blog.sicara.com/get-started-pyspark-jupyter-guide-tutorial-ae2fe84f594f" target="_blank" rel="noopener">https://blog.sicara.com/get-started-pyspark-jupyter-guide-tutorial-ae2fe84f594f</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>使用默认的pyspark会调用python命令行,但总是不太方便.<br>本文会讲解2种方法使用jupyter打开pyspark,加载spark的环境.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/05/spark/04-pyspark-jupyter/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/05/spark/04-pyspark-jupyter/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/spark/04-pyspark-jupyter/" data-id="ck0kbsw9w00ngaxchxun4ti47" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jupyter/">jupyter</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pyspark/">pyspark</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">8</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-maven/000-package-execute-jar" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/05/maven/000-package-execute-jar/" class="article-date">
+  <time datetime="2018-01-05T03:34:08.000Z" itemprop="datePublished">2018-01-05</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/05/maven/000-package-execute-jar/">打包成可执行jar包</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>Maven手记,打包成可执行jar</p>
+<h2 id="打包成可执行jar"><a href="#打包成可执行jar" class="headerlink" title="打包成可执行jar"></a>打包成可执行jar</h2><p>官方文档：<a href="https://maven.apache.org/plugins/maven-jar-plugin/" target="_blank" rel="noopener">https://maven.apache.org/plugins/maven-jar-plugin/</a> </p>
+<p>在之前可能会遇到找不到主类的问题：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc target]$ java test-app-1.0-SNAPSHOT.jar</span><br><span class="line">Error: Could not find or load main class test-app-1.0-SNAPSHOT.jar</span><br><span class="line">[jimo@jimo-pc target]$ java -jar test-app-1.0-SNAPSHOT.jar</span><br><span class="line">no main manifest attribute, in test-app-1.0-SNAPSHOT.jar</span><br></pre></td></tr></table></figure></p>
+<p>解决办法：需要在pom.xml里配置<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;project&gt;</span><br><span class="line">  ...</span><br><span class="line">  &lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;3.0.2&lt;/version&gt;</span><br><span class="line">        &lt;configuration&gt;</span><br><span class="line">          &lt;archive&gt;</span><br><span class="line">            &lt;manifestFile&gt;$&#123;project.build.outputDirectory&#125;/META-INF/MANIFEST.MF&lt;/manifestFile&gt;</span><br><span class="line">          &lt;/archive&gt;</span><br><span class="line">        &lt;/configuration&gt;</span><br><span class="line">        ...</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br><span class="line">  ...</span><br><span class="line">&lt;/project&gt;</span><br></pre></td></tr></table></figure></p>
+<p>当然这种方法需要自定义清单文件，更简单的是直接定义入口类：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">        &lt;plugin&gt;</span><br><span class="line">            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;3.0.2&lt;/version&gt;</span><br><span class="line">            &lt;configuration&gt;</span><br><span class="line">                &lt;archive&gt;</span><br><span class="line">                    &lt;manifest&gt;</span><br><span class="line">                        &lt;mainClass&gt;com.jimo.App&lt;/mainClass&gt;</span><br><span class="line">                    &lt;/manifest&gt;</span><br><span class="line">                &lt;/archive&gt;</span><br><span class="line">            &lt;/configuration&gt;</span><br><span class="line">        &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br></pre></td></tr></table></figure></p>
+<p>其中com.jimo.App包含main方法，是整个程序的入口。</p>
+<p>然后重新构建jar包再执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc test-app]$ mvn clean install</span><br><span class="line">[jimo@jimo-pc target]$ java -jar test-app-1.0-SNAPSHOT.jar</span><br><span class="line">Hello World!</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>Maven手记,打包成可执行jar</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/05/maven/000-package-execute-jar/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/05/maven/000-package-execute-jar/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/05/maven/000-package-execute-jar/" data-id="ck0kbsw8u00k5axchstndb402" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">94</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a><span class="article-tag-list-count">9</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-spark/03-spark-warning" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/03/spark/03-spark-warning/" class="article-date">
+  <time datetime="2018-01-03T12:20:05.000Z" itemprop="datePublished">2018-01-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/03/spark/03-spark-warning/">spark挖坑详解</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>这是一些官方文档没给完的坑.</p>
+<h1 id="命令行参数"><a href="#命令行参数" class="headerlink" title="命令行参数"></a>命令行参数</h1><ol>
+<li>指定jdbc驱动</li>
+</ol>
+<p>打开shell<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-shell --driver-class-path /home/jimo/lib/sqljdbc42.jar</span><br></pre></td></tr></table></figure></p>
+<p>运行submit<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[jimo@jimo-pc spark-2.2.0-bin-hadoop2.7]$ bin/spark-submit --class "CodeDataFromRDB" --master local[1] --driver-class-path /home/jimo/lib/sqljdbc42.jar /home/jimo/target/scala-2.11/aprioritest_2.11-0.1.jar</span><br></pre></td></tr></table></figure></p>
+<h1 id="spark-jdbc"><a href="#spark-jdbc" class="headerlink" title="spark jdbc"></a>spark jdbc</h1><p>官方地址:</p>
+<p>例子代码:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder().appName(<span class="string">s"<span class="subst">$&#123;this.getClass.getSimpleName&#125;</span>"</span>).getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line"><span class="comment">//连接数据库</span></span><br><span class="line"><span class="keyword">val</span> connProperties = <span class="keyword">new</span> <span class="type">Properties</span>()</span><br><span class="line">connProperties.put(<span class="string">"user"</span>, <span class="string">"xxx"</span>)</span><br><span class="line">connProperties.put(<span class="string">"password"</span>, <span class="string">"xxx"</span>)</span><br><span class="line"><span class="keyword">val</span> dbUrl = <span class="string">"jdbc:sqlserver://host:1433;databaseName=mydb"</span></span><br><span class="line"><span class="comment">//构造成绩表DF</span></span><br><span class="line"><span class="keyword">var</span> tableName = <span class="string">"exam_mark"</span></span><br><span class="line"><span class="keyword">val</span> markDF = spark.read.jdbc(dbUrl, tableName, connProperties)</span><br><span class="line">markDF.createOrReplaceTempView(tableName)</span><br><span class="line"><span class="comment">//学生记录</span></span><br><span class="line">tableName = <span class="string">"student_record"</span></span><br><span class="line"><span class="keyword">val</span> studentRecordDF = spark.read.jdbc(dbUrl, tableName, connProperties)</span><br><span class="line">studentRecordDF.createOrReplaceTempView(tableName)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> dataDF = spark.sql(<span class="string">"select student_id,course_code,cast((CASE when mark&gt;=90 then 'A' "</span> +</span><br><span class="line">  <span class="string">"when mark&gt;=80 then 'B' when mark&gt;=70 then 'C' when mark&gt;=60 then 'D' else 'E' end) as String) as mark from exam_mark "</span> +</span><br><span class="line">  <span class="string">"where mark&lt;&gt;0 and student_id like '2014%' and student_id in("</span> +</span><br><span class="line">  <span class="string">"select student_id from student_record where speciality_code='0408')"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>就上面那段sql语句的坑:</p>
+<ol>
+<li>为什么要cast,因为不这样mark得出的结果是null</li>
+<li>cast as String,在sqlserver里是cast as varchar,然而这样也行.</li>
+</ol>
+<p>上面得出的结果是:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dataDF.show(<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">+----------+-----------+----+</span><br><span class="line">|student_id|course_code|mark|</span><br><span class="line">+----------+-----------+----+</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">0471024</span>|   <span class="type">D</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">3223700</span>|   <span class="type">B</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">7047924</span>|   <span class="type">B</span>|</span><br><span class="line">|<span class="number">2014112198</span>|    <span class="number">3273526</span>|   <span class="type">A</span>|</span><br></pre></td></tr></table></figure></p>
+<h1 id="RDD-到-DataSet"><a href="#RDD-到-DataSet" class="headerlink" title="RDD 到 DataSet"></a>RDD 到 DataSet</h1><h1 id="分区的问题"><a href="#分区的问题" class="headerlink" title="分区的问题"></a>分区的问题</h1><p>下面这样写会产生200个txt文件<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">markDS.write.text(<span class="string">"/home/data/d.txt"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>可以这样:<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">markDS.repartition(<span class="number">1</span>).write.text(<span class="string">"/home/data/d.txt"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>还有一些是coalesce()</p>
+<p>他们的区别是什么?</p>
+<h1 id="map之后的结果包含括号的问题"><a href="#map之后的结果包含括号的问题" class="headerlink" title="map之后的结果包含括号的问题"></a>map之后的结果包含括号的问题</h1><h1 id="去除某一列的重复元素"><a href="#去除某一列的重复元素" class="headerlink" title="去除某一列的重复元素"></a>去除某一列的重复元素</h1><p>原数据:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">marks = spark.sql(<span class="string">"select distinct(student_id),mark1,mark2,mark3,mark4,mark5,mark6 as reault from mark"</span>)</span><br><span class="line">marks.show(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br><span class="line">|student_id|mark1|mark2|mark3|mark4|mark5|reault|</span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br><span class="line">|  <span class="number">19990520</span>| <span class="number">80.0</span>| <span class="number">89.0</span>| <span class="number">67.0</span>| <span class="number">82.0</span>| <span class="number">64.0</span>|  <span class="number">87.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">68.0</span>| <span class="number">60.0</span>| <span class="number">58.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">68.0</span>| <span class="number">60.0</span>| <span class="number">65.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">44.0</span>| <span class="number">60.0</span>| <span class="number">58.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">|  <span class="number">20011181</span>| <span class="number">76.0</span>| <span class="number">82.0</span>| <span class="number">44.0</span>| <span class="number">60.0</span>| <span class="number">65.0</span>|  <span class="number">60.0</span>|</span><br><span class="line">+----------+-----+-----+-----+-----+-----+------+</span><br></pre></td></tr></table></figure></p>
+<p>要去除student_id这一列的重复值:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">marks = marks.dropDuplicates([<span class="string">'student_id'</span>])</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>这是一些官方文档没给完的坑.</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/03/spark/03-spark-warning/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/03/spark/03-spark-warning/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/03-spark-warning/" data-id="ck0kbsw9w00neaxch2nvdb4ae" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">94</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-spark/02-write-csv" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/03/spark/02-write-csv/" class="article-date">
+  <time datetime="2018-01-03T03:04:46.000Z" itemprop="datePublished">2018-01-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/03/spark/02-write-csv/">CSV data source does not support array&lt;string&gt; data type</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
+<h1 id="例子数据"><a href="#例子数据" class="headerlink" title="例子数据"></a>例子数据</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----------+----------+-------------------+</span><br><span class="line">|antecedent|consequent|         confidence|</span><br><span class="line">+----------+----------+-------------------+</span><br><span class="line">|   [C47_D]|    [C3_B]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C13_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C23_A]|0.35714285714285715|</span><br><span class="line">|   [C47_D]|   [C24_D]|0.35714285714285715|</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>前面2个是数组.</p>
+<h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><p>多种,下面看2种</p>
+<ol>
+<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions.udf</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stringify = udf((vs: <span class="type">Seq</span>[<span class="type">String</span>]) =&gt; <span class="string">s""</span><span class="string">"$&#123;vs.mkString("</span>,<span class="string">")&#125;"</span><span class="string">""</span>)</span><br><span class="line">    df.withColumn(<span class="string">"antecedent"</span>, stringify($<span class="string">"antecedent"</span>))</span><br><span class="line">      .withColumn(<span class="string">"consequent"</span>, stringify($<span class="string">"consequent"</span>))</span><br><span class="line">      .write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Asso</span>(<span class="params">antecedent: <span class="type">String</span>, consequent: <span class="type">String</span>, confidence: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">df</span>.<span class="title">rdd</span>.<span class="title">map</span> </span>&#123; line =&gt; <span class="type">Asso</span>(line(<span class="number">0</span>).toString, line(<span class="number">1</span>).toString, line(<span class="number">2</span>).toString) &#125;.</span><br><span class="line">      toDF().write.csv(<span class="string">"/path/data/csv"</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>运行spark程序,里面有将DataFrame的数据转为csv存储,<br>但因为数据里有Array类型,无法转换报错:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CSV data source does not support array&lt;string&gt; data type</span><br></pre></td></tr></table></figure></p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/03/spark/02-write-csv/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/03/spark/02-write-csv/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/03/spark/02-write-csv/" data-id="ck0kbsw9v00nbaxchfe8dxnwf" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">8</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-python/000-pyodbc" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/02/python/000-pyodbc/" class="article-date">
+  <time datetime="2018-01-02T12:03:01.000Z" itemprop="datePublished">2018-01-02</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/02/python/000-pyodbc/">python使用pyodbc</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用pyodbc</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pyodbc</span><br></pre></td></tr></table></figure>
+<p>如果出现:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">src/pyodbc.h:56:10: 致命错误：sql.h：没有那个文件或目录</span><br><span class="line">     #include &lt;sql.h&gt;</span><br><span class="line">              ^~~~~~~</span><br><span class="line">    编译中断。</span><br><span class="line">    error: command 'gcc' failed with exit status 1</span><br></pre></td></tr></table></figure></p>
+<p>则再安装:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo pacman -S unixodbc</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><ol>
+<li><p>需要安装驱动,我使用freetds,如果linux没有自带安装源可以下载:<a href="http://www.freetds.org/" target="_blank" rel="noopener">http://www.freetds.org/</a></p>
+</li>
+<li><p>配置/etc/odbcinst.ini:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat /etc/odbcinst.ini </span><br><span class="line">[SQL Server]</span><br><span class="line">Description = FreeTDS ODBC driver for MSSQL</span><br><span class="line"></span><br><span class="line">Driver = /usr/lib/libtdsodbc.so</span><br><span class="line"></span><br><span class="line">Setup = /usr/lib/libtdsS.so</span><br><span class="line"></span><br><span class="line">FileUsage = 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> pyodbc</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;cnxn = pyodbc.connect(<span class="string">'DRIVER=&#123;SQL Server&#125;;SERVER=host\\sql;DATABASE=testDB;UID=sa;PWD=myPassword'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>使用pyodbc</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2018/01/02/python/000-pyodbc/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2018/01/02/python/000-pyodbc/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/python/000-pyodbc/" data-id="ck0kbsw9100kuaxch5f73eni0" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a><span class="article-tag-list-count">14</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-spark/01-rdd" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/01/02/spark/01-rdd/" class="article-date">
@@ -168,12 +698,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="ck0ixo88k00m0mychmp5d5wvz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/spark/01-rdd/" data-id="ck0kbsw9u00n9axchevzxsooi" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">8</span></li></ul>
 
       </footer>
       </div>
@@ -242,7 +772,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="ck0ixo88400kpmychcb5sa59s" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/02/scala/001-method-vs-function/" data-id="ck0kbsw9b00llaxchkm08g2l3" class="article-share-link">
           Share
         </a>
         
@@ -351,7 +881,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="ck0ixo88p00mfmychn0x8uqfh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/01/01/tools/000-latex/" data-id="ck0kbsw9z00noaxchf9zws7vw" class="article-share-link">
           Share
         </a>
         
@@ -474,7 +1004,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="ck0ixo84b0082mychokyxl5mh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/git/000-multi-git-account/" data-id="ck0kbsw25004daxch5zq1kzah" class="article-share-link">
           Share
         </a>
         
@@ -555,12 +1085,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="ck0ixo87200h9mych8hl21wn5" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/31/linux/006-vim/" data-id="ck0kbsw8900i8axchlgda305o" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">2</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a><span class="article-tag-list-count">2</span></li></ul>
 
       </footer>
       </div>
@@ -638,7 +1168,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="ck0ixo88200kkmych5rqxvwbl" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/29/scala/000-case-class-cs-class/" data-id="ck0kbsw9900lgaxch0qdn8np6" class="article-share-link">
           Share
         </a>
         
@@ -719,12 +1249,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="ck0ixo88l00m2mychukr6rcy4" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/spark/00-quick-start/" data-id="ck0kbsw9s00n4axch8bpxji0p" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a><span class="article-tag-list-count">8</span></li></ul>
 
       </footer>
       </div>
@@ -855,12 +1385,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="ck0ixo88f00lqmychyr12asc1" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/shell/000-use-awk/" data-id="ck0kbsw9o00msaxchz9k4z6nk" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a><span class="article-tag-list-count">1</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -936,12 +1466,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="ck0ixo87100h7mychu25wacqb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/28/linux/005-ssh-and-remote/" data-id="ck0kbsw8c00iiaxch83il9j9x" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -1013,12 +1543,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="ck0ixo87000h4mychudj9hxgi" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/004-make-bootable-udisk/" data-id="ck0kbsw8800i6axch7uog0eqe" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -1091,12 +1621,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="ck0ixo87000h2mychd81zer9y" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/003-split-file/" data-id="ck0kbsw8a00ibaxchshbt436o" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -1171,12 +1701,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="ck0ixo86x00gumych732q3agr" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/002-system-info/" data-id="ck0kbsw8700i1axchapugz80i" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -1336,12 +1866,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="ck0ixo86y00gxmychlzlu98cw" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/001-linux-manjaro/" data-id="ck0kbsw8700i3axchjbb8rz5a" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/manjaro/">manjaro</a><span class="article-tag-list-count">1</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/manjaro/">manjaro</a><span class="article-tag-list-count">1</span></li></ul>
 
       </footer>
       </div>
@@ -1536,169 +2066,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="ck0ixo86z00gzmychus04qjnh" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2017/12/27/linux/000-build-mysystem/" data-id="ck0kbsw8600hyaxchtja3d56p" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">9</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-design-pattern/command" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/24/design-pattern/command/" class="article-date">
-  <time datetime="2017-12-24T03:48:17.000Z" itemprop="datePublished">2017-12-24</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/24/design-pattern/command/">command模式实现undo/redo操作</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文将实现一个带有undo/redo操作的计算器来理解command模式.</p>
-<p>首先看看原先的command类图:</p>
-<img src="/2017/12/24/design-pattern/command/000.png">
-<p>然后看看我们这个计算器类图:</p>
-<img src="/2017/12/24/design-pattern/command/001.png">
-<p>下面是代码,简单包懂.</p>
-<p>我们有个计算器:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="comment">//相当于Receiver,真正做事情的对象</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Calculator</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> a;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> b;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> Operation &#123;</span><br><span class="line">        ADD, SUB, MUL, DIV</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Operation operation;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Calculator</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b, Operation operation)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.a = a;</span><br><span class="line">        <span class="keyword">this</span>.b = b;</span><br><span class="line">        <span class="keyword">this</span>.operation = operation;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (operation) &#123;</span><br><span class="line">            <span class="keyword">case</span> ADD:</span><br><span class="line">                result = a + b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SUB:</span><br><span class="line">                result = a - b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MUL:</span><br><span class="line">                result = a * b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> DIV:</span><br><span class="line">                <span class="keyword">if</span> (b == <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"除数为0"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                result = a / b;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"计算:"</span> + a + getOp() + b + <span class="string">"="</span> + result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String op = getOp();</span><br><span class="line">        <span class="keyword">return</span> a + op + b + <span class="string">"="</span> + result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getOp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String op = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">switch</span> (operation) &#123;</span><br><span class="line">            <span class="keyword">case</span> ADD:</span><br><span class="line">                op = <span class="string">"+"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SUB:</span><br><span class="line">                op = <span class="string">"-"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MUL:</span><br><span class="line">                op = <span class="string">"*"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> DIV:</span><br><span class="line">                op = <span class="string">"/"</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> op;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>总的命令接口:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span></span>;<span class="comment">//执行或重做</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span></span>;<span class="comment">//撤销</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>具体的命令实现:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ComputeCommand</span> <span class="keyword">implements</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Calculator calculator;</span><br><span class="line">    <span class="keyword">private</span> Calculator preCalculator;<span class="comment">//上一步的计算,用于回退</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ComputeCommand</span><span class="params">(Calculator calculator)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.calculator = calculator;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.preCalculator = calculator;</span><br><span class="line">        calculator.compute();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//这里的撤销是执行上一次运算</span></span><br><span class="line">        preCalculator.compute();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> calculator.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>然后是Invoker,这里为User类:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Stack;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用计算器的用户,对于Invoker</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Stack&lt;Command&gt; undos;</span><br><span class="line">    <span class="keyword">private</span> Stack&lt;Command&gt; redos;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.undos = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">        <span class="keyword">this</span>.redos = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (undos.size() == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"没有撤销步骤"</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Command cmd = undos.pop();</span><br><span class="line"><span class="comment">//        cmd.undo();//撤销不需要再计算了,假如是累计计算撤销才有用</span></span><br><span class="line">        redos.push(cmd);</span><br><span class="line">        System.out.println(<span class="string">"撤销:"</span> + cmd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">redo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (redos.size() == <span class="number">0</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"没有重做步骤"</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Command cmd = redos.pop();</span><br><span class="line">        cmd.execute();</span><br><span class="line">        undos.push(cmd);</span><br><span class="line">        System.out.println(<span class="string">"重做:"</span> + cmd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//这才是用户调用的接口</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compute</span><span class="params">(Calculator.Operation operation, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        ComputeCommand computeCommand = <span class="keyword">new</span> ComputeCommand(<span class="keyword">new</span> Calculator(a, b, operation));</span><br><span class="line">        computeCommand.execute();</span><br><span class="line">        undos.add(computeCommand);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>最后是Client,相当于整个应用界面:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.command;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.compute(Calculator.Operation.ADD, <span class="number">100</span>, <span class="number">20</span>);</span><br><span class="line">        user.compute(Calculator.Operation.SUB, -<span class="number">100</span>, <span class="number">50</span>);</span><br><span class="line">        user.compute(Calculator.Operation.MUL, <span class="number">10</span>, <span class="number">30</span>);</span><br><span class="line">        user.undo();</span><br><span class="line">        user.undo();</span><br><span class="line">        user.redo();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>运行结果:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">计算:100+20=120</span><br><span class="line">计算:-100-50=-150</span><br><span class="line">计算:10*30=300</span><br><span class="line">撤销:10*30=300</span><br><span class="line">撤销:-100-50=-150</span><br><span class="line">计算:-100-50=-150</span><br><span class="line">重做:-100-50=-150</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文将实现一个带有undo/redo操作的计算器来理解command模式.</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/24/design-pattern/command/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/24/design-pattern/command/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/24/design-pattern/command/" data-id="ck0ixo81m003vmychoifaqhoe" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/design-pattern/">design-pattern</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">94</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-hexo/deploy-hexo-on-github" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/23/hexo/deploy-hexo-on-github/" class="article-date">
-  <time datetime="2017-12-23T14:08:04.000Z" itemprop="datePublished">2017-12-23</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/23/hexo/deploy-hexo-on-github/">部署hexo到github</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>飞快搭建hexo+github博客.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
-        
-          <p class="article-more-link">
-            <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">Read More</a>
-          </p>
-        
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                  
-                    <p>
-                      <p>飞快搭建hexo+github博客.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 安装hexo</span><br><span class="line">[jimo@jimo-pc workspace]$ hexo init myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ cd myblog</span><br><span class="line">[jimo@jimo-pc workspace]$ npm install</span><br></pre></td></tr></table></figure>
-                    </p>
-                    
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2017/12/23/hexo/deploy-hexo-on-github/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2017/12/23/hexo/deploy-hexo-on-github/" data-id="ck0ixo84m008omych3wlk85lt" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a><span class="article-tag-list-count">2</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">12</span></li></ul>
 
       </footer>
       </div>
@@ -1711,7 +2084,7 @@ ga('send', 'pageview');
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/15/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span>
+    <a class="extend prev" rel="prev" href="/page/15/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><a class="extend next" rel="next" href="/page/17/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -1725,7 +2098,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/aop/">aop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geohash/">geohash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geomesa/">geomesa</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j/">log4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j12/">log4j12</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/logback/">logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/md5/">md5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mhtml/">mhtml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slf4j/">slf4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/aop/">aop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geohash/">geohash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geomesa/">geomesa</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j/">log4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j12/">log4j12</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/logback/">logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/md5/">md5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mhtml/">mhtml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slf4j/">slf4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -1735,7 +2108,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.67px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.67px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.67px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 14px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/aop/" style="font-size: 10px;">aop</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 13.33px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.67px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.67px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 11.33px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.67px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 14px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/geohash/" style="font-size: 10px;">geohash</a> <a href="/tags/geomesa/" style="font-size: 10px;">geomesa</a> <a href="/tags/git/" style="font-size: 14px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.33px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.67px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 12px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.67px;">hexo</a> <a href="/tags/html/" style="font-size: 10.67px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 11.33px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 12px;">javascript</a> <a href="/tags/js/" style="font-size: 14px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.67px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.33px;">latex</a> <a href="/tags/life/" style="font-size: 18.67px;">life</a> <a href="/tags/linux/" style="font-size: 19.33px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/log4j/" style="font-size: 10px;">log4j</a> <a href="/tags/log4j12/" style="font-size: 10px;">log4j12</a> <a href="/tags/logback/" style="font-size: 10px;">logback</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.33px;">math</a> <a href="/tags/maven/" style="font-size: 15.33px;">maven</a> <a href="/tags/md5/" style="font-size: 10px;">md5</a> <a href="/tags/mhtml/" style="font-size: 10px;">mhtml</a> <a href="/tags/microservice/" style="font-size: 15.33px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.33px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 12px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.67px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.67px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 12px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.33px;">python</a> <a href="/tags/quartz/" style="font-size: 10.67px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.67px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 12.67px;">shell</a> <a href="/tags/slf4j/" style="font-size: 10px;">slf4j</a> <a href="/tags/spark/" style="font-size: 12.67px;">spark</a> <a href="/tags/spring/" style="font-size: 16.67px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.67px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 14.67px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.33px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.67px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.67px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 14px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.33px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 15.33px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.67px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.33px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.67px;">webpack</a> <a href="/tags/week/" style="font-size: 18px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.33px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/aop/" style="font-size: 10px;">aop</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 13.13px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 11.25px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.5px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/geohash/" style="font-size: 10px;">geohash</a> <a href="/tags/geomesa/" style="font-size: 10px;">geomesa</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.88px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 11.25px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/log4j/" style="font-size: 10px;">log4j</a> <a href="/tags/log4j12/" style="font-size: 10px;">log4j12</a> <a href="/tags/logback/" style="font-size: 10px;">logback</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 15px;">maven</a> <a href="/tags/md5/" style="font-size: 10px;">md5</a> <a href="/tags/mhtml/" style="font-size: 10px;">mhtml</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.88px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/slf4j/" style="font-size: 10px;">slf4j</a> <a href="/tags/spark/" style="font-size: 14.38px;">spark</a> <a href="/tags/spring/" style="font-size: 16.25px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 14.38px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 13.75px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 16.88px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -1757,23 +2130,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/09/14/maven/008-maven-define-jdk-version/">maven手动指定JDK版本</a>
+            <a href="/2019/09/15/linux/032-ubuntu-ufw/">ubuntu防火墙</a>
           </li>
         
           <li>
-            <a href="/2019/09/14/linux/030-ubuntu-change-dns/">ubuntu修改DNS</a>
+            <a href="/2019/09/15/linux/031-ubuntu-ssh-connection-refuesd/">ubuntu localhost:ssh:connect to host localhost port 22:Connection refused</a>
           </li>
         
           <li>
-            <a href="/2019/09/13/java/067-log4j-slf4j-logback-log4j12-diff/">log4j、logback、log4j12、slf4j的区别</a>
+            <a href="/2019/09/15/spark/008-spark-standalone-conf-run/">spark standalone模式的配置与运行</a>
           </li>
         
           <li>
-            <a href="/2019/09/12/java/066-java-cors-rewrite-header/">java后端跨域时自定义header字段</a>
+            <a href="/2019/09/14/spark/007-spark-data-flow/">spark运行流程</a>
           </li>
         
           <li>
-            <a href="/2019/09/12/life/031-weekly-learn/">2019-37-周报</a>
+            <a href="/2019/09/14/spark/006-spark-config-wordcount/">spark001：wordcount</a>
           </li>
         
       </ul>

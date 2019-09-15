@@ -86,6 +86,604 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-linux/019-keepalived-learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/15/linux/019-keepalived-learn/" class="article-date">
+  <time datetime="2019-02-15T04:32:02.000Z" itemprop="datePublished">2019-02-15</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/15/linux/019-keepalived-learn/">keepalived踩坑记录</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文记录了使用keepalived的常用场景和踩坑经历。</p>
+<p>首先贴上官网： <a href="http://www.keepalived.org/manpage.html" target="_blank" rel="noopener">http://www.keepalived.org/manpage.html</a></p>
+<p>对于每个配置的含义，还是以这里为准较好。</p>
+<h1 id="关于环境和安装"><a href="#关于环境和安装" class="headerlink" title="关于环境和安装"></a>关于环境和安装</h1><p>这里就不说了，太多博客了。</p>
+<h1 id="keealived可以做什么"><a href="#keealived可以做什么" class="headerlink" title="keealived可以做什么"></a>keealived可以做什么</h1><p>这个是首先要问的问题。</p>
+<p>Keepalived是一个用C编写的路由软件。</p>
+<p>主要目标是为Linux系统和基于Linux的基础架构提供简单而强大的负载平衡和高可用性设施。</p>
+<p>简单来说就是： 负载均衡和高可用。一般和nginx结合使用。</p>
+<h1 id="如何做到的"><a href="#如何做到的" class="headerlink" title="如何做到的"></a>如何做到的</h1><ol>
+<li>负载平衡： 依赖于众所周知且广泛使用的Linux虚拟服务器（IPVS）内核模块，提供Layer4层负载均衡。 Keepalived实现了一组检查器，以根据其健康状况动态地和自适应地维护和管理负载平衡的服务器池。</li>
+<li>VRRP协议实现了高可用性。 VRRP是路由器故障转移的基础。此外，Keepalived为VRRP有限状态机实现了一组挂钩，提供低级和高速协议交互。为了提供最快的网络故障检测，Keepalived实现了BFD协议。 VRRP状态转换可以考虑BFD提示来驱动快速状态转换。 </li>
+<li>Keepalived框架可以单独使用，也可以一起使用，以提供灵活的基础架构。</li>
+</ol>
+<p>有一些关键词需要了解：</p>
+<ol>
+<li>LVS: <a href="http://www.linuxvirtualserver.org/" target="_blank" rel="noopener">http://www.linuxvirtualserver.org/</a></li>
+<li>VRRP: <a href="https://tools.ietf.org/html/rfc5798" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc5798</a></li>
+<li>BFD: <a href="https://tools.ietf.org/html/rfc5881" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc5881</a>, <a href="http://www.h3c.com/cn/d_200804/603261_30003_0.htm" target="_blank" rel="noopener">http://www.h3c.com/cn/d_200804/603261_30003_0.htm</a></li>
+</ol>
+<h1 id="场景分析"><a href="#场景分析" class="headerlink" title="场景分析"></a>场景分析</h1><ol>
+<li>keepalived+nginx： nginx做负载均衡，keepalived做高可用</li>
+<li>keepalived+redis： 配置redis的主从备份</li>
+<li>keepalived+mysql： 配置数据库的主从备份</li>
+</ol>
+<h1 id="关键问题"><a href="#关键问题" class="headerlink" title="关键问题"></a>关键问题</h1><p>很常见的应用就是主从备份，那关键就是主从何时切换？</p>
+<ol>
+<li>主keepalived挂了，肯定需要切换</li>
+<li>主keepalived监控的应用挂了， 需要切换</li>
+</ol>
+<p>第一种好说，第二种需要注意： 看下面的配置：</p>
+<p>MASTER：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">vrrp_script chk_app &#123;</span><br><span class="line">    script "/etc/keepalived/scripts/monitor_app.sh"</span><br><span class="line">    interval 2</span><br><span class="line">    weight   -20</span><br><span class="line">    fall   3</span><br><span class="line">    rise   1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_instance VI_112 &#123;</span><br><span class="line">    interface ens4f0</span><br><span class="line">    lvs_sync_daemon ens4f0</span><br><span class="line">    state MASTER </span><br><span class="line">    virtual_router_id 177 </span><br><span class="line"></span><br><span class="line">    priority 100</span><br><span class="line">    advert_int 1</span><br><span class="line">    garp_master_delay 1</span><br><span class="line"></span><br><span class="line">    track_interface &#123;</span><br><span class="line">       ens4f0 </span><br><span class="line">    &#125;</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        192.168.17.176/32 dev ens4f0 </span><br><span class="line">    &#125;</span><br><span class="line">    track_script &#123;</span><br><span class="line">       chk_nginx</span><br><span class="line">       chk_app</span><br><span class="line">    &#125;</span><br><span class="line">    authentication &#123;</span><br><span class="line">        auth_type PASS</span><br><span class="line">        auth_pass secret</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>BACKUP：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">vrrp_script chk_app &#123;</span><br><span class="line">    script "/etc/keepalived/scripts/monitor_app.sh"</span><br><span class="line">    interval 2</span><br><span class="line">    weight   -20</span><br><span class="line">    fall   3</span><br><span class="line">    rise   1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_instance VI_112 &#123;</span><br><span class="line">    interface ens4f0</span><br><span class="line">    lvs_sync_daemon ens4f0</span><br><span class="line">    state BACKUP </span><br><span class="line">    virtual_router_id 177 </span><br><span class="line"></span><br><span class="line">    priority 90</span><br><span class="line">    advert_int 1</span><br><span class="line">    garp_master_delay 1</span><br><span class="line"></span><br><span class="line">    track_interface &#123;</span><br><span class="line">       ens4f0 </span><br><span class="line">    &#125;</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        192.168.17.176/32 dev ens4f0 </span><br><span class="line">    &#125;</span><br><span class="line">    track_script &#123;</span><br><span class="line">       chk_nginx</span><br><span class="line">       chk_app</span><br><span class="line">    &#125;</span><br><span class="line">    authentication &#123;</span><br><span class="line">        auth_type PASS</span><br><span class="line">        auth_pass secret</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>vrrp_script里的weight很关键，master检测到应用挂了，权重会减少20，这样master的权重就比backup的低了，这样就会切换到backup。</p>
+<p>如果把weight设为5，这样永远都切不过去，所以是没用的。</p>
+<h2 id="keepalived-LVS"><a href="#keepalived-LVS" class="headerlink" title="keepalived-LVS"></a>keepalived-LVS</h2><p><a href="http://www.keepalived.org/LVS-NAT-Keepalived-HOWTO.html" target="_blank" rel="noopener">http://www.keepalived.org/LVS-NAT-Keepalived-HOWTO.html</a></p>
+<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="https://www.cnblogs.com/pangguoping/p/5721517.html" target="_blank" rel="noopener">keepalived vip漂移基本原理及选举算法</a></p>
+<p><a href="http://blog.51cto.com/xiexiaojun/1718990" target="_blank" rel="noopener">vrrp协议与keepalived详解</a></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文记录了使用keepalived的常用场景和踩坑经历。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/15/linux/019-keepalived-learn/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/15/linux/019-keepalived-learn/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/15/linux/019-keepalived-learn/" data-id="ck0kbsw8k00j9axchx016qbgb" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/keepalived/">keepalived</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-scala/004-scala-style" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/scala/004-scala-style/" class="article-date">
+  <time datetime="2019-02-04T00:53:27.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/scala/004-scala-style/">scala编码规范风格</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文翻译自: <a href="https://docs.scala-lang.org/style/" target="_blank" rel="noopener">https://docs.scala-lang.org/style/</a></p>
+<h1 id="1-缩进"><a href="#1-缩进" class="headerlink" title="1.缩进"></a>1.缩进</h1><p>采用2个空格，而不是tab</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// wrong!</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fourspaces</span> </span>= &#123;</span><br><span class="line">        <span class="keyword">val</span> x = <span class="number">4</span></span><br><span class="line">        ..</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// right!</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">twospaces</span> </span>= &#123;</span><br><span class="line">    <span class="keyword">val</span> x = <span class="number">2</span></span><br><span class="line">    ..</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="换行"><a href="#换行" class="headerlink" title="换行"></a>换行</h2><p>换行一般是80个字符。</p>
+<p>每个连续的行应该从第一行缩进两个空格。 还要记住，Scala要求每个“换行”要么具有未闭合的括号，要么以中缀方法结束，其中没有给出正确的参数：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = <span class="number">1</span> + <span class="number">2</span> + <span class="number">3</span> + <span class="number">4</span> + <span class="number">5</span> + <span class="number">6</span> +</span><br><span class="line">  <span class="number">7</span> + <span class="number">8</span> + <span class="number">9</span> + <span class="number">10</span> + <span class="number">11</span> + <span class="number">12</span> + <span class="number">13</span> + <span class="number">14</span> +</span><br><span class="line">  <span class="number">15</span> + <span class="number">16</span> + <span class="number">17</span> + <span class="number">18</span> + <span class="number">19</span> + <span class="number">20</span></span><br></pre></td></tr></table></figure></p>
+<p>如果没有这种尾随方式，Scala会在一行的末尾推断出一个分号，它有时会包装，有时甚至不会发出警告而抛弃编译。</p>
+<h2 id="有许多参数的方法"><a href="#有许多参数的方法" class="headerlink" title="有许多参数的方法"></a>有许多参数的方法</h2><p>当调用一个有大量参数（5个或更多）的方法时，通常需要将方法调用包装到多行上。 在这种情况下，将每个参数单独放在一行上，从当前缩进级别缩进两个空格：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">foo(</span><br><span class="line">  someVeryLongFieldName,</span><br><span class="line">  andAnotherVeryLongFieldName,</span><br><span class="line">  <span class="string">"this is a string"</span>,</span><br><span class="line">  <span class="number">3.1415</span>)</span><br></pre></td></tr></table></figure></p>
+<p>当太长时，将方法名也换到下一行：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// right!</span></span><br><span class="line"><span class="keyword">val</span> myLongFieldNameWithNoRealPoint =</span><br><span class="line">  foo(</span><br><span class="line">    someVeryLongFieldName,</span><br><span class="line">    andAnotherVeryLongFieldName,</span><br><span class="line">    <span class="string">"this is a string"</span>,</span><br><span class="line">    <span class="number">3.1415</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// wrong!</span></span><br><span class="line"><span class="keyword">val</span> myLongFieldNameWithNoRealPoint = foo(someVeryLongFieldName,</span><br><span class="line">                                         andAnotherVeryLongFieldName,</span><br><span class="line">                                         <span class="string">"this is a string"</span>,</span><br><span class="line">                                         <span class="number">3.1415</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="命名约定"><a href="#命名约定" class="headerlink" title="命名约定"></a>命名约定</h1><p>一般来说，Scala使用驼峰命名法。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">UpperCamelCase</span></span><br><span class="line">lowerCamelCase</span><br></pre></td></tr></table></figure></p>
+<p>首字母缩略词应视为普通词：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">使用：</span><br><span class="line"><span class="type">Xhtml</span></span><br><span class="line">maxId</span><br><span class="line"></span><br><span class="line">而不是：</span><br><span class="line"><span class="type">XHTML</span></span><br><span class="line">maxID</span><br></pre></td></tr></table></figure></p>
+<p>编译器实际上不禁止名称（_）中的下划线，但强烈建议不要这样，因为它们在Scala语法中具有特殊含义。</p>
+<h2 id="Classes-Traits"><a href="#Classes-Traits" class="headerlink" title="Classes/Traits"></a>Classes/Traits</h2><p>使用驼峰：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyFairLady</span></span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Objects"><a href="#Objects" class="headerlink" title="Objects"></a>Objects</h2><p>对象名称类似于类名（上层驼峰案例）。</p>
+<p>模仿包或函数时例外。 这并不常见。 例：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">ast</span> </span>&#123;</span><br><span class="line">  <span class="keyword">sealed</span> <span class="class"><span class="keyword">trait</span> <span class="title">Expr</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">case</span> <span class="title">class</span> <span class="title">Plus</span>(<span class="params">e1: <span class="type">Expr</span>, e2: <span class="type">Expr</span></span>) <span class="keyword">extends</span> <span class="title">Expr</span></span></span><br><span class="line"><span class="class">  ...</span></span><br><span class="line"><span class="class">&#125;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">object</span> <span class="title">inc</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(x: <span class="type">Int</span>): <span class="type">Int</span> = x + <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Package"><a href="#Package" class="headerlink" title="Package"></a>Package</h2><p>Scala包应遵循Java包命名约定：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// wrong!</span></span><br><span class="line"><span class="keyword">package</span> coolness</span><br><span class="line"></span><br><span class="line"><span class="comment">// right! puts only coolness._ in scope</span></span><br><span class="line"><span class="keyword">package</span> com.novell.coolness</span><br><span class="line"></span><br><span class="line"><span class="comment">// right! puts both novell._ and coolness._ in scope</span></span><br><span class="line"><span class="keyword">package</span> com.novell</span><br><span class="line"><span class="keyword">package</span> coolness</span><br><span class="line"></span><br><span class="line"><span class="comment">// right, for package object com.novell.coolness</span></span><br><span class="line"><span class="keyword">package</span> com.novell</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Provides classes related to coolness</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">package</span> <span class="class"><span class="keyword">object</span> <span class="title">coolness</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>root</p>
+<p>有时需要使用<em>root</em>完全限定导入。例如，如果另一个<code>net</code>包在范围内，那么要访问<code>net.liftweb</code>我们必须这样写：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _root_.net.liftweb._</span><br></pre></td></tr></table></figure></p>
+<p>不要过度使用<em>root</em>。通常，嵌套包解析是一件好事，对减少导入混乱很有帮助。使用<em>root</em>不仅会否定它们的好处，而且还会引入额外的混乱。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>方法的名称应该使用小写开头的驼峰：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">myFairMethod</span> </span>= ...</span><br></pre></td></tr></table></figure></p>
+<h3 id="get-set方法"><a href="#get-set方法" class="headerlink" title="get/set方法"></a>get/set方法</h3><p>scala没有和java一样的get/set方法，但有下面的方式：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">bar</span> </span>= ...</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">bar_=</span></span>(bar: <span class="type">Bar</span>) &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">isBaz</span> </span>= ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> foo = <span class="keyword">new</span> <span class="type">Foo</span></span><br><span class="line">foo.bar             <span class="comment">// accessor</span></span><br><span class="line">foo.bar = bar2      <span class="comment">// mutator</span></span><br><span class="line">foo.isBaz           <span class="comment">// boolean property</span></span><br></pre></td></tr></table></figure></p>
+<p>私有变量：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Company</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> _name: <span class="type">String</span> = _</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">name</span> </span>= _name</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">name_=</span></span>(name: <span class="type">String</span>) &#123;</span><br><span class="line">    _name = name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="括号"><a href="#括号" class="headerlink" title="括号"></a>括号</h3><p>方法声明可以有、也可以没有括号：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo1</span></span>() = ...</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo2</span> </span>= ...</span><br></pre></td></tr></table></figure></p>
+<p>但是，建议调用时和声明时一样。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// doesn't change state, call as birthdate</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">birthdate</span> </span>= firstName</span><br><span class="line"></span><br><span class="line"><span class="comment">// updates our internal state, call as age()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">age</span></span>() = &#123;</span><br><span class="line">  _age = updateAge(birthdate)</span><br><span class="line">  _age</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="符号方法名"><a href="#符号方法名" class="headerlink" title="符号方法名"></a>符号方法名</h3><p>尽量避免，虽然可以用。例如：<code>a+b(), c::d, &gt;&gt;=</code>.</p>
+<h3 id="常量、值、变量、方法"><a href="#常量、值、变量、方法" class="headerlink" title="常量、值、变量、方法"></a>常量、值、变量、方法</h3><p>类似java的<code>static final</code>, scala里常量的声明采用大写首字母的驼峰命名：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Container</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> <span class="type">MyConstant</span> = ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而其他命名如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> myValue = ...</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">myMethod</span> </span>= ...</span><br><span class="line"><span class="keyword">var</span> myVariable</span><br></pre></td></tr></table></figure></p>
+<h2 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h2><p>不像Java的泛型用T，scala使用从A开始的字母：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">List</span>[<span class="type">A</span>] </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">B</span>](f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">List</span>[<span class="type">B</span>] = ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>或者：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Right</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Map</span>[<span class="type">Key</span>, <span class="type">Value</span>] </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get</span></span>(key: <span class="type">Key</span>): <span class="type">Value</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">put</span></span>(key: <span class="type">Key</span>, value: <span class="type">Value</span>): <span class="type">Unit</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Wrong; don't use all-caps</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Map</span>[<span class="type">KEY</span>, <span class="type">VALUE</span>] </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get</span></span>(key: <span class="type">KEY</span>): <span class="type">VALUE</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">put</span></span>(key: <span class="type">KEY</span>, value: <span class="type">VALUE</span>): <span class="type">Unit</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Map</span>[<span class="type">K</span>, <span class="type">V</span>] </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get</span></span>(key: <span class="type">K</span>): <span class="type">V</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">put</span></span>(key: <span class="type">K</span>, value: <span class="type">V</span>): <span class="type">Unit</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="高级参数类型"><a href="#高级参数类型" class="headerlink" title="高级参数类型"></a>高级参数类型</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HigherOrderMap</span>[<span class="type">Key</span>[_], <span class="title">Value</span>[_]] </span>&#123; ... &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">doSomething</span></span>[<span class="type">M</span>[_]: <span class="type">Monad</span>](m: <span class="type">M</span>[<span class="type">Int</span>]) = ...</span><br></pre></td></tr></table></figure>
+<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><p>应该是小写：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cloneable</span> <span class="keyword">extends</span> <span class="title">StaticAnnotation</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">type</span> <span class="title">id</span> </span>= javax.persistence.<span class="type">Id</span> <span class="meta">@annotation</span>.target.field</span><br><span class="line"><span class="meta">@id</span></span><br><span class="line"><span class="keyword">var</span> id: <span class="type">Int</span> = <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="简短的特殊性"><a href="#简短的特殊性" class="headerlink" title="简短的特殊性"></a>简短的特殊性</h2><p>在java里可能不是个好习惯，但scala里推荐：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>) = a + b</span><br></pre></td></tr></table></figure></p>
+<h1 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h1><h2 id="引用类型"><a href="#引用类型" class="headerlink" title="引用类型"></a>引用类型</h2><p>// TODO</p>
+<h2 id="注解-1"><a href="#注解-1" class="headerlink" title="注解"></a>注解</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value: <span class="type">Type</span></span><br></pre></td></tr></table></figure>
+<p>冒号写在value后面而不是Type前面是有原因的，如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value :::</span><br></pre></td></tr></table></figure></p>
+<p>可能会有Type是<code>::</code>的。</p>
+<h2 id="Ascription"><a href="#Ascription" class="headerlink" title="Ascription"></a>Ascription</h2><p>// TODO</p>
+<h2 id="函数类型"><a href="#函数类型" class="headerlink" title="函数类型"></a>函数类型</h2><p>函数作为参数时，能省括号就省，一元参数时不加括号：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(f: <span class="type">Int</span> =&gt; <span class="type">String</span>) = ...</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bar</span></span>(f: (<span class="type">Boolean</span>, <span class="type">Double</span>) =&gt; <span class="type">List</span>[<span class="type">String</span>]) = ...</span><br></pre></td></tr></table></figure></p>
+<p>极端例子：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// wrong!</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(f: (<span class="type">Int</span>) =&gt; (<span class="type">String</span>) =&gt; (<span class="type">Boolean</span>) =&gt; <span class="type">Double</span>) = ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// right!</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(f: <span class="type">Int</span> =&gt; <span class="type">String</span> =&gt; <span class="type">Boolean</span> =&gt; <span class="type">Double</span>) = ...</span><br></pre></td></tr></table></figure></p>
+<h2 id="结构类型"><a href="#结构类型" class="headerlink" title="结构类型"></a>结构类型</h2><p>低于50个字符就写在一行，否则分开：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// wrong!</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(a: &#123; <span class="function"><span class="keyword">def</span> <span class="title">bar</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">String</span>; <span class="keyword">val</span> baz: <span class="type">List</span>[<span class="type">String</span> =&gt; <span class="type">String</span>] &#125;) = ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// right!</span></span><br><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">type</span> <span class="title">FooParam</span> </span>= &#123;</span><br><span class="line">  <span class="keyword">val</span> baz: <span class="type">List</span>[<span class="type">String</span> =&gt; <span class="type">String</span>]</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">bar</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">String</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(a: <span class="type">FooParam</span>) = ...</span><br></pre></td></tr></table></figure></p>
+<p>内联：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(a: &#123; <span class="keyword">val</span> bar: <span class="type">String</span> &#125;) = ...</span><br></pre></td></tr></table></figure></p>
+<h1 id="块"><a href="#块" class="headerlink" title="块"></a>块</h1><h2 id="大括号"><a href="#大括号" class="headerlink" title="大括号"></a>大括号</h2><p>左大括号必须和声明的语句在同一行：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span> </span>= &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="小括号"><a href="#小括号" class="headerlink" title="小括号"></a>小括号</h2><p>很长的语句可以换行：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">this</span> + is a very ++ long *</span><br><span class="line">  expression)</span><br></pre></td></tr></table></figure></p>
+<p>条件语句：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(  someCondition</span><br><span class="line">|| someOtherCondition</span><br><span class="line">|| thirdCondition</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<h1 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h1><h2 id="class"><a href="#class" class="headerlink" title="class"></a>class</h2><p>class/object/trait的构造方法还是看情况，能一行就一行，否则分开：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Int</span></span>) </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params"></span></span></span><br><span class="line"><span class="class"><span class="params">    name: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    age: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    birthdate: <span class="type">Date</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    astrologicalSign: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    shoeSize: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    favoriteColor: java.awt.<span class="type">Color</span></span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">firstMethod</span></span>: <span class="type">Foo</span> = ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>继承也是一样：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params"></span></span></span><br><span class="line"><span class="class"><span class="params">    name: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    age: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    birthdate: <span class="type">Date</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    astrologicalSign: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    shoeSize: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    favoriteColor: java.awt.<span class="type">Color</span></span>)</span></span><br><span class="line"><span class="class">  <span class="keyword">extends</span> <span class="title">Entity</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">Logging</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">Identifiable</span></span></span><br><span class="line"><span class="class">  <span class="keyword">with</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="类元素的顺序"><a href="#类元素的顺序" class="headerlink" title="类元素的顺序"></a>类元素的顺序</h2><p>换行：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> bar = <span class="number">42</span></span><br><span class="line">  <span class="keyword">val</span> baz = <span class="string">"Daniel"</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">doSomething</span></span>(): <span class="type">Unit</span> = &#123; ... &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Int</span> = x + y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h2><p>如下声明方式：一定加上返回类型，否则私有方法或局部方法会忽略。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(bar: <span class="type">Baz</span>): <span class="type">Bin</span> = expr</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(x: <span class="type">Int</span> = <span class="number">6</span>, y: <span class="type">Int</span> = <span class="number">7</span>): <span class="type">Int</span> = x + y</span><br></pre></td></tr></table></figure></p>
+<p>如下：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// don't do this</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">printBar</span></span>(bar: <span class="type">Baz</span>) &#123;</span><br><span class="line">  println(bar)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// write this instead</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">printBar</span></span>(bar: <span class="type">Bar</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">  println(bar)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="修饰符"><a href="#修饰符" class="headerlink" title="修饰符"></a>修饰符</h2><p>声明顺序：</p>
+<ol>
+<li>注解</li>
+<li><code>Override</code></li>
+<li>访问修饰符（<code>private ,protected</code>）</li>
+<li><code>implicit</code></li>
+<li><code>final</code></li>
+<li><code>def</code></li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transaction</span></span><br><span class="line"><span class="meta">@throws</span>(classOf[<span class="type">IOException</span>])</span><br><span class="line"><span class="keyword">override</span> <span class="keyword">protected</span> <span class="keyword">final</span> <span class="function"><span class="keyword">def</span> <span class="title">foo</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="函数体"><a href="#函数体" class="headerlink" title="函数体"></a>函数体</h2><p>当函数体长度小于30个字符，写在一行：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(a: <span class="type">Int</span>, b: <span class="type">Int</span>): <span class="type">Int</span> = a + b</span><br></pre></td></tr></table></figure></p>
+<p>在30到70个字符时：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sum</span></span>(ls: <span class="type">List</span>[<span class="type">String</span>]): <span class="type">Int</span> =</span><br><span class="line">  ls.map(_.toInt).foldLeft(<span class="number">0</span>)(_ + _)</span><br></pre></td></tr></table></figure></p>
+<p>但推荐更易读的方式：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sum</span></span>(ls: <span class="type">List</span>[<span class="type">String</span>]): <span class="type">Int</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> ints = ls map (_.toInt)</span><br><span class="line">  ints.foldLeft(<span class="number">0</span>)(_ + _)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>对于match语句：<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// right!</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sum</span></span>(ls: <span class="type">List</span>[<span class="type">Int</span>]): <span class="type">Int</span> = ls <span class="keyword">match</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> hd :: tail =&gt; hd + sum(tail)</span><br><span class="line">  <span class="keyword">case</span> <span class="type">Nil</span> =&gt; <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// wrong!</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sum</span></span>(ls: <span class="type">List</span>[<span class="type">Int</span>]): <span class="type">Int</span> = &#123;</span><br><span class="line">  ls <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> hd :: tail =&gt; hd + sum(tail)</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Nil</span> =&gt; <span class="number">0</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>本文翻译自: <a href="https://docs.scala-lang.org/style/" target="_blank" rel="noopener">https://docs.scala-lang.org/style/</a></p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/04/scala/004-scala-style/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/04/scala/004-scala-style/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/04/scala/004-scala-style/" data-id="ck0kbsw9d00ltaxchpjr27x6n" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-spark/005-big-data-tutorial" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/03/spark/005-big-data-tutorial/" class="article-date">
+  <time datetime="2019-02-03T14:17:20.000Z" itemprop="datePublished">2019-02-03</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/03/spark/005-big-data-tutorial/">大数据进阶教程</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>记录大数据学习之路。</p>
+<p>宗旨：在实践中学习。</p>
+<p>拿到一个完整的项目，让项目代码变成你认为最好的样子，然后你就成为了King。</p>
+<h1 id="熟悉Scala语言"><a href="#熟悉Scala语言" class="headerlink" title="熟悉Scala语言"></a>熟悉Scala语言</h1><p><a href="https://docs.scala-lang.org/zh-cn/tour/tour-of-scala.html" target="_blank" rel="noopener">https://docs.scala-lang.org/zh-cn/tour/tour-of-scala.html</a></p>
+<ol>
+<li>语法初级了解</li>
+<li>scala编码规范：</li>
+<li>语法高级使用</li>
+</ol>
+<p>1.scala中函数和方法的区别</p>
+<p>函数是一条语句：由参数+函数体组成<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> addOne = (x: <span class="type">Int</span>) =&gt; x + <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>方法：由def定义<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Int</span> = x + y</span><br><span class="line">println(add(<span class="number">1</span>, <span class="number">2</span>)) <span class="comment">// 3</span></span><br></pre></td></tr></table></figure></p>
+<p>object: </p>
+<ol>
+<li>单例</li>
+<li>静态</li>
+</ol>
+<p>提取器对象：</p>
+<p>List.tail 方法返回的是：</p>
+<p>for循环里的yield操作是什么原理</p>
+<p>scala的协变和逆变，java不支持。</p>
+<p>类型上下界： <code>:&lt;</code>, <code>&gt;:</code>.</p>
+<p>内部类和java不一样的地方，内部类是不一样的实例。<code>OuterClass#InnerClass</code></p>
+<p>注意： 抽象类型、复合类型、自类型的定义和区别。</p>
+<p>什么叫隐式参数？</p>
+<p>隐式转换没懂： TODO</p>
+<p>注意传值参数和传名参数的不同。</p>
+<p>常用注解： <code>@deprecate, @tailrec(什么是尾递归？), @inline</code>.<br>注意： java定义的注解在java和scala中使用的差别， 关于默认值和明确表示</p>
+<p>导包： </p>
+<ol>
+<li>如何设置别名：<code>import users.{UserInfo =&gt; UI}</code></li>
+<li>scala 可以在任何地方导包</li>
+<li>从根包导入： <code>import _root_.users._</code>.</li>
+</ol>
+<h1 id="spark"><a href="#spark" class="headerlink" title="spark"></a>spark</h1><p>接着就可以开始拿spark练手了，一方面是熟悉scala语言，一方面学习spark。</p>
+<ol>
+<li><p>spark-shell使用： <a href="https://spark.apache.org/docs/latest/quick-start.html" target="_blank" rel="noopener">https://spark.apache.org/docs/latest/quick-start.html</a></p>
+</li>
+<li><p>scala版本问题导致的运行失败，需要在<code>SPARK_HOME/jars</code>下查看spark需要的scala版本，然后编译时使用相应的scala版本：<a href="https://blog.csdn.net/u013054888/article/details/54600229" target="_blank" rel="noopener">blog</a></p>
+</li>
+</ol>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>记录大数据学习之路。</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/02/03/spark/005-big-data-tutorial/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/02/03/spark/005-big-data-tutorial/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/02/03/spark/005-big-data-tutorial/" data-id="ck0kbsw9t00n6axchijt38n4e" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/big-data/">big data</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/scala/">scala</a><span class="article-tag-list-count">10</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-life/004-new-year" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/29/life/004-new-year/" class="article-date">
+  <time datetime="2019-01-29T00:34:45.000Z" itemprop="datePublished">2019-01-29</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/29/life/004-new-year/">过年的人性</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>早上一个人在办公室学习，因为挺早，门外的清洁大姐相互说： 哎呀，快过年了！</p>
+<p>就是，以前过年都是穿新衣服，吃好吃的，现在就只是花钱，后辈们花钱。</p>
+<p>然后我想到：极端情况才是显示人性的时候。</p>
+<p>然后群里分享的关于林清玄的言语：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">今天比昨天慈悲，今天比昨天智慧，今天比昨天快乐。这就是成功。</span><br></pre></td></tr></table></figure></p>
+<p>我就想说：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我一定是个异常坚强的人，因为我每天都承受着失败。</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>早上一个人在办公室学习，因为挺早，门外的清洁大姐相互说： 哎呀，快过年了！</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/29/life/004-new-year/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/29/life/004-new-year/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/29/life/004-new-year/" data-id="ck0kbsw7h00fraxch31olgo23" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/life/">life</a><span class="article-tag-list-count">29</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-java/024-java-fix-problem" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/28/java/024-java-fix-problem/" class="article-date">
+  <time datetime="2019-01-28T06:13:31.000Z" itemprop="datePublished">2019-01-28</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/28/java/024-java-fix-problem/">如何解决问题</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天遇到一个简单的问题： nacos + springcloud<br>环境搭好后，spring-cloud项目启动，打了一条日志就退出了，而这条日志还是个INFO级别的，</p>
+<p>让我很是困扰， 于是思考应该怎么解决，于是采用普遍思维：debug。</p>
+<p>从那条日志的类开始打断点，经过十几个类，终于找到错误原因： 找不到一个类。</p>
+<p>再一查，发现来自guava包，然后明白是版本冲突了，nacos使用的19.0版本被spring-cloud的12.0覆盖了，于是找不到类。</p>
+<p>但编译时没报错，运行时报错了。</p>
+<p>这也算一个经验把，于是查找IDEA下maven依赖包的有用工具，<br>比如下面这个：</p>
+<p><a href="https://blog.csdn.net/sunpeng_sp/article/details/77393348" target="_blank" rel="noopener">maven helper</a></p>
+<p>虽然idea自带了查看依赖图，但真的太多包时根本看不过来。</p>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <p>今天遇到一个简单的问题： nacos + springcloud<br>环境搭好后，spring-cloud项目启动，打了一条日志就退出了，而这条日志还是个INFO级别的，</p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/28/java/024-java-fix-problem/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/28/java/024-java-fix-problem/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/28/java/024-java-fix-problem/" data-id="ck0kbsw6i00ceaxchglh5w03j" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">94</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
+    <article id="post-linux/018-ubuntu-java" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/27/linux/018-ubuntu-java/" class="article-date">
+  <time datetime="2019-01-27T01:50:17.000Z" itemprop="datePublished">2019-01-27</time>
+</a>
+      
+  </div>
+  <div class="article-inner">
+    
+      
+        <header class="article-header">
+          
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/27/linux/018-ubuntu-java/">ubuntu安装/更新Java</a>
+    </h1>
+  
+
+        </header>
+        
+          <!-- <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="ubuntu18-x"><a href="#ubuntu18-x" class="headerlink" title="ubuntu18.x"></a>ubuntu18.x</h1><p>参考<a href="https://linuxconfig.org/how-to-install-java-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">文章</a></p>
+<h2 id="安装相应版本Java"><a href="#安装相应版本Java" class="headerlink" title="安装相应版本Java"></a>安装相应版本Java</h2><p>JDK11（默认）<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install openjdk-11-jdk</span><br></pre></td></tr></table></figure></p>
+<p>JDK8<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install openjdk-8-jdk</span><br></pre></td></tr></table></figure></p>
+<h2 id="切换版本"><a href="#切换版本" class="headerlink" title="切换版本"></a>切换版本</h2><p>注意对于安装多个jdk版本时如何切换jdk版本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo update-alternatives --config java</span><br><span class="line">有 2 个候选项可用于替换 java (提供 /usr/bin/java)。</span><br><span class="line"></span><br><span class="line">  选择       路径                                          优先级  状态</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">* 0            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1101      自动模式</span><br><span class="line">  1            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1101      手动模式</span><br><span class="line">  2            /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java   1081      手动模式</span><br><span class="line"></span><br><span class="line">要维持当前值[*]请按&lt;回车键&gt;，或者键入选择的编号：2</span><br><span class="line">update-alternatives: 使用 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java 来在手动模式中提供 /usr/bin/java (java)</span><br><span class="line"></span><br><span class="line">jack@jack:~/workspace/iad-boot/nacos-server-0.8.0/nacos$ java -version</span><br><span class="line">openjdk version "1.8.0_191"</span><br><span class="line">OpenJDK Runtime Environment (build 1.8.0_191-8u191-b12-0ubuntu0.18.04.1-b12)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 25.191-b12, mixed mode)</span><br></pre></td></tr></table></figure>
+
+      
+    </div> -->
+          <div class="article-entry" itemprop="articleBody">
+            
+              
+                
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+                                    <p>
+                                      <h1 id="ubuntu18-x"><a href="#ubuntu18-x" class="headerlink" title="ubuntu18.x"></a>ubuntu18.x</h1><p>参考<a href="https://linuxconfig.org/how-to-install-java-on-ubuntu-18-04-bionic-beaver-linux" target="_blank" rel="noopener">文章</a></p>
+
+                                        <p>
+                                          
+                                            
+                                              
+                                                      
+          </div>
+    <p class="article-more-link">
+      <a href="/2019/01/27/linux/018-ubuntu-java/#more">
+        Read More
+      </a>
+    </p>
+    <!-- <div class="article-more-link">
+      <a href="/2019/01/27/linux/018-ubuntu-java/#more">
+        read more
+      </a>
+    </div> -->
+    
+
+
+      <footer class="article-footer">
+        <a data-url="http://http://jimolonely.github.io/2019/01/27/linux/018-ubuntu-java/" data-id="ck0kbsw8j00j7axche6xp79xb" class="article-share-link">
+          Share
+        </a>
+        
+            
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">94</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a><span class="article-tag-list-count">12</span></li></ul>
+
+      </footer>
+      </div>
+      
+</article>
+
+
+  
     <article id="post-java/023-springboot-logback-config" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/01/18/java/023-springboot-logback-config/" class="article-date">
@@ -151,7 +749,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/18/java/023-springboot-logback-config/" data-id="ck0ixo85j00bvmychuitdu1ym" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/18/java/023-springboot-logback-config/" data-id="ck0kbsw6j00cjaxch87bq7yw5" class="article-share-link">
           Share
         </a>
         
@@ -262,7 +860,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/16/ansible/005-ansible-demo1/" data-id="ck0ixo7yz000hmychk944ezm6" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/16/ansible/005-ansible-demo1/" data-id="ck0kbsw0z000oaxch91o6tc76" class="article-share-link">
           Share
         </a>
         
@@ -371,7 +969,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/12/ansible/004-ansible-playbook-variables/" data-id="ck0ixo7zg000vmychcg58fmdv" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/12/ansible/004-ansible-playbook-variables/" data-id="ck0kbsw0y000jaxchgx0oqr5k" class="article-share-link">
           Share
         </a>
         
@@ -522,12 +1120,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/10/ansible/003-ansible-roles/" data-id="ck0ixo7z7000omychdbmf1bpz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/10/ansible/003-ansible-roles/" data-id="ck0kbsw0w000haxchg3q69ylg" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -598,12 +1196,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" data-id="ck0ixo84l008imychunz6miga" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/09/hadoop/004-frequently-hbase-shell-cmd/" data-id="ck0kbsw3x009baxchc05593tw" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">4</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hbase/">hbase</a><span class="article-tag-list-count">4</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -713,12 +1311,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/04/ansible/002-reusable-playbook/" data-id="ck0ixo7yw000dmychk95l1a0m" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/04/ansible/002-reusable-playbook/" data-id="ck0kbsw0u000gaxch8ihtvj8p" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -827,12 +1425,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/03/ansible/001-playbook/" data-id="ck0ixo7yu000bmychpx7442dz" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/03/ansible/001-playbook/" data-id="ck0kbsw0r000daxch37yiexi5" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -939,12 +1537,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/02/ansible/000-ansible-fresh/" data-id="ck0ixo7ym0005mychmn22z685" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/02/ansible/000-ansible-fresh/" data-id="ck0kbsw0m0009axchy1uxgovg" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/">ansible</a><span class="article-tag-list-count">7</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li></ul>
 
       </footer>
       </div>
@@ -1019,12 +1617,12 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/02/tools/013-ssh/" data-id="ck0ixo89100nbmychsiie7x2k" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/02/tools/013-ssh/" data-id="ck0kbswaa00oiaxchqcfua5um" class="article-share-link">
           Share
         </a>
         
             
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">53</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a><span class="article-tag-list-count">55</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a><span class="article-tag-list-count">5</span></li></ul>
 
       </footer>
       </div>
@@ -1109,7 +1707,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2019/01/01/git/002-git-commit-wrong-person/" data-id="ck0ixo844007zmychj8q0rcfe" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2019/01/01/git/002-git-commit-wrong-person/" data-id="ck0kbsw26004haxchox1afv3f" class="article-share-link">
           Share
         </a>
         
@@ -1184,7 +1782,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/22/algorithm/001-week-algo/" data-id="ck0ixo7yl0004mychz2otggrb" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/22/algorithm/001-week-algo/" data-id="ck0kbsw0a0001axchwedbzn2f" class="article-share-link">
           Share
         </a>
         
@@ -1280,7 +1878,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/19/basic/013-consumer-driven-contracts/" data-id="ck0ixo80e001jmych59zvnvyp" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/19/basic/013-consumer-driven-contracts/" data-id="ck0kbsw1a001oaxch4w5y2664" class="article-share-link">
           Share
         </a>
         
@@ -1377,7 +1975,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/17/basic/012-circuit-breaker/" data-id="ck0ixo80b001gmychiqro56op" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/17/basic/012-circuit-breaker/" data-id="ck0kbsw15001aaxchm8uuszri" class="article-share-link">
           Share
         </a>
         
@@ -1500,7 +2098,7 @@ ga('send', 'pageview');
 
 
       <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/14/tools/012-idea-question/" data-id="ck0ixo89000n8mychgaczgxup" class="article-share-link">
+        <a data-url="http://http://jimolonely.github.io/2018/12/14/tools/012-idea-question/" data-id="ck0kbswa800odaxch7zbkq5rf" class="article-share-link">
           Share
         </a>
         
@@ -1514,625 +2112,11 @@ ga('send', 'pageview');
 
 
   
-    <article id="post-algorithm/000-week-algo" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/14/algorithm/000-week-algo/" class="article-date">
-  <time datetime="2018-12-14T00:24:37.000Z" itemprop="datePublished">2018-12-14</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/14/algorithm/000-week-algo/">week algorithm</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-超哥的大眼球（2018-12-13～2018-12-20）"><a href="#1-超哥的大眼球（2018-12-13～2018-12-20）" class="headerlink" title="1.超哥的大眼球（2018-12-13～2018-12-20）"></a>1.超哥的大眼球（2018-12-13～2018-12-20）</h1><p>超哥开了一个造仿真机器人的公司，最近新出了一个造机器人眼球的测试机，但是造出来的眼球大小不一，你知道造眼球的原料很贵的，为了不浪费，他想将这些眼球合并成2个最大的眼球，当然不是为了摸的，是用来做广告宣传。<br>问题来了，2个眼球必须一样大，且原来的单个小眼球不可分割，如果能够造成功，返回最大眼球的size，否则返回0。<br>例如：<br>输入小眼球数组(eyeball[n])：[1,1,2,3,6]，输出6（1，2，3合并为6,余下1）；<br>输入：[1,2]，返回0，不可造。</p>
-<p>请大家帮助超哥吧^_^。</p>
-<p>数据限制：</p>
-<ol>
-<li>1&lt;= n &lt;=20</li>
-<li>1&lt;= eyeball[i] &lt;=1000 (0&lt;=i&lt;n)</li>
-<li>size&lt;=5000(即眼球最大为5000)</li>
-</ol>
-<h1 id="答案"><a href="#答案" class="headerlink" title="答案"></a>答案</h1><p>大脑就像肌肉，也是需要锻炼的，否则会卡在一个舒适区很难走出来，就像看抖音的人和想方设法制作抖音视频的人。<br>我们人类善于从已有知识中总结经验，这是目前和计算机的最大差别，但是人类的这个进化过程异常缓慢，几千年来<br>智力都还差不多，可能我是个进化的失败品把。</p>
-<h2 id="1"><a href="#1" class="headerlink" title="1."></a>1.</h2><p>复杂的东西可能很容易，简单的东西也可能很难理解。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bigEyeball</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> maxSize = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// TODO</span></span><br><span class="line">		<span class="keyword">return</span> maxSize;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="让我们热身吧"><a href="#让我们热身吧" class="headerlink" title="让我们热身吧"></a>让我们热身吧</h3><p>你能想到的最直接的算法，实现它。</p>
-<p>思考最大size的构成：</p>
-<ol>
-<li>可能就是其中一个小球的size： eye[i]</li>
-<li>可能是其中2个小球+起来的size： eye[i1] + eye[i2]</li>
-<li>可能是其中3个小球+起来的size： eye[i1] + eye[i2] + eye[i3]</li>
-<li>可能是其中<strong>n-1(当然不可能是n个)</strong>个小球+起来的size： eye[i] +…+ eye[n-1]</li>
-</ol>
-<p>于是进一步思考：n-1不就等价于1个吗？ 于是猜测，只需要考虑一半的情况？（有待证明）这可是一个大的飞跃，直接奠定了计算机的基础！</p>
-<p>然后我们可以求出以上每种情况的解，取最大即可。</p>
-<p>于是：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bigEyeball</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> maxSize = <span class="number">0</span>;</span><br><span class="line">	<span class="comment">// 1</span></span><br><span class="line">	maxSize = Math.max(maxSize, getMax1(eyes));</span><br><span class="line">	<span class="comment">// 2</span></span><br><span class="line">	maxSize = Math.max(maxSize, getMax2(eyes));</span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">	<span class="comment">// 19</span></span><br><span class="line">	maxSize = Math.max(maxSize, getMax19(eyes));</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> maxSize;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>没错，因为<code>n&lt;=20</code>,所以我们只需要写19个方法。。。</p>
-<h4 id="如何实现getMax1"><a href="#如何实现getMax1" class="headerlink" title="如何实现getMax1()"></a>如何实现getMax1()</h4><p>一个小球，这个问题不就变成了给定一个数组，判断其中一个数字能否由其他数字相加得到？<br>对把，那就简单了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">getMax1</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> max = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; eyes.length; j++) &#123;</span><br><span class="line">		<span class="keyword">if</span> (foundEqual(eyes[j], removeIndex(eyes, j))) &#123;</span><br><span class="line">			max = Math.max(max, eyes[j]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> max;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 移除arr中下标i对应的元素，返回一个新的数组</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span>[] removeIndex(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> i) &#123;</span><br><span class="line">	<span class="keyword">int</span>[] sub = <span class="keyword">new</span> <span class="keyword">int</span>[arr.length - <span class="number">1</span>];</span><br><span class="line">	<span class="keyword">int</span> k = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; arr.length; j++) &#123;</span><br><span class="line">		<span class="keyword">if</span> (i != j) &#123;</span><br><span class="line">			sub[k++] = arr[j];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> sub;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>boolean foundEqual(int x, int[] arr)</code>干什么： 判断x是否能由arr中的元素相加得到，是返回true.</p>
-<p>现在，这个问题怎么办？ 依然采用复杂的思考方式，如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">* x = <span class="number">0</span> + arr(n)</span><br><span class="line">*          |</span><br><span class="line">*          a1 + arr(n-<span class="number">1</span>)</span><br><span class="line">*                  |</span><br><span class="line">*                  a2 + arr(n-<span class="number">2</span>)</span><br><span class="line">*                          ...</span><br><span class="line">*                          an-<span class="number">1</span> + arr1</span><br></pre></td></tr></table></figure></p>
-<p>既然这样，一个递归完全能搞定了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">foundEqual</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span>[] arr)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (x == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (x &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (arr.length == <span class="number">1</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> x == arr[<span class="number">0</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr.length; i++) &#123;</span><br><span class="line">		<span class="keyword">int</span>[] sub = removeIndex(arr, i);</span><br><span class="line">		<span class="keyword">boolean</span> ok = foundEqual(x - arr[i], sub);</span><br><span class="line">		<span class="keyword">if</span> (ok) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>那么这个问题就算完成了，谁都可以写出来，那它的时间复杂度是多少呢？ </p>
-<p><code>f(n) = n*f(n-1) = n*(n-1)*f(n-2) = ... = n!</code>, 所以最坏是<code>O(n!)</code></p>
-<p>19!=1.22e+17, 如果每秒进行一亿次运算，大概要3.17年，还不算太长，谷歌还花了2年研究如何破解SHA-1呢。</p>
-<h4 id="如何实现getMaxn"><a href="#如何实现getMaxn" class="headerlink" title="如何实现getMaxn()"></a>如何实现getMaxn()</h4><p>现在，我们实现了<code>getMax1()</code>，那么<code>getMaxn()</code>怎么实现？</p>
-<p>同样的思路，选择2个小球：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">getMax2</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> max = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; eyes.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; eyes.length; j++) &#123;</span><br><span class="line">			<span class="keyword">int</span>[] sub = removeIndex(removeIndex(eyes, j), i);</span><br><span class="line">			<span class="keyword">int</span> x = eyes[i] + eyes[j];</span><br><span class="line">			<span class="keyword">if</span> (foundEqual(x, sub)) &#123;</span><br><span class="line">				max = Math.max(max, x);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> max;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>思考： 如果由2个小球构成，是否可等价于已经确定一个小球，剩下的变为一个小球问题？ 如果可以，那么就简单了：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; eyes.length; j++) &#123;</span><br><span class="line">	<span class="keyword">int</span>[] sub = removeIndex(eyes, j);</span><br><span class="line">	<span class="comment">//1</span></span><br><span class="line">	max = Math.max(max, eyes[j] + getMax1(sub));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可惜答案是no，比如[5,4,3,2,1]。</p>
-<p>2个选择2个循环，3个也就需要3个，19个循环你写过吗？ 仔细一看，这也就是个组合问题，所以可以改成通用形式：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Comb</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> sum;</span><br><span class="line">	<span class="keyword">int</span>[] sub;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bigEyeball</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> maxSize = <span class="number">0</span>;</span><br><span class="line">	<span class="comment">// 每一种情况：从1到n-1</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; eyes.length; i++) &#123;</span><br><span class="line">		<span class="comment">// 求得这种情况下所有组合和子数组</span></span><br><span class="line">		Comb[] c = getCombination(eyes, i);</span><br><span class="line">		<span class="keyword">for</span> (Comb comb : c) &#123;</span><br><span class="line">			<span class="keyword">if</span> (foundEqual(comb.sum, comb.sub)) &#123;</span><br><span class="line">				maxSize = Math.max(maxSize, comb.sum);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> maxSize;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>关于<code>getCombination()</code>方法是可以实现的，也就是<a href="https://cgs1999.iteye.com/blog/2327664" target="_blank" rel="noopener">m选n的组合问题</a>，或参考<a href="https://stackoverflow.com/questions/29910312/algorithm-to-get-all-the-combinations-of-size-n-from-an-array-java" target="_blank" rel="noopener">stackoverflow</a>。</p>
-<p>到此为止，热身运动做完了，可以开始正式活动了。</p>
-<p>人天生具有很好的递归思维。</p>
-<h3 id="来段长跑吧"><a href="#来段长跑吧" class="headerlink" title="来段长跑吧"></a>来段长跑吧</h3><p>你觉得<code>n!</code>就很厉害了吗？ nonono， 再想想，一定可以想出更低复杂度的。</p>
-<p>我们想得到2个球对把，不重复的选择，那么一个球的可能情况不就刚好3种情况：</p>
-<ol>
-<li>做成球1</li>
-<li>做成球2</li>
-<li>被抛弃</li>
-</ol>
-<p>如果遍历出每个球的所有情况，也才 <code>3^20=3486784401</code>, 远低于<code>19!</code>。所以，这个简单：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bigEyeball</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> maxSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; Math.pow(<span class="number">3</span>, eyes.length); i++) &#123;</span><br><span class="line">		<span class="keyword">int</span> k = i;</span><br><span class="line">		<span class="keyword">int</span> s1 = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">int</span> s2 = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> s : eyes) &#123;</span><br><span class="line">			<span class="keyword">if</span> (k % <span class="number">3</span> == <span class="number">0</span>) &#123;</span><br><span class="line">				<span class="comment">// 加入球1</span></span><br><span class="line">				s1 += s;</span><br><span class="line">			&#125; <span class="keyword">else</span> <span class="keyword">if</span> (k % <span class="number">3</span> == <span class="number">1</span>) &#123;</span><br><span class="line">				<span class="comment">// 加入球2</span></span><br><span class="line">				s2 += s;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="comment">// 都不加入</span></span><br><span class="line">			&#125;</span><br><span class="line">			k /= <span class="number">3</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (s1 == s2) &#123;</span><br><span class="line">			maxSize = Math.max(maxSize, s1);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> maxSize;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>当然，这并不是唯一的一种暴力求解方法，还可以利用数组: 这个思想的解释见下面一节。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Ball[] state = <span class="keyword">new</span> Ball[(<span class="keyword">int</span>) Math.pow(<span class="number">3</span>, eyes.length)];</span><br><span class="line"><span class="keyword">int</span> t = <span class="number">0</span>;</span><br><span class="line">state[t++] = <span class="keyword">new</span> Ball(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> size : eyes) &#123;</span><br><span class="line">	<span class="keyword">int</span> end = t;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; end; i++) &#123;</span><br><span class="line">		Ball b = state[i];</span><br><span class="line">		<span class="comment">// 放入s1</span></span><br><span class="line">		state[t++] = <span class="keyword">new</span> Ball(b.s1 + size, b.s2);</span><br><span class="line">		<span class="comment">// 放入s2</span></span><br><span class="line">		state[t++] = <span class="keyword">new</span> Ball(b.s1, b.s2 + size);</span><br><span class="line">		<span class="comment">// 不放，舍去</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (Ball b : state) &#123;</span><br><span class="line">	<span class="keyword">if</span> (b.s1 == b.s2) &#123;</span><br><span class="line">		maxSize = Math.max(maxSize, b.s1);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="找个捷径穿过去"><a href="#找个捷径穿过去" class="headerlink" title="找个捷径穿过去"></a>找个捷径穿过去</h3><p>我们有<code>3^N</code>种可能的状态，每个小球x要么放入s1，要么放入s2，要么不放，为了方便计算，我们用数字表示，分别对应：+x，-x 或 0。</p>
-<p>为了加快速度，我们先单独求解每一半，然后将它们结合起来。例如，如果我们有球[1,2,3,6]，那么前两个球最多可以创建九种状态：<br><code>[0 + 0,1 + 0,0 - 1,2 + 0,0 - 2，3 + 0，1 - 2,2 - 1,0 - 3]</code>，后两个球也可以创造9个状态。<br>我们将每个状态存储为正项的总和，以及负项的绝对值之和。例如，<code>+ 1 + 2 -3 -4</code>变为（3,7）。<br>我们也将差值<code>3  -  7</code>称为该状态的增量，因此该状态的增量为-4。</p>
-<p>我们的下一个目标是将总和为0的增量的状态 结合起来。状态的大小将是正项的总和， 我们希望获得最大大小。请注意，对于每个增量，我们只关心大小最大的状态。</p>
-<p>算法</p>
-<ol>
-<li>将球分成两半：左右两侧。</li>
-<li>对于每一半，使用暴力计算上面定义的可达状态。然后，对于每个状态，记录增量和最大分数。</li>
-<li>现在，我们有一个左右两半的[（增量，分数）]信息。我们将找到总增量为0的最大总分。</li>
-</ol>
-<p>如何计算每一半的状态：就是上一节的第二种暴力方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Map&lt;Integer, Integer&gt; <span class="title">cal</span><span class="params">(<span class="keyword">int</span>[] sizes)</span> </span>&#123;</span><br><span class="line">	Ball[] state = <span class="keyword">new</span> Ball[(<span class="keyword">int</span>) Math.pow(<span class="number">3</span>, sizes.length)];</span><br><span class="line">	<span class="keyword">int</span> t = <span class="number">0</span>;</span><br><span class="line">	state[t++] = <span class="keyword">new</span> Ball(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> size : sizes) &#123;</span><br><span class="line">		<span class="keyword">int</span> end = t;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; end; i++) &#123;</span><br><span class="line">			Ball b = state[i];</span><br><span class="line">			<span class="comment">// 放入s1</span></span><br><span class="line">			state[t++] = <span class="keyword">new</span> Ball(b.s1 + size, b.s2);</span><br><span class="line">			<span class="comment">// 放入s2</span></span><br><span class="line">			state[t++] = <span class="keyword">new</span> Ball(b.s1, b.s2 + size);</span><br><span class="line">			<span class="comment">// 不放，舍去</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这个求解的结果如下：以[1,2,3,6]为例，下面是前半段[1,2]的状态集：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Ball&#123;s1=<span class="number">0</span>, s2=<span class="number">0</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">1</span>, s2=<span class="number">0</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">0</span>, s2=<span class="number">1</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">2</span>, s2=<span class="number">0</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">0</span>, s2=<span class="number">2</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">3</span>, s2=<span class="number">0</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">1</span>, s2=<span class="number">2</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">2</span>, s2=<span class="number">1</span>&#125;</span><br><span class="line">Ball&#123;s1=<span class="number">0</span>, s2=<span class="number">3</span>&#125;</span><br></pre></td></tr></table></figure></p>
-<p>接着求解增量状态：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;(t);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; t; i++) &#123;</span><br><span class="line">	<span class="keyword">int</span> s1 = state[i].s1;</span><br><span class="line">	<span class="keyword">int</span> s2 = state[i].s2;</span><br><span class="line">	map.put(s1 - s2, Math.max(map.getOrDefault(s1 - s2, <span class="number">0</span>), s1));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>最后是合并，完整代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bigEyeBallHalf</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> maxSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> n = eyes.length;</span><br><span class="line">	Map&lt;Integer, Integer&gt; delta1 = cal(Arrays.copyOfRange(eyes, <span class="number">0</span>, n / <span class="number">2</span>));</span><br><span class="line">	Map&lt;Integer, Integer&gt; delta2 = cal(Arrays.copyOfRange(eyes, n / <span class="number">2</span>, n));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 合并，差值为0的最大情况</span></span><br><span class="line">	<span class="keyword">for</span> (Integer d : delta1.keySet()) &#123;</span><br><span class="line">		<span class="keyword">if</span> (delta2.containsKey(-d)) &#123;</span><br><span class="line">			maxSize = Math.max(maxSize, delta1.get(d) + delta2.get(-d));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> maxSize;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Map&lt;Integer, Integer&gt; <span class="title">cal</span><span class="params">(<span class="keyword">int</span>[] sizes)</span> </span>&#123;</span><br><span class="line">	Ball[] state = <span class="keyword">new</span> Ball[(<span class="keyword">int</span>) Math.pow(<span class="number">3</span>, sizes.length)];</span><br><span class="line">	<span class="keyword">int</span> t = <span class="number">0</span>;</span><br><span class="line">	state[t++] = <span class="keyword">new</span> Ball(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> size : sizes) &#123;</span><br><span class="line">		<span class="keyword">int</span> end = t;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; end; i++) &#123;</span><br><span class="line">			Ball b = state[i];</span><br><span class="line">			<span class="comment">// 放入s1</span></span><br><span class="line">			state[t++] = <span class="keyword">new</span> Ball(b.s1 + size, b.s2);</span><br><span class="line">			<span class="comment">// 放入s2</span></span><br><span class="line">			state[t++] = <span class="keyword">new</span> Ball(b.s1, b.s2 + size);</span><br><span class="line">			<span class="comment">// 不放，舍去</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	Map&lt;Integer, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;(t);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; t; i++) &#123;</span><br><span class="line">		<span class="keyword">int</span> s1 = state[i].s1;</span><br><span class="line">		<span class="keyword">int</span> s2 = state[i].s2;</span><br><span class="line">		map.put(s1 - s2, Math.max(map.getOrDefault(s1 - s2, <span class="number">0</span>), s1));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> map;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Ball</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> s1;</span><br><span class="line">	<span class="keyword">int</span> s2;</span><br><span class="line"></span><br><span class="line">	Ball(<span class="keyword">int</span> s1, <span class="keyword">int</span> s2) &#123;</span><br><span class="line">		<span class="keyword">this</span>.s1 = s1;</span><br><span class="line">		<span class="keyword">this</span>.s2 = s2;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">"Ball&#123;"</span> +</span><br><span class="line">				<span class="string">"s1="</span> + s1 +</span><br><span class="line">				<span class="string">", s2="</span> + s2 +</span><br><span class="line">				<span class="string">'&#125;'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>为什么可以拆分又合并？<br>为什么可以不需要考虑数组元素的顺序？</p>
-<h3 id="穿越虫洞"><a href="#穿越虫洞" class="headerlink" title="穿越虫洞"></a>穿越虫洞</h3><p>总会有更好、更快的方法。 应该一开始就看出来这道题满足动态规划的条件。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">bigEyeball</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> n = eyes.length;</span><br><span class="line">		<span class="keyword">int</span>[][] dp = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>][];</span><br><span class="line"></span><br><span class="line">		<span class="keyword">int</span> sum = sum(eyes);</span><br><span class="line"></span><br><span class="line">		initArray(dp, sum);</span><br><span class="line"></span><br><span class="line">		dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= eyes.length; i++) &#123;</span><br><span class="line">			<span class="keyword">int</span> s = eyes[i - <span class="number">1</span>];</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= sum - s; j++) &#123;</span><br><span class="line">				<span class="keyword">if</span> (dp[i - <span class="number">1</span>][j] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">					<span class="keyword">continue</span>;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="comment">// not choose</span></span><br><span class="line">				dp[i][j] = max(dp[i][j], dp[i - <span class="number">1</span>][j]);</span><br><span class="line">				<span class="comment">// put in bigger</span></span><br><span class="line">				dp[i][j + s] = max(dp[i][j + s], dp[i - <span class="number">1</span>][j]);</span><br><span class="line">				<span class="comment">// put in smaller, 2 situation</span></span><br><span class="line">				dp[i][abs(j - s)] = max(dp[i][abs(j - s)], dp[i - <span class="number">1</span>][j] + min(j, s));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"><span class="comment">//		printArray(dp);</span></span><br><span class="line">		<span class="keyword">return</span> dp[n][<span class="number">0</span>];</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initArray</span><span class="params">(<span class="keyword">int</span>[][] dp, <span class="keyword">int</span> sum)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; dp.length; i++) &#123;</span><br><span class="line">			dp[i] = <span class="keyword">new</span> <span class="keyword">int</span>[sum + <span class="number">1</span>];</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; dp[i].length; j++) &#123;</span><br><span class="line">				dp[i][j] = -<span class="number">1</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> s : eyes) &#123;</span><br><span class="line">			sum += s;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> sum;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-<p>其中的状态dp[i][j]代表： 已选择i个小球且增量（已经组成的2个球的大小差）为j时的最大大球size。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// not choose</span></span><br><span class="line">dp[i][j] = max(dp[i][j], dp[i - <span class="number">1</span>][j]);</span><br><span class="line"><span class="comment">// put in bigger</span></span><br><span class="line">dp[i][j + s] = max(dp[i][j + s], dp[i - <span class="number">1</span>][j]);</span><br><span class="line"><span class="comment">// put in smaller, 2 situation</span></span><br><span class="line">dp[i][abs(j - s)] = max(dp[i][abs(j - s)], dp[i - <span class="number">1</span>][j] + min(j, s));</span><br></pre></td></tr></table></figure></p>
-<p>这3个状态转移方程对应3种情况，需要说明的就是第3种情况，画个图解释把。</p>
-<p>// todo</p>
-<p>如果你觉得这就完了，那你就太天真了，其实这里的二维数组完全可以变为一维数组：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bigEyeballDim1</span><span class="params">(<span class="keyword">int</span>[] eyes)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> n = eyes.length;</span><br><span class="line">	<span class="keyword">int</span> sum = sum(eyes);</span><br><span class="line">	<span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[sum + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">	Arrays.fill(dp, -<span class="number">1</span>);</span><br><span class="line">	dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> s : eyes) &#123;</span><br><span class="line">		<span class="keyword">int</span>[] old = Arrays.copyOf(dp, dp.length);</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= sum - s; i++) &#123;</span><br><span class="line">			<span class="keyword">if</span> (old[i] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			dp[i + s] = max(dp[i + s], old[i]);</span><br><span class="line">			dp[abs(i - s)] = max(dp[abs(i - s)], old[i] + min(s, i));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> dp[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://dzone.com/articles/java-8-master-permutations" target="_blank" rel="noopener">java8实现排列算法</a></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <h1 id="1-超哥的大眼球（2018-12-13～2018-12-20）"><a href="#1-超哥的大眼球（2018-12-13～2018-12-20）" class="headerlink" title="1.超哥的大眼球（2018-12-13～2018-12-20）"></a>1.超哥的大眼球（2018-12-13～2018-12-20）</h1><p>超哥开了一个造仿真机器人的公司，最近新出了一个造机器人眼球的测试机，但是造出来的眼球大小不一，你知道造眼球的原料很贵的，为了不浪费，他想将这些眼球合并成2个最大的眼球，当然不是为了摸的，是用来做广告宣传。<br>问题来了，2个眼球必须一样大，且原来的单个小眼球不可分割，如果能够造成功，返回最大眼球的size，否则返回0。<br>例如：<br>输入小眼球数组(eyeball[n])：[1,1,2,3,6]，输出6（1，2，3合并为6,余下1）；<br>输入：[1,2]，返回0，不可造。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/12/14/algorithm/000-week-algo/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/12/14/algorithm/000-week-algo/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/14/algorithm/000-week-algo/" data-id="ck0ixo7ys0009mychg888vngx" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/algorithm/">algorithm</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">94</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-hadoop/003-hdfs-cmd" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/12/hadoop/003-hdfs-cmd/" class="article-date">
-  <time datetime="2018-12-12T09:33:07.000Z" itemprop="datePublished">2018-12-12</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/12/hadoop/003-hdfs-cmd/">HDFS常用命令</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文记录在实践中使用的常用命令。</p>
-<h1 id="ls"><a href="#ls" class="headerlink" title="ls"></a>ls</h1><p>按时间倒序查看文件列表：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> hadoop fs -ls -t /dir</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文记录在实践中使用的常用命令。</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/12/12/hadoop/003-hdfs-cmd/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/12/12/hadoop/003-hdfs-cmd/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/12/hadoop/003-hdfs-cmd/" data-id="ck0ixo84j008emychpjpbviks" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a><span class="article-tag-list-count">2</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a><span class="article-tag-list-count">94</span></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-basic/011-microservice-trade-offs" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/11/basic/011-microservice-trade-offs/" class="article-date">
-  <time datetime="2018-12-11T00:48:57.000Z" itemprop="datePublished">2018-12-11</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/11/basic/011-microservice-trade-offs/">微服务权衡</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文翻译自：<a href="https://martinfowler.com/articles/microservice-trade-offs.html" target="_blank" rel="noopener">https://martinfowler.com/articles/microservice-trade-offs.html</a></p>
-<p>许多开发团队发现<a href="https://martinfowler.com/articles/microservices.html" target="_blank" rel="noopener">微服务架构</a>风格是单片架构的优秀方法。 但其他团队发现它们是一种影响生产力的负担。 与任何架构一样，微服务带来成本和收益。 要做出明智的选择，您必须了解这些并将其应用于您的特定背景。</p>
-<h2 id="微服务提供的好处……"><a href="#微服务提供的好处……" class="headerlink" title="微服务提供的好处……"></a>微服务提供的好处……</h2><ul>
-<li><p>强大的模块边界：微服务增强了模块化结构，这对大型团队尤为重要。</p>
-</li>
-<li><p>独立部署：简单的服务更易于部署，并且由于它们是自治的，因此在出错时不太可能导致系统故障。</p>
-</li>
-<li><p>技术多样性：通过微服务，您可以混合使用多种语言，开发框架和数据存储技术。</p>
-</li>
-</ul>
-<h2 id="……但需要付出代价"><a href="#……但需要付出代价" class="headerlink" title="……但需要付出代价"></a>……但需要付出代价</h2><ul>
-<li><p>分布式：分布式系统更难编程，因为远程调用很慢并且始终存在故障风险。</p>
-</li>
-<li><p>最终的一致性：对于分布式系统来说，保持强一致性非常困难，这意味着每个人都必须管理最终的一致性。</p>
-</li>
-<li><p>运维复杂性：您需要一个成熟的运营团队来管理大量服务，这些服务需要定期重新部署。</p>
-</li>
-</ul>
-<h1 id="强大的模块边界"><a href="#强大的模块边界" class="headerlink" title="强大的模块边界"></a>强大的模块边界</h1><p>微服务的第一大好处是强大的模块边界。 这是一个重要的好处，但却是一个奇怪的好处，因为从理论上讲，为什么微服务应该具有比单块更强的模块边界。</p>
-<p>那么强大的模块边界是什么意思呢？ 我想大多数人都会同意将软件分成模块是很好的：大块的软件彼此分离。 你希望你的模块工作，这样如果我需要更改系统的一部分，大多数时候我只需要了解该系统的一小部分来进行更改，我可以很容易地找到这个小部分。 良好的模块化结构在任何程序中都很有用，但随着软件规模的扩大，它会变得越来越重要。 也许更重要的是，随着开发团队的规模不断扩大，它变得越来越重要。</p>
-<p>微服务的倡导者很快就会引入<a href="http://www.thoughtworks.com/insights/blog/demystifying-conways-law" target="_blank" rel="noopener">康微法则</a>，即软件系统的结构反映了构建它的组织的通信结构。对于规模较大的团队，特别是如果这些团队位于不同的地点，重要的是构建软件以识别团队间通信将比团队内的团队通信更频繁，更正式。微服务允许每个团队使用这种通信模式来管理相对独立的单元。</p>
-<p>正如我之前所说，单片系统没有理由不具备良好的模块化结构。 [1]但是很多人观察到它似乎很少见，因此<a href="http://www.laputan.org/mud/" target="_blank" rel="noopener">泥大球</a>是最常见的架构模式。事实上，对单一应用的共同命运的这种挫败感正在驱使一些团队进入微服务。与模块的分离是有效的，因为模块边界是模块之间引用的障碍。麻烦的是，使用单片系统，通常很容易绕过障碍物。这样做可以成为快速构建功能的一种有用的战术捷径，但是做得很广泛会破坏模块化结构并破坏团队的工作效率。将模块放入单独的服务使得边界更加牢固，使得找到这些癌症变通方法变得更加困难。</p>
-<p>这种耦合的一个重要方面是持久化数据。 微服务的一个关键特性是<a href="https://martinfowler.com/microservices.html#DecentralizedDataManagement" target="_blank" rel="noopener">分散数据管理</a>，它表示每个服务都管理自己的数据库，任何其他服务都必须通过服务的API才能获得它。 这消除了<a href="https://martinfowler.com/bliki/IntegrationDatabase.html" target="_blank" rel="noopener">集成数据库</a>，这是大型系统中令人讨厌的耦合的主要来源。</p>
-<p>重要的是要强调，单片系统完全可能具有牢固的模块边界，但它需要规范。 同样地，你可以得到一个微型泥球，但它需要更多的努力，而且是错的。 我看待使用微服务的方式增加了你获得更好的模块化的可能性。 如果你对你的团队的纪律充满信心，那么这可能会消除这种优势，但随着团队的发展，它越来越难以保持纪律，就像维护模块边界变得更加重要一样。</p>
-<p>如果你没有正确的界限，这种优势将成为一个障碍。这是<a href="https://martinfowler.com/bliki/MonolithFirst.html" target="_blank" rel="noopener">单片优先</a>策略的两个主要原因之一，以及为什么即使那些<a href="https://martinfowler.com/articles/dont-start-monolith.html" target="_blank" rel="noopener">更倾向于使用微服务运行</a>的人也会强调，只有通过一个易于理解的域才能这样做。</p>
-<p>但是我还没有完成关于这一点的警告。在时间过去之后，您才能真正了解系统维护模块化的程度。因此，一旦我们看到微服务系统已经存在至少几年，我们就能真正评估微服务是否会带来更好的模块化。此外，早期采用者往往更有天赋，因此在我们评估普通团队编写的微服务系统的模块化优势之前还会有进一步的延迟。即使在那时，我们也必须接受普通团队编写普通软件，因此我们不必将结果与顶级团队进行比较，而是将所得到的软件与单片体系结构下的软件进行比较 - 这是一个棘手的反事实评估。</p>
-<p>我现在所能继续的只是我从我认识的人那里听到的早期证据。他们的判断是维护模块要容易得多。</p>
-<p>一个案例研究特别有趣。团队做出了错误的选择，在一个系统上使用微服务，这个系统不够复杂，无法覆盖<a href="https://martinfowler.com/bliki/MicroservicePremium.html" target="_blank" rel="noopener">Microservice Premium</a>。该项目陷入困境，需要获救，因此更多的人被投入到项目中。在这一点上，微服务架构变得有用，因为系统能够吸收开发人员的快速涌入，并且团队能够比单片系统下更容易地利用更大团队的人数数量。因此，该项目加速到比单块预期更高的生产力，使团队能够赶上。结果仍然是一个净负值，因为软件花费的工作时间比它们使用单​​块时所花费的工作时间更多，但微服务架构确实支持提升。</p>
-<h1 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h1><p>因此，微服务使用分布式系统来改善模块化。但是分布式软件有一个主要的缺点，即它是分布式的。一旦你玩分布式，就会产生一系列复杂性。我认为微服务社区并不像分布式对象运动那样天真，但复杂性仍然存在。</p>
-<p>第一个是性能。你必须处在一个非常不寻常的地方才能看到进程中的函数调用现在变成性能热点，但是远程调用很慢。如果您的服务调用了六个远程服务，每个远程服务调用另外六个远程服务，这些响应时间会增加一些可怕的延迟特性。</p>
-<p>当然，你可以做很多事情来缓解这个问题。首先，您可以增加调用的粒度，因此您可以减少调用的次数。这使您的编程模型变得复杂，您现在必须考虑如何批量处理服务间交互。它也只会让你到目前为止，因为你将不得不至少调用一次合作服务。</p>
-<p>第二个缓解是使用异步。如果并行进行六次异步调用，那么现在只有最慢的调用而不是它们的延迟总和。这可能是一个巨大的性能提升，但另一个认知成本。异步编程很难：很难做到正确，而且更难调试。但是我听过的大多数微服务故事需要不同步才能获得可接受的性能。</p>
-<p>在速度之后是可靠性。您希望进程内函数调用可以正常工作，但远程调用可能随时失败。有了很多微服务，还有更多潜在的失败点。聪明的开发人员知道这一点并<a href="https://martinfowler.com/articles/microservices.html#DesignForFailure" target="_blank" rel="noopener">设计失败</a>。令人高兴的是，异步协作所需的策略也很适合处理故障，结果可以提高弹性。然而，这并没有太大的补偿，每次远程调用失败的后果仍然带有额外的复杂性。</p>
-<p>这只是<a href="http://www.rgoarchitects.com/Files/fallacies.pdf" target="_blank" rel="noopener">分布式计算的两大谬误</a>。</p>
-<p>这个问题有一些警告。首先，随着它的发展，许多这些问题都会出现。很少有单片系统是真正独立的，通常还有其他系统，比如遗留系统。与它们交互涉及到网络并遇到同样的问题。这就是为什么许多人倾向于更快地移动到微服务来处理与远程系统的交互。这个问题也是经验有帮助的问题，一个技能更高的团队将能够更好地处理分布式。</p>
-<p>但分布式总是一个成本。我总是不愿意玩分布式，并且认为太多人玩分布式玩的太快，因为他们低估了问题。</p>
-<h1 id="最终一致性"><a href="#最终一致性" class="headerlink" title="最终一致性"></a>最终一致性</h1><p>我相信你知道需要一点耐心的网站。 您对某些内容进行了更新，它会刷新您的屏幕并且更新不见了。 你等一两分钟，点击刷新，就在那里。</p>
-<p>这是一个非常恼人的可用性问题，几乎可以肯定是由于最终一致性的危险。 粉红色节点收到了您的更新，但您的获取请求由绿色节点处理。 在绿色节点从粉红节点获取更新之前，您将陷入不一致的窗口。 最终它将是一致的，但在那之前你想知道是否出了什么问题。</p>
-<p>像这样的不一致是足够刺激，但它们可能会更加严重。 业务逻辑最终可能会对不一致的信息做出决策，当发生这种情况时，很难诊断出错的原因，因为任何调查都会在不一致窗口关闭后很久发生。</p>
-<p>微服务引入了最终的一致性问题，因为它们对分散的数据管理抱有很大的支持。使用整体应用，您可以在一个事务中一起更新一堆东西。微服务需要多个资源来更新，并且分布式事务不受欢迎（有充分理由）。所以现在，开发人员需要了解一致性问题，并在做任何代码后悔的事情之前弄清楚如何检测事情何时不同步。</p>
-<p>整体应用并没有摆脱这些问题。随着系统的发展，需要使用缓存来提高性能，而缓存失效则是<a href="https://martinfowler.com/bliki/TwoHardThings.html" target="_blank" rel="noopener">另一个难题</a>。大多数应用程序需要<a href="https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html" target="_blank" rel="noopener">脱机锁</a> 以避免长期存在的数据库事务。 外部系统需要无法与事务管理器协调的更新。 业务流程通常比你想象的更容忍不一致，因为企业往往更多地奖励可用性（业务流程长期以来对<a href="http://ksat.me/a-plain-english-introduction-to-cap-theorem/" target="_blank" rel="noopener">CAP定理</a>有本能的理解）。</p>
-<p>因此，与其他分布式问题一样，整体应用并不能完全避免不一致问题，但它们确实会受到更少的影响，特别是当它们更小时。</p>
-<h1 id="独立部署"><a href="#独立部署" class="headerlink" title="独立部署"></a>独立部署</h1><p>在我的整个职业生涯中，模块化边界与分布式系统的复杂性之间的权衡已经存在。但是，在过去的十年中，有一件事情发生了显着变化，即释放到生产中的作用。在二十世纪，生产版本几乎普遍是一个痛苦和罕见的事件，白天/晚上的周末转移，以获得一些尴尬的软件，它可以做一些有用的事情。但是现在，熟练的团队经常发布生产，许多组织实行<a href="https://martinfowler.com/bliki/ContinuousDelivery.html" target="_blank" rel="noopener">持续交付</a>，允许他们每天多次进行生产许可。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">微服务是DevOps革命后的第一个架构</span><br><span class="line"></span><br><span class="line"> - 尼尔福特</span><br></pre></td></tr></table></figure></p>
-<p>这种转变对软件行业产生了深远的影响，并且与微服务运动密切相关。部署大型整体应用的难度引发了一些微服务工作，其中部分整体块的微小变化可能导致整个部署失败。微服务的一个关键原则是<a href="https://martinfowler.com/articles/microservices.html#ComponentizationViaServices" target="_blank" rel="noopener">服务是组件</a>，因此可以独立部署。所以现在当你做出改变时，你只需要测试和部署一个小服务。如果搞砸了，你就不会打倒整个系统。毕竟，由于需求设计失败，即使组件完全失效也不应该阻止系统的其他部分工作，尽管有某种形式的优雅降级。</p>
-<p>这种关系是双向的。由于许多微服务需要经常部署，因此必须让您的部署协同工作。这就是快速应用程序部署和快速配置基础架构是<a href="https://martinfowler.com/bliki/MicroservicePrerequisites.html" target="_blank" rel="noopener">微服务先决条件</a>的原因。对于除基础之外的任何事情，您需要持续交付。</p>
-<p>持续交付的巨大好处是减少了创建和运行软件之间的周期时间。这样做的组织可以快速响应市场变化，并比竞争对手更快地推出新功能。</p>
-<p>尽管许多人认为持续交付是使用微服务的一个原因，但必须要提到的是，即使是大型的单一应用也可以连续交付。 Facebook和Etsy是两个最着名的案例。在很多情况下，尝试的微服务架构在独立部署中失败，其中多个服务需要仔细协调它们的发布[2]。虽然我确实听到很多人认为使用微服务进行连续交付要容易得多，但我不太相信它们对模块化的实际重要性 - 尽管自然模块化确实与交付速度密切相关。</p>
-<h1 id="运维复杂性"><a href="#运维复杂性" class="headerlink" title="运维复杂性"></a>运维复杂性</h1><p>能够快速部署小型独立单元对于开发来说是一个巨大的福音，但它给运维带来了额外的压力，因为现在有六个应用程序变成了数百个小型微服务。许多组织会发现处理这类快速变化的工具的难度令人望而却步。</p>
-<p>这加强了持续交付的重要作用。虽然持续交付对于整体结构来说是一种有价值的技能，但是它几乎总是值得付出努力，但对于严格的微服务设置来说，它变得至关重要。没有持续交付促进的自动化和协作，就没有办法处理数十种服务。由于对管理这些服务和监控的需求增加，运维复杂性也增加了。如果微服务混合在一起，那么对单片应用程序有用的成熟度也是必要的。</p>
-<p>微服务支持者喜欢指出，由于每项服务都较小，因此更容易理解。但危险在于没有消除复杂性，它只是转移到服务之间的互连。然后，这可以表现为增加的操作复杂性，例如跨越服务的困难调试行为。良好的服务边界选择将减少这个问题，但错误的界限会使情况变得更糟。</p>
-<p>处理这种操作复杂性需要大量新技能和工具 - 最重要的是技能。工具仍然不成熟，但我的直觉告诉我，即使使用更好的工具，在微服务环境中技能的低标准也更高。</p>
-<p>然而，对更好技能和工具的这种需求并不是处理这些操作复杂性最困难的部分。要有效地完成所有这些工作，您还需要介绍一种<a href="https://martinfowler.com/bliki/DevOpsCulture.html" target="_blank" rel="noopener">devops文化</a>：开发人员，运维人员以及参与软件交付的其他所有人之间的更好协作。文化变革很难，特别是在较大和较老的组织中。如果你不进行这种技术性的改变，你的整体应用程序将受到阻碍，你的微服务应用程序将受到创伤。</p>
-<h1 id="技术多样性"><a href="#技术多样性" class="headerlink" title="技术多样性"></a>技术多样性</h1><p>由于每个微服务都是一个可独立部署的单元，因此您可以自由选择技术。微服务可以用不同的语言编写，使用不同的库，并使用不同的数据存储。这允许团队为工作选择合适的工具，某些语言和库更适合某些类型的问题。</p>
-<p>技术多样性的讨论通常集中在最佳工具上，但微服务的最大好处往往是更平淡的版本控制问题。在单块中，您只能使用单个版本的库，这种情况通常会导致有问题的升级。系统的一部分可能需要升级才能使用其新功能，但不能，因为升级会破坏系统的另一部分。处理库版本问题是随着代码库变大而成倍增加的问题之一。</p>
-<p>这里有一种危险，即技术的多样性使开发组织不堪重负。我认识的大多数组织确实鼓励使用有限的技术。通过提供监控等常用工具来支持这种鼓励，使服务更容易适应一小部分常见环境。</p>
-<p>不要低估支持实验的价值。使用单一系统，语言和框架的早期决策很难逆转。经过十年左右的时间，这些决定可能会使团队陷入尴尬的技术之中。微服务允许团队尝试新工具，并且如果优越的技术变得适用，还可以逐步迁移服务。</p>
-<h1 id="次要因素"><a href="#次要因素" class="headerlink" title="次要因素"></a>次要因素</h1><p>我认为上面的项目是需要考虑的主要权衡因素。以下是我认为不太重要的一些事情。</p>
-<p>微服务支持者经常说服务更容易扩展，因为如果一个服务获得大量负载，你可以扩展它，而不是整个应用程序。然而，我很难回想起一份体面的体验报告，它让我相信，与通过复制整个应用程序进行<a href="http://paulhammant.com/2011/11/29/cookie-cutter-scaling/" target="_blank" rel="noopener">千篇一律的扩展</a>相比，实际上这种选择性扩展更有效率。</p>
-<p>微服务允许您分离敏感数据并为该数据添加更加谨慎的安全性。此外，通过确保微服务之间的所有流量都是安全的，微服务可能会更难以被攻破。随着安全问题变得越来越重要，这可能会成为使用微服务的主要考虑因素。即使没有这一点，主要是单片系统创建单独的服务来处理敏感数据也并不罕见。</p>
-<p>对微服务的批评者谈到测试微服务应用程序比单片机更难。虽然这是一个真正的困难 - 分布式应用程序更复杂的一部分 - 但是有<a href="https://martinfowler.com/articles/microservice-testing/" target="_blank" rel="noopener">很好的方法可以对微服务进行测试</a>。这里最重要的是进行严格的测试，而测试单块和测试微服务之间的差异是次要的。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>任何架构的任何帖子都受到<a href="https://martinfowler.com/bliki/LimitationsOfGeneralAdvice.html" target="_blank" rel="noopener">一般建议的限制</a>。所以阅读这样的帖子不能为您做出决定，但这些文章可以帮助您确保考虑应该考虑的各种因素。这里的每个成本和收益对不同的系统都有不同的权重，甚至在成本和收益之间交换（强大的模块边界在更复杂的系统中是好的，但对简单系统来说是一个障碍）你做出的任何决定取决于将这些标准应用于你的背景，评估哪些因素对您的系统最重要，以及它们如何影响您的特定环境。此外，我们对微服务架构的体验相对有限。您通常只能在系统成熟后判断架构决策，并且了解了开发开始后多年的工作。我们还没有很多关于长寿命微服务架构的轶事。</p>
-<p>有关微服务的更多信息，请从我的微服务资源指南开始，我在其中选择了有关微服务的内容，时间，方式和人员的最佳信息。</p>
-<p>单块和微服务不是简单的二元选择。两者都是模糊定义，这意味着许多系统将位于模糊的边界区域。还有其他系统不适合任何一种类别。包括我自己在内的大多数人都谈论微服务而不是单块，因为将它们与更常见的风格进行对比是有意义的，但我们必须记住，有些系统不适合这两种类型。我认为单体和微观体是架构空间中的两个区域。它们值得命名，因为它们具有有用的讨论特征，但没有明智的架构师将它们视为对架构空间的全面划分。</p>
-<p>也就是说，似乎被广泛接受的一个总体观点是<a href="https://martinfowler.com/bliki/MicroservicePremium.html" target="_blank" rel="noopener">微服务高级版</a>：微服务会降低生产力成本，只能在更复杂的系统中弥补。因此，如果您可以使用单片架构管理系统的复杂性，那么您就不应该使用微服务。</p>
-<p>但微服务对话的数量不应该让我们忘记推动软件项目成功和失败的更重要的问题。诸如团队成员的质量，他们彼此协作的程度以及与领域专家的沟通程度之类的软因素将比是否使用微服务产生更大的影响。在纯粹的技术层面上，重点关注整洁代码、良好测试和对进化架构的关注等问题更为重要。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文翻译自：<a href="https://martinfowler.com/articles/microservice-trade-offs.html" target="_blank" rel="noopener">https://martinfowler.com/articles/microservice-trade-offs.html</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/12/11/basic/011-microservice-trade-offs/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/12/11/basic/011-microservice-trade-offs/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/11/basic/011-microservice-trade-offs/" data-id="ck0ixo805001cmychu356fh82" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/microservice/">microservice</a><span class="article-tag-list-count">9</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-basic/010-devops-culture" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/10/basic/010-devops-culture/" class="article-date">
-  <time datetime="2018-12-10T12:38:37.000Z" itemprop="datePublished">2018-12-10</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/10/basic/010-devops-culture/">开发运维文化</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文翻译自：<a href="https://martinfowler.com/bliki/DevOpsCulture.html" target="_blank" rel="noopener">https://martinfowler.com/bliki/DevOpsCulture.html</a></p>
-<p>敏捷软件开发打破了需求分析、测试和开发之间的一些孤岛。 部署、运维和维护是与其他软件开发过程类似分离的其他活动。 DevOps运动旨在消除这些孤岛并鼓励开发和运维之间的协作。</p>
-<p>DevOps已经成为可能，主要是由于新的操作工具和已建立的敏捷工程实践的结合[1]，但这些还不足以实现DevOps的优势。 即使使用最好的工具，如果你没有合适的文化，DevOps也只是另一个流行语。</p>
-<p>DevOps文化的主要特征是增加开发和运维角色之间的协作。 在团队内部和组织层面，有一些重要的文化转变支持这种合作。</p>
-<p>有<strong>共同责任</strong>的态度是DevOps文化的一个方面，鼓励更紧密的合作。如果系统交给另一个团队照顾，开发团队很容易对系统的操作和维护不感兴趣。如果开发团队负责在整个生命周期内管理系统，他们就能够分担运维人员的痛苦，从而确定简化部署和维护的方法（例如，通过自动化部署和改进日志记录）。他们还可能通过监控生产中的系统获得额外的<a href="https://martinfowler.com/bliki/ObservedRequirement.html" target="_blank" rel="noopener">ObservedRequirements</a>。当运营人员分担系统业务目标的责任时，他们能够与开发人员更紧密地合作，以更好地了解系统的运营需求并帮助实现这些目标。在实践中，协作通常始于开发人员对运营问题（例如部署和监控）的认识提高以及运营人员采用新的自动化工具和实践。</p>
-<img src="/2018/12/10/basic/010-devops-culture/000.png">
-<p>需要进行一些组织变革来支持共同责任的文化。开发和运维之间应该没有孤岛。切换期和文档不能替代从一开始就在解决方案上合作。调整资源结构有助于操作人员尽早参与团队。让开发人员和运营人员共处一地可以帮助他们一起工作。交接和签字不鼓励人们分担责任并导致责备文化。相反，开发人员和操作人员都应该对系统的成功和失败负责。 DevOps文化模糊了开发人员和运营人员之间的界限，最终可能消除这种区别。将DevOps引入组织时，一种常见的反模式是为某人分配“DevOps”角色或<a href="http://www.thoughtworks.com/radar/techniques/separate-devops-team" target="_blank" rel="noopener">将团队称为“DevOps团队”</a>。这样做可以延续DevOps旨在打破的各种孤岛，并防止DevOps文化和实践扩散并被更广泛的组织采用。</p>
-<p>另一个有价值的组织转变是支持自治团队。 为了有效协作，开发人员和运营人员需要能够做出决策并应用变更，而无需复杂的决策过程。 这涉及信任团队，改变风险管理方式以及创建一个不用担心失败的环境。 例如，为了部署到测试环境而必须生成用于签核的更改列表的团队可能会经常被延迟。 不需要这样的手动检查，可以依赖版本控制，这是完全可审计的。 版本控制中的更改甚至可以链接到团队项目管理工具中的票证。 如果没有手动注销，团队可以自动部署并加快测试周期。</p>
-<p>转向DevOps文化的一个影响是，将新代码投入生产变得更容易。 这需要进一步的文化变革。 为了确保生产变化合理，团队需要将构建质量评估为开发过程。 这包括性能和安全性等跨职能问题。 <a href="https://martinfowler.com/bliki/ContinuousDelivery.html" target="_blank" rel="noopener">持续发布</a>技术（包括<a href="https://martinfowler.com/bliki/SelfTestingCode.html" target="_blank" rel="noopener">自测试代码</a>）构成了允许定期，低风险部署的基础。</p>
-<p>为了不断改进开发人员和操作人员以及系统本身的协同工作方式，团队重视反馈也很重要。 生产监控是一个有用的反馈循环，用于诊断问题和发现潜在的改进。</p>
-<p>自动化是DevOps运动的基石，有助于协作。 自动化测试、配置和部署等任务可以让人们专注于其他有价值的活动，并减少人为错误的可能性。 自动化的一个有用的副作用是 自动化脚本和测试可以作为有用的、始终是系统最新的文档。 例如，自动化服务器配置可消除与<a href="https://martinfowler.com/bliki/SnowflakeServer.html" target="_blank" rel="noopener">SnowflakeServer</a>相关的猜测，这意味着开发人员和运维人员同样能够了解和更改服务器的配置方式。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文概括起来讲了以下几点：</p>
-<ol>
-<li>DevOps的宗旨：消除开发与运维人员的隔阂，让大家一起合作；</li>
-<li>共同责任：开发和运维人员都应该对系统负责，而不是推卸责任；</li>
-<li>组织结构调整：打破开发和运维人员的界限；</li>
-<li>自治团队：充分相信团队可以自己决定什么时候部署，而无需复杂的手续；</li>
-<li>自动化：是DevOps的基础；</li>
-<li>其他：更快的部署，系统的反馈也很重要；</li>
-</ol>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文翻译自：<a href="https://martinfowler.com/bliki/DevOpsCulture.html" target="_blank" rel="noopener">https://martinfowler.com/bliki/DevOpsCulture.html</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/12/10/basic/010-devops-culture/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/12/10/basic/010-devops-culture/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/010-devops-culture/" data-id="ck0ixo8000018mychuyhhj56h" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/架构/">架构</a><span class="article-tag-list-count">1</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-shell/002-join-list" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/10/shell/002-join-list/" class="article-date">
-  <time datetime="2018-12-10T03:41:48.000Z" itemprop="datePublished">2018-12-10</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/10/shell/002-join-list/">shell如何join数组</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>shell里如何使用某个分割符连接数组、List等</p>
-<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><h2 id="1-使用local"><a href="#1-使用local" class="headerlink" title="1.使用local"></a>1.使用local</h2><p><a href="https://zaiste.net/how_to_join_elements_of_an_array_in_bash/" target="_blank" rel="noopener">https://zaiste.net/how_to_join_elements_of_an_array_in_bash/</a></p>
-<h2 id="2-使用python"><a href="#2-使用python" class="headerlink" title="2.使用python"></a>2.使用python</h2><p>一般在linux系统里都自带python。使用高级语言写起来当然更爽。</p>
-<h1 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/bash</span><br><span class="line"></span><br><span class="line">re=`netstat -anp | grep -E '::(8001|8003|8761|5557)' | awk '&#123;print $7&#125;' OFS="\n" | awk -F/ '&#123;print $1&#125;'`</span><br><span class="line"></span><br><span class="line">function join &#123; local IFS="$1"; shift; echo "$*"; &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 以逗号连接</span><br><span class="line">pids=`join , $re`</span><br><span class="line">echo $pids</span><br><span class="line"></span><br><span class="line">top -p $pids</span><br></pre></td></tr></table></figure>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>shell里如何使用某个分割符连接数组、List等</p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/12/10/shell/002-join-list/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/12/10/shell/002-join-list/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/shell/002-join-list/" data-id="ck0ixo88h00lvmychx3e5vk3s" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a><span class="article-tag-list-count">5</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
-    <article id="post-basic/009-observed-required" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/10/basic/009-observed-required/" class="article-date">
-  <time datetime="2018-12-10T01:35:10.000Z" itemprop="datePublished">2018-12-10</time>
-</a>
-      
-  </div>
-  <div class="article-inner">
-    
-      
-        <header class="article-header">
-          
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/10/basic/009-observed-required/">可观察需求</a>
-    </h1>
-  
-
-        </header>
-        
-          <!-- <div class="article-entry" itemprop="articleBody">
-      
-        <p>本文翻译自：<a href="https://martinfowler.com/bliki/ObservedRequirement.html" target="_blank" rel="noopener">https://martinfowler.com/bliki/ObservedRequirement.html</a></p>
-<p>这是我最喜欢的软件开发报价之一：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">需求是您在开始构建产品之前应该发现的事情。 在施工过程中发现需求，或者更糟糕的是，当客户开始使用您的产品时，发现需求非常昂贵且效率低下，我们将假设没有正确思考的人会这样做，并且不会再提及它。</span><br><span class="line"></span><br><span class="line"> -  Suzanne和James Robertson</span><br></pre></td></tr></table></figure></p>
-<p>这是他们的书“掌握需求过程”第一版的开头段落。 正如普通读者可能猜到的那样，我的喜好与规则无关。 我喜欢这句话，因为它总结了瀑布价值体系的需求（事实上，“需求”一词本身就是瀑布式）。</p>
-<p>敏捷方法违反了这一基本假设，意图在施工期间和交付后发现“要求”。 但即便是这种对上述圣人建议的无视，与目前许多领先网站的做法相比毫无意义。 这些站点通过观察用户在其站点上执行的操作以及使用该信息生成以下行中的新功能的想法来探索需求：</p>
-<ol>
-<li>看看人们试图对网站做些什么，并为他们提供更简单的方法。</li>
-<li>看看人们放弃做某事的地方，并寻找解决令他们感到沮丧的事情的方法。</li>
-<li>构建一个新功能，看看人们是否使用它。</li>
-<li>构建实验性功能并使其可供用户群的子集使用。 您不仅可以看到他们是否喜欢它，还可以评估它对服务器的负载程度。</li>
-</ol>
-<p>要支持此类分析，您需要将用户日志记录行为添加到应用程序中，并构建一些工具来分析这些日志。许多日志记录在Web应用程序中免费显示，我怀疑这是人们开始这样做的主要推动力。但是，日志记录和分析可以进一步添加到应用程序中。</p>
-<p>我没有在网上找到关于如何做到这一点的很多建议，我在实践中没有听到太多关于这样做的讨论。像许多事情一样，它需要集中精力花时间来构建监控功能，然后使用它来探索如何改进软件。此外，它远离传统软件流程，即使对于敏捷项目也是如此。</p>
-<p>但这里有巨大的潜力。每个人都知道人们说他们想要什么和人们实际需要和使用的差异有多大。通过观察人们对您的应用程序实际执行的操作，您可以了解软件实际发生的情况 - 这可以为您提供比其他来源更直接的信息。因此，我认为更多的团队应该考虑将这种方法添加到他们的工具包中。</p>
-
-      
-    </div> -->
-          <div class="article-entry" itemprop="articleBody">
-            
-              
-                
-                      
-                        
-                          
-                            
-                              
-                                
-                                  
-                                    <p>
-                                      <p>本文翻译自：<a href="https://martinfowler.com/bliki/ObservedRequirement.html" target="_blank" rel="noopener">https://martinfowler.com/bliki/ObservedRequirement.html</a></p>
-
-                                        <p>
-                                          
-                                            
-                                              
-                                                      
-          </div>
-    <p class="article-more-link">
-      <a href="/2018/12/10/basic/009-observed-required/#more">
-        Read More
-      </a>
-    </p>
-    <!-- <div class="article-more-link">
-      <a href="/2018/12/10/basic/009-observed-required/#more">
-        read more
-      </a>
-    </div> -->
-    
-
-
-      <footer class="article-footer">
-        <a data-url="http://http://jimolonely.github.io/2018/12/10/basic/009-observed-required/" data-id="ck0ixo7zw0016mych1qhb6m1l" class="article-share-link">
-          Share
-        </a>
-        
-            
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/basic/">basic</a><span class="article-tag-list-count">6</span></li></ul>
-
-      </footer>
-      </div>
-      
-</article>
-
-
-  
 
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/7/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/9/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/7/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="extend next" rel="next" href="/page/9/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -2146,7 +2130,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/aop/">aop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geohash/">geohash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geomesa/">geomesa</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j/">log4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j12/">log4j12</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/logback/">logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/md5/">md5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mhtml/">mhtml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slf4j/">slf4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-test/">UI test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/annotation/">annotation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ansible/">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ant/">ant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/aop/">aop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/archiva/">archiva</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asciidoc/">asciidoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/basic/">basic</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/big-data/">big data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cglib/">cglib</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/checkstyle/">checkstyle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computer-principle/">computer principle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-structure/">data structure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/design-pattern/">design-pattern</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es/">es</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/eureka/">eureka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flask/">flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geohash/">geohash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geomesa/">geomesa</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab/">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gradle/">gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/groovy/">groovy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/idea/">idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ip/">ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junit/">junit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jvm/">jvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/katalon/">katalon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepalived/">keepalived</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/latex/">latex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/life/">life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux-kernel/">linux kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log/">log</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j/">log4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/log4j12/">log4j12</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/logback/">logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lru/">lru</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lucene/">lucene</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/magnet/">magnet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/manjaro/">manjaro</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/math/">math</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/md5/">md5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mhtml/">mhtml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/microservice/">microservice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/music/">music</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/npm/">npm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nvidia/">nvidia</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/optimization/">optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandoc/">pandoc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pgsql/">pgsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/probability/">probability</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pyspark/">pyspark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/quartz/">quartz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/resource/">resource</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/review/">review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sbt/">sbt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scala/">scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slf4j/">slf4j</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring-boot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqlserver/">sqlserver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssh/">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/statistics/">statistics</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/syslog/">syslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/term/">term</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/test/">test</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/texlive/">texlive</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/urban-computing/">urban computing</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/">video</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-dav/">web-dav</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/week/">week</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wordcloud/">wordcloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zipkin/">zipkin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/云计算/">云计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/元编程/">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/城市计算/">城市计算</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/架构/">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/概念/">概念</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测试/">测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维/">运维</a></li></ul>
     </div>
   </div>
 
@@ -2156,7 +2140,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 10.67px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.67px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.67px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 14px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/aop/" style="font-size: 10px;">aop</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 13.33px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.67px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.67px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 11.33px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.67px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 14px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/geohash/" style="font-size: 10px;">geohash</a> <a href="/tags/geomesa/" style="font-size: 10px;">geomesa</a> <a href="/tags/git/" style="font-size: 14px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.33px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.67px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 12px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.67px;">hexo</a> <a href="/tags/html/" style="font-size: 10.67px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 11.33px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 12px;">javascript</a> <a href="/tags/js/" style="font-size: 14px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.67px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.33px;">latex</a> <a href="/tags/life/" style="font-size: 18.67px;">life</a> <a href="/tags/linux/" style="font-size: 19.33px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/log4j/" style="font-size: 10px;">log4j</a> <a href="/tags/log4j12/" style="font-size: 10px;">log4j12</a> <a href="/tags/logback/" style="font-size: 10px;">logback</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.33px;">math</a> <a href="/tags/maven/" style="font-size: 15.33px;">maven</a> <a href="/tags/md5/" style="font-size: 10px;">md5</a> <a href="/tags/mhtml/" style="font-size: 10px;">mhtml</a> <a href="/tags/microservice/" style="font-size: 15.33px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.33px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 12px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.67px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.67px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 12px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.33px;">python</a> <a href="/tags/quartz/" style="font-size: 10.67px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.67px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 16px;">scala</a> <a href="/tags/shell/" style="font-size: 12.67px;">shell</a> <a href="/tags/slf4j/" style="font-size: 10px;">slf4j</a> <a href="/tags/spark/" style="font-size: 12.67px;">spark</a> <a href="/tags/spring/" style="font-size: 16.67px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.67px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 14.67px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.33px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.67px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.67px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 14px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.33px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 15.33px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.67px;">vim</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.33px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.67px;">webpack</a> <a href="/tags/week/" style="font-size: 18px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.33px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
+      <a href="/tags/AI/" style="font-size: 10.63px;">AI</a> <a href="/tags/UI-test/" style="font-size: 10px;">UI test</a> <a href="/tags/algorithm/" style="font-size: 10.63px;">algorithm</a> <a href="/tags/android/" style="font-size: 10.63px;">android</a> <a href="/tags/annotation/" style="font-size: 10px;">annotation</a> <a href="/tags/ansible/" style="font-size: 13.75px;">ansible</a> <a href="/tags/ant/" style="font-size: 10px;">ant</a> <a href="/tags/aop/" style="font-size: 10px;">aop</a> <a href="/tags/archiva/" style="font-size: 10px;">archiva</a> <a href="/tags/asciidoc/" style="font-size: 10px;">asciidoc</a> <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/basic/" style="font-size: 13.13px;">basic</a> <a href="/tags/big-data/" style="font-size: 10.63px;">big data</a> <a href="/tags/blockchain/" style="font-size: 10px;">blockchain</a> <a href="/tags/centos/" style="font-size: 12.5px;">centos</a> <a href="/tags/cglib/" style="font-size: 10px;">cglib</a> <a href="/tags/checkstyle/" style="font-size: 10px;">checkstyle</a> <a href="/tags/chrome/" style="font-size: 11.25px;">chrome</a> <a href="/tags/computer-principle/" style="font-size: 10px;">computer principle</a> <a href="/tags/data-structure/" style="font-size: 10px;">data structure</a> <a href="/tags/design-pattern/" style="font-size: 10.63px;">design-pattern</a> <a href="/tags/docker/" style="font-size: 17.5px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 13.75px;">elasticsearch</a> <a href="/tags/es/" style="font-size: 10px;">es</a> <a href="/tags/eureka/" style="font-size: 10px;">eureka</a> <a href="/tags/firefox/" style="font-size: 10px;">firefox</a> <a href="/tags/flask/" style="font-size: 10px;">flask</a> <a href="/tags/geohash/" style="font-size: 10px;">geohash</a> <a href="/tags/geomesa/" style="font-size: 10px;">geomesa</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/gitlab/" style="font-size: 11.25px;">gitlab</a> <a href="/tags/gradle/" style="font-size: 10px;">gradle</a> <a href="/tags/groovy/" style="font-size: 10px;">groovy</a> <a href="/tags/hadoop/" style="font-size: 10.63px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 11.88px;">hbase</a> <a href="/tags/hexo/" style="font-size: 10.63px;">hexo</a> <a href="/tags/html/" style="font-size: 10.63px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/idea/" style="font-size: 11.25px;">idea</a> <a href="/tags/ip/" style="font-size: 10px;">ip</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/javascript/" style="font-size: 11.88px;">javascript</a> <a href="/tags/js/" style="font-size: 13.75px;">js</a> <a href="/tags/junit/" style="font-size: 10px;">junit</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/jvm/" style="font-size: 10px;">jvm</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/katalon/" style="font-size: 10px;">katalon</a> <a href="/tags/keepalived/" style="font-size: 10.63px;">keepalived</a> <a href="/tags/latex/" style="font-size: 11.25px;">latex</a> <a href="/tags/life/" style="font-size: 18.75px;">life</a> <a href="/tags/linux/" style="font-size: 19.38px;">linux</a> <a href="/tags/linux-kernel/" style="font-size: 10px;">linux kernel</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/log4j/" style="font-size: 10px;">log4j</a> <a href="/tags/log4j12/" style="font-size: 10px;">log4j12</a> <a href="/tags/logback/" style="font-size: 10px;">logback</a> <a href="/tags/lru/" style="font-size: 10px;">lru</a> <a href="/tags/lucene/" style="font-size: 10px;">lucene</a> <a href="/tags/magnet/" style="font-size: 10px;">magnet</a> <a href="/tags/manjaro/" style="font-size: 10px;">manjaro</a> <a href="/tags/math/" style="font-size: 11.25px;">math</a> <a href="/tags/maven/" style="font-size: 15px;">maven</a> <a href="/tags/md5/" style="font-size: 10px;">md5</a> <a href="/tags/mhtml/" style="font-size: 10px;">mhtml</a> <a href="/tags/microservice/" style="font-size: 15px;">microservice</a> <a href="/tags/music/" style="font-size: 10px;">music</a> <a href="/tags/mybatis/" style="font-size: 11.25px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 11.88px;">mysql</a> <a href="/tags/nginx/" style="font-size: 12.5px;">nginx</a> <a href="/tags/npm/" style="font-size: 10px;">npm</a> <a href="/tags/nvidia/" style="font-size: 10px;">nvidia</a> <a href="/tags/openstack/" style="font-size: 12.5px;">openstack</a> <a href="/tags/optimization/" style="font-size: 10px;">optimization</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/pandoc/" style="font-size: 10px;">pandoc</a> <a href="/tags/pgsql/" style="font-size: 11.88px;">pgsql</a> <a href="/tags/probability/" style="font-size: 10px;">probability</a> <a href="/tags/pyspark/" style="font-size: 10px;">pyspark</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/quartz/" style="font-size: 10.63px;">quartz</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/redis/" style="font-size: 16.25px;">redis</a> <a href="/tags/resource/" style="font-size: 10px;">resource</a> <a href="/tags/review/" style="font-size: 10px;">review</a> <a href="/tags/sbt/" style="font-size: 10px;">sbt</a> <a href="/tags/scala/" style="font-size: 15.63px;">scala</a> <a href="/tags/shell/" style="font-size: 12.5px;">shell</a> <a href="/tags/slf4j/" style="font-size: 10px;">slf4j</a> <a href="/tags/spark/" style="font-size: 14.38px;">spark</a> <a href="/tags/spring/" style="font-size: 16.25px;">spring</a> <a href="/tags/spring-cloud/" style="font-size: 12.5px;">spring cloud</a> <a href="/tags/spring-boot/" style="font-size: 14.38px;">spring-boot</a> <a href="/tags/springboot/" style="font-size: 10px;">springboot</a> <a href="/tags/sql/" style="font-size: 11.25px;">sql</a> <a href="/tags/sqlserver/" style="font-size: 10.63px;">sqlserver</a> <a href="/tags/ssh/" style="font-size: 12.5px;">ssh</a> <a href="/tags/statistics/" style="font-size: 10px;">statistics</a> <a href="/tags/syslog/" style="font-size: 10px;">syslog</a> <a href="/tags/term/" style="font-size: 10px;">term</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/texlive/" style="font-size: 10px;">texlive</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/tomcat/" style="font-size: 13.75px;">tomcat</a> <a href="/tags/tool/" style="font-size: 17.5px;">tool</a> <a href="/tags/ubuntu/" style="font-size: 16.88px;">ubuntu</a> <a href="/tags/urban-computing/" style="font-size: 10px;">urban computing</a> <a href="/tags/video/" style="font-size: 10px;">video</a> <a href="/tags/vim/" style="font-size: 10.63px;">vim</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/vue/" style="font-size: 11.25px;">vue</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/web-dav/" style="font-size: 10px;">web-dav</a> <a href="/tags/webpack/" style="font-size: 10.63px;">webpack</a> <a href="/tags/week/" style="font-size: 18.13px;">week</a> <a href="/tags/wordcloud/" style="font-size: 10px;">wordcloud</a> <a href="/tags/work/" style="font-size: 10px;">work</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/zipkin/" style="font-size: 10px;">zipkin</a> <a href="/tags/云计算/" style="font-size: 13.13px;">云计算</a> <a href="/tags/元编程/" style="font-size: 10px;">元编程</a> <a href="/tags/城市计算/" style="font-size: 10px;">城市计算</a> <a href="/tags/架构/" style="font-size: 10px;">架构</a> <a href="/tags/概念/" style="font-size: 10px;">概念</a> <a href="/tags/测试/" style="font-size: 10px;">测试</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/运维/" style="font-size: 10px;">运维</a>
     </div>
   </div>
 
@@ -2178,23 +2162,23 @@ ga('send', 'pageview');
       <ul>
         
           <li>
-            <a href="/2019/09/14/maven/008-maven-define-jdk-version/">maven手动指定JDK版本</a>
+            <a href="/2019/09/15/linux/032-ubuntu-ufw/">ubuntu防火墙</a>
           </li>
         
           <li>
-            <a href="/2019/09/14/linux/030-ubuntu-change-dns/">ubuntu修改DNS</a>
+            <a href="/2019/09/15/linux/031-ubuntu-ssh-connection-refuesd/">ubuntu localhost:ssh:connect to host localhost port 22:Connection refused</a>
           </li>
         
           <li>
-            <a href="/2019/09/13/java/067-log4j-slf4j-logback-log4j12-diff/">log4j、logback、log4j12、slf4j的区别</a>
+            <a href="/2019/09/15/spark/008-spark-standalone-conf-run/">spark standalone模式的配置与运行</a>
           </li>
         
           <li>
-            <a href="/2019/09/12/java/066-java-cors-rewrite-header/">java后端跨域时自定义header字段</a>
+            <a href="/2019/09/14/spark/007-spark-data-flow/">spark运行流程</a>
           </li>
         
           <li>
-            <a href="/2019/09/12/life/031-weekly-learn/">2019-37-周报</a>
+            <a href="/2019/09/14/spark/006-spark-config-wordcount/">spark001：wordcount</a>
           </li>
         
       </ul>
