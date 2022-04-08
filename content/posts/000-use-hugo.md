@@ -105,3 +105,47 @@ hugo -D
 可以参考主题 `themes`下某个主题的结构。
 
 
+# 发布到Github Pages
+
+文档：[https://gohugo.io/hosting-and-deployment/hosting-on-github/](https://gohugo.io/hosting-and-deployment/hosting-on-github/)
+
+1. 建好github项目：[https://github.com/jimolonely/jimolonely.github.io.git](https://github.com/jimolonely/jimolonely.github.io.git)
+2. 设置Github Action自动化发布脚本
+
+路径为：`.github/workflows/gh-pages.yml`
+
+```yaml
+name: github pages
+
+on:
+  push:
+    branches:
+      - main  # Set a branch to deploy
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          # extended: true
+
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+```
+
