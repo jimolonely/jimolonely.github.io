@@ -1,5 +1,4 @@
 +++ 
-draft = false
 date = 2022-04-08T15:49:26+08:00
 title = "Hugo使用入门"
 description = "安装Hugo，编译成静态网页，发布到Github Pages"
