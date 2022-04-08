@@ -11,6 +11,13 @@ externalLink = ""
 series = []
 +++
 
+# 创建github项目
+
+因为一开始我就打算发布在Github Pages上，所以需要将 `Hugo`这个项目叫做 `{username}.github.io`, 我的是：[https://github.com/jimolonely/jimolonely.github.io](https://github.com/jimolonely/jimolonely.github.io).
+
+然后最后发布时，会创建出一个 `gh-pages`分支来发布页面。
+
+下面是在这个项目里按照 Hugo的方式将博客页搭好。
 
 # 启动服务
 
@@ -68,7 +75,6 @@ weight = 5
 url = "contact/"
 ```
 
-
 # 自定义主题
 
 ```shell
@@ -109,8 +115,7 @@ hugo -D
 
 文档：[https://gohugo.io/hosting-and-deployment/hosting-on-github/](https://gohugo.io/hosting-and-deployment/hosting-on-github/)
 
-1. 建好github项目：[https://github.com/jimolonely/jimolonely.github.io.git](https://github.com/jimolonely/jimolonely.github.io.git)
-2. 设置Github Action自动化发布脚本
+设置Github Action自动化发布脚本
 
 路径为：`.github/workflows/gh-pages.yml`
 
@@ -120,7 +125,7 @@ name: github pages
 on:
   push:
     branches:
-      - main  # Set a branch to deploy
+      - master  # 就是当前项目的主分支
   pull_request:
 
 jobs:
@@ -143,9 +148,18 @@ jobs:
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
 ```
+
+然后push到仓库，会触发上面的流程运行。
+
+运行完后，可以看到多了一个 `gh-pages`分支，里面就是静态页面。
+
+我们需要通过 `Settings`--`Pages`将页面的分支设为 `gh-pages`，才能正确访问。
+
+不一会，就可以通过 [https://jimolonely.github.io/](https://jimolonely.github.io/)访问了。
+
 
