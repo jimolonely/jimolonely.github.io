@@ -2,12 +2,7 @@
 date = 2022-04-08T15:49:26+08:00
 title = "Hugo使用入门"
 description = "安装Hugo，编译成静态网页，发布到Github Pages"
-slug = "blog-by-hugo-and-github-pages"
-authors = ["jimo"]
-tags = ["hugo"]
-categories = []
-externalLink = ""
-series = []
+toc = true
 +++
 
 # 创建github项目
@@ -17,6 +12,16 @@ series = []
 然后最后发布时，会创建出一个 `gh-pages`分支来发布页面。
 
 下面是在这个项目里按照 Hugo的方式将博客页搭好。
+
+# 安装hugo
+
+[https://gohugo.io/getting-started/installing/](https://gohugo.io/getting-started/installing/)
+
+# 创建hugo项目
+
+```shell
+hugo new site jimolonely.github.io
+```
 
 # 启动服务
 
@@ -31,7 +36,7 @@ hugo server -D
 # 创建主页
 
 ```shell
-hugo new index.md
+hugo new _index.md
 ```
 
 然后在里面随便写点什么。
