@@ -3,7 +3,7 @@ title: "我是寂寞"
 
 description: "我很强，遇强则强"
 cascade:
-  featured_image: '/images/gohugo-default-sample-hero-image.jpg'
+  featured_image: '/images/feiman.jpeg'
 ---
 
 你能从茫茫人海中发现我，是我的荣幸，是你的幸运！
