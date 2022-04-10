@@ -8,3 +8,7 @@ cascade.featured_image = '/images/gohugo-default-sample-hero-image.jpg'
 +++
 
 This page should not be exists.
+
+# [Hugo]({{< relref "hugo" >}})
+
+
