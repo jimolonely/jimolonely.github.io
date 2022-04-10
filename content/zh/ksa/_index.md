@@ -28,9 +28,14 @@ Knowledge, Skill, Ability: 知识、技能、能力框架。
 ### [基础技能]({{< relref "skill/basic" >}})
 
 
-## 能力
+## [能力]({{< relref "ability" >}})
 
-
+### [记忆力]({{< relref "ability/memory" >}})
+### [学习能力]({{< relref "ability/learning" >}})
+### [思考力]({{< relref "ability/thinking" >}})
+### [性情]({{< relref "ability/nature" >}})
+### [表达能力]({{< relref "ability/express" >}})
+### [身体能力]({{< relref "ability/body" >}})
 
 {{< /align >}}
 

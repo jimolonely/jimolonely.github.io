@@ -9,11 +9,9 @@ cascade:
 你能从茫茫人海中发现我，是我的荣幸，是你的幸运！
 
 
-之前的内容迁移到 [https://jimolonely.github.io/history](https://jimolonely.github.io/history) 下面了。
+之前的内容迁移到 [https://jimolonely.github.io/history](https://jimolonely.github.io/history) 了。
 
-我将会有一个新的博客！
-
-新的开始！
+这是我新的博客！ 新的开始！
 
 # 凡是我写在这里的东西，都是我掌握的东西
 
