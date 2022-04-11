@@ -11,4 +11,6 @@ This page should not be exists.
 
 # [Hugo]({{< relref "hugo" >}})
 
+# [Linux]({{< relref "linux" >}})
+
 
