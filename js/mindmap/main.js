@@ -46,8 +46,8 @@ var MM_FUNCS = {
         minder.execCommand('theme', 'fish')
         mmData.root = MM_FUNCS.li2jsonData(ulElement.children("li:first"));
         minder.importJson(mmData)
-        minder.disable();
-        minder.execCommand('hand');
+        // minder.disable();
+        // minder.execCommand('hand');
         console.log(kityminder.Minder.getThemeList())
         console.log(kityminder.Minder.getLayoutList())
         console.log(kityminder.Minder.getTemplateList())
