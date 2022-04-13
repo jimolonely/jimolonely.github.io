@@ -64,3 +64,17 @@ markup.defaultMarkdownHandler=blackfriday is deprecated and will be removed in a
 {{</*/* align left */*/>}}
 ```
 
+## Shortcodes如何引用其他文件？
+
+有一些公共的东西写在一个文件里，其他文件都可以引用，使用 [`partial` 命令](https://gohugo.io/templates/partials/) 。
+
+```markdown
+{{ partial "header/site-header.html" . }}
+```
+
+* 这个路径从 `layouts/partials` 开头
+* 最后那个 `.` 很重要
+
+
+
+
