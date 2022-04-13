@@ -11,12 +11,12 @@ toc: true
 
 下面的 `\\`去掉
 ```html
-{{\< ref "blog/post.md" >}} => https://example.com/blog/post/
-{{\< ref "post.md#tldr" >}} => https://example.com/blog/post/#tldr:caffebad
-{{\< relref "post.md" >}} => /blog/post/
-{{\< relref "blog/post.md#tldr" >}} => /blog/post/#tldr:caffebad
-{{\< ref "#tldr" >}} => #tldr:badcaffe
-{{\< relref "#tldr" >}} => #tldr:badcaffe
+{{</* ref "blog/post.md" */>}} => https://example.com/blog/post/
+{{</* ref "post.md#tldr" */>}} => https://example.com/blog/post/#tldr:caffebad
+{{</* relref "post.md" */>}} => /blog/post/
+{{</* relref "blog/post.md#tldr" */>}} => /blog/post/#tldr:caffebad
+{{</* ref "#tldr" */>}} => #tldr:badcaffe
+{{</* relref "#tldr" */>}} => #tldr:badcaffe
 ```
 
 ## 新窗口打开链接
@@ -52,10 +52,15 @@ markup.defaultMarkdownHandler=blackfriday is deprecated and will be removed in a
 然后在文章里使用：
 
 ```markdown
-{{< align left >}}
+{{</* align left */>}}
 内容
-{{< /align >}}
+{{</* /align */>}}
 ```
 
+## 如何阻止Hugo渲染Shortcodes
 
+需要在 `{{</*` 和 `*/>}}`之间加上注释 `/* ... */`
+```markdown
+{{</*/* align left */*/>}}
+```
 
