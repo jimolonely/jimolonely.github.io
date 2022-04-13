@@ -75,6 +75,12 @@ markup.defaultMarkdownHandler=blackfriday is deprecated and will be removed in a
 * 这个路径从 `layouts/partials` 开头
 * 最后那个 `.` 很重要
 
+## Hugo的日期格式
 
+```toml
+[params]
+# Hugo的日期格式也是奇葩，必须是2006年1月2日3时4分5秒
+date_format = "2006-01-02"
+```
 
 
