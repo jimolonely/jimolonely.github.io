@@ -1,4 +1,29 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 孤独的寂寞</title><link>https://jimolonely.github.io/posts/linux/</link><description>Recent content in Linux on 孤独的寂寞</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 11 Apr 2022 14:36:38 +0800</lastBuildDate><atom:link href="https://jimolonely.github.io/posts/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>必会Shell命令</title><link>https://jimolonely.github.io/posts/linux/shell-command/</link><pubDate>Mon, 11 Apr 2022 14:38:12 +0800</pubDate><guid>https://jimolonely.github.io/posts/linux/shell-command/</guid><description>这些命令并不是先学再用，而是用到再学。一般是从一个问题出发，比如：如何通过名称查询一个进程？
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 孤独的寂寞</title><link>https://jimolonely.github.io/posts/linux/</link><description>Recent content in Linux on 孤独的寂寞</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 11 Apr 2022 14:36:38 +0800</lastBuildDate><atom:link href="https://jimolonely.github.io/posts/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>在麒麟Linux安装Postgis</title><link>https://jimolonely.github.io/posts/linux/install-postgis-kylin/</link><pubDate>Thu, 14 Apr 2022 20:33:15 +0800</pubDate><guid>https://jimolonely.github.io/posts/linux/install-postgis-kylin/</guid><description>接着上一篇在麒麟linux上安装Postgresql12.5 ,我们来安装 PostGIS插件。
+方案 因为 PostgreSQL不是通过 rpm包安装的，所以即便 PostGIS有现成的rpm包，也无法使用（需要引用 PG的包）。
+所以，我们还是采用源码编译的方式。
+下载PostGIS源码 我们选择的版本是3.0.5, 如果是不同版本，那么后面他所依赖的东西可能略有差别。
+下载地址： http://postgis.net/stuff/postgis-3.0.5.tar.gz
+编译过程 运行
+./configure 报错
+configure: error: could not find geos-config within the current path. You may need to try re-running configure with a --with-geosconfig parameter. 报差错原因是缺少 geos依赖， 那就安装geos
+yum install geos geos-devel 再运行./configure发现报错
+configure: error: could not find proj.h or proj_api.h - you may need to specify the directory of a PROJ installation using --with-projdir 报差错原因是缺少 proj依赖,那就安装</description></item><item><title>在麒麟linux上安装Postgresql12.5</title><link>https://jimolonely.github.io/posts/linux/install-postgresql-kylin/</link><pubDate>Thu, 14 Apr 2022 19:17:12 +0800</pubDate><guid>https://jimolonely.github.io/posts/linux/install-postgresql-kylin/</guid><description>本文主要实践在麒麟V10版本上通过源码编译安装PostgreSQL12.5，因为是源码编译，所以对于其他版本也具有参考性。
+麒麟版本 V10
+$ uname -a Linux kylin-v10-02 4.19.90-24.4.v2101.ky10.aarch64 #1 SMP Mon May 24 14:45:37 CST 2021 aarch64 aarch64 aarch64 GNU/Linux 下载PostgreSQL12.5源码 下载地址为官网：https://www.postgresql.org/ftp/source/v12.5/
+上传解压到服务器。
+编译源码过程 官方文档.
+运行
+./configure 得到如下报错：
+error: readline library not found 需要安装readline
+yum install readline-devel -y 然后再运行 ./configure
+没有报错后，再运行
+make 编译完成后得到成功提示
+然后开始安装, 运行
+make install 安装成功后可以看到
+默认安装路径为 /usr/local/pgsql，我们需要将权限改为postgres
+[root@kylin-v10-02 local]# useradd postgres [root@kylin-v10-02 local]# chown -R postgres:postgres /usr/local/pgsql/ 配置环境变量 安装完成后，还要做一些配置操作.
+vim /etc/profile加入下面的环境变量配置
+export PATH=/usr/local/pgsql/bin:$PATH LD_LIBRARY_PATH=/usr/local/pgsql/lib export LD_LIBRARY_PATH 然后刷新配置：</description></item><item><title>必会Shell命令</title><link>https://jimolonely.github.io/posts/linux/shell-command/</link><pubDate>Mon, 11 Apr 2022 14:38:12 +0800</pubDate><guid>https://jimolonely.github.io/posts/linux/shell-command/</guid><description>这些命令并不是先学再用，而是用到再学。一般是从一个问题出发，比如：如何通过名称查询一个进程？
 如何查询一个进程命令的目录（工作空间）？ 方法1：pwdx pid 命令：pwdx得到的是启动一个命令的路径。
 pwdx ${PID} 案例：知道nginx进程ID，需要知道nginx安装在哪？
 # pwdx 1498563 1498563: /export/server/openresty/nginx/conf/conf.d 方法2：lsof -p pid 该命令可得到更完整的进程信息。
