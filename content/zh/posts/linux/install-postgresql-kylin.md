@@ -155,5 +155,27 @@ template1 | postgres | UTF8     | zh_CN.UTF-8 | zh_CN.UTF-8 | =c/postgres       
 (3 rows)
 ```
 
+测试ok，不过要提供给其他机器用，还需要一些监听和安全配置。
+
+## 修改密码
+```sql
+postgres=# alter user postgres password 'postgres';
+ALTER ROLE
+```
+## 修改监听地址
+默认情况是在localhost上监听
+`vim /export/pgdata/postgresql.conf` ，修改监听地址
+```shell
+listen_addresses = '*'
+```
+还要允许密码访问，`vim /export/pgdata/pg_hba.conf`，在最后加入：
+```shell
+host  all  all 0.0.0.0/0 md5
+```
+然后重启服务
+```shell
+pg_ctl -D /export/pgdata/ -l logfile restart
+```
+
 下一篇，我们还会接着安装 `PostGIS`: [在麒麟Linux安装Postgis]({{< relref "install-postgis-kylin" >}}) .
 
