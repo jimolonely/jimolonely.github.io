@@ -40,17 +40,12 @@ var MM_FUNCS = {
         var minder = new kityminder.Minder({
             renderTo: ulParent
         });
-        console.log(minder.queryCommandState('template'))
-        console.log(minder.queryCommandState('theme'))
         minder.execCommand('template', 'structure')
         minder.execCommand('theme', 'fish')
         mmData.root = MM_FUNCS.li2jsonData(ulElement.children("li:first"));
         minder.importJson(mmData)
         // minder.disable();
         // minder.execCommand('hand');
-        console.log(kityminder.Minder.getThemeList())
-        console.log(kityminder.Minder.getLayoutList())
-        console.log(kityminder.Minder.getTemplateList())
         $(ulElement).hide();
     }
 };
