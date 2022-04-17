@@ -26,6 +26,7 @@ Knowledge, Skill, Ability: 知识、技能、能力框架。
 ## 技能
 
 ### [基础技能]({{< relref "skill/basic" >}})
+### [英语技能]({{< relref "skill/english" >}})
 
 
 ## [能力]({{< relref "ability" >}})
