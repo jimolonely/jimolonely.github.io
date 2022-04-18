@@ -9,3 +9,5 @@ weight: 100
 
 ## [机车爱好者]({{< relref "motor" >}})
 
+## [不得不懂的经济]({{< relref "economy" >}})
+
