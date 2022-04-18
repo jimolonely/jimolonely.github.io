@@ -11,4 +11,7 @@ description: "分布式不只是理论，更要通过实践才能深入理解"
     - [分布式事务]({{< relref "transaction-dist" >}})
         - 二阶段提交
         - 三阶段提交
+    - [共识算法]
+        - [Paxos](#)
+        - [Raft]({{< relref "raft" >}})
 {{< /mind-lg >}}
