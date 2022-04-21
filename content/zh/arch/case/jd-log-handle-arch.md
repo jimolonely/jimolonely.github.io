@@ -4,6 +4,7 @@ date: 2022-04-21T16:59:22+08:00
 tags: []
 featured_image: ""
 description: ""
+toc: true
 ---
 
 日志架构分为几个部分：
