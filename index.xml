@@ -1,4 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我是寂寞 on 孤独的寂寞</title><link>https://jimolonely.github.io/</link><description>Recent content in 我是寂寞 on 孤独的寂寞</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 19 Apr 2022 20:36:28 +0800</lastBuildDate><atom:link href="https://jimolonely.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>我如何买东西</title><link>https://jimolonely.github.io/life/economy/how-do-i-buy-things/</link><pubDate>Mon, 18 Apr 2022 21:22:01 +0800</pubDate><guid>https://jimolonely.github.io/life/economy/how-do-i-buy-things/</guid><description>买一件物品不仅要考虑它带给我的价值，还要看到它带给我的成本。
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我是寂寞 on 孤独的寂寞</title><link>https://jimolonely.github.io/</link><description>Recent content in 我是寂寞 on 孤独的寂寞</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 21 Apr 2022 16:59:22 +0800</lastBuildDate><atom:link href="https://jimolonely.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>秒级百G日志架构</title><link>https://jimolonely.github.io/arch/case/jd-log-handle-arch/</link><pubDate>Thu, 21 Apr 2022 16:59:22 +0800</pubDate><guid>https://jimolonely.github.io/arch/case/jd-log-handle-arch/</guid><description>日志架构分为几个部分：
+采集日志&amp;ndash;》传输日志&amp;ndash;》存储日志&amp;ndash;》查询/展示日志
+下面是一些日志架构。
+文件日志存储 在小规模（个位数机器）、低并发的应用下，直接使用log4j/logback将日志输出到本地文件即可。
+ELK三剑客 稍微常见的日志接收、存储和查询架构就是ELK（ElasticSearch、Logstash/Filebeat、Kibana）。
+对于现成的开源框架，用得也挺广泛。
+不过，当日志量很大时，硬件开销不容小觑。
+基于MQ 比如使用Kafka，单台几十万的并发可以达到，压力在传输和存储上。
+传输需要经过3次序列化和反序列化（采集时写入本地硬盘，进出MQ，入库）；存储一般用ES或HBase。
+对于每秒上百G的日志，需要的机器至少上千台（根据硬盘写入速度200MB来算，几百G/s的日志量），这个开销也是很大的。
+更精简的架构 减少传输量：压缩日志，一般能高达80%以上的压缩率 减少序列化次数：需要减少中转流程，采集完不用落盘，直接发送给日志处理服务 更强的存储数据库：列式存储的ClickHouse 下面可以实现一个简单的客户端和日志处理端：
+日志发送客户端：基于UDP传输（节省传输量），需要考虑UDP最大传输量64KB，换HTTP传输。 日志处理服务：接收日志，写入ClickHouse 这是某东的日志处理架构，也算是与时俱进了。</description></item><item><title>我如何买东西</title><link>https://jimolonely.github.io/life/economy/how-do-i-buy-things/</link><pubDate>Mon, 18 Apr 2022 21:22:01 +0800</pubDate><guid>https://jimolonely.github.io/life/economy/how-do-i-buy-things/</guid><description>买一件物品不仅要考虑它带给我的价值，还要看到它带给我的成本。
 那些你根本不会用的东西，别让它们混进来。
 物品有哪些成本？ 资金：购买的成本，也是很多人只能看到的表面一次性成本 时间：使用这件物品的时间成本，同类物品带来的时间成本差异 空间：物品占用的空间成本，比如桌子占用2平米，房价是2万/m，那桌子会有4万的空间成本 物品带来的价值 解决的问题 使用频率 观赏性 买完东西的后续处理 包装盒
 在搬家时</description></item><item><title>经济报告中的那些术语</title><link>https://jimolonely.github.io/life/economy/economy-terms/</link><pubDate>Mon, 18 Apr 2022 18:10:57 +0800</pubDate><guid>https://jimolonely.github.io/life/economy/economy-terms/</guid><description>先来一份简单的报告，老实说，里面都是很基础的概念，大家都看得懂，全部指数都在涨嘛。 但是我有些地方不明白，所以要搞清楚。
@@ -54,7 +65,15 @@ export PATH=/usr/local/pgsql/bin:$PATH LD_LIBRARY_PATH=/usr/local/pgsql/lib expo
 如何查询一个进程命令的目录（工作空间）？ 方法1：pwdx pid 命令：pwdx得到的是启动一个命令的路径。
 pwdx ${PID} 案例：知道nginx进程ID，需要知道nginx安装在哪？
 # pwdx 1498563 1498563: /export/server/openresty/nginx/conf/conf.d 方法2：lsof -p pid 该命令可得到更完整的进程信息。
-# lsof -p 1498563 | grep cwd nginx 1498563 root cwd DIR 8,32 37 5371079203 /export/server/openresty/nginx/conf/conf.d 方法3：/proc/pid/cwd # readlink /proc/1498563/cwd /export/server/openresty/nginx/conf/conf.</description></item><item><title>学习能力</title><link>https://jimolonely.github.io/ksa/ability/learning/</link><pubDate>Sun, 10 Apr 2022 21:44:56 +0800</pubDate><guid>https://jimolonely.github.io/ksa/ability/learning/</guid><description/></item><item><title>思考力</title><link>https://jimolonely.github.io/ksa/ability/thinking/</link><pubDate>Sun, 10 Apr 2022 21:40:31 +0800</pubDate><guid>https://jimolonely.github.io/ksa/ability/thinking/</guid><description> 当我遇到没有头绪的问题时，我会遍历下面的思维方式，总会得到一些启发，希望对你也有帮助。
+# lsof -p 1498563 | grep cwd nginx 1498563 root cwd DIR 8,32 37 5371079203 /export/server/openresty/nginx/conf/conf.d 方法3：/proc/pid/cwd # readlink /proc/1498563/cwd /export/server/openresty/nginx/conf/conf.</description></item><item><title>学习能力</title><link>https://jimolonely.github.io/ksa/ability/learning/</link><pubDate>Sun, 10 Apr 2022 21:44:56 +0800</pubDate><guid>https://jimolonely.github.io/ksa/ability/learning/</guid><description>我对学习能力的定义是： 将输入（知识，行为，信息等）内化成认知记忆，并能转换输出的能力。
+也许定义得并不准确，但每个人对事物的理解都不相同，上面只是我的理解。
+并且，我需要更深入的理解：
+学习一定要有输入，不可能无中生有，输入不一定来自外界，内省已有的东西也算输入 学习一定能够输出，输出的方式有很多，文字，演讲，行为等，如果无法清晰地输出，那说明学习不到位 学习会构建认知记忆，一定会在大脑留下什么，不管是神经元的连接，还是细胞的改变，并且长期有效 学习不能全部吸收，需要有过滤器，这个过滤器就是[做人做事的原则]()。
+输入 输入有很多种方式，比如被动灌输（音视频，被授课），主动输入（阅读，搜索）。
+当然，主动输入的效果会好些，我比较喜欢阅读。
+快速阅读 什么时候能用快速阅读？ 我之前觉得快速阅读要区分对象，能够使用快速阅读的对象才能用（比如工具类书籍：励志成长类，社科普及类）。 《快速阅读术》里面也有提过选择快速阅读的书籍。 不过，读得越来越多、越来越快之后，我发现理解能力是会提升的，只是非常费脑。
+不过，为了享受一部文学作品，就可以慢下来。
+如何快速阅读 建立书籍索引：通过浏览目录，甚至全书的小标题，分析作者的协作思路 划重点：每个小标题下的内容用一句话总结，一句话不行就2句话 输出精简复制版笔记，这份笔记就是对书籍内容的高度概括 输出自己的感悟，根据概括联系自身情况，输出更多文章，变成自己的知识 如果有纸质书籍当然好，可以手写。否则，电子版书籍用平板或电脑，需要大一些的屏幕，才能快速浏览。</description></item><item><title>思考力</title><link>https://jimolonely.github.io/ksa/ability/thinking/</link><pubDate>Sun, 10 Apr 2022 21:40:31 +0800</pubDate><guid>https://jimolonely.github.io/ksa/ability/thinking/</guid><description> 当我遇到没有头绪的问题时，我会遍历下面的思维方式，总会得到一些启发，希望对你也有帮助。
 以终为始 出自【高效能人士的7个习惯】。
 这种思维强调目标的重要性。
 实操步骤：
