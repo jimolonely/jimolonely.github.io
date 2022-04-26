@@ -1,7 +1,7 @@
 ---
-title: "我是寂寞"
+title: "寂寞是多么无敌"
 
-description: "我很强，遇强则强"
+description: "What I cannot create, I do not understand.------费曼"
 cascade:
   featured_image: '/images/feiman.jpeg'
 ---
