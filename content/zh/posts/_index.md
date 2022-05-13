@@ -13,4 +13,8 @@ cascade.featured_image = '/images/gohugo-default-sample-hero-image.jpg'
 
 # [分布式理论与实践]({{< relref "distribute" >}})
 
+# [Web]({{< relref "web" >}})
+
+# [Java]({{< relref "java" >}})
+
 
