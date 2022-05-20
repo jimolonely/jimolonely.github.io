@@ -22,5 +22,19 @@ if(a instanceof List && !((List<?>)a).isEmpty() && ((List<?>)a).get(0) instanceo
 }
 ```
 
-没问题，就是会有警告，目前还没想到更好的办法，欢迎补充。
+没问题，就是会有警告，而且这种方式在List没有元素时就不行.
+
+另外一种方式侵入性较高，就是对List进行继承，确定一个泛型：
+
+```java
+public class ListA extends ArrayList<A> {
+}
+
+ListA listA = new ListA();
+listA.add(new A());
+
+assert listA instanceof ListA;
+```
+
+目前还没想到更好的办法，欢迎补充。
 
