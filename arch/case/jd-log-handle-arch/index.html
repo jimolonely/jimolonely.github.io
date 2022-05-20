@@ -9,7 +9,7 @@ ELK三剑客 稍微常见的日志接收、存储和查询架构就是ELK（Elas
 传输需要经过3次序列化和反序列化（采集时写入本地硬盘，进出MQ，入库）；存储一般用ES或HBase。
 对于每秒上百G的日志，需要的机器至少上千台（根据硬盘写入速度200MB来算，几百G/s的日志量），这个开销也是很大的。
 更精简的架构  减少传输量：压缩日志，一般能高达80%以上的压缩率 减少序列化次数：需要减少中转流程，采集完不用落盘，直接发送给日志处理服务 更强的存储数据库：列式存储的ClickHouse  下面可以实现一个简单的客户端和日志处理端：
- 日志发送客户端：基于UDP传输（节省传输量），需要考虑UDP最大传输量64KB，换HTTP传输。 日志处理服务：接收日志，写入ClickHouse  这是某东的日志处理架构，也算是与时俱进了。"><meta name=generator content="Hugo 0.98.0"><meta name=robots content="index, follow"><link rel=stylesheet href=/ananke/css/main.min.css><meta property="og:title" content="秒级百G日志架构"><meta property="og:description" content="日志架构分为几个部分：
+ 日志发送客户端：基于UDP传输（节省传输量），需要考虑UDP最大传输量64KB，换HTTP传输。 日志处理服务：接收日志，写入ClickHouse  这是某东的日志处理架构，也算是与时俱进了。"><meta name=generator content="Hugo 0.99.1"><meta name=robots content="index, follow"><link rel=stylesheet href=/ananke/css/main.min.css><meta property="og:title" content="秒级百G日志架构"><meta property="og:description" content="日志架构分为几个部分：
 采集日志&ndash;》传输日志&ndash;》存储日志&ndash;》查询/展示日志
 下面是一些日志架构。
 文件日志存储 在小规模（个位数机器）、低并发的应用下，直接使用log4j/logback将日志输出到本地文件即可。
