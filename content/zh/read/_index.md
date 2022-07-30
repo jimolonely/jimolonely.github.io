@@ -7,10 +7,11 @@ description: "读书是最廉价的自我提升方式"
 weight: 150
 ---
 
+{{< list-dir path= "content/zh/read" >}}
 
 {{% button href="biography" %}} 牛人传记{{% /button %}}
 {{% button href="invest" %}} 投资与企业{{% /button %}}
-{{% button href="it" %}} 我的程序员之路{{% /button %}}
+{{% button href="我的程序员之路" %}} 我的程序员之路{{% /button %}}
 {{% button href="learn" %}} 学习技巧{{% /button %}}
 {{% button href="life" %}} 生活方法{{% /button %}}
 {{% button href="novel" %}} 那些牛逼的小说{{% /button %}}

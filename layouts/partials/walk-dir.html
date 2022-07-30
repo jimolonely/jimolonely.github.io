@@ -1,0 +1,11 @@
+{{ $path     := . }}
+<ul class="h6">
+  {{range (readDir $path) }}
+  <li> {{.Name}}
+    {{if .IsDir}}
+    {{ partial "walk-dir.html" (path.Join $path .Name) }}
+    {{end}}
+  </li>
+  {{end}}
+</ul>
+{{ partial "theme.html"}}
