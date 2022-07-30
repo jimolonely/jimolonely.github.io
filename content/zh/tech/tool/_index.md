@@ -7,14 +7,5 @@ weight = 50
 cascade.featured_image = '/images/gohugo-default-sample-hero-image.jpg'
 +++
 
-# [Hugo]({{< relref "hugo" >}})
-
-# [Linux]({{< relref "linux" >}})
-
-# [分布式理论与实践]({{< relref "distribute" >}})
-
-# [Web]({{< relref "web" >}})
-
-# [Java]({{< relref "java" >}})
 
 
