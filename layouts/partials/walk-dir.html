@@ -1,11 +1,17 @@
 {{ $path     := . }}
-<ul class="h6">
-  {{range (readDir $path) }}
-  <li> {{.Name}}
+<ol>
+    {{range (readDir $path) }}
+    {{ if ne .Name "_index.md" }}
+    <li>
+        <a class="btn" href="{{path.Join $path .Name}}" style="font-size: 1.5em;"> {{.Name}} </a>
+    </li>
+    {{ end}}
     {{if .IsDir}}
     {{ partial "walk-dir.html" (path.Join $path .Name) }}
+    <!--<p class="border" style="border: 3px solid; padding: 10px;">-->
+    <!--    {{ partial "walk-dir.html" (path.Join $path .Name) }}-->
+    <!--</p>-->
     {{end}}
-  </li>
-  {{end}}
-</ul>
+    {{end}}
+</ol>
 {{ partial "theme.html"}}
