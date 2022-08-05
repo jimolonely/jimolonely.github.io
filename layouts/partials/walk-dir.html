@@ -1,11 +1,19 @@
 {{ $path     := . }}
+{{ $real_path := replace $path "content/zh" "" }}
 <ol>
     {{range (readDir $path) }}
     {{ if ne .Name "_index.md" }}
     <li>
-        <a class="btn" href="{{path.Join $path .Name}}" style="font-size: 1.5em;"> {{.Name}} </a>
+        {{ $real_name := replace .Name ".md" "" }}
+        <a class="btn" href="{{path.Join $real_path $real_name}}" style="font-size: 1.5em;">
+            {{if strings.HasSuffix .Name ".md" }}
+            <<{{$real_name}}>>
+            {{else}}
+            {{$real_name}}
+            {{end}}
+        </a>
     </li>
-    {{ end}}
+    {{ end }}
     {{if .IsDir}}
     {{ partial "walk-dir.html" (path.Join $path .Name) }}
     <!--<p class="border" style="border: 3px solid; padding: 10px;">-->
